@@ -1,1 +1,39 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
 # Structure des ménages
+
+```{r}
+library(tidyverse)
+library(haven)
+library(dplyr)
+
+#Chargement des données de ménages
+res_deb <- read_dta("data/res_deb.dta")
+res_m_a <- read_dta("data/res_m_a.dta")
+  
+
+```
+
+# Quelques statistiques descriptives sur les ménages
+
+```{r}
+# Tableau de répartition des ménages selon les codes observatoires
+tab <- res_deb %>%
+  group_by(j0) %>%
+  summarise(n = n_distinct(j5), .groups = "drop") %>%
+  arrange(desc(n)) %>%
+  mutate(Percent = n / sum(n) * 100) 
+
+tab_print <- tab %>% 
+  mutate(j0 = as.character(j0)) %>% 
+  rename(Observatory = j0) %>%
+  tibble::add_row(Observatory = "Total", n = sum(tab$n), Percent = sum(tab$Percent, na.rm = TRUE))%>%
+  mutate(Percent = if_else(Observatory == "Total",
+                           sprintf("%.0f%%", Percent),
+                           sprintf("%.1f%%", Percent))) 
+
+```
