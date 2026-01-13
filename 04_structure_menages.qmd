@@ -18,7 +18,7 @@ res_m_a <- read_dta("data/res_m_a.dta")
 
 ```
 
-# Quelques statistiques descriptives sur les ménages
+## Caractéristiques socio-démographiques des ménages
 
 ```{r}
 # Tableau de répartition des ménages selon les codes observatoires
@@ -35,5 +35,17 @@ tab_print <- tab %>%
   mutate(Percent = if_else(Observatory == "Total",
                            sprintf("%.0f%%", Percent),
                            sprintf("%.1f%%", Percent))) 
+
+```
+
+Calculons la taille des ménages par observatoire
+
+```{r}
+hh_size <- res_m_a %>%
+  group_by(j5) %>%
+  mutate(hh_size = n()) %>%
+  select(j5,hh_size) %>% 
+  distinct(j5,hh_size)
+  
 
 ```
