@@ -10,6 +10,7 @@ editor_options:
 library(tidyverse)
 library(haven)
 library(dplyr)
+library (gt) #Easily create presentation - ready display tables
 
 #Chargement des données de ménages
 res_deb <- read_dta("data/res_deb.dta")
@@ -18,7 +19,7 @@ res_m_a <- read_dta("data/res_m_a.dta")
 
 ```
 
-## Caractéristiques socio-démographiques des ménages
+## Caractéristiques socio-démographiques des ménage
 
 ```{r}
 # Tableau de répartition des ménages selon les codes observatoires
@@ -26,15 +27,31 @@ tab <- res_deb %>%
   group_by(j0) %>%
   summarise(n = n_distinct(j5), .groups = "drop") %>%
   arrange(desc(n)) %>%
-  mutate(Percent = n / sum(n) * 100) 
-
-tab_print <- tab %>% 
-  mutate(j0 = as.character(j0)) %>% 
+  mutate(
+    Percent = round(n / sum(n) * 100, 1),
+    j0 = as.character(j0)
+  ) %>% 
   rename(Observatory = j0) %>%
-  tibble::add_row(Observatory = "Total", n = sum(tab$n), Percent = sum(tab$Percent, na.rm = TRUE))%>%
-  mutate(Percent = if_else(Observatory == "Total",
-                           sprintf("%.0f%%", Percent),
-                           sprintf("%.1f%%", Percent))) 
+  select(Observatory, n, Percent)
+
+tab <- tab %>% 
+  tibble::add_row(Observatory = "Total", n = sum(tab$n), Percent = sum(tab$Percent, na.rm = TRUE))
+
+# Créer un tableau avec gt 
+gt_tab <- gt(tab) %>% 
+  tab_header( 
+    title = "Répartition des ménages selon les codes observatoires",
+    ) %>% 
+  fmt_number( 
+    columns = Percent, 
+    decimals = 0, 
+    suffixing = TRUE ) %>%
+  tab_footnote( 
+    footnote = "Percent (%)", 
+    locations = cells_column_labels(columns = Percent) 
+    )
+gt_tab
+
 
 ```
 
