@@ -4,7 +4,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Structure des ménages
+# Caractéristiques socio-démographiques des ménages
 
 ```{r}
 library(tidyverse)
@@ -15,14 +15,10 @@ library (gt) #Easily create presentation - ready display tables
 #Chargement des données de ménages
 res_deb <- read_dta("data/res_deb.dta")
 res_m_a <- read_dta("data/res_m_a.dta")
-  
-
 ```
 
-## Caractéristiques socio-démographiques des ménage
-
 ```{r}
-# Tableau de répartition des ménages selon les codes observatoires
+# Tableau de répartition des ménages selon les observatoires
 tab <- res_deb %>%
   group_by(j0) %>%
   summarise(n = n_distinct(j5), .groups = "drop") %>%
@@ -34,13 +30,28 @@ tab <- res_deb %>%
   rename(Observatory = j0) %>%
   select(Observatory, n, Percent)
 
+tab <- res_deb %>%
+  group_by(j0) %>%
+  summarise(n = n_distinct(j5), .groups = "drop") %>%
+  arrange(desc(n)) %>%
+  mutate(
+    Percent = round(n / sum(n) * 100, 1),
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  ) %>%
+  select(Observatory, n, Percent)
+
 tab <- tab %>% 
   tibble::add_row(Observatory = "Total", n = sum(tab$n), Percent = sum(tab$Percent, na.rm = TRUE))
 
 # Créer un tableau avec gt 
 gt_tab <- gt(tab) %>% 
   tab_header( 
-    title = "Répartition des ménages selon les codes observatoires",
+    title = "Répartition des ménages selon les observatoires",
     ) %>% 
   fmt_number( 
     columns = Percent, 
@@ -50,9 +61,7 @@ gt_tab <- gt(tab) %>%
     footnote = "Percent (%)", 
     locations = cells_column_labels(columns = Percent) 
     )
-gt_tab # View(gt_tab) affiche la liste pas le tableau
-
-
+gt_tab 
 ```
 
 Calculons la taille des ménages par observatoire
@@ -66,3 +75,9 @@ hh_size <- res_m_a %>%
   
 
 ```
+
+# Habitat et niveau de vie
+
+# Activités des ménages
+
+# Foncier
