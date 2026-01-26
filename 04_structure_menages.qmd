@@ -12,8 +12,9 @@ library(haven)
 library(dplyr)
 library (gt) #Easily create presentation - ready display tables
 
-#Chargement des données de ménages
+#Loading observatories data
 res_deb <- read_dta("data/res_deb.dta")
+#Loading household data
 res_m_a <- read_dta("data/res_m_a.dta")
 ```
 
@@ -64,6 +65,8 @@ gt_tab <- gt(tab) %>%
 gt_tab 
 ```
 
+## Description des ménages
+
 Calculons la taille des ménages par observatoire
 
 ```{r}
@@ -76,8 +79,6 @@ hh_size <- res_m_a %>%
 
 ```
 
-# Habitat et niveau de vie
+## Caractéristiques des chefs de ménages
 
-# Activités des ménages
-
-# Foncier
+## Caractéristiques des autres membres de ménages
