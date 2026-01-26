@@ -5,3 +5,23 @@ editor_options:
 ---
 
 # Cataclysme et catastrophe
+
+Nous allons charger les données concernant les cataclysme et catastrophe subits par les ménages.
+
+```{r}
+library(tidyverse)
+library(haven)
+library(dplyr)
+library (gt) # Easily create presentation - ready display tables
+
+# Loading observatories data
+res_deb <- read_dta("data/res_deb.dta")
+# Loading household data
+res_m_a <- read_dta("data/res_m_a.dta")
+```
+
+```{r}
+# Loading disaster data
+res_cc <- read_dta("data/res_cc.dta") # year, j5
+res_cca <- read_dta("data/res_cca.dta") # year, j5
+```

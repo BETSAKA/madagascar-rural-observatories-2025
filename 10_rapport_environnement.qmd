@@ -5,3 +5,55 @@ editor_options:
 ---
 
 # Rapport des ménages ruraux avec l'environnement en particulier les Aires protégées (AP)
+
+Les ménages ruraux ont des rapports à l'environnement en particulier les aires protéges.
+
+Nous allons d'abord charger les informations collectées relatives à la relation de ces ménages avec l'environnement.
+
+```{r}
+library(tidyverse)
+library(haven)
+library(dplyr)
+library (gt) # Easily create presentation - ready display tables
+
+# Loading observatories data
+res_deb <- read_dta("data/res_deb.dta")
+# Loading household data
+res_m_a <- read_dta("data/res_m_a.dta")
+
+```
+
+## Représentation de l'Aire protégée par les ménages
+
+```{r}
+# Loading  household representation of Protected area
+res_ap_def <- read_dta("data/res_ap_def.dta") # year, j5 #rm2_a - rm2c
+res_biodiv <- read_dta("data/res_biodiv.dta") # year, j5 #rm2_cat, rm2_d, rm2_e
+res_op_env <- read_dta("data/res_op_env.dta") # year, j5 #rm3-rm5
+```
+
+## Exploitation forestière et usage de l'Aire protégée
+
+```{r}
+# Loading forestry exploitation data
+res_ef <- read_dta("data/res_ef.dta") # year, j5
+# Loading using of Protected area 
+res_um1 <- read_dta("data/res_um1.dta") # year, j5
+res_um2 <- read_dta("data/res_um2.dta") # year, j5
+```
+
+## Feu
+
+```{r}
+# Loading bushfire data
+res_feubrousse <- read_dta("data/res_feubrousse.dta") # year, j5
+```
+
+## Protection de l'Aire protégée
+
+```{r}
+# Loading Protected area data
+res_ap <- read_dta("data/res_ap.dta") #year, j5
+res_ap2 <- read_dta("data/res_ap2.dta") #year, j5
+
+```

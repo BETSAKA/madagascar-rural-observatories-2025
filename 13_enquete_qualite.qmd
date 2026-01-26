@@ -4,4 +4,25 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Enquête qualité auprès des ménages ruraux
+# Evaluation de l'enquête des OR auprès des ménages ruraux
+
+Cette partie concerne les opinions des ménages sur l'enquête réalisée en 2025.
+
+```{r}
+library(tidyverse)
+library(haven)
+library(dplyr)
+library (gt) # Easily create presentation - ready display tables
+
+# Loading observatories data
+res_deb <- read_dta("data/res_deb.dta")
+# Loading household data
+res_m_a <- read_dta("data/res_m_a.dta")
+```
+
+Nous allons charger les données de l'évaluation des enquêtes OR auprès des ménages ruraux d'Alaotra et de Marovoay.
+
+```{r}
+# Loading evaluation section data
+res_remq <- read_dta("data/res_remq.dta")
+```

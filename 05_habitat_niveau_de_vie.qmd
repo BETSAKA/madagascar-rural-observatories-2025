@@ -5,3 +5,64 @@ editor_options:
 ---
 
 # Habitat et niveau de vie
+
+Nous allons charger les données de l'habitat et niveau de vies.
+
+```{r}
+library(tidyverse)
+library(haven)
+library(dplyr)
+library (gt) # Easily create presentation - ready display tables
+
+# Loading observatories data
+res_deb <- read_dta("data/res_deb.dta")
+# Loading household data
+res_m_a <- read_dta("data/res_m_a.dta")
+```
+
+## Habitat
+
+```{r}
+# Loading habitat data including kitchen (h)
+res_h <- read_dta("data/res_h.dta") # year, j5 
+```
+
+## Niveau de vie
+
+### Indicateur de confort
+
+```{r}
+# Loading indicateur de confort (v), equipement , communication (tm1, ut1, snw), equipement agricole (e0) data
+res_v <- read_dta("data/res_v.dta") # year, j5 
+```
+
+### Equipement
+
+```{r}
+res_e <- read_dta("data/res_e.dta") # year, j5 # Equipement module next part
+```
+
+Les équipements agricoles sont dans "res_v.dta" avec "e0" uniquement comme variable.
+
+### Communication
+
+Les données de communication sont dans "res_v.dta".
+
+### Epargne et emprunt
+
+```{r}
+# Loading savings and loan data
+res_pp0 <- read_dta("data/res_pp0.dta") # year, j5 
+res_pp <- read_dta("data/res_pp.dta") # year, j5 
+```
+
+### Transfert
+
+```{r}
+# Loading trasfers data
+res_t <- read_dta("data/res_t.dta") # year, j5 
+res_t1 <- read_dta("data/res_t1.dta") # year, j5 
+res_t2 <- read_dta("data/res_t2.dta") # year, j5 
+```
+
+### Revenu

@@ -5,3 +5,71 @@ editor_options:
 ---
 
 # Agriculture
+
+Nous allons charger les données de l'Agriculture relative aux ménages des OR Alaotra et Marovoay.
+
+```{r}
+library(tidyverse)
+library(haven)
+library(dplyr)
+library (gt) # Easily create presentation - ready display tables
+
+# Loading observatories data
+res_deb <- read_dta("data/res_deb.dta")
+# Loading household data
+res_m_a <- read_dta("data/res_m_a.dta")
+```
+
+## Agriculture, Elevage et Pêche
+
+### Agriculture
+
+#### Riziculture
+
+```{r}
+# Loading rice farming data
+res_r <- read_dta("data/res_r.dta") # Year, j5
+res_r1 <- read_dta("data/res_r1.dta") # Year, j5
+res_dc1 <- read_dta("data/res_dc1.dta") # Year, j5
+res_dc20 <- read_dta("data/res_dc20.dta") # Year, j5
+res_dc21 <- read_dta("data/res_dc21.dta") # Year, j5
+```
+
+#### Autres cultures
+
+```{r}
+# Loading other culture data
+res_c <- read_dta("data/res_c.dta") # Year, j5
+res_c0 <- read_dta("data/res_c0.dta") # Year, j5
+# Loading vegetable garden data
+res_jp <- read_dta("data/res_jp.dta") # Year, j5
+res_jpchphef <- read_dta("data/res_jpchphef.dta") # Year, j5
+```
+
+### Elevage
+
+```{r}
+# Loading livestock data
+res_el2 <- read_dta("data/res_el2.dta") # Year, j5
+res_ele <- read_dta("data/res_ele.dta") # Year, j5
+# Loading livestock products data
+res_pe <- read_dta("data/res_pe.dta") # Year, j5
+```
+
+### Chasse et Pêche
+
+```{r}
+# Loading hunting and fishing data
+res_chph <- read_dta("data/res_chph.dta") # Year, j5
+```
+
+## Main d'oeuvre
+
+```{r}
+# Loading labor data
+res_mor <- read_dta("data/res_mor.dta") # Year, j5
+res_mp <- read_dta("data/res_mp.dta") # Year, j5
+res_mp0 <- read_dta("data/res_mp0.dta") # Year, j5
+```
+
+**Remarque :** Main d'oeuvre non-agricole?

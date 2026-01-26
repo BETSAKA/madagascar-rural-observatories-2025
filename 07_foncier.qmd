@@ -5,3 +5,24 @@ editor_options:
 ---
 
 # Foncier
+
+Nous allons charger les données concernant le foncier des ménages des OR Alaotra et Marovoay.
+
+```{r}
+library(tidyverse)
+library(haven)
+library(dplyr)
+library (gt) # Easily create presentation - ready display tables
+
+# Loading observatories data
+res_deb <- read_dta("data/res_deb.dta")
+# Loading household data
+res_m_a <- read_dta("data/res_m_a.dta")
+
+# Loading land data
+res_fr30 <- read_dta("data/res_fr30.dta") # year, j5
+res_fr30a <- read_dta("data/res_fr30a.dta") # year, j5
+res_fr33 <- read_dta("data/res_fr33.dta") # year, j5
+res_fr34 <- read_dta("data/res_fr34.dta") # year, j5
+
+```

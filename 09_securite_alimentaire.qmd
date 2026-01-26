@@ -5,3 +5,31 @@ editor_options:
 ---
 
 # Sécurité alimentaire
+
+Nous allons charger les données concernant la sécurité alimentaire des ménages des OR Alaotra et Marovoay.
+
+```{r}
+library(tidyverse)
+library(haven)
+library(dplyr)
+library (gt) # Easily create presentation - ready display tables
+
+# Loading observatories data
+res_deb <- read_dta("data/res_deb.dta")
+# Loading household data
+res_m_a <- read_dta("data/res_m_a.dta")
+```
+
+## Disponibilité alimentaire
+
+```{r}
+# Loading food security data
+res_sa <- read_dta("data/res_sa.dta") # year, j5
+```
+
+## Stratégie de la sécurité alimentaire
+
+```{r}
+# Loading food security strategy data
+res_ssa <- read_dta("data/res_ssa.dta") # year, j5
+```

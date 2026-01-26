@@ -5,3 +5,36 @@ editor_options:
 ---
 
 # Insertion sociale et accès des ménages aux projets dans les OR Alaotra et Marovoay
+
+Nous allons charger les données concernant l'insertion sociale des ménages par l'appartenance à un groupement et l'accès des ménages aux projets dans les OR Alaotra et Marovoay.
+
+```{r}
+library(tidyverse)
+library(haven)
+library(dplyr)
+library (gt) # Easily create presentation - ready display tables
+ 
+# Loading observatories data
+res_deb <- read_dta("data/res_deb.dta")
+# Loading household data
+res_m_a <- read_dta("data/res_m_a.dta")
+```
+
+## Insertion sociale
+
+```{r}
+# Loading social organization data
+res_respg <- read_dta("data/res_respg.dta") # year, j5
+res_respg0 <- read_dta("data/res_respg0.dta") # year, j5
+```
+
+## Accès des ménages aux projets
+
+```{r}
+# Loading household project acces data
+res_pro <- read_dta("data/res_pro.dta") # year, j5
+```
+
+La variable "pro1" dans "respg0.dta";
+
+On va assembler d'abord repg0\$pro1 avec res_pro
