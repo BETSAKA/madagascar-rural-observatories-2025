@@ -1,0 +1,70 @@
+# Data catalog
+
+The ROS survey data is organized in a collection of year-specific folders ranging from 1995 to 2015. Each yearly folder houses multiple .dta files (Stata data format) -- about 85 per year -- with diverse filenames such as "res_as.dta" and "res_bp.dta". The code block below creates a data dictionary, which can be downloaded by clicking [on this link](https://raw.githubusercontent.com/BETSAKA/Rural_Obs_Madagascar/main/output/ROS_Variable_Dictionary.xlsx 
+). It also displays the interactive table below, which can be browsed or searched.
+
+```{r var_dict}
+library(tidyverse)    # A series of packages for data manipulation
+library(haven)        # Required for reading STATA files (.dta)
+library(labelled)     # To work with labelled data from STATA
+library(writexl)      # Write data frames to Excel format
+library(readxl)
+
+ros_data_loc <- "data/dta_format/"
+
+# Function to extract variable info for a given year and file
+extract_variable_info <- function(year, file) {
+  
+  file_path <- paste0(ros_data_loc, year, "/", file)
+  
+  if (!file.exists(file_path)) return(tibble())
+  
+  data <- read_dta(file_path, n_max = 0)
+  
+  tibble(
+    file_name = file,
+    variable_name = names(data),
+    variable_label = var_label(data) %>% as.character(),
+    year = year)
+}
+
+# Obtain all years from the directory structure
+years <- list.dirs(ros_data_loc, recursive = FALSE, full.names = FALSE)
+
+# Use the tidyverse approach to map over years and files
+all_vars <- map_df(years, ~{
+  files_for_year <- list.files(paste0(ros_data_loc, .x), pattern = "\\.dta$", full.names = FALSE)
+  map_df(files_for_year, extract_variable_info, year = .x)
+})
+
+# Convert any NULL values in variable_label to "NA"
+all_vars$variable_label[is.na(all_vars$variable_label)] <- "NA"
+
+# retreive the file labels
+file_labels <- read_excel("references/File_labels.xlsx") %>%
+  select(file_name = filename, file_label = title_en)
+
+# Consolidate the information using the tidyverse approach
+variable_dictionary <- all_vars %>%
+  group_by(file_name, variable_name) %>%
+  arrange(year) %>%  
+  summarise(
+    variable_label = first(variable_label[variable_label != "NA"] %||% "NA"),
+    years_present = list(unique(year))) %>%
+  ungroup() %>%
+  mutate(years_present = map_chr(years_present, ~ paste(.x, collapse = ","))) %>%
+  left_join(file_labels, by = "file_name", .before) %>%
+  relocate(file_label, .after = file_name) %>%
+  arrange(substr(years_present, 1, 4), # To have 1st variables of 1995
+          case_when(file_name == "res_deb.dta" ~ as.integer(1),
+                    file_name == "res_h.dta" ~ as.integer(2),
+                    TRUE ~ as.integer(3))) # starts with hh ID and housing
+
+# Write the variable dictionary to an Excel file
+write_xlsx(variable_dictionary, "output/ROS_Variable_Dictionary.xlsx")
+# To include in published dataset
+write_xlsx(variable_dictionary, "data/ROS_Variable_Dictionary.xlsx")
+
+# Display in interactive format
+DT::datatable(variable_dictionary)
+```
