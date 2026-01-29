@@ -74,7 +74,7 @@
     "href": "07_foncier.html",
     "title": "4  Foncier",
     "section": "",
-    "text": "Nous allons charger les données concernant le foncier des ménages des OR Alaotra et Marovoay.\n\n\nCode\nlibrary(tidyverse)\nlibrary(haven)\nlibrary(dplyr)\nlibrary (gt) # Easily create presentation - ready display tables\n\n# Loading observatories data\nres_deb &lt;- read_dta(\"data/res_deb.dta\")\n# Loading household data\nres_m_a &lt;- read_dta(\"data/res_m_a.dta\")\n\n# Loading land data\nres_fr30 &lt;- read_dta(\"data/res_fr30.dta\") # year, j5\nres_fr30a &lt;- read_dta(\"data/res_fr30a.dta\") # year, j5\nres_fr33 &lt;- read_dta(\"data/res_fr33.dta\") # year, j5\nres_fr34 &lt;- read_dta(\"data/res_fr34.dta\") # year, j5",
+    "text": "4.1 Nombres et taille des parcelles",
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Foncier</span>"
     ]
@@ -217,6 +217,36 @@
     "text": "1.1.1 Taille des ménages\nCalculons la taille des ménages par observatoire\n\n\nCode\nhh_size &lt;- res_m_a %&gt;%\n  group_by(j5) %&gt;%\n  mutate(hh_size = n()) %&gt;%\n  select(j5,hh_size) %&gt;% \n  distinct(j5,hh_size)\n\n\n\n\n1.1.2 Structure par âge\n\n\n1.1.3 Origine",
     "crumbs": [
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Caractéristiques socio-démographiques des ménages</span>"
+    ]
+  },
+  {
+    "objectID": "07_foncier.html#larrêt-des-cultures",
+    "href": "07_foncier.html#larrêt-des-cultures",
+    "title": "4  Foncier",
+    "section": "4.2 L’arrêt des cultures",
+    "text": "4.2 L’arrêt des cultures",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Foncier</span>"
+    ]
+  },
+  {
+    "objectID": "07_foncier.html#méthodes-dirrigation",
+    "href": "07_foncier.html#méthodes-dirrigation",
+    "title": "4  Foncier",
+    "section": "4.3 Méthodes d’irrigation",
+    "text": "4.3 Méthodes d’irrigation",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Foncier</span>"
+    ]
+  },
+  {
+    "objectID": "07_foncier.html#satisfaction-à-légard-des-parcelles",
+    "href": "07_foncier.html#satisfaction-à-légard-des-parcelles",
+    "title": "4  Foncier",
+    "section": "4.4 Satisfaction à l’égard des parcelles",
+    "text": "4.4 Satisfaction à l’égard des parcelles",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Foncier</span>"
     ]
   }
 ]
