@@ -75,12 +75,36 @@ gt_tab
 Calculons la taille des ménages par observatoire
 
 ```{r}
-hh_size <- res_m_a %>%
-  group_by(j5) %>%
-  mutate(hh_size = n()) %>%
-  select(j5,hh_size) %>% 
-  distinct(j5,hh_size)
-  
+
+hh_size_obs <- res_m_a %>% 
+  left_join(res_deb, by = "j5") %>% 
+  group_by(j0, j5) %>% 
+  mutate(hh_size = n()) %>% 
+  distinct(j0, j5, hh_size) %>% 
+  group_by(j0) %>% 
+  summarise(mean_hh_size = mean(hh_size), .groups = "drop") %>% 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  ) %>% 
+  select(Observatory, mean_hh_size)
+
+# Créer un tableau avec gt 
+hh_size_obs_tab <- gt(hh_size_obs) %>% 
+  tab_header( 
+    title = "Taille moyenne des ménages par observatoire",
+    ) %>% 
+  fmt_number( 
+    columns = mean_hh_size, 
+    decimals = 2, 
+    suffixing = TRUE ) %>%
+  cols_label( 
+    mean_hh_size = "Taille moyenne" )
+hh_size_obs_tab
 
 ```
 

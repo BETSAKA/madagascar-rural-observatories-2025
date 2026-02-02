@@ -1,0 +1,130 @@
+# Data catalog
+
+The ROS survey data is organized in a collection of year-specific folders ranging from 1995 to 2015. Each yearly folder houses multiple .dta files (Stata data format) -- about 85 per year -- with diverse filenames such as "res_as.dta" and "res_bp.dta". The code block below creates a data dictionary, which can be downloaded by clicking [on this link](https://raw.githubusercontent.com/BETSAKA/Rural_Obs_Madagascar/main/output/ROS_Variable_Dictionary.xlsx 
+). It also displays the interactive table below, which can be browsed or searched.
+
+```{r var_dict}
+# NOMMER LE CHUNK => PERMET DE LOCALISER UNE ERREUR S'IL Y EN A
+library(tidyverse)    # A series of packages for data manipulation
+library(haven)        # Required for reading STATA files (.dta)
+library(labelled)     # To work with labelled data from STATA
+library(writexl)      # Write data frames to Excel format
+library(readxl)
+
+ros_data_loc <- "data/dta_format/"
+
+# Function to extract variable info for a given year and file
+# CONSTRUCTION D'UNE FONCTION "extract_variable_info" QUI RETOURNE UN TIBBLE AVEC LE NOM DU FICHIER, LE NOM DES VARIABLES, LEUR LABEL ET L'ANNEE CORRESPONDANTE POUR UNE ANNEE ET UN FICHIER DONNES
+
+extract_variable_info <- function(year, file) {
+  
+  file_path <- paste0(ros_data_loc, year, "/", file) # CREATION D'UNE VARIABLE QUI INDIQUE LE CHEMIN VERS LE FICHIER CONCERNE
+  
+  if (!file.exists(file_path)) return(tibble()) # SI LE FICHIER N'EXISTE PAS LA FONCTION S'ARRETE ET RETOURNE UN TIBBLE VIDE
+  
+  data <- read_dta(file_path, n_max = 0)
+  # n_max = 0 ON CHARGE SEULEMENT LA STRUCTURE (NOMS DES COLONNES ET METADONNEES) SANS LES OBSERVATIONS.
+  
+  tibble(
+    file_name = file,
+    variable_name = names(data),
+    variable_label = var_label(data) %>% as.character(),
+    year = year)
+}
+
+# Obtain all years from the directory structure
+years <- list.dirs(ros_data_loc, recursive = FALSE, full.names = FALSE)
+
+#    list.dirs(): PARCOURT LE REPERTOIRE INDIQUE PAR ros_data_loc ET RENVOIE LES CHEMINS DES SOUS-REPERTOIRES
+# recursive = FALSE: LIMITE LA RECHERCHE AUX SOUS-REPERTOIRES DE PREMIER NIVEAU
+#full.names = FALSE: PAS DE RENVOIE DE CHEMIN COMPLET, JUSTE LES NOMS DES SOUS-REPERTOIRES AU 1er NIVEAU, i.e. ICI LES ANNEES
+# RESULTAT AFFECTE A YEARS = UN VECTEUR DE CARACTERES CONTENNAT LES NOMS DES DOSSIERS TROUVES
+
+# Use the tidyverse approach to map over years and files
+# all_vars RENVOIE POUR CHAQUE ANNEE, LE NOM DE CHAQUE FICHIER, LEUR LABEL, ET SES VARIABLES
+all_vars <- map_df(years, ~{
+  files_for_year <- list.files(paste0(ros_data_loc, .x), pattern = "\\.dta$", full.names = FALSE)
+  #files_for_year : TOUS LES FICHIERS POUR TOUTES LES ANNEES
+  map_df(files_for_year, extract_variable_info, year = .x)
+  #extract_variable_info : UN FICHIER POUR UNE ANNEE
+  #D'OU LA NECESSITE DE FAIRE UN LIEN
+})
+#map_def(years, ~FONCTION) APRES LE TILDE C'EST UNE FONCTION
+#list.files() RETOURNE LES NOMS DES FICHIERS DANS LE REPERTOIRE COURANT POUR CHAQUE ANNEE
+# pattern = NE GARDER QUE LES FICHIERS .dta
+# full.names = FALSE NE RETOURNE QUE LE NOM DES FICHIER AU LIEU DU CHEMIN COMPLET
+
+# Convert any NULL values in variable_label to "NA"
+all_vars$variable_label[is.na(all_vars$variable_label)] <- "NA"
+#NULL = ABSENCE TOTALE D'OBJET (IL N'Y A RIEN A REMPLACER).
+#NA = VALEUR MANQUANTE DANS UN OBJET EXISTANT (ON PEUT LA REMPLACER).
+# LE BUT EST AU LIEU D'AVOIR UNE CASE VIDE, ON ECRIT EXPLICITEMENT QUE C'EST "NA"
+
+# retreive the file labels
+# CETTE FONCTION RETOURNE UN TIBBLE AVEC DEUX COLONNES : NOM DE FICHIER ET LABEL DES FICHIERS
+file_labels <- read_excel("references/File_labels.xlsx") %>%
+  select(file_name = filename, file_label = title_en)
+# LE PIPE %>%  : POUR ENCHAINER LES OPERATIONS
+# SELECT () : NE CHOISIR QUE LES COLONNES "filename" ET "title_an" DANS LE FICHIER EXCEL ET LES RENOMMER EN "file_name" et "file_label" en même temps
+##---------------------------------------------------------------
+# Consolidate the information using the tidyverse approach
+# RENVOIE LES COLONNES SUIVANTES :  file_name, file_label, variable_name, variable_label, years_present
+variable_dictionary <- all_vars %>%
+  # ON PART DU TIBBLE "all_vars" QUI CONTIENNENT
+  # YEARS, files_for_year (NOMS DE FICHIERS), extract_variable_info (nom fichier, variable_name, variable_label, year)
+  # ET ON LE TRANSFORME ETAPE PAR ETAPE AVEC " %>% "
+  group_by(file_name, variable_name) %>%
+  # ON REGROUPE LES DONNEES PAR NOM DE FICHIER ET NOM DE VARIABLE.
+  # TOUTES LES OCCURENCES D'UNE MEME VARIABLE DANS UN MEME FICHIER (SUR PLUSIEURS ANNEES) SONT TRAITEES ENSEMBLE.
+  arrange(year) %>%  
+  # METTRE "year" DANS L'ORDRE CROISSANTE.
+  summarise(
+    # RESUMER
+    variable_label = first(variable_label[variable_label != "NA"] %||% "NA"),
+    # POUR "variable_label != "NA" VRAI => variable_label[variable_label != "NA"] = "NA"
+    # "%||%" VEUT DIRE SI L'OBJET DE GAUCHE EST "NULL" ALORS RETOURNE LA VALEUR DE DROITE +> SI ON A TROUVE AUCUNE "variable_label" de valeur "NA" => NULL, ON MET "NA" POUR LA PREMIERE VALEURE
+    # SINON, ON MET LA PREMIERE VALEUR DU LABEL VALIDE
+    
+    years_present = list(unique(year))) %>%
+  #CREATION D'UNE LISTE "years_present" CONTENANT TOUTES LES VALEURS UNIQUES DE "year" OU LA VARIABLE APPARAIT.
+  # "year" pas "years" CAR SEUL "year" EXISTE DANS "years_present"
+  ungroup() %>%
+  # ENLEVER L'EFFET DE GROUPE
+  mutate(years_present = map_chr(years_present, ~ paste(.x, collapse = ","))) %>%
+  # paste () CONVERTIT LES LISTES D'ANNEES EN CHAINES DE TEXTE SEPAREES
+ # map_chr FORCE LE RESULTAT A ETRE UN VECTEUR DE CARACTERE AU LIEU D'UNE LISTE DE CHAINES.
+
+  left_join(file_labels, by = "file_name", .before) %>%
+  # left_join()= JOINTURE A GAUCHE, IL N'Y A PAS D'OPTION "after" DANS LEFT JOIN
+  relocate(file_label, .after = file_name) %>%
+  # relocate = DEPLACER
+  arrange(substr(years_present, 1, 4), # To have 1st variables of 1995
+          # L'OBJECTIF EST DE COMMENCER PAR LES VARIABLES PRESENTES DES 1995
+          # arrange () SERT A TRIER LES LIGNES D'UN TIBBLE SELON DEUX CRITERES SUCCESSIFS : L'ANNEE, UN ORDRE SPECIAL POUR CERTAINS FICHIERS
+          # years_present EST UNE COLONNE QUI CONTIENT LES ANNEES CONCATENEES EN TEXTE (ex. "1995,1996,1997").
+# substr(years_present, 1, 4) PREND LES 4 PREMIERS CARACTERES DE CETTE CHAINE; DONC LA PREMIERE ANNEE
+#CELA PERMET DE TRIER LES VARIABLES SELON LA PREMIERE ANNEE OU ELLES APPARAISSENT 
+
+          case_when(file_name == "res_deb.dta" ~ as.integer(1),
+                    file_name == "res_h.dta" ~ as.integer(2),
+#case_when() EST UNE FONCTION QUI PERMET DE CREER UNE COLONNE DE TRI PERSONNALISEE SELON DES CONDITIONS.
+# ICI, ON ATTRIBUE UN RANG NUMERIQUE AUX FICHIERS
+# DONC, LORS DU TRI, LES VARIALBES DE "res_deb.dta" APPARAISSENT EN PREMIER, CELLES DE "res_h.dta" EN DEUXIEME, ET TOUTES LES AUTRES ENSUITES.
+
+
+                    TRUE ~ as.integer(3))) # starts with hh ID and housing # -  # LE DICTIONNAIRE COMMENCE PAR LES FICHIERS RELATIFS AUX MENAGES ET HABITAT
+
+#---------------------------
+# variable_dictionary EST UNE VERSION BIEN RANGEE DE all_vars()
+
+#----------------------------
+
+# Write the variable dictionary to an Excel file
+# "ROS_Variable_Dictionary.xlsx" EST LE NOM DU FICHIER EXCEL CREE
+write_xlsx(variable_dictionary, "output/ROS_Variable_Dictionary.xlsx")
+# To include in published dataset
+write_xlsx(variable_dictionary, "data/ROS_Variable_Dictionary.xlsx")
+
+# Display in interactive format
+DT::datatable(variable_dictionary)
+```

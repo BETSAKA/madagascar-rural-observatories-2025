@@ -214,7 +214,7 @@
     "href": "04_structure_menages.html#description-des-ménages",
     "title": "1  Caractéristiques socio-démographiques des ménages",
     "section": "",
-    "text": "1.1.1 Taille des ménages\nCalculons la taille des ménages par observatoire\n\n\nCode\nhh_size &lt;- res_m_a %&gt;%\n  group_by(j5) %&gt;%\n  mutate(hh_size = n()) %&gt;%\n  select(j5,hh_size) %&gt;% \n  distinct(j5,hh_size)\n\n\n\n\n1.1.2 Structure par âge\n\n\n1.1.3 Origine",
+    "text": "1.1.1 Taille des ménages\nCalculons la taille des ménages par observatoire\n\n\nCode\nhh_size_obs &lt;- res_m_a %&gt;% \n  left_join(res_deb, by = \"j5\") %&gt;% \n  group_by(j0, j5) %&gt;% \n  mutate(hh_size = n()) %&gt;% \n  distinct(j0, j5, hh_size) %&gt;% \n  group_by(j0) %&gt;% \n  summarise(mean_hh_size = mean(hh_size), .groups = \"drop\") %&gt;% \n  mutate(\n    j0 = as.character(j0),\n    Observatory = case_when(\n      j0 == \"3\"  ~ \"Marovoay\",\n      j0 == \"21\" ~ \"Alaotra\",\n      TRUE       ~ j0\n    )\n  ) %&gt;% \n  select(Observatory, mean_hh_size)\n\n# Créer un tableau avec gt \nhh_size_obs_tab &lt;- gt(hh_size_obs) %&gt;% \n  tab_header( \n    title = \"Taille moyenne des ménages par observatoire\",\n    ) %&gt;% \n  fmt_number( \n    columns = mean_hh_size, \n    decimals = 2, \n    suffixing = TRUE ) %&gt;%\n  cols_label( \n    mean_hh_size = \"Taille moyenne\" )\nhh_size_obs_tab\n\n\n\n\n\n\n\n\nTaille moyenne des ménages par observatoire\n\n\nObservatory\nTaille moyenne\n\n\n\n\nMarovoay\n4.43\n\n\nAlaotra\n3.90\n\n\n\n\n\n\n\n\n\n1.1.2 Structure par âge\n\n\n1.1.3 Origine",
     "crumbs": [
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Caractéristiques socio-démographiques des ménages</span>"
     ]

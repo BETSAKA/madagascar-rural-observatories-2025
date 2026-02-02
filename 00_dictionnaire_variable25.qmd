@@ -1,7 +1,5 @@
 # Data catalog
 
-The ROS survey data is organized in a collection of year-specific folders ranging from 1995 to 2015. Each yearly folder houses multiple .dta files (Stata data format) -- about 85 per year -- with diverse filenames such as "res_as.dta" and "res_bp.dta". The code block below creates a data dictionary, which can be downloaded by clicking [on this link](https://raw.githubusercontent.com/BETSAKA/Rural_Obs_Madagascar/main/output/ROS_Variable_Dictionary.xlsx 
-). It also displays the interactive table below, which can be browsed or searched.
 
 ```{r var_dict}
 library(tidyverse)    # A series of packages for data manipulation
@@ -13,9 +11,7 @@ library(readxl)
 ros_data_loc <- "data/dta_format/"
 
 # Function to extract variable info for a given year and file
-extract_variable_info <- function(year, file) {
-  
-  file_path <- paste0(ros_data_loc, year, "/", file)
+extract_variable_info <- function(file_path, file) {
   
   if (!file.exists(file_path)) return(tibble())
   
@@ -24,12 +20,14 @@ extract_variable_info <- function(year, file) {
   tibble(
     file_name = file,
     variable_name = names(data),
-    variable_label = var_label(data) %>% as.character(),
-    year = year)
+    variable_label = var_label(data) %>% as.character()
+  )
 }
 
-# Obtain all years from the directory structure
-years <- list.dirs(ros_data_loc, recursive = FALSE, full.names = FALSE)
+# Liste directement tous les fichiers .dta dans le dossier 
+files <- list.files(ros_data_loc, pattern = "\\.dta$", full.names = TRUE)
+
+
 
 # Use the tidyverse approach to map over years and files
 all_vars <- map_df(years, ~{
