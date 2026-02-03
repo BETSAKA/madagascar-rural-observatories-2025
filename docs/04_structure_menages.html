@@ -284,6 +284,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>res_m_a <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">"data/res_m_a.dta"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+<p>Nous allons voir le nombre de ménages enquêtés par observatoire.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -294,62 +295,51 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n)) <span class="sc">%&gt;%</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Percent =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">j0 =</span> <span class="fu">as.character</span>(j0)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Observatory =</span> j0) <span class="sc">%&gt;%</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Observatory, n, Percent)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> res_deb <span class="sc">%&gt;%</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(j0) <span class="sc">%&gt;%</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n_distinct</span>(j5), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n)) <span class="sc">%&gt;%</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">Percent =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">j0 =</span> <span class="fu">as.character</span>(j0),</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">Observatory =</span> <span class="fu">case_when</span>(</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"3"</span>  <span class="sc">~</span> <span class="st">"Marovoay"</span>,</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"21"</span> <span class="sc">~</span> <span class="st">"Alaotra"</span>,</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span>       <span class="sc">~</span> j0</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Observatory, n, Percent)</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> tab <span class="sc">%&gt;%</span> </span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">add_row</span>(<span class="at">Observatory =</span> <span class="st">"Total"</span>, <span class="at">n =</span> <span class="fu">sum</span>(tab<span class="sc">$</span>n), <span class="at">Percent =</span> <span class="fu">sum</span>(tab<span class="sc">$</span>Percent, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Créer un tableau avec gt </span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>gt_tab <span class="ot">&lt;-</span> <span class="fu">gt</span>(tab) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>( </span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Répartition des ménages selon les observatoires"</span>,</span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>( </span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> Percent, </span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">0</span>, </span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">suffixing =</span> <span class="cn">TRUE</span> ) <span class="sc">%&gt;%</span></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>( </span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">footnote =</span> <span class="st">"Percent (%)"</span>, </span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> Percent) </span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>gt_tab </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">j0 =</span> <span class="fu">as.character</span>(j0),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Observatory =</span> <span class="fu">case_when</span>(</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"3"</span>  <span class="sc">~</span> <span class="st">"Marovoay"</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"21"</span> <span class="sc">~</span> <span class="st">"Alaotra"</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span>       <span class="sc">~</span> j0</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Observatory, n, Percent)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> tab <span class="sc">%&gt;%</span> </span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">add_row</span>(<span class="at">Observatory =</span> <span class="st">"Total"</span>, <span class="at">n =</span> <span class="fu">sum</span>(tab<span class="sc">$</span>n), <span class="at">Percent =</span> <span class="fu">sum</span>(tab<span class="sc">$</span>Percent, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Créer un tableau avec gt </span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>gt_tab <span class="ot">&lt;-</span> <span class="fu">gt</span>(tab) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>( </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Répartition des ménages selon les observatoires"</span>,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>( </span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> Percent, </span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">0</span>, </span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">suffixing =</span> <span class="cn">TRUE</span> ) <span class="sc">%&gt;%</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>( </span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">footnote =</span> <span class="st">"Percent (%)"</span>, </span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> Percent) </span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>gt_tab </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="pmnfhmiipl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#pmnfhmiipl table {
+<div id="ykpxopnrbp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ykpxopnrbp table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#pmnfhmiipl thead, #pmnfhmiipl tbody, #pmnfhmiipl tfoot, #pmnfhmiipl tr, #pmnfhmiipl td, #pmnfhmiipl th {
+#ykpxopnrbp thead, #ykpxopnrbp tbody, #ykpxopnrbp tfoot, #ykpxopnrbp tr, #ykpxopnrbp td, #ykpxopnrbp th {
   border-style: none;
 }
 
-#pmnfhmiipl p {
+#ykpxopnrbp p {
   margin: 0;
   padding: 0;
 }
 
-#pmnfhmiipl .gt_table {
+#ykpxopnrbp .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -375,12 +365,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#pmnfhmiipl .gt_caption {
+#ykpxopnrbp .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#pmnfhmiipl .gt_title {
+#ykpxopnrbp .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -392,7 +382,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#pmnfhmiipl .gt_subtitle {
+#ykpxopnrbp .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -404,7 +394,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#pmnfhmiipl .gt_heading {
+#ykpxopnrbp .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -416,13 +406,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#pmnfhmiipl .gt_bottom_border {
+#ykpxopnrbp .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#pmnfhmiipl .gt_col_headings {
+#ykpxopnrbp .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -437,7 +427,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#pmnfhmiipl .gt_col_heading {
+#ykpxopnrbp .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -457,7 +447,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#pmnfhmiipl .gt_column_spanner_outer {
+#ykpxopnrbp .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -469,15 +459,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#pmnfhmiipl .gt_column_spanner_outer:first-child {
+#ykpxopnrbp .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#pmnfhmiipl .gt_column_spanner_outer:last-child {
+#ykpxopnrbp .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#pmnfhmiipl .gt_column_spanner {
+#ykpxopnrbp .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -489,11 +479,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#pmnfhmiipl .gt_spanner_row {
+#ykpxopnrbp .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#pmnfhmiipl .gt_group_heading {
+#ykpxopnrbp .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -519,7 +509,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#pmnfhmiipl .gt_empty_group_heading {
+#ykpxopnrbp .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -534,15 +524,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#pmnfhmiipl .gt_from_md > :first-child {
+#ykpxopnrbp .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#pmnfhmiipl .gt_from_md > :last-child {
+#ykpxopnrbp .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#pmnfhmiipl .gt_row {
+#ykpxopnrbp .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -561,7 +551,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#pmnfhmiipl .gt_stub {
+#ykpxopnrbp .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -574,7 +564,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#pmnfhmiipl .gt_stub_row_group {
+#ykpxopnrbp .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -588,15 +578,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#pmnfhmiipl .gt_row_group_first td {
+#ykpxopnrbp .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#pmnfhmiipl .gt_row_group_first th {
+#ykpxopnrbp .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#pmnfhmiipl .gt_summary_row {
+#ykpxopnrbp .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -606,16 +596,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#pmnfhmiipl .gt_first_summary_row {
+#ykpxopnrbp .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#pmnfhmiipl .gt_first_summary_row.thick {
+#ykpxopnrbp .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#pmnfhmiipl .gt_last_summary_row {
+#ykpxopnrbp .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -625,7 +615,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#pmnfhmiipl .gt_grand_summary_row {
+#ykpxopnrbp .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -635,7 +625,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#pmnfhmiipl .gt_first_grand_summary_row {
+#ykpxopnrbp .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -645,7 +635,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #D3D3D3;
 }
 
-#pmnfhmiipl .gt_last_grand_summary_row_top {
+#ykpxopnrbp .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -655,11 +645,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#pmnfhmiipl .gt_striped {
+#ykpxopnrbp .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#pmnfhmiipl .gt_table_body {
+#ykpxopnrbp .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -668,7 +658,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#pmnfhmiipl .gt_footnotes {
+#ykpxopnrbp .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -682,7 +672,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#pmnfhmiipl .gt_footnote {
+#ykpxopnrbp .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -691,7 +681,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#pmnfhmiipl .gt_sourcenotes {
+#ykpxopnrbp .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -705,7 +695,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#pmnfhmiipl .gt_sourcenote {
+#ykpxopnrbp .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -713,72 +703,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#pmnfhmiipl .gt_left {
+#ykpxopnrbp .gt_left {
   text-align: left;
 }
 
-#pmnfhmiipl .gt_center {
+#ykpxopnrbp .gt_center {
   text-align: center;
 }
 
-#pmnfhmiipl .gt_right {
+#ykpxopnrbp .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#pmnfhmiipl .gt_font_normal {
+#ykpxopnrbp .gt_font_normal {
   font-weight: normal;
 }
 
-#pmnfhmiipl .gt_font_bold {
+#ykpxopnrbp .gt_font_bold {
   font-weight: bold;
 }
 
-#pmnfhmiipl .gt_font_italic {
+#ykpxopnrbp .gt_font_italic {
   font-style: italic;
 }
 
-#pmnfhmiipl .gt_super {
+#ykpxopnrbp .gt_super {
   font-size: 65%;
 }
 
-#pmnfhmiipl .gt_footnote_marks {
+#ykpxopnrbp .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#pmnfhmiipl .gt_asterisk {
+#ykpxopnrbp .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#pmnfhmiipl .gt_indent_1 {
+#ykpxopnrbp .gt_indent_1 {
   text-indent: 5px;
 }
 
-#pmnfhmiipl .gt_indent_2 {
+#ykpxopnrbp .gt_indent_2 {
   text-indent: 10px;
 }
 
-#pmnfhmiipl .gt_indent_3 {
+#ykpxopnrbp .gt_indent_3 {
   text-indent: 15px;
 }
 
-#pmnfhmiipl .gt_indent_4 {
+#ykpxopnrbp .gt_indent_4 {
   text-indent: 20px;
 }
 
-#pmnfhmiipl .gt_indent_5 {
+#ykpxopnrbp .gt_indent_5 {
   text-indent: 25px;
 }
 
-#pmnfhmiipl .katex-display {
+#ykpxopnrbp .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#pmnfhmiipl div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#ykpxopnrbp div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -821,62 +811,65 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<section id="description-des-ménages" class="level2" data-number="1.1">
-<h2 data-number="1.1" class="anchored" data-anchor-id="description-des-ménages"><span class="header-section-number">1.1</span> Description des ménages</h2>
-<section id="taille-des-ménages-par-observatoire" class="level3" data-number="1.1.1">
-<h3 data-number="1.1.1" class="anchored" data-anchor-id="taille-des-ménages-par-observatoire"><span class="header-section-number">1.1.1</span> Taille des ménages par observatoire</h3>
-<p>Calculons la taille des ménages par observatoire</p>
+<p>Nous allons voir le nombre de ménages enquêtés par hameau.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>hh_size_obs <span class="ot">&lt;-</span> res_m_a <span class="sc">%&gt;%</span> </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(res_deb, <span class="at">by =</span> <span class="st">"j5"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(j0, j5) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">hh_size =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(j0, j5, hh_size) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(j0) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_hh_size =</span> <span class="fu">mean</span>(hh_size), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tableau de répartition des ménages enquêtés par hameau selon les observatoires</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> res_deb <span class="sc">%&gt;%</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(j0,j4) <span class="sc">%&gt;%</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n_distinct</span>(j5), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Percent =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">j0 =</span> <span class="fu">as.character</span>(j0),</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Observatory =</span> <span class="fu">case_when</span>(</span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"3"</span>  <span class="sc">~</span> <span class="st">"Marovoay"</span>,</span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"21"</span> <span class="sc">~</span> <span class="st">"Alaotra"</span>,</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span>       <span class="sc">~</span> j0</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Observatory, mean_hh_size)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Observatory,j4, n, Percent)</span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Displaying with gt</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>hh_size_obs_tab <span class="ot">&lt;-</span> <span class="fu">gt</span>(hh_size_obs) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>( </span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Taille moyenne des ménages par observatoire"</span>,</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>( </span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> mean_hh_size, </span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">2</span>, </span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">suffixing =</span> <span class="cn">TRUE</span> ) <span class="sc">%&gt;%</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>( </span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_hh_size =</span> <span class="st">"Taille moyenne"</span> )</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>hh_size_obs_tab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> tab <span class="sc">%&gt;%</span> </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">add_row</span>(<span class="at">Observatory =</span> <span class="st">"Total"</span>, <span class="at">n =</span> <span class="fu">sum</span>(tab<span class="sc">$</span>n), <span class="at">Percent =</span> <span class="fu">sum</span>(tab<span class="sc">$</span>Percent, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Créer un tableau avec gt </span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>gt_tab <span class="ot">&lt;-</span> <span class="fu">gt</span>(tab) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>( </span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Répartition des ménages par hameau selon les observatoires"</span>,</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>( </span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> Percent, </span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">0</span>, </span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">suffixing =</span> <span class="cn">TRUE</span> ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>( </span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">footnote =</span> <span class="st">"Percent (%)"</span>, </span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> Percent) </span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>( </span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">j4 =</span> <span class="st">"Hameau"</span> )</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>gt_tab </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="vgipwozvrg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#vgipwozvrg table {
+<div id="idmobqajqo" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#idmobqajqo table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#vgipwozvrg thead, #vgipwozvrg tbody, #vgipwozvrg tfoot, #vgipwozvrg tr, #vgipwozvrg td, #vgipwozvrg th {
+#idmobqajqo thead, #idmobqajqo tbody, #idmobqajqo tfoot, #idmobqajqo tr, #idmobqajqo td, #idmobqajqo th {
   border-style: none;
 }
 
-#vgipwozvrg p {
+#idmobqajqo p {
   margin: 0;
   padding: 0;
 }
 
-#vgipwozvrg .gt_table {
+#idmobqajqo .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -902,12 +895,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#vgipwozvrg .gt_caption {
+#idmobqajqo .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#vgipwozvrg .gt_title {
+#idmobqajqo .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -919,7 +912,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#vgipwozvrg .gt_subtitle {
+#idmobqajqo .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -931,7 +924,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#vgipwozvrg .gt_heading {
+#idmobqajqo .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -943,13 +936,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#vgipwozvrg .gt_bottom_border {
+#idmobqajqo .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#vgipwozvrg .gt_col_headings {
+#idmobqajqo .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -964,7 +957,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#vgipwozvrg .gt_col_heading {
+#idmobqajqo .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -984,7 +977,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#vgipwozvrg .gt_column_spanner_outer {
+#idmobqajqo .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -996,15 +989,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#vgipwozvrg .gt_column_spanner_outer:first-child {
+#idmobqajqo .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#vgipwozvrg .gt_column_spanner_outer:last-child {
+#idmobqajqo .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#vgipwozvrg .gt_column_spanner {
+#idmobqajqo .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1016,11 +1009,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#vgipwozvrg .gt_spanner_row {
+#idmobqajqo .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#vgipwozvrg .gt_group_heading {
+#idmobqajqo .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1046,7 +1039,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#vgipwozvrg .gt_empty_group_heading {
+#idmobqajqo .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1061,15 +1054,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#vgipwozvrg .gt_from_md > :first-child {
+#idmobqajqo .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#vgipwozvrg .gt_from_md > :last-child {
+#idmobqajqo .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#vgipwozvrg .gt_row {
+#idmobqajqo .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1088,7 +1081,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#vgipwozvrg .gt_stub {
+#idmobqajqo .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1101,7 +1094,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#vgipwozvrg .gt_stub_row_group {
+#idmobqajqo .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1115,15 +1108,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#vgipwozvrg .gt_row_group_first td {
+#idmobqajqo .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#vgipwozvrg .gt_row_group_first th {
+#idmobqajqo .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#vgipwozvrg .gt_summary_row {
+#idmobqajqo .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1133,16 +1126,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#vgipwozvrg .gt_first_summary_row {
+#idmobqajqo .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#vgipwozvrg .gt_first_summary_row.thick {
+#idmobqajqo .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#vgipwozvrg .gt_last_summary_row {
+#idmobqajqo .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1152,7 +1145,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#vgipwozvrg .gt_grand_summary_row {
+#idmobqajqo .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1162,7 +1155,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#vgipwozvrg .gt_first_grand_summary_row {
+#idmobqajqo .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1172,7 +1165,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #D3D3D3;
 }
 
-#vgipwozvrg .gt_last_grand_summary_row_top {
+#idmobqajqo .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1182,11 +1175,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#vgipwozvrg .gt_striped {
+#idmobqajqo .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#vgipwozvrg .gt_table_body {
+#idmobqajqo .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1195,7 +1188,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#vgipwozvrg .gt_footnotes {
+#idmobqajqo .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1209,7 +1202,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#vgipwozvrg .gt_footnote {
+#idmobqajqo .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1218,7 +1211,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#vgipwozvrg .gt_sourcenotes {
+#idmobqajqo .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1232,7 +1225,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#vgipwozvrg .gt_sourcenote {
+#idmobqajqo .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1240,72 +1233,789 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#vgipwozvrg .gt_left {
+#idmobqajqo .gt_left {
   text-align: left;
 }
 
-#vgipwozvrg .gt_center {
+#idmobqajqo .gt_center {
   text-align: center;
 }
 
-#vgipwozvrg .gt_right {
+#idmobqajqo .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#vgipwozvrg .gt_font_normal {
+#idmobqajqo .gt_font_normal {
   font-weight: normal;
 }
 
-#vgipwozvrg .gt_font_bold {
+#idmobqajqo .gt_font_bold {
   font-weight: bold;
 }
 
-#vgipwozvrg .gt_font_italic {
+#idmobqajqo .gt_font_italic {
   font-style: italic;
 }
 
-#vgipwozvrg .gt_super {
+#idmobqajqo .gt_super {
   font-size: 65%;
 }
 
-#vgipwozvrg .gt_footnote_marks {
+#idmobqajqo .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#vgipwozvrg .gt_asterisk {
+#idmobqajqo .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#vgipwozvrg .gt_indent_1 {
+#idmobqajqo .gt_indent_1 {
   text-indent: 5px;
 }
 
-#vgipwozvrg .gt_indent_2 {
+#idmobqajqo .gt_indent_2 {
   text-indent: 10px;
 }
 
-#vgipwozvrg .gt_indent_3 {
+#idmobqajqo .gt_indent_3 {
   text-indent: 15px;
 }
 
-#vgipwozvrg .gt_indent_4 {
+#idmobqajqo .gt_indent_4 {
   text-indent: 20px;
 }
 
-#vgipwozvrg .gt_indent_5 {
+#idmobqajqo .gt_indent_5 {
   text-indent: 25px;
 }
 
-#vgipwozvrg .katex-display {
+#idmobqajqo .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#vgipwozvrg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#idmobqajqo div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="header gt_heading">
+<th colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">Répartition des ménages par hameau selon les observatoires</th>
+</tr>
+<tr class="odd gt_col_headings">
+<th id="Observatory" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Observatory</th>
+<th id="j4" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Hameau</th>
+<th id="n" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">n</th>
+<th id="Percent" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Percent<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
+<td class="gt_row gt_left" headers="j4">Avaradrano</td>
+<td class="gt_row gt_right" headers="n">90</td>
+<td class="gt_row gt_right" headers="Percent">9</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
+<td class="gt_row gt_left" headers="j4">Feramanga Atsimo</td>
+<td class="gt_row gt_right" headers="n">89</td>
+<td class="gt_row gt_right" headers="Percent">9</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
+<td class="gt_row gt_left" headers="j4">Mangabe</td>
+<td class="gt_row gt_right" headers="n">73</td>
+<td class="gt_row gt_right" headers="Percent">7</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
+<td class="gt_row gt_left" headers="j4">Ambatomanga</td>
+<td class="gt_row gt_right" headers="n">68</td>
+<td class="gt_row gt_right" headers="Percent">7</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
+<td class="gt_row gt_left" headers="j4">Ambodivoara</td>
+<td class="gt_row gt_right" headers="n">58</td>
+<td class="gt_row gt_right" headers="Percent">6</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Ampijoroa Morafeno</td>
+<td class="gt_row gt_right" headers="n">52</td>
+<td class="gt_row gt_right" headers="Percent">5</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
+<td class="gt_row gt_left" headers="j4">Ambohidrony</td>
+<td class="gt_row gt_right" headers="n">52</td>
+<td class="gt_row gt_right" headers="Percent">5</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
+<td class="gt_row gt_left" headers="j4">Analamiranga</td>
+<td class="gt_row gt_right" headers="n">46</td>
+<td class="gt_row gt_right" headers="Percent">4</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Ampijoroa Centre</td>
+<td class="gt_row gt_right" headers="n">41</td>
+<td class="gt_row gt_right" headers="Percent">4</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Madiromiongana</td>
+<td class="gt_row gt_right" headers="n">39</td>
+<td class="gt_row gt_right" headers="Percent">4</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Bepako Avara-dalana</td>
+<td class="gt_row gt_right" headers="n">38</td>
+<td class="gt_row gt_right" headers="Percent">4</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Madiromiongana Tsaratanteraka</td>
+<td class="gt_row gt_right" headers="n">36</td>
+<td class="gt_row gt_right" headers="Percent">4</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Maroala Antanandava</td>
+<td class="gt_row gt_right" headers="n">33</td>
+<td class="gt_row gt_right" headers="Percent">3</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Ampijoroa Ambalakida</td>
+<td class="gt_row gt_right" headers="n">31</td>
+<td class="gt_row gt_right" headers="Percent">3</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
+<td class="gt_row gt_left" headers="j4">Ambatoharanana</td>
+<td class="gt_row gt_right" headers="n">31</td>
+<td class="gt_row gt_right" headers="Percent">3</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Bepako Ambony atsinanana</td>
+<td class="gt_row gt_right" headers="n">26</td>
+<td class="gt_row gt_right" headers="Percent">2</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Bepako Ambodisakoa</td>
+<td class="gt_row gt_right" headers="n">25</td>
+<td class="gt_row gt_right" headers="Percent">2</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Maroala Centre</td>
+<td class="gt_row gt_right" headers="n">25</td>
+<td class="gt_row gt_right" headers="Percent">2</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Maroala Morafeno</td>
+<td class="gt_row gt_right" headers="n">25</td>
+<td class="gt_row gt_right" headers="Percent">2</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Madiromiongana Tsivikinina</td>
+<td class="gt_row gt_right" headers="n">23</td>
+<td class="gt_row gt_right" headers="Percent">2</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Maroala Soamandroso</td>
+<td class="gt_row gt_right" headers="n">20</td>
+<td class="gt_row gt_right" headers="Percent">2</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Bepako Ambany atsimo</td>
+<td class="gt_row gt_right" headers="n">17</td>
+<td class="gt_row gt_right" headers="Percent">2</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Bepako Atsimon-dalana</td>
+<td class="gt_row gt_right" headers="n">16</td>
+<td class="gt_row gt_right" headers="Percent">2</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Madiromiongana Ambararatafotsy</td>
+<td class="gt_row gt_right" headers="n">15</td>
+<td class="gt_row gt_right" headers="Percent">2</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Ampijoroa Antanambao</td>
+<td class="gt_row gt_right" headers="n">14</td>
+<td class="gt_row gt_right" headers="Percent">1</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Madiromiongana Bongomena</td>
+<td class="gt_row gt_right" headers="n">12</td>
+<td class="gt_row gt_right" headers="Percent">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Maroala Ambomiray</td>
+<td class="gt_row gt_right" headers="n">8</td>
+<td class="gt_row gt_right" headers="Percent">1</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Madiromiongana Soamanonga</td>
+<td class="gt_row gt_right" headers="n">6</td>
+<td class="gt_row gt_right" headers="Percent">1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Ampijoroa Andolobe</td>
+<td class="gt_row gt_right" headers="n">5</td>
+<td class="gt_row gt_right" headers="Percent">0</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Madiromiongana Ambonara II</td>
+<td class="gt_row gt_right" headers="n">5</td>
+<td class="gt_row gt_right" headers="Percent">0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Maroala Antafia</td>
+<td class="gt_row gt_right" headers="n">5</td>
+<td class="gt_row gt_right" headers="Percent">0</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">Bepako Ambany antsinanana</td>
+<td class="gt_row gt_right" headers="n">1</td>
+<td class="gt_row gt_right" headers="Percent">0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
+<td class="gt_row gt_left" headers="j4">MADIROMIONGANA AMBARARATAFOTSY</td>
+<td class="gt_row gt_right" headers="n">1</td>
+<td class="gt_row gt_right" headers="Percent">0</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Observatory">Total</td>
+<td class="gt_row gt_left" headers="j4">NA</td>
+<td class="gt_row gt_right" headers="n">1026</td>
+<td class="gt_row gt_right" headers="Percent">100</td>
+</tr>
+</tbody><tfoot class="gt_footnotes">
+<tr class="even">
+<td colspan="4" class="gt_footnote"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> Percent (%)</td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
+</div>
+</div>
+<section id="description-des-ménages" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="description-des-ménages"><span class="header-section-number">1.1</span> Description des ménages</h2>
+<section id="taille-des-ménages-par-observatoire" class="level3" data-number="1.1.1">
+<h3 data-number="1.1.1" class="anchored" data-anchor-id="taille-des-ménages-par-observatoire"><span class="header-section-number">1.1.1</span> Taille des ménages par observatoire</h3>
+<p>Calculons la taille des ménages par observatoire</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>hh_size_obs <span class="ot">&lt;-</span> res_m_a <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(res_deb, <span class="at">by =</span> <span class="st">"j5"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(j0, j5) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">hh_size =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(j0, j5, hh_size) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(j0) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_hh_size =</span> <span class="fu">mean</span>(hh_size), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">j0 =</span> <span class="fu">as.character</span>(j0),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Observatory =</span> <span class="fu">case_when</span>(</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"3"</span>  <span class="sc">~</span> <span class="st">"Marovoay"</span>,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"21"</span> <span class="sc">~</span> <span class="st">"Alaotra"</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span>       <span class="sc">~</span> j0</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Observatory, mean_hh_size)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Displaying with gt</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>hh_size_obs_tab <span class="ot">&lt;-</span> <span class="fu">gt</span>(hh_size_obs) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>( </span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Taille moyenne des ménages par observatoire"</span>,</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>( </span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> mean_hh_size, </span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">2</span>, </span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">suffixing =</span> <span class="cn">TRUE</span> ) <span class="sc">%&gt;%</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>( </span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_hh_size =</span> <span class="st">"Taille moyenne"</span> )</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>hh_size_obs_tab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="bhpujolhns" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#bhpujolhns table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#bhpujolhns thead, #bhpujolhns tbody, #bhpujolhns tfoot, #bhpujolhns tr, #bhpujolhns td, #bhpujolhns th {
+  border-style: none;
+}
+
+#bhpujolhns p {
+  margin: 0;
+  padding: 0;
+}
+
+#bhpujolhns .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#bhpujolhns .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#bhpujolhns .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#bhpujolhns .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#bhpujolhns .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#bhpujolhns .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#bhpujolhns .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#bhpujolhns .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#bhpujolhns .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#bhpujolhns .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#bhpujolhns .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#bhpujolhns .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#bhpujolhns .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#bhpujolhns .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#bhpujolhns .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#bhpujolhns .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#bhpujolhns .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#bhpujolhns .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#bhpujolhns .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bhpujolhns .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#bhpujolhns .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#bhpujolhns .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#bhpujolhns .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bhpujolhns .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#bhpujolhns .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#bhpujolhns .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#bhpujolhns .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bhpujolhns .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#bhpujolhns .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#bhpujolhns .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#bhpujolhns .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#bhpujolhns .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#bhpujolhns .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bhpujolhns .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#bhpujolhns .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bhpujolhns .gt_left {
+  text-align: left;
+}
+
+#bhpujolhns .gt_center {
+  text-align: center;
+}
+
+#bhpujolhns .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#bhpujolhns .gt_font_normal {
+  font-weight: normal;
+}
+
+#bhpujolhns .gt_font_bold {
+  font-weight: bold;
+}
+
+#bhpujolhns .gt_font_italic {
+  font-style: italic;
+}
+
+#bhpujolhns .gt_super {
+  font-size: 65%;
+}
+
+#bhpujolhns .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#bhpujolhns .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#bhpujolhns .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#bhpujolhns .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#bhpujolhns .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#bhpujolhns .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#bhpujolhns .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#bhpujolhns .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#bhpujolhns div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1341,65 +2051,65 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>hh_size_obs <span class="ot">&lt;-</span> res_m_a <span class="sc">%&gt;%</span> </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(res_deb, <span class="at">by =</span> <span class="st">"j5"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(j0, j4, j5) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">hh_size =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(j0, j4, j5, hh_size) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(j0, j4) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_hh_size =</span> <span class="fu">mean</span>(hh_size), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">j0 =</span> <span class="fu">as.character</span>(j0),</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Observatory =</span> <span class="fu">case_when</span>(</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"3"</span>  <span class="sc">~</span> <span class="st">"Marovoay"</span>,</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"21"</span> <span class="sc">~</span> <span class="st">"Alaotra"</span>,</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span>       <span class="sc">~</span> j0</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Observatory, j4, mean_hh_size) <span class="co">#%&gt;% </span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># bind_rows( </span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   tibble( </span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">#     Observatory = "Total", </span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">#     j4 = "Tous hameaux", </span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">#     mean_hh_size = mean(hh_size_obs$mean_hh_size) </span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">#     ) </span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   )</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Displaying with gt</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>hh_size_obs_tab <span class="ot">&lt;-</span> <span class="fu">gt</span>(</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  hh_size_obs,</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">groupname_col =</span> <span class="st">"Observatory"</span> <span class="co"># les observatoires deviennent des groupes</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>( </span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Taille moyenne des ménages par hameau et selon l'observatoire"</span>,</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>( </span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> mean_hh_size, </span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">2</span>, </span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">suffixing =</span> <span class="cn">TRUE</span> ) <span class="sc">%&gt;%</span></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>( </span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_hh_size =</span> <span class="st">"Taille moyenne"</span>,</span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">j4 =</span> <span class="st">"Hameau"</span>) </span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>hh_size_obs_tab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>hh_size_obs <span class="ot">&lt;-</span> res_m_a <span class="sc">%&gt;%</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(res_deb, <span class="at">by =</span> <span class="st">"j5"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(j0, j4, j5) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">hh_size =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(j0, j4, j5, hh_size) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(j0, j4) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mean_hh_size =</span> <span class="fu">mean</span>(hh_size), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">j0 =</span> <span class="fu">as.character</span>(j0),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Observatory =</span> <span class="fu">case_when</span>(</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"3"</span>  <span class="sc">~</span> <span class="st">"Marovoay"</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"21"</span> <span class="sc">~</span> <span class="st">"Alaotra"</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span>       <span class="sc">~</span> j0</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Observatory, j4, mean_hh_size) <span class="co">#%&gt;% </span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># bind_rows( </span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   tibble( </span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="co">#     Observatory = "Total", </span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">#     j4 = "Tous hameaux", </span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">#     mean_hh_size = mean(hh_size_obs$mean_hh_size) </span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">#     ) </span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   )</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Displaying with gt</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>hh_size_obs_tab <span class="ot">&lt;-</span> <span class="fu">gt</span>(</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  hh_size_obs,</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">groupname_col =</span> <span class="st">"Observatory"</span> <span class="co"># les observatoires deviennent des groupes</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>( </span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Taille moyenne des ménages par hameau et selon l'observatoire"</span>,</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>( </span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> mean_hh_size, </span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">2</span>, </span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">suffixing =</span> <span class="cn">TRUE</span> ) <span class="sc">%&gt;%</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>( </span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_hh_size =</span> <span class="st">"Taille moyenne"</span>,</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">j4 =</span> <span class="st">"Hameau"</span>) </span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>hh_size_obs_tab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="ehltywagcp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#ehltywagcp table {
+<div id="xldkxuejbf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#xldkxuejbf table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#ehltywagcp thead, #ehltywagcp tbody, #ehltywagcp tfoot, #ehltywagcp tr, #ehltywagcp td, #ehltywagcp th {
+#xldkxuejbf thead, #xldkxuejbf tbody, #xldkxuejbf tfoot, #xldkxuejbf tr, #xldkxuejbf td, #xldkxuejbf th {
   border-style: none;
 }
 
-#ehltywagcp p {
+#xldkxuejbf p {
   margin: 0;
   padding: 0;
 }
 
-#ehltywagcp .gt_table {
+#xldkxuejbf .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1425,12 +2135,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#ehltywagcp .gt_caption {
+#xldkxuejbf .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ehltywagcp .gt_title {
+#xldkxuejbf .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1442,7 +2152,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#ehltywagcp .gt_subtitle {
+#xldkxuejbf .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1454,7 +2164,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#ehltywagcp .gt_heading {
+#xldkxuejbf .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1466,13 +2176,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#ehltywagcp .gt_bottom_border {
+#xldkxuejbf .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ehltywagcp .gt_col_headings {
+#xldkxuejbf .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1487,7 +2197,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#ehltywagcp .gt_col_heading {
+#xldkxuejbf .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1507,7 +2217,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#ehltywagcp .gt_column_spanner_outer {
+#xldkxuejbf .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1519,15 +2229,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#ehltywagcp .gt_column_spanner_outer:first-child {
+#xldkxuejbf .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ehltywagcp .gt_column_spanner_outer:last-child {
+#xldkxuejbf .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ehltywagcp .gt_column_spanner {
+#xldkxuejbf .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1539,11 +2249,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#ehltywagcp .gt_spanner_row {
+#xldkxuejbf .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#ehltywagcp .gt_group_heading {
+#xldkxuejbf .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1569,7 +2279,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#ehltywagcp .gt_empty_group_heading {
+#xldkxuejbf .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1584,15 +2294,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#ehltywagcp .gt_from_md > :first-child {
+#xldkxuejbf .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ehltywagcp .gt_from_md > :last-child {
+#xldkxuejbf .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ehltywagcp .gt_row {
+#xldkxuejbf .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1611,7 +2321,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#ehltywagcp .gt_stub {
+#xldkxuejbf .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1624,7 +2334,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ehltywagcp .gt_stub_row_group {
+#xldkxuejbf .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1638,15 +2348,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#ehltywagcp .gt_row_group_first td {
+#xldkxuejbf .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ehltywagcp .gt_row_group_first th {
+#xldkxuejbf .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#ehltywagcp .gt_summary_row {
+#xldkxuejbf .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1656,16 +2366,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ehltywagcp .gt_first_summary_row {
+#xldkxuejbf .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ehltywagcp .gt_first_summary_row.thick {
+#xldkxuejbf .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ehltywagcp .gt_last_summary_row {
+#xldkxuejbf .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1675,7 +2385,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#ehltywagcp .gt_grand_summary_row {
+#xldkxuejbf .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1685,7 +2395,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ehltywagcp .gt_first_grand_summary_row {
+#xldkxuejbf .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1695,7 +2405,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #D3D3D3;
 }
 
-#ehltywagcp .gt_last_grand_summary_row_top {
+#xldkxuejbf .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1705,11 +2415,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#ehltywagcp .gt_striped {
+#xldkxuejbf .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ehltywagcp .gt_table_body {
+#xldkxuejbf .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1718,7 +2428,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#ehltywagcp .gt_footnotes {
+#xldkxuejbf .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1732,7 +2442,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#ehltywagcp .gt_footnote {
+#xldkxuejbf .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1741,7 +2451,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ehltywagcp .gt_sourcenotes {
+#xldkxuejbf .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1755,7 +2465,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#ehltywagcp .gt_sourcenote {
+#xldkxuejbf .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1763,72 +2473,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ehltywagcp .gt_left {
+#xldkxuejbf .gt_left {
   text-align: left;
 }
 
-#ehltywagcp .gt_center {
+#xldkxuejbf .gt_center {
   text-align: center;
 }
 
-#ehltywagcp .gt_right {
+#xldkxuejbf .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ehltywagcp .gt_font_normal {
+#xldkxuejbf .gt_font_normal {
   font-weight: normal;
 }
 
-#ehltywagcp .gt_font_bold {
+#xldkxuejbf .gt_font_bold {
   font-weight: bold;
 }
 
-#ehltywagcp .gt_font_italic {
+#xldkxuejbf .gt_font_italic {
   font-style: italic;
 }
 
-#ehltywagcp .gt_super {
+#xldkxuejbf .gt_super {
   font-size: 65%;
 }
 
-#ehltywagcp .gt_footnote_marks {
+#xldkxuejbf .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#ehltywagcp .gt_asterisk {
+#xldkxuejbf .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ehltywagcp .gt_indent_1 {
+#xldkxuejbf .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ehltywagcp .gt_indent_2 {
+#xldkxuejbf .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ehltywagcp .gt_indent_3 {
+#xldkxuejbf .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ehltywagcp .gt_indent_4 {
+#xldkxuejbf .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ehltywagcp .gt_indent_5 {
+#xldkxuejbf .gt_indent_5 {
   text-indent: 25px;
 }
 
-#ehltywagcp .katex-display {
+#xldkxuejbf .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#ehltywagcp div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#xldkxuejbf div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>

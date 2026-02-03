@@ -20,20 +20,9 @@ res_deb <- read_dta("data/res_deb.dta")
 # Loading household data
 res_m_a <- read_dta("data/res_m_a.dta")
 ```
-
+Nous allons voir le nombre de ménages enquêtés par observatoire.
 ```{r}
 # Tableau de répartition des ménages selon les observatoires
-tab <- res_deb %>%
-  group_by(j0) %>%
-  summarise(n = n_distinct(j5), .groups = "drop") %>%
-  arrange(desc(n)) %>%
-  mutate(
-    Percent = round(n / sum(n) * 100, 1),
-    j0 = as.character(j0)
-  ) %>% 
-  rename(Observatory = j0) %>%
-  select(Observatory, n, Percent)
-
 tab <- res_deb %>%
   group_by(j0) %>%
   summarise(n = n_distinct(j5), .groups = "drop") %>%
@@ -67,6 +56,48 @@ gt_tab <- gt(tab) %>%
     )
 gt_tab 
 ```
+
+Nous allons voir le nombre de ménages enquêtés par hameau.
+
+```{r}
+# Tableau de répartition des ménages enquêtés par hameau selon les observatoires
+
+tab <- res_deb %>%
+  group_by(j0,j4) %>%
+  summarise(n = n_distinct(j5), .groups = "drop") %>%
+  arrange(desc(n)) %>%
+  mutate(
+    Percent = round(n / sum(n) * 100, 1),
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  ) %>%
+  select(Observatory,j4, n, Percent)
+
+tab <- tab %>% 
+  tibble::add_row(Observatory = "Total", n = sum(tab$n), Percent = sum(tab$Percent, na.rm = TRUE))
+
+# Créer un tableau avec gt 
+gt_tab <- gt(tab) %>% 
+  tab_header( 
+    title = "Répartition des ménages par hameau selon les observatoires",
+    ) %>% 
+  fmt_number( 
+    columns = Percent, 
+    decimals = 0, 
+    suffixing = TRUE ) %>%
+  tab_footnote( 
+    footnote = "Percent (%)", 
+    locations = cells_column_labels(columns = Percent) 
+    ) %>% 
+  cols_label( 
+    j4 = "Hameau" )
+gt_tab 
+```
+
 
 ## Description des ménages
 
