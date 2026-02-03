@@ -15,10 +15,12 @@ library(dplyr)
 library (gt) # Easily create presentation - ready display tables
 
 # Loading observatories data
-res_deb <- read_dta("data/res_deb.dta")
+res_deb <- read_dta("data/dta_format/res_deb.dta")
 # Loading household data
-res_m_a <- read_dta("data/res_m_a.dta")
+res_m_a <- read_dta("data/dta_format/res_m_a.dta")
 ```
+
+
 Nous allons voir le nombre de ménages enquêtés par observatoire.
 ```{r}
 # Tableau de répartition des ménages selon les observatoires
@@ -179,6 +181,50 @@ hh_size_obs_tab <- gt(
     mean_hh_size = "Taille moyenne",
     j4 = "Hameau") 
 hh_size_obs_tab
+
+
+gt(
+  hh_size_obs,
+  groupname_col = "Observatory"
+  ) %>% 
+  tab_header( 
+    title = md("**Taille moyenne des ménages par hameau**"),
+    subtitle = "Selon l'observatoire"
+    ) %>% 
+  fmt_number( 
+    columns = mean_hh_size, 
+    decimals = 2
+    ) %>%
+  summary_rows(
+    groups = TRUE,
+    columns = mean_hh_size,
+    fns = list("Moyenne observatoire" = ~mean(.)),
+    fmt = ~fmt_number(., decimals = 2)
+  ) %>%
+  tab_options(
+    row_group.font.weight = "bold",
+    row_group.font.size = px(14),
+    row_group.padding = px(8),
+    summary_row.background.color = "#F8F9FA",
+    summary_row.text_transform = "uppercase",
+#    summary_row.font.size = px(11),
+    table.font.size = px(12),
+    heading.title.font.size = px(16),
+    heading.subtitle.font.size = px(13)
+  ) %>%
+  tab_style(
+    style = cell_text(indent = px(10)),
+    locations = cells_body(columns = j4)
+  ) %>%
+  cols_label( 
+    mean_hh_size = "Taille moyenne",
+    j4 = "Hameau"
+  ) %>%
+  cols_align(
+    align = "right",
+    columns = mean_hh_size
+  )
+
 
 ```
 
