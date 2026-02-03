@@ -30,13 +30,25 @@ files <- list.files(ros_data_loc, pattern = "\\.dta$", full.names = TRUE)
 
 
 # Use the tidyverse approach to map over years and files
-all_vars <- map_df(years, ~{
-  files_for_year <- list.files(paste0(ros_data_loc, .x), pattern = "\\.dta$", full.names = FALSE)
-  map_df(files_for_year, extract_variable_info, year = .x)
+
+# all_vars <- map_df(years, ~{
+#   files_for_year <- list.files(paste0(ros_data_loc, .x), pattern = "\\.dta$", full.names = FALSE)
+#   map_df(files_for_year, extract_variable_info, year = .x)
+# })
+
+all_vars <- map_df(files, ~{
+  file_path <- paste0(ros_data_loc, .x)
+  extract_variable_info(file_path, .x)
 })
+
+
 
 # Convert any NULL values in variable_label to "NA"
 all_vars$variable_label[is.na(all_vars$variable_label)] <- "NA"
+
+# retreive the file labels
+file_labels <- read_excel("references/File_labels.xlsx") %>%
+  select(file_name = filename, file_label = title_en)
 
 # retreive the file labels
 file_labels <- read_excel("references/File_labels.xlsx") %>%
