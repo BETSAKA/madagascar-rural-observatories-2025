@@ -70,7 +70,7 @@ gt_tab
 
 ## Description des ménages
 
-### Taille des ménages
+### Taille des ménages par observatoire
 
 Calculons la taille des ménages par observatoire
 
@@ -93,7 +93,7 @@ hh_size_obs <- res_m_a %>%
   ) %>% 
   select(Observatory, mean_hh_size)
 
-# Créer un tableau avec gt 
+# Displaying with gt
 hh_size_obs_tab <- gt(hh_size_obs) %>% 
   tab_header( 
     title = "Taille moyenne des ménages par observatoire",
@@ -104,6 +104,52 @@ hh_size_obs_tab <- gt(hh_size_obs) %>%
     suffixing = TRUE ) %>%
   cols_label( 
     mean_hh_size = "Taille moyenne" )
+hh_size_obs_tab
+
+```
+
+### Taille des ménages par hameau et par observatoire
+
+```{r hh_size_hameau}
+hh_size_obs <- res_m_a %>% 
+  left_join(res_deb, by = "j5") %>% 
+  group_by(j0, j4, j5) %>% 
+  mutate(hh_size = n()) %>% 
+  distinct(j0, j4, j5, hh_size) %>% 
+  group_by(j0, j4) %>% 
+  summarise(mean_hh_size = mean(hh_size), .groups = "drop") %>% 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  ) %>% 
+  select(Observatory, j4, mean_hh_size) #%>% 
+  # bind_rows( 
+  #   tibble( 
+  #     Observatory = "Total", 
+  #     j4 = "Tous hameaux", 
+  #     mean_hh_size = mean(hh_size_obs$mean_hh_size) 
+  #     ) 
+  #   )
+
+# Displaying with gt
+hh_size_obs_tab <- gt(
+  hh_size_obs,
+  groupname_col = "Observatory" # les observatoires deviennent des groupes
+  ) %>% 
+  tab_header( 
+    title = "Taille moyenne des ménages par hameau et selon l'observatoire",
+    ) %>% 
+  fmt_number( 
+    columns = mean_hh_size, 
+    decimals = 2, 
+    suffixing = TRUE ) %>%
+  cols_label( 
+    mean_hh_size = "Taille moyenne",
+    j4 = "Hameau") 
 hh_size_obs_tab
 
 ```
