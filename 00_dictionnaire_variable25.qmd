@@ -55,10 +55,20 @@ if (length(unique_files) == length(files)) {
 # retreive the file labels
 file_labels <- read_excel("documentation/File_labels.xlsx") %>%
   select(file_name = filename, file_label = title_en) %>% 
-# A VERIFIER VALEUR MANQUANTE
-
  # Fix encoding issues for display, without silently dropping characters
   mutate(across(where(is.character), ~iconv(.x, from = "latin1", to = "UTF-8", sub = NA)))
+
+# Verifying presence of NA value in file_labels
+file_labels %>%
+  summarise(across(everything(), ~sum(is.na(.x)), .names = "missing_{.col}")) %>%
+  pivot_longer(everything(),
+               names_to = "colonne",
+               values_to = "nb_missing") %>%
+  mutate(message = if_else(nb_missing == 0,
+                           paste0("✅ La colonne ", colonne, " n'a pas de valeurs manquantes."),
+                           paste0("⚠️ La colonne ", colonne, " contient ", nb_missing, " valeurs manquantes."))) %>%
+  pull(message) %>%
+  cat(sep = "\n")
 
 # Consolidate the information using the tidyverse approach
 variable_dictionary <- all_vars %>%
