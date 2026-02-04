@@ -53,24 +53,6 @@ file_labels <- read_excel("documentation/File_labels.xlsx") %>%
 # Consolidate the information using the tidyverse approach
 variable_dictionary <- all_vars %>%
   group_by(file_name, variable_name) %>%
-  arrange(year) %>%  
-  summarise(
-    variable_label = first(variable_label[variable_label != "NA"] %||% "NA"),
-    years_present = list(unique(year))) %>%
-  ungroup() %>%
-  mutate(years_present = map_chr(years_present, ~ paste(.x, collapse = ","))) %>%
-      variable_label = first(variable_label[variable_label != "NA"], default = "NA", .groups = "drop") %>%
-# adding validation after the join to check for NA file_labels and either log a warning or provide a default label for unmatched files
-  left_join(file_labels, by = "file_name", .before) %>%
-  relocate(file_label, .after = file_name) %>%
-  arrange(substr(years_present, 1, 4), # To have 1st variables of 1995
-          case_when(file_name == "res_deb.dta" ~ as.integer(1),
-                    file_name == "res_h.dta" ~ as.integer(2),
-                    TRUE ~ as.integer(3))) # starts with hh ID and housing
-
-########################################################
-variable_dictionary <- all_vars %>%
-  group_by(file_name, variable_name) %>%
   summarise(
     variable_label = first(variable_label[variable_label != "NA"] %||% "NA"),
     .groups = "drop"
@@ -84,13 +66,9 @@ variable_dictionary <- all_vars %>%
               TRUE                       ~ as.integer(3))
   ) # starts with hh ID and housing
 
-
 # Write the variable dictionary to an Excel file
 write_xlsx(variable_dictionary, "output/ROS_Variable_Dictionary.xlsx")
-#Nécessite une creation au prealable du dossier output
-
-# To include in published dataset
-#write_xlsx(variable_dictionary, "output/ROS_Variable_Dictionary.xlsx")
+# Requires prior creation of the output folder
 
 # Display in interactive format
 DT::datatable(
