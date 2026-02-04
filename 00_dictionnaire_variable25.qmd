@@ -25,14 +25,13 @@ extract_variable_info <- function(file_path, file) {
 }
 
 # Liste directement tous les fichiers .dta dans le dossier 
-files <- list.files(ros_data_loc, pattern = "\\.dta$", full.names = TRUE)
-
+files <- list.files(ros_data_loc, pattern = "\\.dta$", full.names = FALSE)
 
 
 # Use the tidyverse approach to map over years and files
-all_vars <- map_df(years, ~{
-  files_for_year <- list.files(paste0(ros_data_loc, .x), pattern = "\\.dta$", full.names = FALSE)
-  map_df(files_for_year, extract_variable_info, year = .x)
+all_vars <- map_df(files, ~{
+  file_path <- paste0(ros_data_loc, .x)
+  extract_variable_info(file_path, .x)
 })
 
 # Convert any NULL values in variable_label to "NA"
@@ -45,24 +44,29 @@ file_labels <- read_excel("references/File_labels.xlsx") %>%
 # Consolidate the information using the tidyverse approach
 variable_dictionary <- all_vars %>%
   group_by(file_name, variable_name) %>%
-  arrange(year) %>%  
   summarise(
-    variable_label = first(variable_label[variable_label != "NA"] %||% "NA"),
-    years_present = list(unique(year))) %>%
-  ungroup() %>%
-  mutate(years_present = map_chr(years_present, ~ paste(.x, collapse = ","))) %>%
-  left_join(file_labels, by = "file_name", .before) %>%
+    variable_label = first(variable_label[variable_label != "NA"], default = "NA"),
+    .groups = "drop") %>%
+  left_join(file_labels, by = "file_name") %>%
   relocate(file_label, .after = file_name) %>%
-  arrange(substr(years_present, 1, 4), # To have 1st variables of 1995
-          case_when(file_name == "res_deb.dta" ~ as.integer(1),
-                    file_name == "res_h.dta" ~ as.integer(2),
-                    TRUE ~ as.integer(3))) # starts with hh ID and housing
+  arrange(case_when(file_name == "res_deb.dta" ~ 1L,
+                    file_name == "res_h.dta" ~ 2L,
+                    TRUE ~ 3L),
+          file_name,
+          variable_name) %>%
+  # Fix encoding issues for display
+  mutate(across(where(is.character), ~iconv(.x, from = "latin1", to = "UTF-8", sub = "")))
 
 # Write the variable dictionary to an Excel file
-write_xlsx(variable_dictionary, "output/ROS_Variable_Dictionary.xlsx")
-# To include in published dataset
-write_xlsx(variable_dictionary, "data/ROS_Variable_Dictionary.xlsx")
+write_xlsx(variable_dictionary, "references/ROS_Variable_Dictionary.xlsx")
 
-# Display in interactive format
-DT::datatable(variable_dictionary)
+# Display in interactive format with encoding option
+DT::datatable(
+  variable_dictionary,
+  options = list(
+    pageLength = 25,
+    scrollX = TRUE,
+    encoding = "UTF-8"
+  )
+)
 ```
