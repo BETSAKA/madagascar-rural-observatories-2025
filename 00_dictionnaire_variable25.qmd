@@ -10,7 +10,7 @@ library(readxl)
 
 ros_data_loc <- "data/"
 
-# Function to extract variable info for a given year and file
+# Function to extract variable info for a given file_path and file
 extract_variable_info <- function(file_path, file) {
   
   if (!file.exists(file_path)) return(tibble())
@@ -25,7 +25,7 @@ extract_variable_info <- function(file_path, file) {
 }
 
 # Liste directement tous les fichiers .dta dans le dossier 
-files <- list.files(ros_data_loc, pattern = "\\.dta$", full.names = TRUE)
+files <- list.files(ros_data_loc, pattern = "\\.dta$", full.names = FALSE)
 # full.names = FALSE will return only filenames without the directory path
 
 if (length(files) == 0) {
@@ -33,26 +33,19 @@ if (length(files) == 0) {
 }
 #to ensure that at least some .dta files were found, or add an informative message if no files are found
 
-# Use the tidyverse approach to map over years and files
-
-# all_vars <- map_df(years, ~{
-#   files_for_year <- list.files(paste0(ros_data_loc, .x), pattern = "\\.dta$", full.names = FALSE)
-#   map_df(files_for_year, extract_variable_info, year = .x)
-# })
-
+# Use the tidyverse approach to map files
 all_vars <- map_df(files, ~{
   file_path <- file.path(ros_data_loc, .x)
   extract_variable_info(file_path, .x)
 })
 
-
-
 # Convert any NULL values in variable_label to "NA"
 all_vars$variable_label[is.na(all_vars$variable_label)] <- "NA"
 
 # retreive the file labels
-file_labels <- read_excel("references/File_labels.xlsx") %>%
-  select(file_name = filename, file_label = title_en)
+file_labels <- read_excel("documentation/File_labels.xlsx") %>%
+  select(file_name = filename, file_label = title_en) %>% 
+# A VERIFIER VALEUR MANQUANTE
 
  # Fix encoding issues for display, without silently dropping characters
   mutate(across(where(is.character), ~iconv(.x, from = "latin1", to = "UTF-8", sub = NA)))
@@ -75,11 +68,29 @@ variable_dictionary <- all_vars %>%
                     file_name == "res_h.dta" ~ as.integer(2),
                     TRUE ~ as.integer(3))) # starts with hh ID and housing
 
+########################################################
+variable_dictionary <- all_vars %>%
+  group_by(file_name, variable_name) %>%
+  summarise(
+    variable_label = first(variable_label[variable_label != "NA"] %||% "NA"),
+    .groups = "drop"
+  ) %>%
+  # adding validation after the join to check for NA file_labels and either log a warning or provide a default label for unmatched files
+  left_join(file_labels, by = "file_name", .before) %>%
+  relocate(file_label, .after = file_name) %>%
+  arrange(
+    case_when(file_name == "res_deb.dta" ~ as.integer(1),
+              file_name == "res_h.dta"   ~ as.integer(2),
+              TRUE                       ~ as.integer(3))
+  ) # starts with hh ID and housing
+
+
 # Write the variable dictionary to an Excel file
 write_xlsx(variable_dictionary, "output/ROS_Variable_Dictionary.xlsx")
-#Creation au prélable du dossier output
+#Nécessite une creation au prealable du dossier output
+
 # To include in published dataset
-write_xlsx(variable_dictionary, "output/ROS_Variable_Dictionary.xlsx")
+#write_xlsx(variable_dictionary, "output/ROS_Variable_Dictionary.xlsx")
 
 # Display in interactive format
 DT::datatable(
