@@ -8,7 +8,7 @@ library(labelled)     # To work with labelled data from STATA
 library(writexl)      # Write data frames to Excel format
 library(readxl)
 
-ros_data_loc <- "data/dta_format/"
+ros_data_loc <- "data/"
 
 # Function to extract variable info for a given year and file
 extract_variable_info <- function(file_path, file) {
@@ -26,10 +26,12 @@ extract_variable_info <- function(file_path, file) {
 
 # Liste directement tous les fichiers .dta dans le dossier 
 files <- list.files(ros_data_loc, pattern = "\\.dta$", full.names = TRUE)
+# full.names = FALSE will return only filenames without the directory path
+
 if (length(files) == 0) {
   stop("No .dta files found in ", ros_data_loc)
 }
-
+#to ensure that at least some .dta files were found, or add an informative message if no files are found
 
 # Use the tidyverse approach to map over years and files
 
@@ -64,6 +66,8 @@ variable_dictionary <- all_vars %>%
     years_present = list(unique(year))) %>%
   ungroup() %>%
   mutate(years_present = map_chr(years_present, ~ paste(.x, collapse = ","))) %>%
+      variable_label = first(variable_label[variable_label != "NA"], default = "NA", .groups = "drop") %>%
+# adding validation after the join to check for NA file_labels and either log a warning or provide a default label for unmatched files
   left_join(file_labels, by = "file_name", .before) %>%
   relocate(file_label, .after = file_name) %>%
   arrange(substr(years_present, 1, 4), # To have 1st variables of 1995
@@ -78,5 +82,11 @@ write_xlsx(variable_dictionary, "output/ROS_Variable_Dictionary.xlsx")
 write_xlsx(variable_dictionary, "output/ROS_Variable_Dictionary.xlsx")
 
 # Display in interactive format
-DT::datatable(variable_dictionary)
+DT::datatable(
+  variable_dictionary,
+  options = list(
+    pageLength = 25,
+    scrollX = TRUE
+  )
+)
 ```
