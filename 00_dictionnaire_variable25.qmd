@@ -66,6 +66,12 @@ variable_dictionary <- all_vars %>%
               TRUE                       ~ as.integer(3))
   ) # starts with hh ID and housing
 
+#Convert all text-type columns to UTF‑8
+variable_dictionary <- variable_dictionary %>%
+  mutate(across(where(is.character),
+                ~ iconv(.x, from = "latin1", to = "UTF-8", sub = NA)))
+
+
 # Write the variable dictionary to an Excel file
 write_xlsx(variable_dictionary, "output/ROS_Variable_Dictionary.xlsx")
 # Requires prior creation of the output folder
