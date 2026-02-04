@@ -37,7 +37,7 @@ files <- list.files(ros_data_loc, pattern = "\\.dta$", full.names = TRUE)
 # })
 
 all_vars <- map_df(files, ~{
-  file_path <- paste0(ros_data_loc, .x)
+  file_path <- file.path(ros_data_loc, .x)
   extract_variable_info(file_path, .x)
 })
 
@@ -50,9 +50,8 @@ all_vars$variable_label[is.na(all_vars$variable_label)] <- "NA"
 file_labels <- read_excel("references/File_labels.xlsx") %>%
   select(file_name = filename, file_label = title_en)
 
-# retreive the file labels
-file_labels <- read_excel("references/File_labels.xlsx") %>%
-  select(file_name = filename, file_label = title_en)
+ # Fix encoding issues for display, without silently dropping characters
+  mutate(across(where(is.character), ~iconv(.x, from = "latin1", to = "UTF-8", sub = NA)))
 
 # Consolidate the information using the tidyverse approach
 variable_dictionary <- all_vars %>%
