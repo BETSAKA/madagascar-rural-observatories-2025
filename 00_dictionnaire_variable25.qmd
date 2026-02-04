@@ -26,7 +26,9 @@ extract_variable_info <- function(file_path, file) {
 
 # Liste directement tous les fichiers .dta dans le dossier 
 files <- list.files(ros_data_loc, pattern = "\\.dta$", full.names = TRUE)
-
+if (length(files) == 0) {
+  stop("No .dta files found in ", ros_data_loc)
+}
 
 
 # Use the tidyverse approach to map over years and files
@@ -71,8 +73,9 @@ variable_dictionary <- all_vars %>%
 
 # Write the variable dictionary to an Excel file
 write_xlsx(variable_dictionary, "output/ROS_Variable_Dictionary.xlsx")
+#Creation au prélable du dossier output
 # To include in published dataset
-write_xlsx(variable_dictionary, "data/ROS_Variable_Dictionary.xlsx")
+write_xlsx(variable_dictionary, "output/ROS_Variable_Dictionary.xlsx")
 
 # Display in interactive format
 DT::datatable(variable_dictionary)
