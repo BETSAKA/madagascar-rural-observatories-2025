@@ -103,65 +103,12 @@ variable_dictionary %>%
   pull(message) %>%
   cat(sep = "\n")
 
+# Count NA value
 na_dictionary_counts <- variable_dictionary %>%
-  filter(is.na(file_label)) %>%   # garder uniquement les lignes où file_label est NA
-  count(file_name, sort = TRUE)   # compter les occurrences par file_name
+  filter(is.na(file_label)) %>%   # Keep only the rows where file_label is NA
+  count(file_name, sort = TRUE)   # Count the occurrences by file_name
 
-
-na_file_names <- variable_dictionary %>%
-  filter(is.na(file_label)) %>%   # garder uniquement les lignes où file_label est NA
-  distinct(file_name)             # extraire les file_name uniques
-
-variable_dictionary <- variable_dictionary %>%
-  mutate(
-    file_label = case_when(
-      # règles spécifiques
-      file_name == "res_E.dta" ~ "Equipement",
-      file_name == "res_JPCHPH.dta" ~ "Jardin Potager, Chasse et Pêche",
-      "res_ap.dta"
-"res_ap2.dta
-"res_ap_def.dta
-res_biodiv.dta
-res_chph.dta
-res_ef.dta
-res_feubrousse.dta
-res_fr30.dta
-res_fr30a.dta
-res_fr33.dta
-res_fr34.dta
-res_jp.dta
-res_mor.dta
-res_mp.dta
-res_op_env.dta
-res_pp.dta
-res_pp0.dta
-res_pro.dta
-res_r1.dta
-res_remq.dta
-res_respg.dta
-res_respg0.dta
-res_sac.dta
-res_sac3.dta
-res_sac4.dta
-res_sac5.dta
-res_ssa.dta
-res_um1.dta
-res_um2.dta
-      
-      # tu peux rajouter autant de conditions que nécessaire :
-      # file_name == "autre_fichier.dta" ~ "Libellé correspondant",
-      
-      # garder les valeurs existantes si elles ne sont pas NA
-      !is.na(file_label) ~ file_label,
-      
-      # valeur par défaut si aucune règle ne s'applique
-      TRUE ~ "Label manquant"
-    )
-  )
-
-
-
-# Ajouter une ligne "Total"
+# Add a total ligne to na_dictionary_counts
 na_dictionary_counts <- na_dictionary_counts %>%
   bind_rows(
     tibble(
@@ -170,7 +117,12 @@ na_dictionary_counts <- na_dictionary_counts %>%
     )
   )
 
+# Target the files whose file_label is missing
+na_file_names <- variable_dictionary %>%
+  filter(is.na(file_label)) %>%   # Keep only the rows where file_label is NA
+  distinct(file_name)             # Extract the unique file_name values
 
+#### IMPORTER UN NOUVEAU FICHIER "FILE_LABELS" AVEC TOUS LES NOUVEAUX FICHIERS DE 2025 => PUIS L'INCLURE DANS "Variable_dictionary" pour ne plus avoir les valeurs manquantes dans "file_label" (@Bezaka) #######
 
 #Convert all text-type columns to UTF‑8
 variable_dictionary <- variable_dictionary %>%
