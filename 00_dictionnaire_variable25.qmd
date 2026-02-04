@@ -37,10 +37,21 @@ if (length(files) == 0) {
 all_vars <- map_df(files, ~{
   file_path <- file.path(ros_data_loc, .x)
   extract_variable_info(file_path, .x)
-})
+}) %>% 
+  mutate(across(where(is.character), 
+                ~iconv(.x, from = "latin1", to = "UTF-8", sub = NA)))
 
 # Convert any NULL values in variable_label to "NA"
 all_vars$variable_label[is.na(all_vars$variable_label)] <- "NA"
+
+
+#Verify the data files completude
+# Comparer avec nb_files
+if (length(unique_files) == length(files)) {
+  message("✅ Tous les fichiers ont été chargés (", length(unique_files) ," sur ", length(files), ").")
+} else {
+  message("⚠️ Attention : ", length(unique_files), " fichiers uniques chargés, mais ", length(files), " attendus.")
+}
 
 # retreive the file labels
 file_labels <- read_excel("documentation/File_labels.xlsx") %>%
