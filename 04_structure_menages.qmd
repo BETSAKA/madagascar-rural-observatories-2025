@@ -23,12 +23,27 @@ res_m_a <- read_dta("data/res_m_a.dta")
 
 ```
 
-Afin de voir si les positions dans l'identifiant des ménages correspondent bien à l'assemblage du code observatoire, du code commune, et du code des hameaux, quelques vérifications s'imposent notamment sur le nombre de caractères constituants ces codes.
+## Vérification
+
+Afin de s'assurer si les positions dans l’identifiant des ménages correspondent bien à la structure formée par le code observatoire, le code commune et le code des hameaux, quelques vérifications s’imposent, notamment sur le nombre de caractères constituant ces codes.
 
 ```{r}
 # Vérification des nombres de position dans j0, j4_a, j41
+source("01_apurement_j5_j0_j4a_j41.R")
 result <- length_analysis(res_deb) 
-result$grouped_table # tableau groupé 
+result$grouped_table %>% 
+  gt() %>% 
+  tab_header( 
+    title = "Occurrences by Obs, hh_ID, village, commune lengths" ) %>% 
+  cols_label( 
+    j0 = "Obs", 
+    j0_length = "Obs_length",
+    j5_length = "hh_ID_length", 
+    j4_a_length = "Village_length", 
+    j41_length = "Commune_length", 
+    n = "Count" 
+    )
+
 min_max_table <- bind_cols(result$min_table,result$max_table) %>% 
   pivot_longer( 
     cols = everything(), 
@@ -41,6 +56,21 @@ min_max_table %>%
     title = "Character Count Summary", 
     )
 ```
+
+La longueur du code des hameaux varie entre 1 et 2, celle de la commune est égale à 1.\
+Or, j5 (contenant 7 positions) est composée de :
+
+-   code observatoire à la position 1 à 3 (Solution déjà proposé par [\@fBedecarrats](https://github.com/fBedecarrats) dans [j0 et j5 sont enregistrés comme numérique dans j5, entraînant une perte des 0 initiaux à la lecture #35](https://github.com/BETSAKA/madagascar-rural-observatories-2025/issues/35) ;
+
+-   code commune à la position 4 ;
+
+-   code village à la position 5 ;
+
+-   code ménage à la position 6-7 ;
+
+Qu’en est-il des codes ménages aux positions 6 et 7 de J5 ?
+
+## Description des ménages
 
 Nous allons voir le nombre de ménages enquêtés par observatoire.
 
@@ -122,8 +152,6 @@ gt_tab <- gt(tab) %>%
     j4 = "Hameau" )
 gt_tab 
 ```
-
-## Description des ménages
 
 =\> A ajouter dans les tableaux :
 
