@@ -23,6 +23,25 @@ res_m_a <- read_dta("data/res_m_a.dta")
 
 ```
 
+Afin de voir si les positions dans l'identifiant des ménages correspondent bien à l'assemblage du code observatoire, du code commune, et du code des hameaux, quelques vérifications s'imposent notamment sur le nombre de caractères constituants ces codes.
+
+```{r}
+# Vérification des nombres de position dans j0, j4_a, j41
+result <- length_analysis(res_deb) 
+result$grouped_table # tableau groupé 
+min_max_table <- bind_cols(result$min_table,result$max_table) %>% 
+  pivot_longer( 
+    cols = everything(), 
+    names_to = c(" ", ".value"), 
+    names_pattern = "(.*)_(min|max)" 
+    ) 
+min_max_table %>% 
+  gt() %>% 
+  tab_header( 
+    title = "Character Count Summary", 
+    )
+```
+
 Nous allons voir le nombre de ménages enquêtés par observatoire.
 
 ```{r}
