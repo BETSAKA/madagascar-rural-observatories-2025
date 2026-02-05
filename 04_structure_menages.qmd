@@ -20,13 +20,7 @@ res_deb <- read_dta("data/res_deb.dta")
 res_m_a <- read_dta("data/res_m_a.dta")
 
 
-# Ce code convertit les ID de ménage en caractrères et rajoute un 0 devant 
-# pour les observatoires avec code "3" (Marovoay") et un identifiant à 6 chiffres
-res_deb <- read_dta("data/dta_format/res_deb.dta") %>%
-  mutate(
-    j5 = as.character(j5),
-    j5 = if_else(j0 == 3 & nchar(j5) == 6, paste0("0", j5), j5)
-  )
+
 ```
 
 Nous allons voir le nombre de ménages enquêtés par observatoire.
