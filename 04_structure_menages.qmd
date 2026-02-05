@@ -8,7 +8,7 @@ editor_options:
 
 Le ménage est l'unité de base de l'enquête.
 
-```{r}
+```{r data_loading}
 library(tidyverse)
 library(haven)
 library(dplyr)
@@ -18,8 +18,6 @@ library (gt) # Easily create presentation - ready display tables
 res_deb <- read_dta("data/res_deb.dta")
 # Loading household data
 res_m_a <- read_dta("data/res_m_a.dta")
-
-
 
 ```
 
@@ -71,95 +69,6 @@ Or, j5 (contenant 7 positions) est composée de :
 Qu’en est-il des codes ménages aux positions 6 et 7 de J5 ?
 
 ## Description des ménages
-
-Nous allons voir le nombre de ménages enquêtés par observatoire.
-
-```{r}
-# Tableau de répartition des ménages selon les observatoires
-tab <- res_deb %>%
-  group_by(j0) %>%
-  summarise(n = n_distinct(j5), .groups = "drop") %>%
-  arrange(desc(n)) %>%
-  mutate(
-    Percent = round(n / sum(n) * 100, 1),
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    )
-  ) %>%
-  select(Observatory, n, Percent)
-
-tab <- tab %>% 
-  tibble::add_row(Observatory = "Total", n = sum(tab$n), Percent = sum(tab$Percent, na.rm = TRUE))
-
-# Créer un tableau avec gt 
-gt_tab <- gt(tab) %>% 
-  tab_header( 
-    title = "Répartition des ménages selon les observatoires",
-    ) %>% 
-  fmt_number( 
-    columns = Percent, 
-    decimals = 0, 
-    suffixing = TRUE ) %>%
-  tab_footnote( 
-    footnote = "Percent (%)", 
-    locations = cells_column_labels(columns = Percent) 
-    )
-gt_tab 
-```
-
-Nous allons voir le nombre de ménages enquêtés par hameau.
-
-=\> A ajouter dans les tableaux : les sous-totaux
-
-```{r}
-# Tableau de répartition des ménages enquêtés par hameau selon les observatoires
-
-tab <- res_deb %>%
-  group_by(j0,j4) %>%
-  summarise(n = n_distinct(j5), .groups = "drop") %>%
-  arrange(desc(n)) %>%
-  mutate(
-    Percent = round(n / sum(n) * 100, 1),
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    )
-  ) %>%
-  select(Observatory,j4, n, Percent)
-
-tab <- tab %>% 
-  tibble::add_row(Observatory = "Total", n = sum(tab$n), Percent = sum(tab$Percent, na.rm = TRUE))
-
-# Créer un tableau avec gt 
-gt_tab <- gt(tab) %>% 
-  tab_header( 
-    title = "Répartition des ménages par hameau selon les observatoires",
-    ) %>% 
-  fmt_number( 
-    columns = Percent, 
-    decimals = 0, 
-    suffixing = TRUE ) %>%
-  tab_footnote( 
-    footnote = "Percent (%)", 
-    locations = cells_column_labels(columns = Percent) 
-    ) %>% 
-  cols_label( 
-    j4 = "Hameau" )
-gt_tab 
-```
-
-=\> A ajouter dans les tableaux :
-
--   une colonne avec les nombres de ménages enquêtés,
-
--   les sous-totaux
-
--   la totale
 
 ### Taille des ménages par observatoire
 

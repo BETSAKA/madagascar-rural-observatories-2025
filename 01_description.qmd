@@ -4,6 +4,18 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{r data_loading}
+library(tidyverse)
+library(haven)
+library(dplyr)
+library (gt) # Easily create presentation - ready display tables
+
+# Loading observatories data
+res_deb <- read_dta("data/res_deb.dta")
+# Loading household data
+res_m_a <- read_dta("data/res_m_a.dta")
+```
+
 # Description
 
 Il s'agit d'un chapitre préliminaire decrivant le déroulement de l'enquête ainsi que les methodologies déployées.
@@ -21,3 +33,118 @@ Cette partie inclut des tables et figures sur :
 -   chronogramme des enquêtes (à partir des dates saisies dans les questionnaires)
 
 -   nombre de questionnaire par enquêteur (anonysés) et par agent de saisie
+
+On introduit par une présentation des deux ORs Alaotra et Marovoay.
+
+Contexte notamment 02 greniers à riz et APs.
+
+Lien avec les ORs de 1995-2015
+
+Période de l'enquête : 01 octobre - 15 novembre 2025
+
+Période de référence : 01 octobre 2024 - 30 septembre 2025
+
+Présentation de la division administrative de Marovoay et Alaotra : région, district, commune, fokontany et hameau
+
+Zone de dénombrement / d'enquête =\> hameau
+
+Carte de Marovoay et d'Alaotra
+
+Méthodologie :
+
+Ethique =\> Approbation éthique en annexe
+
+Formation des superviseurs, des enquêteurs sur terrain, pas de formation pour les agents de saisie
+
+Selection des zones d'études
+
+Echantillonnage
+
+Nombre de ménages enquêtés par observatoire
+
+```{r}
+# Tableau de répartition des ménages selon les observatoires
+tab <- res_deb %>%
+  group_by(j0) %>%
+  summarise(n = n_distinct(j5), .groups = "drop") %>%
+  arrange(desc(n)) %>%
+  mutate(
+    Percent = round(n / sum(n) * 100, 1),
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  ) %>%
+  select(Observatory, n, Percent)
+
+tab <- tab %>% 
+  tibble::add_row(Observatory = "Total", n = sum(tab$n), Percent = sum(tab$Percent, na.rm = TRUE))
+
+# Créer un tableau avec gt 
+gt_tab <- gt(tab) %>% 
+  tab_header( 
+    title = "Répartition des ménages selon les observatoires",
+    ) %>% 
+  fmt_number( 
+    columns = Percent, 
+    decimals = 0, 
+    suffixing = TRUE ) %>%
+  tab_footnote( 
+    footnote = "Percent (%)", 
+    locations = cells_column_labels(columns = Percent) 
+    )
+gt_tab 
+```
+
+=\> A ajouter dans les tableaux : les sous-totaux
+
+Nombre de ménages enquêtés par hameaux
+
+```{r}
+# Tableau de répartition des ménages enquêtés par hameau selon les observatoires
+
+tab <- res_deb %>%
+  group_by(j0,j4) %>%
+  summarise(n = n_distinct(j5), .groups = "drop") %>%
+  arrange(desc(n)) %>%
+  mutate(
+    Percent = round(n / sum(n) * 100, 1),
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  ) %>%
+  select(Observatory,j4, n, Percent)
+
+tab <- tab %>% 
+  tibble::add_row(Observatory = "Total", n = sum(tab$n), Percent = sum(tab$Percent, na.rm = TRUE))
+
+# Créer un tableau avec gt 
+gt_tab <- gt(tab) %>% 
+  tab_header( 
+    title = "Répartition des ménages par hameau selon les observatoires",
+    ) %>% 
+  fmt_number( 
+    columns = Percent, 
+    decimals = 0, 
+    suffixing = TRUE ) %>%
+  tab_footnote( 
+    footnote = "Percent (%)", 
+    locations = cells_column_labels(columns = Percent) 
+    ) %>% 
+  cols_label( 
+    j4 = "Hameau" )
+gt_tab 
+```
+
+=\> A ajouter dans les tableaux :
+
+-   une colonne avec les nombres de ménages enquêtés,
+
+-   les sous-totaux
+
+-   la totale
