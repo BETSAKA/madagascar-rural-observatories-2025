@@ -4,6 +4,8 @@ editor_options:
   chunk_output_type: console
 ---
 
+# Description
+
 ```{r data_loading}
 library(tidyverse)
 library(haven)
@@ -16,7 +18,7 @@ res_deb <- read_dta("data/res_deb.dta")
 res_m_a <- read_dta("data/res_m_a.dta")
 ```
 
-# Description
+
 
 Il s'agit d'un chapitre préliminaire decrivant le déroulement de l'enquête ainsi que les methodologies déployées.
 
@@ -60,9 +62,16 @@ Selection des zones d'études
 
 Echantillonnage
 
-Nombre de ménages enquêtés par observatoire
+Nombre de ménages enquêtés par observatoire. Voir @tbl-men-obs.
+
 
 ```{r}
+#| tbl-cap: |
+#|    Répartition des ménages selon les observatoires.     
+#|    Source : enquête
+#| tbl-cap-location: bottom
+#| label: tbl-men-obs
+
 # Tableau de répartition des ménages selon les observatoires
 tab <- res_deb %>%
   group_by(j0) %>%

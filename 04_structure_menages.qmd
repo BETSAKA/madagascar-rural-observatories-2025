@@ -18,7 +18,7 @@ library (gt) # Easily create presentation - ready display tables
 res_deb <- read_dta("data/res_deb.dta")
 # Loading household data
 res_m_a <- read_dta("data/res_m_a.dta")
-
+# Changing j0 and j5 in character value
 ```
 
 ## Vérification
@@ -116,7 +116,16 @@ hh_size_obs <- res_m_a %>%
   group_by(j0, j4, j5) %>% 
   mutate(hh_size = n()) %>% 
   distinct(j0, j4, j5, hh_size) %>% 
-  group_by(j0, j4) %>% 
+  mutate(
+     j4bis = case_when(
+      str_starts(str_to_lower(j4), "bepako") ~ "Bepako",
+      str_starts(str_to_lower(j4), "ampijoroa") ~ "Ampijoroa",
+      str_starts(str_to_lower(j4), "maroala") ~ "Maroala",
+      str_starts(str_to_lower(j4), "madiromiongana") ~ "Madiromiongana",
+      TRUE       ~ j4
+    )
+  ) %>% 
+  group_by(j0, j4bis) %>% 
   summarise(mean_hh_size = mean(hh_size), .groups = "drop") %>% 
   mutate(
     j0 = as.character(j0),
@@ -126,7 +135,7 @@ hh_size_obs <- res_m_a %>%
       TRUE       ~ j0
     )
   ) %>% 
-  select(Observatory, j4, mean_hh_size) #%>% 
+  select(Observatory, j4bis, mean_hh_size) #%>% 
   # bind_rows( 
   #   tibble( 
   #     Observatory = "Total", 
@@ -149,10 +158,14 @@ hh_size_obs_tab <- gt(
     suffixing = TRUE ) %>%
   cols_label( 
     mean_hh_size = "Taille moyenne",
-    j4 = "Hameau") 
+    j4bis = "Hameau") 
 hh_size_obs_tab
 
 ```
+
+A CORRIGER :
+
+-   A mettre à côté de Marovoay et Alaotra leur taille moyenne,
 
 ### Structure par âge
 
@@ -319,10 +332,19 @@ m6 : rohim-pihavanana, 1 : CM, 2 : sa femme
 
 m3 : origine
 
-```{r}
+```{r origine_CM}
 # Origine des chefs de ménages et de leurs conjoints
 
-
+hh_origine <- res_deb %>%
+  left_join(res_m_a, by="j5") %>% 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  )
 
 ```
 
