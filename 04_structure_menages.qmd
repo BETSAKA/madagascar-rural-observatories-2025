@@ -630,6 +630,29 @@ gt_hh_combined
 
 ### Niveau d'éducation
 
+```{r}
+hh_educ <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 == 1) %>%  # Keep only CM = 1
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+      Niv_education = case_when(
+      s3a >= 1 & s3a <= 5 | s3a == 99~ "Primaire",
+      s3a >= 6 & s3a <= 9 ~ "Secondaire 1er cycle",
+      s3a >= 10 & s3a <= 12 ~ "Secondaire 2ème cycle",
+      TRUE ~ NA_character_
+  ) %>%
+  select(Observatory, j5, Niv_education )
+  
+  
+  class(hh_educ$Niv_education)
+```
 
 
 ### Activités principales des Chefs de ménage
