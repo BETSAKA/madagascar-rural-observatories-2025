@@ -646,13 +646,192 @@ hh_educ <- res_deb %>%
       s3a >= 1 & s3a <= 5 | s3a == 99~ "Primaire",
       s3a >= 6 & s3a <= 9 ~ "Secondaire 1er cycle",
       s3a >= 10 & s3a <= 12 ~ "Secondaire 2ème cycle",
+      s3a >= 10 & s3a <= 12 ~ "Secondaire 2ème cycle",
+      s3a >= 13 & s3a <= 22 ~ "Universitaire",
       TRUE ~ NA_character_
-  ) %>%
+     ), 
+    )%>%
   select(Observatory, j5, Niv_education )
   
-  
-  class(hh_educ$Niv_education)
+# Education level tab
+hh_educ_level <- hh_educ %>%
+  mutate(
+    Niv_education = replace_na(Niv_education, "Inconnu")
+  ) %>%
+  group_by(Observatory, Niv_education) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  group_by(Observatory) %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) %>%
+  ungroup()
+
+# GT tab
+educ_table <- hh_educ_level %>%
+  mutate(
+    Valeur = paste0(count, " (", percentage, "%)")
+  ) %>%
+  select(Observatory, Niv_education, Valeur) %>%
+  pivot_wider(
+    names_from = Observatory,
+    values_from = Valeur,
+    values_fill = "-"
+  ) %>%
+  rename(
+    `Niveau d'éducation` = Niv_education
+  )
+
+# GT tab display
+gt_educ <- educ_table %>%
+  gt() %>%
+  tab_header(
+    title = "Répartition des chefs de ménage selon leur niveau d'éducation",
+  ) %>%
+  cols_label(
+    `Niveau d'éducation` = "Niveau d'éducation",
+    Alaotra = "Alaotra",
+    Marovoay = "Marovoay"
+  ) %>%
+  # GRAS : Titre
+  tab_style(
+    style = cell_text(weight = "bold", size = "large"),
+    locations = cells_title(groups = "title")
+  ) %>%
+  # GRAS : Sous-titre
+  tab_style(
+    style = cell_text(weight = "bold", size = "medium"),
+    locations = cells_title(groups = "subtitle")
+  ) %>%
+  # GRAS : En-têtes de colonnes
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  ) %>%
+  # Alternance de couleurs
+  tab_style(
+    style = cell_fill(color = "#e8f4f8"),
+    locations = cells_body(rows = seq(1, nrow(educ_table), 2))
+  ) %>%
+  tab_footnote(
+    footnote = "Les pourcentages sont calculés par rapport au total des chefs de ménage de chaque observatoire",
+    locations = cells_title(groups = "title")
+  )
+
+gt_educ
+
 ```
+
+Remarque :
+- A revoir modalité des niveaux d'éducation
+
+#### Niveau d'éducation des chefs de ménages par sexe
+
+```{r}
+hh_educ_sexe <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 == 1) %>%  # Keep only CM = 1
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    Sexe = case_when(
+      m4 == 1 ~ "Homme",
+      m4 == 2 ~ "Femme",
+      TRUE    ~ NA_character_
+    ),
+    Niv_education = case_when(
+      s3a >= 1 & s3a <= 5 | s3a == 99 ~ "Primaire",
+      s3a >= 6 & s3a <= 9 ~ "Secondaire 1er cycle",
+      s3a >= 10 & s3a <= 12 ~ "Secondaire 2ème cycle",
+      s3a >= 13 & s3a <= 22 ~ "Universitaire",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  select(Observatory, Sexe, j5, Niv_education)
+
+# Education level tab with sex
+hh_educ_level <- hh_educ_sexe %>%
+  mutate(
+    Niv_education = replace_na(Niv_education, "Inconnu")
+  ) %>%
+  group_by(Observatory, Sexe, Niv_education) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  group_by(Observatory, Sexe) %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) %>%
+  ungroup()
+
+# GT tab
+educ_table <- hh_educ_level %>%
+  mutate(
+    Valeur = paste0(count, " (", percentage, "%)")
+  ) %>%
+  select(Observatory, Sexe, Niv_education, Valeur) %>%
+  pivot_wider(
+    names_from = c(Observatory, Sexe),
+    values_from = Valeur,
+    names_glue = "{Observatory}_{Sexe}",
+    values_fill = "-"
+  ) %>%
+  rename(
+    `Niveau d'éducation` = Niv_education
+  )
+
+# GT tab display
+gt_educ <- educ_table %>%
+  gt() %>%
+  tab_header(
+    title = "Répartition des chefs de ménage selon leur niveau d'éducation et sexe"
+  ) %>%
+  cols_label(
+    `Niveau d'éducation` = "Niveau d'éducation",
+    Alaotra_Homme = "Homme",
+    Alaotra_Femme = "Femme",
+    Marovoay_Homme = "Homme",
+    Marovoay_Femme = "Femme"
+  ) %>%
+  tab_spanner(
+    label = "Alaotra",
+    columns = c(Alaotra_Homme, Alaotra_Femme)
+  ) %>%
+  tab_spanner(
+    label = "Marovoay",
+    columns = c(Marovoay_Homme, Marovoay_Femme)
+  ) %>%
+  # GRAS : Titre
+  tab_style(
+    style = cell_text(weight = "bold", size = "large"),
+    locations = cells_title(groups = "title")
+  ) %>%
+  # GRAS : En-têtes de colonnes
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  ) %>%
+  # GRAS : Spanners (Alaotra, Marovoay)
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_spanners()
+  ) %>%
+  # Alternance de couleurs
+  tab_style(
+    style = cell_fill(color = "#e8f4f8"),
+    locations = cells_body(rows = seq(1, nrow(educ_table), 2))
+  ) %>%
+  tab_footnote(
+    footnote = "Les pourcentages sont calculés par rapport au total des chefs de ménage de chaque sexe et observatoire",
+    locations = cells_title(groups = "title")
+  )
+
+gt_educ
+```
+
+
 
 
 ### Activités principales des Chefs de ménage
