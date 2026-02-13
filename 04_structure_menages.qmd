@@ -111,61 +111,62 @@ hh_size_obs_tab
 ### Taille des ménages par hameau et par observatoire
 
 ```{r hh_size_hameau}
+# Calculer la taille moyenne des ménages par hameau
 hh_size_obs <- res_m_a %>% 
   left_join(res_deb, by = "j5") %>% 
   group_by(j0, j4, j5) %>% 
-  mutate(hh_size = n()) %>% 
-  distinct(j0, j4, j5, hh_size) %>% 
+  summarise(hh_size = n(), .groups = "drop") %>% 
   mutate(
-     j4bis = case_when(
+    j4bis = case_when(
       str_starts(str_to_lower(j4), "bepako") ~ "Bepako",
       str_starts(str_to_lower(j4), "ampijoroa") ~ "Ampijoroa",
       str_starts(str_to_lower(j4), "maroala") ~ "Maroala",
       str_starts(str_to_lower(j4), "madiromiongana") ~ "Madiromiongana",
-      TRUE       ~ j4
-    )
-  ) %>% 
-  group_by(j0, j4bis) %>% 
-  summarise(mean_hh_size = mean(hh_size), .groups = "drop") %>% 
-  mutate(
-    j0 = as.character(j0),
+      TRUE ~ j4
+    ),
     Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
+      j0 == 3  ~ "Marovoay",
+      j0 == 21 ~ "Alaotra",
+      TRUE ~ as.character(j0)
     )
   ) %>% 
-  select(Observatory, j4bis, mean_hh_size) #%>% 
-  # bind_rows( 
-  #   tibble( 
-  #     Observatory = "Total", 
-  #     j4 = "Tous hameaux", 
-  #     mean_hh_size = mean(hh_size_obs$mean_hh_size) 
-  #     ) 
-  #   )
+  group_by(Observatory, j4bis) %>% 
+  summarise(
+    n_hh = n(),
+    mean_hh_size = mean(hh_size), 
+    .groups = "drop"
+  )
 
-# Displaying with gt
-hh_size_obs_tab <- gt(
-  hh_size_obs,
-  groupname_col = "Observatory" # les observatoires deviennent des groupes
-  ) %>% 
-  tab_header( 
-    title = "Taille moyenne des ménages par hameau et selon l'observatoire",
-    ) %>% 
-  fmt_number( 
-    columns = mean_hh_size, 
-    decimals = 2, 
-    suffixing = TRUE ) %>%
-  cols_label( 
-    mean_hh_size = "Taille moyenne",
-    j4bis = "Hameau") 
-hh_size_obs_tab
+# Ajouter les lignes de résumé par observatoire
+hh_size_combined <- hh_size_obs %>%
+  group_by(Observatory) %>%
+  summarise(
+    j4bis = "Ensemble",
+    mean_hh_size = weighted.mean(mean_hh_size, n_hh),
+    # On a besoin de n_hh pour pondérer le calcul de la moyenne par observatoire
+    n_hh = sum(n_hh) 
+  ) %>%
+  bind_rows(hh_size_obs, .) %>%
+  arrange(Observatory, j4bis == "Ensemble", j4bis)
+
+# Afficher le tableau avec gt
+gt(hh_size_combined, groupname_col = "Observatory") %>% 
+  tab_header(title = "Taille moyenne des ménages par hameau et selon l'observatoire") %>% 
+  fmt_number(columns = mean_hh_size, decimals = 2) %>%
+  # on utilise n_hh pour calculer la moyenne par observatoire, mais on le 
+  # masque car cette information est déjà fournie plus haut
+  cols_hide(columns = n_hh) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#F0F0F0")),
+    locations = cells_body(rows = j4bis == "Ensemble")
+  ) %>%
+  tab_options(row_group.font.weight = "bold") %>%
+  cols_label(mean_hh_size = "Taille moyenne", j4bis = "Hameau")
+
 
 ```
 
-A CORRIGER :
 
--   A mettre à côté de Marovoay et Alaotra leur taille moyenne,
 
 ### Structure par âge
 
@@ -231,7 +232,7 @@ gt_hh_age
 
 Nous allons voir la répartition des ménages par tranche d'âge par hameau et par observatoire.
 
-```{r}
+```{r pyramide_age}
 # Tableau de répartition des ménages par tranche d'âge selon les observatoires
 
 hh_age <- res_deb %>%
@@ -308,13 +309,49 @@ ggplot(hh_age, aes(x = AgeGroup, y = Percent, fill = Observatory)) +
   theme_minimal() + 
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# Pyramide des âges par observatoire 
-ggplot(hh_age, aes(x = AgeGroup, y = ifelse(Observatory == "Marovoay", Percent, -Percent), fill = Observatory)) +
+# Pyramide des âges par sexe et observatoire
+hh_age_sex <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>% 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    AgeGroup = case_when(
+      m5 <= 10              ~ "0-10 ans",
+      between(m5, 11, 20)   ~ "11-20 ans",
+      between(m5, 21, 30)   ~ "21-30 ans",
+      between(m5, 31, 40)   ~ "31-40 ans",
+      between(m5, 41, 50)   ~ "41-50 ans",
+      between(m5, 51, 60)   ~ "51-60 ans",
+      between(m5, 61, 70)   ~ "61-70 ans",
+      m5 >= 71              ~ "71 ans et plus",
+      TRUE                  ~ NA_character_
+    ),
+    Sexe = case_when(
+      m4 == 1 ~ "Homme",
+      m4 == 2 ~ "Femme",
+      TRUE    ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(Sexe) & !is.na(AgeGroup)) %>%
+  group_by(Observatory, AgeGroup, Sexe) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(Observatory, Sexe) %>%
+  mutate(
+    Percent = round(n / sum(n) * 100, 1),
+    Percent = if_else(Sexe == "Homme", -Percent, Percent)
+  )
+
+ggplot(hh_age_sex, aes(x = AgeGroup, y = Percent, fill = Sexe)) +
   geom_col() + 
   coord_flip() + 
+  facet_wrap(~Observatory) +
   labs( 
     title = "Pyramide des âges des ménages enquêtés par observatoire",
-    x = "Tranche d’âge",
+    x = "Tranche d'âge",
     y = "Pourcentage (%)" 
     ) + 
   scale_y_continuous(labels = abs) + 
