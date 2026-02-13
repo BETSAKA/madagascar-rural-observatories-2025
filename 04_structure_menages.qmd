@@ -464,13 +464,173 @@ Raison d'implantation (Mg4a)
  m5 : age
 m5 : situation matrimoniale
 
-```{r caracteristiques_CM}
+```{r}
+# Marital status of household heads
+hh_m_status <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 == 1) %>%  # Keep only CM = 1
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    Sexe = case_when(
+      m4 == 1 ~ "Homme",
+      m4 == 2 ~ "Femme",
+      TRUE    ~ NA_character_
+    ),
+    Age = m5,
+    Statut_matrimonial = case_when(
+      m7 == 1 ~ "Célibataire",
+      m7 == 2 ~ "Marié(e) selon la tradition",
+      m7 == 3 ~ "En concubinage",
+      m7 == 4 ~ "Divorcé(e)",
+      m7 == 5 ~ "Veuf(ve)",
+      m7 == 6 ~ "Polygame",
+      m7 == 7 ~ "Marié(e) civilement",
+      m7 == 8 ~ "Marié(e) religieusement",
+      TRUE    ~ NA_character_
+    )
+  ) %>%
+  select(Observatory, Sexe, Age, Statut_matrimonial)
 
+# Sexe tab
+sexe_stats <- hh_m_status %>%
+  group_by(Observatory, Sexe) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  group_by(Observatory) %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) %>%
+  ungroup()
 
+sexe_table <- sexe_stats %>%
+  select(Observatory, Sexe, count, percentage) %>%
+  mutate(
+    Valeur = paste0(count, " (", percentage, "%)")
+  ) %>%
+  select(Observatory, Sexe, Valeur) %>%
+  pivot_wider(
+    names_from = Observatory,
+    values_from = Valeur,
+    values_fill = "-"
+  ) %>%
+  rename(Sexe = Sexe) %>%
+  mutate(Caractéristique = "Sexe", .before = Sexe) %>%
+  rename(Catégorie = Sexe)
 
+# Age tab
+age_stats <- hh_m_status %>%
+  group_by(Observatory) %>%
+  summarise(
+    Médiane = median(Age, na.rm = TRUE),
+    Moyenne = round(mean(Age, na.rm = TRUE), 1),
+    Mode = as.numeric(names(sort(table(Age), decreasing = TRUE)[1])),
+    Minimum = min(Age, na.rm = TRUE),
+    Maximum = max(Age, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+age_table <- age_stats %>%
+  pivot_longer(
+    cols = -Observatory,
+    names_to = "Statistique",
+    values_to = "Valeur"
+  ) %>%
+  pivot_wider(
+    names_from = Observatory,
+    values_from = Valeur
+  ) %>%
+  mutate(
+    Statistique = factor(Statistique, 
+      levels = c("Minimum", "Mode", "Médiane", "Moyenne", "Maximum"))
+  ) %>%
+  arrange(Statistique) %>%
+  mutate(
+    Alaotra = as.character(round(Alaotra, 0)),
+    Marovoay = as.character(round(Marovoay, 0))
+  ) %>%
+  mutate(Caractéristique = "Âge", .before = Statistique) %>%
+  rename(Catégorie = Statistique)
+
+# Marital status tab
+statut_stats <- hh_m_status %>%
+  group_by(Observatory, Statut_matrimonial) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  group_by(Observatory) %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) %>%
+  ungroup()
+
+statut_table <- statut_stats %>%
+  select(Observatory, Statut_matrimonial, percentage) %>%
+  pivot_wider(
+    names_from = Observatory,
+    values_from = percentage,
+    values_fill = 0
+  ) %>%
+  mutate(across(-Statut_matrimonial, ~paste0(., "%"))) %>%
+  mutate(Caractéristique = "Statut matrimonial", .before = Statut_matrimonial) %>%
+  rename(Catégorie = Statut_matrimonial)
+
+# Merge tab
+hh_combined <- bind_rows(
+  sexe_table,
+  age_table,
+  statut_table
+)
+
+# GT tab avec formatage en gras
+gt_hh_combined <- hh_combined %>%
+  gt(groupname_col = "Caractéristique") %>%
+  tab_header(
+    title = "Caractéristiques des chefs de ménage"
+  ) %>%
+  cols_label(
+    Catégorie = "Catégorie",
+    Alaotra = "Alaotra",
+    Marovoay = "Marovoay"
+  ) %>%
+  # GRAS : Titre
+  tab_style(
+    style = cell_text(weight = "bold", size = "large"),
+    locations = cells_title(groups = "title")
+  ) %>%
+  # GRAS : Sous-titre
+  tab_style(
+    style = cell_text(weight = "bold", size = "medium"),
+    locations = cells_title(groups = "subtitle")
+  ) %>%
+  # GRAS : En-têtes de colonnes
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  ) %>%
+  # GRAS : Noms des groupes (Sexe, Âge, Statut matrimonial)
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_row_groups()
+  ) %>%
+  # Alternance de couleurs
+  tab_style(
+    style = cell_fill(color = "#e8f4f8"),
+    locations = cells_body(rows = seq(1, nrow(hh_combined), 2))
+  ) %>%
+  tab_footnote(
+    footnote = "Sexe et Statut matrimonial : en nombres et pourcentages. Âge : statistiques descriptives (minimum, mode, médiane, moyenne, maximum)",
+    locations = cells_title(groups = "title")
+  )
+
+gt_hh_combined
 ```
 
 ### Niveau d'éducation
+
+
 
 ### Activités principales des Chefs de ménage
 
