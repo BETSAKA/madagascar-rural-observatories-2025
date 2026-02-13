@@ -832,9 +832,34 @@ gt_educ
 ```
 
 
-
-
 ### Activités principales des Chefs de ménage
+
+```{r}
+# Main activities of the household head
+
+hh_main_act <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 == 1) %>%  # Keep only CM = 1
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    Act_principal = case_when(
+      a1 == 95 ~ "Cultivateur",
+      a1 == 96 ~ "Eleveur",
+      a1 == 45 ~ "Commerçant"
+      TRUE    ~ NA_character_
+    ),
+  ) %>%
+  select(Observatory, Sexe, j5, Act_principal)
+
+
+```
+
 
 ## Caractéristiques des autres membres de ménages
 
