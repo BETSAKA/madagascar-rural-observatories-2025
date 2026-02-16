@@ -873,11 +873,10 @@ gt_educ
 
 ```{r}
 # Main activities of the household head
-
 hh_main_act <- res_deb %>%
   left_join(res_m_a, by = "j5") %>%
   arrange(j5) %>% 
-  filter(m6 == 1) %>%  # Keep only CM = 1
+  filter(m6 == 1) %>%  # Keep only household head = 1
   mutate(
     j0 = as.character(j0),
     Observatory = case_when(
@@ -888,12 +887,24 @@ hh_main_act <- res_deb %>%
     Act_principal = case_when(
       a1 == 95 ~ "Cultivateur",
       a1 == 96 ~ "Eleveur",
-      a1 == 45 ~ "Commerçant"
+      a1 == 45 ~ "Commerçant",
+      TRUE    ~ NA_character_
+    ),
+     Sexe = case_when(
+      m4 == 1 ~ "Homme",
+      m4 == 2 ~ "Femme",
       TRUE    ~ NA_character_
     ),
   ) %>%
-  select(Observatory, Sexe, j5, Act_principal)
-
+  group_by(Observatory, Sexe, Act_principal) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  group_by(Observatory, Sexe) %>% 
+  mutate( 
+    Percent = round(n / sum(n) * 100, 1) 
+    ) %>% 
+  arrange(Observatory, Sexe, desc(n))
+hh_main_act
+  #select(Observatory, Sexe, Act_principal)
 
 ```
 

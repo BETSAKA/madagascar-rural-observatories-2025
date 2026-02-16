@@ -113,13 +113,15 @@ Nombre de ménages enquêtés par hameaux
 
 ```{r}
 # Tableau de répartition des ménages enquêtés par hameau selon les observatoires
-
 tab <- res_deb %>%
-  group_by(j0,j4) %>%
-  summarise(n = n_distinct(j5), .groups = "drop") %>%
-  arrange(desc(n)) %>%
-  mutate(
-    Percent = round(n / sum(n) * 100, 1),
+    mutate(
+    j4bis = case_when(
+      str_starts(str_to_lower(j4), "bepako") ~ "Bepako",
+      str_starts(str_to_lower(j4), "ampijoroa") ~ "Ampijoroa",
+      str_starts(str_to_lower(j4), "maroala") ~ "Maroala",
+      str_starts(str_to_lower(j4), "madiromiongana") ~ "Madiromiongana",
+      TRUE ~ j4
+    ),
     j0 = as.character(j0),
     Observatory = case_when(
       j0 == "3"  ~ "Marovoay",
@@ -127,7 +129,13 @@ tab <- res_deb %>%
       TRUE       ~ j0
     )
   ) %>%
-  select(Observatory,j4, n, Percent)
+  group_by(Observatory,j4bis) %>%
+  summarise(n = n_distinct(j5), .groups = "drop") %>%
+  arrange(desc(n)) %>%
+  mutate(
+    Percent = round(n / sum(n) * 100, 1) 
+  ) %>% 
+  select(Observatory,j4bis, n, Percent)
 
 tab <- tab %>% 
   tibble::add_row(Observatory = "Total", n = sum(tab$n), Percent = sum(tab$Percent, na.rm = TRUE))
@@ -146,7 +154,7 @@ gt_tab <- gt(tab) %>%
     locations = cells_column_labels(columns = Percent) 
     ) %>% 
   cols_label( 
-    j4 = "Hameau" )
+    j4bis = "Hameau" )
 gt_tab 
 ```
 
