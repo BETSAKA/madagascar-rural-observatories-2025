@@ -13,6 +13,7 @@ library(tidyverse)
 library(haven)
 library(dplyr)
 library (gt) # Easily create presentation - ready display tables
+library(ggplot2)
 
 # Loading observatories data
 res_deb <- read_dta("data/res_deb.dta")
@@ -870,6 +871,53 @@ gt_educ
 
 
 ### Activités principales des Chefs de ménage
+Tout d'abord, on va vérifier les effectifs des activités principales (a1) des Chefs de ménage
+
+```{r}
+# All main activities of the household head
+all_hh_main_act <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 == 1) %>%  # Keep only household head = 1
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+  ) %>%
+  group_by(Observatory, a1) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate( 
+    Percent = round(n / sum(n) * 100, 1) 
+    ) %>% 
+  arrange(Observatory, desc(n), desc(Percent)) 
+
+# Display with gt
+all_hh_main_act %>%
+  gt(groupname_col = "Observatory") %>%
+  tab_header(
+    title = md("**Main activities of the household head by observatory**")
+  ) %>%
+  cols_label(
+    a1 = "Main activity",
+    n = "Count",
+    Percent = "Percentage (%)"
+  ) %>%
+  fmt_number(
+    columns = Percent,
+    decimals = 1
+  ) %>%
+  tab_options(
+    table.font.size = 12,
+    table.width = pct(100)
+  )
+```
+Les cultivateurs exploitants (code = 95), les ouvriers agricoles (salariés agricoles) (code = 76) et commercants (code = 45) sont majoritaires tant à Alaotra et à Marovoay.
+Il n'y a pas de pêcheur exploitant à Alaotra (code = 99)
+
+Nous allons voir les effectifs des activités principales comme "Cultivateur", "Eleveur", et "Commerçant"
 
 ```{r}
 # Main activities of the household head
@@ -886,14 +934,15 @@ hh_main_act <- res_deb %>%
     ),
     Act_principal = case_when(
       a1 == 95 ~ "Cultivateur",
-      a1 == 96 ~ "Eleveur",
+      a1 == 76 ~ "Ouvrier agricole",
       a1 == 45 ~ "Commerçant",
-      TRUE    ~ NA_character_
+      a1 == 96 ~ "Eleveur",
+      TRUE    ~ "Autres"
     ),
      Sexe = case_when(
       m4 == 1 ~ "Homme",
       m4 == 2 ~ "Femme",
-      TRUE    ~ NA_character_
+      TRUE    ~ "Autres"
     ),
   ) %>%
   group_by(Observatory, Sexe, Act_principal) %>% 
@@ -902,10 +951,95 @@ hh_main_act <- res_deb %>%
   mutate( 
     Percent = round(n / sum(n) * 100, 1) 
     ) %>% 
-  arrange(Observatory, Sexe, desc(n))
-hh_main_act
-  #select(Observatory, Sexe, Act_principal)
+  arrange(Observatory, Sexe, desc(n)) 
 
+ # Calculate totals by observatory and sex
+  totaux <- hh_main_act %>% 
+  group_by(Observatory, Sexe) %>% 
+  summarise( 
+    Act_principal = "Total", 
+    n = sum(n), 
+    Percent = 100, 
+    .groups = "drop" 
+    ) 
+# Merge detailed data with totals
+hh_main_act_final <- bind_rows(hh_main_act, totaux) %>%
+  arrange(Observatory, Sexe, desc(Act_principal))
+
+# Pivot to have Male/Female in columns
+hh_wide <- hh_main_act_final %>% 
+  pivot_wider( 
+    names_from = Sexe, 
+    values_from = c(n, Percent) 
+    )
+
+hh_wide %>%
+  gt(groupname_col = "Observatory") %>%
+  tab_header(
+    title = md("**Activités principales du chef de ménage par observatoire et par sexe**")
+  ) %>%
+  cols_label(
+    Act_principal = "Activité principale",
+    n_Homme = "Effectif Homme",
+    Percent_Homme = "Pourcentage Homme (%)",
+    n_Femme = "Effectif Femme",
+    Percent_Femme = "Pourcentage Femme (%)"
+  ) %>%
+  fmt_number(
+    columns = starts_with("Percent"),
+    decimals = 1
+  ) %>%
+  tab_options(
+    table.font.size = 12,
+    table.width = pct(100)
+  ) %>% 
+# Make the headers bold
+  tab_style( 
+    style = cell_text(weight = "bold"), 
+    locations = cells_column_labels( 
+      columns = everything() 
+      ) 
+    ) %>% 
+
+# Group titles (Alaotra, Marovoay) in bold + light gray background
+tab_style( 
+  style = list( cell_text(weight = "bold"), 
+                cell_fill(color = "#f0f0f0") 
+                ), 
+  locations = cells_row_groups(groups = c("Alaotra", "Marovoay")
+                               ) 
+  ) %>% 
+ # "Total" row and its content in bold + light blue background
+  tab_style( 
+    style = list( cell_text(weight = "bold"), 
+                  cell_fill(color = "#e6f2ff") 
+                  ), 
+    locations = cells_body( rows = Act_principal == "Total" ) 
+    ) %>% 
+# Column headers in bold + bluish gray background
+  tab_style( 
+    style = list( cell_text(weight = "bold"), 
+                  cell_fill(color = "#d9e2ef") 
+                  ), 
+    locations = cells_column_labels( columns = everything() 
+                                     ) 
+    )
+
+# Histogramm per observatory and sex
+ggplot(hh_main_act_final, aes(x = Act_principal, y = Percent, fill = Sexe)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~Observatory) +
+  labs(
+    title = "Répartition des activités principales \n des chefs de ménage selon l'observatoire et par sexe (%)",
+    x = "Activité principale",
+    y = "Pourcentage (%)"
+  ) +
+  scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e")) +
+  theme_minimal(base_size = 14) +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 12),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
 ```
 
 
