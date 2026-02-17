@@ -372,7 +372,7 @@ m6 : rohim-pihavanana, 1 : CM, 2 : sa femme
 
 m3 : origine
 
-```{r}
+```{r hhh-spouse-origin}
 # Origin of household heads and spouses by observatory
 
 hh_origine <- res_deb %>%
@@ -419,6 +419,9 @@ origin_table <- hh_origine %>%
 
 # Tableau GT - Réorganiser les données pour GT
 origin_gt_data <- origin_table %>%
+  # S'assurer que toutes les combinaisons existent
+  complete(Observatory, Member_Type, Origine, fill = list(count = 0, percentage = 0)) %>%
+  select(-total) %>%
   pivot_wider(
     names_from = Member_Type,
     values_from = c(count, percentage),
