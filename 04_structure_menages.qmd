@@ -9,6 +9,10 @@ editor_options:
 Le ménage est l'unité de base de l'enquête.
 
 ```{r data_loading}
+# Set encoding 
+options(encoding = "UTF-8")
+
+# Load package
 library(tidyverse)
 library(haven)
 library(dplyr)
@@ -167,8 +171,6 @@ gt(hh_size_combined, groupname_col = "Observatory") %>%
 
 ```
 
-
-
 ### Structure par âge
 
 Nous allons voir la répartition des ménages par tranche d'âge par observatoire.
@@ -285,7 +287,6 @@ gt_hh_age <- gt(hh_age) %>%
 gt_hh_age 
 ```
 
-
 =\> On va voir les graphiques
 
 ```{r}
@@ -358,9 +359,8 @@ ggplot(hh_age_sex, aes(x = AgeGroup, y = Percent, fill = Sexe)) +
   scale_y_continuous(labels = abs) + 
   theme_minimal()
 ```
-REMARQUE :
-- A revoir l'âge si on utilise la moyenne des âges.
 
+REMARQUE : - A revoir l'âge si on utilise la moyenne des âges.
 
 ### Origine
 
@@ -493,14 +493,15 @@ ggplot(origin_table, aes(x = Origine, y = percentage, fill = Member_Type)) +
 
 ```
 
+REMARQUE : - A corriger tableau des origines pour conjoint =\> affichage en parallèle avec CM - "NA" à traiter
+
 Raison d'implantation (Mg4a)
 
 ## Caractéristiques des chefs de ménages
 
 ### Situation matrimoniale
- m4 :sexe
- m5 : age
-m5 : situation matrimoniale
+
+m4 :sexe m5 : age m5 : situation matrimoniale
 
 ```{r}
 # Marital status of household heads
@@ -759,8 +760,7 @@ gt_educ
 
 ```
 
-Remarque :
-- A revoir modalité des niveaux d'éducation
+Remarque : - A revoir modalité des niveaux d'éducation
 
 #### Niveau d'éducation des chefs de ménages par sexe
 
@@ -869,8 +869,8 @@ gt_educ <- educ_table %>%
 gt_educ
 ```
 
-
 ### Activités principales des Chefs de ménage
+
 Tout d'abord, on va vérifier les effectifs des activités principales (a1) des Chefs de ménage
 
 ```{r}
@@ -898,7 +898,7 @@ all_hh_main_act <- res_deb %>%
 all_hh_main_act %>%
   gt(groupname_col = "Observatory") %>%
   tab_header(
-    title = md("**Main activities of the household head by observatory**")
+    title = md("**Principales activités des Chefs de ménages par observatoire**")
   ) %>%
   cols_label(
     a1 = "Main activity",
@@ -914,8 +914,12 @@ all_hh_main_act %>%
     table.width = pct(100)
   )
 ```
-Les cultivateurs exploitants (code = 95), les ouvriers agricoles (salariés agricoles) (code = 76) et commercants (code = 45) sont majoritaires tant à Alaotra et à Marovoay.
-Il n'y a pas de pêcheur exploitant à Alaotra (code = 99)
+
+-   Les cultivateurs exploitants (code = 95), les ouvriers agricoles (salariés agricoles) (code = 76) et commercants (code = 45) sont majoritaires tant à Alaotra et à Marovoay.
+
+-    Il n'y a pas de pêcheur exploitant à Alaotra (code = 99), 1.1% pour Marovoay. 1.5% de chomeurs à Alaotra. Ce taux de chômage passe avant les autres activités comme 51 : Taxi-bicyclette (1.3%) et 91 (1%) : Ouvrier d'entretien, bricoleur.
+
+-   Par contre, il y a n'y a pas de chomeurs à Marovoay.
 
 Nous allons voir les effectifs des activités principales comme "Cultivateur", "Eleveur", et "Commerçant"
 
@@ -1042,9 +1046,134 @@ ggplot(hh_main_act_final, aes(x = Act_principal, y = Percent, fill = Sexe)) +
   )
 ```
 
-
 ## Caractéristiques des autres membres de ménages
 
 ### Activités principales
 
+Activités principales des autres membres (de 15 ans et plus) des ménages (%)
+
+On va voir d'abord toutes les activités des autres membres de ménages sans limite d'âge.
+
+```{r}
+# All main activities of the others household member
+all_hh_main_act <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 != 1) %>%  # Don't keep the household head = 1
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+  ) %>%
+  group_by(Observatory, a1) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate( 
+    Percent = round(n / sum(n) * 100, 1) 
+    ) %>% 
+  arrange(Observatory, desc(n), desc(Percent)) 
+
+# Display with gt
+all_hh_main_act %>%
+  gt(groupname_col = "Observatory") %>%
+  tab_header(
+    title = "Principales activités des autres membres du ménage par observatoire"
+  ) %>%
+  cols_label(
+    a1 = "Main activity",
+    n = "Count",
+    Percent = "Percentage (%)"
+  ) %>%
+  fmt_number(
+    columns = Percent,
+    decimals = 1
+  ) %>%
+  tab_options(
+    table.font.size = 12,
+    table.width = pct(100)
+  )
+```
+Nous allons voir les activités des autres membres du ménage selon le lien avec le Chef du ménage.  
+Variable concernée : m6, annexe 3
+
+```{r}
+# Main activities of other household members according to their relationship with the head of household
+
+all_hh_main_act <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 != 1) %>%  # Don't keep only household head = 1
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    m6 = as.character(m6),
+    lien_CM = case_when(
+      m6 == "2" ~ "Conjoint",
+      m6 == "3" ~ "Enfant",
+      m6 == "5" ~ "Petit enfant",
+      m6 == "6" ~ "Mère/Père",
+      m6 == "7" ~ "Frère/Soeur",
+      TRUE      ~ "Autres"
+    ),
+  ) %>%
+  group_by(Observatory, lien_CM, a1) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate( 
+    Percent = round(n / sum(n) * 100, 1) 
+    ) %>% 
+  arrange(Observatory, lien_CM, desc(n), desc(Percent)) 
+
+# Display with gt
+all_hh_main_act %>%
+  gt(groupname_col = "Observatory") %>%
+ tab_header(
+  title = "Principales activités des autres membres du ménage par observatoire et selon leur lien avec le Chef du ménage"
+) %>%
+  cols_label(
+    lien_CM = "Lien de parenté avec le Chef de ménage",
+    a1 = "Main activity",
+    n = "Count",
+    Percent = "Percentage (%)"
+  ) %>%
+  fmt_number(
+    columns = Percent,
+    decimals = 1
+  ) %>%
+  tab_options(
+    table.font.size = 12,
+    table.width = pct(100)
+  )
+```
+REMARQUE :
+A revoir forme du tableau : titre en gras, nuance de couleurs
+
+Activités des autres membres du ménages selon le sexe
+```{r}
+
+```
+
+
+Activités des autres membres du ménage selon l'âge et le sexe
+
+
+
+Activités des autres membres du ménage selon le lien de parenté, l'âge
+
+
+
+Activités des autres membres du ménage selon le lien de parenté, l'âge et le sexe
+
+
 ### Education et scolarisation
+
+Taux de scolarisation des enfants de 6 à 14 ans (%
+
+Classe suivie pendant l’année scolaire 2020 - 2021 suivant les catégories d’âge
+
+Raisons de non fréquentation de l’école pour les 6 à 15 ans
