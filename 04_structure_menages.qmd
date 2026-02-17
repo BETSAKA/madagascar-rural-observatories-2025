@@ -873,7 +873,7 @@ gt_educ
 
 Tout d'abord, on va vérifier les effectifs des activités principales (a1) des Chefs de ménage
 
-```{r}
+```{r hhh-activite}
 # All main activities of the household head
 all_hh_main_act <- res_deb %>%
   left_join(res_m_a, by = "j5") %>%
@@ -886,8 +886,11 @@ all_hh_main_act <- res_deb %>%
       j0 == "21" ~ "Alaotra",
       TRUE       ~ j0
     ),
+    # Extraire les labels des activités et corriger l'encodage
+    Activite = iconv(as.character(to_factor(a1)), from = "latin1", to = "UTF-8"),
+    Activite = gsub("&#39;", "'", Activite, fixed = TRUE)
   ) %>%
-  group_by(Observatory, a1) %>% 
+  group_by(Observatory, Activite) %>% 
   summarise(n = n(), .groups = "drop") %>% 
   mutate( 
     Percent = round(n / sum(n) * 100, 1) 
@@ -898,12 +901,12 @@ all_hh_main_act <- res_deb %>%
 all_hh_main_act %>%
   gt(groupname_col = "Observatory") %>%
   tab_header(
-    title = md("**Principales activités des Chefs de ménages par observatoire**")
+    title = "Principales activités des Chefs de ménages par observatoire"
   ) %>%
   cols_label(
-    a1 = "Main activity",
-    n = "Count",
-    Percent = "Percentage (%)"
+    Activite = "Activité principale",
+    n = "Effectif",
+    Percent = "Pourcentage (%)"
   ) %>%
   fmt_number(
     columns = Percent,
@@ -1054,7 +1057,7 @@ Activités principales des autres membres (de 15 ans et plus) des ménages (%)
 
 On va voir d'abord toutes les activités des autres membres de ménages sans limite d'âge.
 
-```{r}
+```{r hhm-activites}
 # All main activities of the others household member
 all_hh_main_act <- res_deb %>%
   left_join(res_m_a, by = "j5") %>%
@@ -1067,27 +1070,46 @@ all_hh_main_act <- res_deb %>%
       j0 == "21" ~ "Alaotra",
       TRUE       ~ j0
     ),
+    # Extraire les labels des activités et corriger l'encodage
+      Activite = iconv(as.character(to_factor(a1)), from = "latin1", to = "UTF-8"),
+      Activite = gsub("&#39;", "'", Activite, fixed = TRUE)
   ) %>%
-  group_by(Observatory, a1) %>% 
+  group_by(Observatory, Activite) %>% 
   summarise(n = n(), .groups = "drop") %>% 
-  mutate( 
-    Percent = round(n / sum(n) * 100, 1) 
-    ) %>% 
-  arrange(Observatory, desc(n), desc(Percent)) 
+  group_by(Observatory) %>%
+  mutate(Percent = round(n / sum(n) * 100, 1)) %>%
+  ungroup() %>%
+  # Pivoter pour avoir les observatoires en colonnes
+  pivot_wider(
+    names_from = Observatory,
+    values_from = c(n, Percent),
+    values_fill = 0
+  ) %>%
+  arrange(desc(n_Alaotra + n_Marovoay))
 
 # Display with gt
 all_hh_main_act %>%
-  gt(groupname_col = "Observatory") %>%
+  gt() %>%
   tab_header(
     title = "Principales activités des autres membres du ménage par observatoire"
   ) %>%
+  tab_spanner(
+    label = "Alaotra",
+    columns = c(n_Alaotra, Percent_Alaotra)
+  ) %>%
+  tab_spanner(
+    label = "Marovoay",
+    columns = c(n_Marovoay, Percent_Marovoay)
+  ) %>%
   cols_label(
-    a1 = "Main activity",
-    n = "Count",
-    Percent = "Percentage (%)"
+    Activite = "Activité principale",
+    n_Alaotra = "Effectif",
+    Percent_Alaotra = "%",
+    n_Marovoay = "Effectif",
+    Percent_Marovoay = "%"
   ) %>%
   fmt_number(
-    columns = Percent,
+    columns = starts_with("Percent"),
     decimals = 1
   ) %>%
   tab_options(
