@@ -121,6 +121,83 @@ gt_tab <- gt(tab) %>%
   )
 gt_tab 
 ```
+EN TENANT COMPTE DES INDIVIDUS
+
+```{r}
+# CORRECTIONS 4
+#| tbl-cap: |
+#|    <strong>Répartition des ménages et des individus selon les observatoires</strong>      
+#| tbl-cap-location: top
+#| label: tbl-men-obs
+
+# Tableau de répartition des ménages par tranche d'âge selon les observatoires
+# Recode j0 en Observatoire (labels) dans res_deb
+res_deb <- res_deb %>%
+  mutate(
+    j0 = as.character(j0),
+    Observatoire = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  )
+# Joindre l'info Observatoire à res_m_a via j5
+res_m_a <- res_m_a %>%
+  left_join(res_deb %>% select(j5, Observatoire), by = "j5")
+
+# Vérifier que la colonne Observatoire existe bien
+stopifnot("Observatoire" %in% names(res_m_a))
+# Tableau de répartition des ménages et individus selon les observatoires
+tab <- res_deb %>%
+  group_by(Observatoire) %>%
+  summarise(n_menages = n_distinct(j5), .groups = "drop") %>%
+  left_join(
+    res_m_a %>%
+      group_by(Observatoire) %>%
+      summarise(n_individus = n(), .groups = "drop"),
+    by = "Observatoire"
+  ) %>%
+  arrange(desc(n_menages)) %>%
+  mutate(
+    Pourcent_menages   = round(n_menages / sum(n_menages) * 100, 1),
+    Pourcent_individus = round(n_individus / sum(n_individus) * 100, 1)
+  )
+
+# Ajouter une ligne "Ensemble"
+tab <- tab %>%
+  tibble::add_row(
+    Observatoire       = "Ensemble",
+    n_menages          = sum(tab$n_menages),
+    Pourcent_menages   = 100,
+    n_individus        = sum(tab$n_individus),
+    Pourcent_individus = 100
+  )
+# Créer un tableau avec gt
+gt_tab <- gt(tab) %>%
+  fmt_number(columns = c(Pourcent_menages, Pourcent_individus), decimals = 0) %>%
+  cols_label(
+    n_menages          = "Effectif ménages",
+    Pourcent_menages   = "Pourcent ménages",
+    n_individus        = "Effectif individus",
+    Pourcent_individus = "Pourcent individus"
+  ) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
+    locations = cells_body(rows = Observatoire == "Ensemble")
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+gt_tab
+
+```
+
+
+
+
 
 Nombre de ménages enquêtés par hameaux
 

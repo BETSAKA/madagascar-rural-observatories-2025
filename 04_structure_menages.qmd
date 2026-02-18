@@ -4,7 +4,13 @@ editor_options:
   chunk_output_type: console
 ---
 
+  
+
 # Caractéristiques socio-démographiques des ménages
+
+**REMARQUE :**  
+Les tableaux nous serviront d'apporter plus de precision à la compréhension des graphiques.  
+A la fin, on peut supprimer les tableaux et les graphiques non pertinentes.
 
 Le ménage est l'unité de base de l'enquête.
 
@@ -76,12 +82,17 @@ Qu’en est-il des codes ménages aux positions 6 et 7 de J5 ?
 
 ## Description des ménages
 
+#
 ### Taille des ménages par observatoire
 
 Calculons la taille des ménages par observatoire
 
 ```{r}
-
+#| tbl-cap: |
+#|    <strong>Taille moyenne des ménages par observatoire</strong> 
+#| tbl-cap-location: top
+#| label: tbl-men-obs
+#| 
 hh_size_obs <- res_m_a %>% 
   left_join(res_deb, by = "j5") %>% 
   group_by(j0, j5) %>% 
@@ -99,19 +110,46 @@ hh_size_obs <- res_m_a %>%
   ) %>% 
   select(Observatory, mean_hh_size)
 
+# Ajouter la moyenne globale
+hh_size_obs <- hh_size_obs %>%
+  bind_rows(
+    tibble(
+      Observatory   = "Ensemble",
+      mean_hh_size  = mean(hh_size_obs$mean_hh_size)
+    )
+  )
 # Displaying with gt
-hh_size_obs_tab <- gt(hh_size_obs) %>% 
-  tab_header( 
-    title = "Taille moyenne des ménages par observatoire",
-    ) %>% 
-  fmt_number( 
-    columns = mean_hh_size, 
-    decimals = 2, 
-    suffixing = TRUE ) %>%
-  cols_label( 
-    mean_hh_size = "Taille moyenne" )
+hh_size_obs_tab <- gt(hh_size_obs) %>%
+  fmt_number(
+    columns = mean_hh_size,
+    decimals = 2,
+    suffixing = TRUE
+  ) %>%
+  cols_label(
+    mean_hh_size = "Taille moyenne",
+    Observatory = "Observatoire"
+  ) %>% 
+  # Mettre en gras + fond bleu pâle pour la ligne Ensemble
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#e8f4f8")
+    ),
+    locations = cells_body(rows = Observatory == "Ensemble")
+  ) %>%
+   # Mettre les en-têtes de colonnes en gras
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#7fb")
+    ),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+# Ajouter une note de source en bas du tableau
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
 hh_size_obs_tab
-
 ```
 
 ### Taille des ménages par hameau et par observatoire
@@ -162,25 +200,44 @@ gt(hh_size_combined, groupname_col = "Observatory") %>%
   # on utilise n_hh pour calculer la moyenne par observatoire, mais on le 
   # masque car cette information est déjà fournie plus haut
   cols_hide(columns = n_hh) %>%
+  # Ligne Ensemble en gras + fond bleu pâle
   tab_style(
-    style = list(cell_text(weight = "bold"), cell_fill(color = "#F0F0F0")),
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#e8f4f8")),
     locations = cells_body(rows = j4bis == "Ensemble")
   ) %>%
+  # Titre principal en gras + fond beige clair
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#f9f2e7")),
+    locations = cells_title(groups = "title")
+  ) %>%
+  # En-têtes de colonnes en gras + fond beige foncé
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#d2b48c")),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  # Groupes d'observatoires en gras + fond gris clair
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#b2df2b")),
+    locations = cells_row_groups()
+  ) %>%
   tab_options(row_group.font.weight = "bold") %>%
-  cols_label(mean_hh_size = "Taille moyenne", j4bis = "Hameau")
-
+  cols_label(mean_hh_size = "Taille moyenne", j4bis = "Hameau")%>% 
+        # Ajouter une note de source en bas du tableau
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
 
 ```
-
 ### Structure par âge
-
+#### Au niveau des observatoires
 Nous allons voir la répartition des ménages par tranche d'âge par observatoire.
 
-```{r}
-# Tableau de répartition des ménages par tranche d'âge selon les observatoires
 
+```{r}
+# CORRECTION3
+# Tableau de répartition des ménages par tranche d'âge selon les observatoires
 hh_age <- res_deb %>%
-  left_join(res_m_a, by="j5") %>% 
+  left_join(res_m_a, by="j5") %>%
   mutate(
     j0 = as.character(j0),
     Observatory = case_when(
@@ -200,33 +257,59 @@ hh_age <- res_deb %>%
       TRUE                  ~ NA_character_
     )
   ) %>%
-  group_by(Observatory, AgeGroup) %>%
-  summarise(
-    n = n(), 
-    .groups = "drop"
-  ) %>%
+group_by(Observatory, AgeGroup) %>%
+  summarise(n = n(), .groups = "drop") %>%
   group_by(Observatory) %>%
-  mutate(
-    Percent = round(n / sum(n) * 100, 1)
-  ) %>%
+  mutate(Percent = round(n / sum(n) * 100, 1)) %>%
   arrange(Observatory, AgeGroup)
 
+# Ajouter une ligne "Ensemble" par observatoire
+hh_age_combined <- hh_age %>%
+  group_by(Observatory) %>%
+  summarise(
+    AgeGroup = "Ensemble",
+    n = sum(n),
+    Percent = 100,
+    .groups = "drop"
+  ) %>%
+  bind_rows(hh_age, .) %>%
+  arrange(Observatory, AgeGroup == "Ensemble", AgeGroup)
 
-# Créer un tableau avec gt 
-gt_hh_age <- gt(hh_age) %>% 
-  tab_header( 
-    title = "Répartition des ménages par tranche d'âge selon les observatoires",
-    ) %>% 
-  fmt_number( 
-    columns = Percent, 
-    decimals = 0, 
-    suffixing = TRUE ) %>%
-  tab_footnote( 
-    footnote = "Percent (%)", 
-    locations = cells_column_labels(columns = Percent) 
-    )
-gt_hh_age 
+# Créer un tableau avec gt
+gt_hh_age <- gt(hh_age_combined, groupname_col = "Observatory") %>%
+  tab_header(
+    title = "Répartition des ménages par tranche d'âge selon les observatoires"
+  ) %>%
+  fmt_number(columns = Percent, decimals = 0) %>%
+  cols_label(
+    n        = "Effectif",
+    Percent  = "Pourcent",
+    AgeGroup = "Tranche d'âge"
+  ) %>%
+tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#e8f5e9")),
+    locations = cells_body(rows = AgeGroup == "Ensemble")
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_title(groups = "title")
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_options(row_group.font.weight = "bold") %>%
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
+
+gt_hh_age
+
 ```
+
+
+
+
 
 **Remarques :**
 
@@ -235,16 +318,6 @@ gt_hh_age
 -   Tableau à améliorer en ajoutant des sous-totaux et une ligne "total".
 
 ```{r}
-# Histogramme : nombre de ménages par tranche d’âge et observatoire 
-ggplot(hh_age, aes(x = AgeGroup, y = n, fill = Observatory)) + 
-  geom_col(position = "dodge") + 
-  labs( 
-    title = "Répartition des ménages enquêtés par tranche d’âge", 
-    x = "Tranche d’âge", 
-    y = "Nombre de ménages" 
-    ) + theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
 # Histogramme séparé par observatoire
 ggplot(hh_age, aes(x = AgeGroup, y = n, fill = AgeGroup)) +
   geom_col(show.legend = FALSE) +
@@ -335,7 +408,7 @@ ggplot(hh_age_sex, aes(x = AgeGroup, y = Percent, fill = Sexe)) +
   theme_minimal()
 ```
 
-
+#### Au niveau des hameaux
 Nous allons voir la répartition des ménages par tranche d'âge par hameau et par observatoire.
 
 
