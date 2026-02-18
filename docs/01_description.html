@@ -289,7 +289,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Selection des zones d’études</p>
 <p>Echantillonnage</p>
 <p>Nombre de ménages enquêtés par observatoire. Voir <a href="#tbl-men-obs" class="quarto-xref">Table&nbsp;<span>1.1</span></a>.</p>
-<div class="cell" data-tbl-cap-location="bottom">
+<div class="cell" data-tbl-cap-location="top">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tableau de répartition des ménages selon les observatoires</span></span>
@@ -298,55 +298,74 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n_distinct</span>(j5), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n)) <span class="sc">%&gt;%</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Percent =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Pourcent =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
 <span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">j0 =</span> <span class="fu">as.character</span>(j0),</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Observatory =</span> <span class="fu">case_when</span>(</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Observatoire =</span> <span class="fu">case_when</span>(</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"3"</span>  <span class="sc">~</span> <span class="st">"Marovoay"</span>,</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"21"</span> <span class="sc">~</span> <span class="st">"Alaotra"</span>,</span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span>       <span class="sc">~</span> j0</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Observatory, n, Percent)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Observatoire, n, Pourcent)</span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> tab <span class="sc">%&gt;%</span> </span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">add_row</span>(<span class="at">Observatory =</span> <span class="st">"Total"</span>, <span class="at">n =</span> <span class="fu">sum</span>(tab<span class="sc">$</span>n), <span class="at">Percent =</span> <span class="fu">sum</span>(tab<span class="sc">$</span>Percent, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">add_row</span>(<span class="at">Observatoire =</span> <span class="st">"Ensemble"</span>, <span class="at">n =</span> <span class="fu">sum</span>(tab<span class="sc">$</span>n), <span class="at">Pourcent =</span> <span class="fu">sum</span>(tab<span class="sc">$</span>Pourcent, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Créer un tableau avec gt </span></span>
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>gt_tab <span class="ot">&lt;-</span> <span class="fu">gt</span>(tab) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>( </span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Répartition des ménages selon les observatoires"</span>,</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>( </span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> Percent, </span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">0</span>, </span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">suffixing =</span> <span class="cn">TRUE</span> ) <span class="sc">%&gt;%</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>( </span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">footnote =</span> <span class="st">"Percent (%)"</span>, </span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> Percent) </span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>gt_tab </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>( </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> Pourcent, </span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">0</span>, </span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">suffixing =</span> <span class="cn">TRUE</span> ) <span class="sc">%&gt;%</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>( </span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">footnote =</span> <span class="st">"Pourcent (%)"</span>, </span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> Pourcent) </span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="st">"Effectif"</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Mettre en gras + couleur la ligne des colonnes et "ensemble"</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_fill</span>(<span class="at">color =</span> <span class="st">"#B0E0E6"</span>)   <span class="co"># Bleu poudre</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">locations =</span> <span class="fu">list</span> (</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> <span class="fu">everything</span>()),</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cells_body</span>(<span class="at">rows =</span> Observatoire <span class="sc">==</span> <span class="st">"Ensemble"</span>)</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Ajouter une note de source en bas du tableau</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_source_note</span>(</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">source_note =</span> <span class="fu">md</span>(<span class="st">"**Source : Enquête auprès des OR 2025**"</span>)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>gt_tab </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div id="tbl-men-obs" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-tbl-cap-location="bottom">
+<div id="tbl-men-obs" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-tbl-cap-location="top">
 <figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-men-obs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1.1: <strong>Répartition des ménages selon les observatoires</strong>
+</figcaption>
 <div aria-describedby="tbl-men-obs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="mkaextkktb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#mkaextkktb table {
+<div id="cjywqmxxnj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#cjywqmxxnj table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#mkaextkktb thead, #mkaextkktb tbody, #mkaextkktb tfoot, #mkaextkktb tr, #mkaextkktb td, #mkaextkktb th {
+#cjywqmxxnj thead, #cjywqmxxnj tbody, #cjywqmxxnj tfoot, #cjywqmxxnj tr, #cjywqmxxnj td, #cjywqmxxnj th {
   border-style: none;
 }
 
-#mkaextkktb p {
+#cjywqmxxnj p {
   margin: 0;
   padding: 0;
 }
 
-#mkaextkktb .gt_table {
+#cjywqmxxnj .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -372,12 +391,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#mkaextkktb .gt_caption {
+#cjywqmxxnj .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#mkaextkktb .gt_title {
+#cjywqmxxnj .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -389,7 +408,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#mkaextkktb .gt_subtitle {
+#cjywqmxxnj .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -401,7 +420,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#mkaextkktb .gt_heading {
+#cjywqmxxnj .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -413,13 +432,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#mkaextkktb .gt_bottom_border {
+#cjywqmxxnj .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#mkaextkktb .gt_col_headings {
+#cjywqmxxnj .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -434,7 +453,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#mkaextkktb .gt_col_heading {
+#cjywqmxxnj .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -454,7 +473,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#mkaextkktb .gt_column_spanner_outer {
+#cjywqmxxnj .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -466,15 +485,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#mkaextkktb .gt_column_spanner_outer:first-child {
+#cjywqmxxnj .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#mkaextkktb .gt_column_spanner_outer:last-child {
+#cjywqmxxnj .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#mkaextkktb .gt_column_spanner {
+#cjywqmxxnj .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -486,11 +505,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#mkaextkktb .gt_spanner_row {
+#cjywqmxxnj .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#mkaextkktb .gt_group_heading {
+#cjywqmxxnj .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -516,7 +535,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#mkaextkktb .gt_empty_group_heading {
+#cjywqmxxnj .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -531,15 +550,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#mkaextkktb .gt_from_md > :first-child {
+#cjywqmxxnj .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#mkaextkktb .gt_from_md > :last-child {
+#cjywqmxxnj .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#mkaextkktb .gt_row {
+#cjywqmxxnj .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -558,7 +577,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#mkaextkktb .gt_stub {
+#cjywqmxxnj .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -571,7 +590,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#mkaextkktb .gt_stub_row_group {
+#cjywqmxxnj .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -585,15 +604,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#mkaextkktb .gt_row_group_first td {
+#cjywqmxxnj .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#mkaextkktb .gt_row_group_first th {
+#cjywqmxxnj .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#mkaextkktb .gt_summary_row {
+#cjywqmxxnj .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -603,16 +622,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#mkaextkktb .gt_first_summary_row {
+#cjywqmxxnj .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#mkaextkktb .gt_first_summary_row.thick {
+#cjywqmxxnj .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#mkaextkktb .gt_last_summary_row {
+#cjywqmxxnj .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -622,7 +641,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#mkaextkktb .gt_grand_summary_row {
+#cjywqmxxnj .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -632,7 +651,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#mkaextkktb .gt_first_grand_summary_row {
+#cjywqmxxnj .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -642,7 +661,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #D3D3D3;
 }
 
-#mkaextkktb .gt_last_grand_summary_row_top {
+#cjywqmxxnj .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -652,11 +671,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#mkaextkktb .gt_striped {
+#cjywqmxxnj .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#mkaextkktb .gt_table_body {
+#cjywqmxxnj .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -665,7 +684,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#mkaextkktb .gt_footnotes {
+#cjywqmxxnj .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -679,7 +698,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#mkaextkktb .gt_footnote {
+#cjywqmxxnj .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -688,7 +707,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#mkaextkktb .gt_sourcenotes {
+#cjywqmxxnj .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -702,7 +721,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#mkaextkktb .gt_sourcenote {
+#cjywqmxxnj .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -710,117 +729,108 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#mkaextkktb .gt_left {
+#cjywqmxxnj .gt_left {
   text-align: left;
 }
 
-#mkaextkktb .gt_center {
+#cjywqmxxnj .gt_center {
   text-align: center;
 }
 
-#mkaextkktb .gt_right {
+#cjywqmxxnj .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#mkaextkktb .gt_font_normal {
+#cjywqmxxnj .gt_font_normal {
   font-weight: normal;
 }
 
-#mkaextkktb .gt_font_bold {
+#cjywqmxxnj .gt_font_bold {
   font-weight: bold;
 }
 
-#mkaextkktb .gt_font_italic {
+#cjywqmxxnj .gt_font_italic {
   font-style: italic;
 }
 
-#mkaextkktb .gt_super {
+#cjywqmxxnj .gt_super {
   font-size: 65%;
 }
 
-#mkaextkktb .gt_footnote_marks {
+#cjywqmxxnj .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#mkaextkktb .gt_asterisk {
+#cjywqmxxnj .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#mkaextkktb .gt_indent_1 {
+#cjywqmxxnj .gt_indent_1 {
   text-indent: 5px;
 }
 
-#mkaextkktb .gt_indent_2 {
+#cjywqmxxnj .gt_indent_2 {
   text-indent: 10px;
 }
 
-#mkaextkktb .gt_indent_3 {
+#cjywqmxxnj .gt_indent_3 {
   text-indent: 15px;
 }
 
-#mkaextkktb .gt_indent_4 {
+#cjywqmxxnj .gt_indent_4 {
   text-indent: 20px;
 }
 
-#mkaextkktb .gt_indent_5 {
+#cjywqmxxnj .gt_indent_5 {
   text-indent: 25px;
 }
 
-#mkaextkktb .katex-display {
+#cjywqmxxnj .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#mkaextkktb div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#cjywqmxxnj div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
-
-<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
-<thead>
-<tr class="header gt_heading">
-<th colspan="3" class="gt_heading gt_title gt_font_normal gt_bottom_border">Répartition des ménages selon les observatoires</th>
-</tr>
-<tr class="odd gt_col_headings">
-<th id="Observatory" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Observatory</th>
-<th id="n" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">n</th>
-<th id="Percent" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Percent<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
-</tr>
-</thead>
-<tbody class="gt_table_body">
-<tr class="odd">
-<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
-<td class="gt_row gt_right" headers="n">519</td>
-<td class="gt_row gt_right" headers="Percent">51</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
-<td class="gt_row gt_right" headers="n">507</td>
-<td class="gt_row gt_right" headers="Percent">49</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="Observatory">Total</td>
-<td class="gt_row gt_right" headers="n">1026</td>
-<td class="gt_row gt_right" headers="Percent">100</td>
-</tr>
-</tbody><tfoot class="gt_footnotes">
-<tr class="odd">
-<td colspan="3" class="gt_footnote"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> Percent (%)</td>
-</tr>
-</tfoot>
-
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" style="font-weight: bold; background-color: #B0E0E6;" scope="col" id="Observatoire">Observatoire</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="font-weight: bold; background-color: #B0E0E6;" scope="col" id="n">Effectif</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" style="font-weight: bold; background-color: #B0E0E6;" scope="col" id="Pourcent">Pourcent<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="Observatoire" class="gt_row gt_left">Marovoay</td>
+<td headers="n" class="gt_row gt_right">519</td>
+<td headers="Pourcent" class="gt_row gt_right">51</td></tr>
+    <tr><td headers="Observatoire" class="gt_row gt_left">Alaotra</td>
+<td headers="n" class="gt_row gt_right">507</td>
+<td headers="Pourcent" class="gt_row gt_right">49</td></tr>
+    <tr><td headers="Observatoire" class="gt_row gt_left" style="font-weight: bold; background-color: #B0E0E6;">Ensemble</td>
+<td headers="n" class="gt_row gt_right" style="font-weight: bold; background-color: #B0E0E6;">1026</td>
+<td headers="Pourcent" class="gt_row gt_right" style="font-weight: bold; background-color: #B0E0E6;">100</td></tr>
+  </tbody>
+  <tfoot class="gt_sourcenotes">
+    <tr>
+      <td class="gt_sourcenote" colspan="3"><span data-qmd-base64="PHN0cm9uZz5Tb3VyY2UgOiBFbnF1w6p0ZSBhdXByw6hzIGRlcyBPUiAyMDI1PC9zdHJvbmc+"><span class="gt_from_md"><strong>Source : Enquête auprès des OR 2025</strong></span></span></td>
+    </tr>
+  </tfoot>
+  <tfoot class="gt_footnotes">
+    <tr>
+      <td class="gt_footnote" colspan="3"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> Pourcent (%)</td>
+    </tr>
+  </tfoot>
 </table>
-
 </div>
 </div>
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-tbl" id="tbl-men-obs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enquête
-</figcaption>
 </figure>
 </div>
 </div>
@@ -829,9 +839,9 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tableau de répartition des ménages enquêtés par hameau selon les observatoires</span></span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcul des hameaux avec pourcentage interne</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> res_deb <span class="sc">%&gt;%</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">j4bis =</span> <span class="fu">case_when</span>(</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_starts</span>(<span class="fu">str_to_lower</span>(j4), <span class="st">"bepako"</span>) <span class="sc">~</span> <span class="st">"Bepako"</span>,</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_starts</span>(<span class="fu">str_to_lower</span>(j4), <span class="st">"ampijoroa"</span>) <span class="sc">~</span> <span class="st">"Ampijoroa"</span>,</span>
@@ -846,52 +856,91 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span>       <span class="sc">~</span> j0</span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Observatory,j4bis) <span class="sc">%&gt;%</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n_distinct</span>(j5), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n)) <span class="sc">%&gt;%</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">Percent =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>) </span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Observatory,j4bis, n, Percent)</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> tab <span class="sc">%&gt;%</span> </span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">add_row</span>(<span class="at">Observatory =</span> <span class="st">"Total"</span>, <span class="at">n =</span> <span class="fu">sum</span>(tab<span class="sc">$</span>n), <span class="at">Percent =</span> <span class="fu">sum</span>(tab<span class="sc">$</span>Percent, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Créer un tableau avec gt </span></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>gt_tab <span class="ot">&lt;-</span> <span class="fu">gt</span>(tab) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>( </span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Répartition des ménages par hameau selon les observatoires"</span>,</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>( </span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> Percent, </span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">0</span>, </span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">suffixing =</span> <span class="cn">TRUE</span> ) <span class="sc">%&gt;%</span></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_footnote</span>( </span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">footnote =</span> <span class="st">"Percent (%)"</span>, </span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> Percent) </span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>( </span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">j4bis =</span> <span class="st">"Hameau"</span> )</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>gt_tab </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Observatory, j4bis) <span class="sc">%&gt;%</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n_distinct</span>(j5), <span class="at">.groups =</span> <span class="st">"drop_last"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">Percent =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>)   <span class="co"># pourcentage interne à chaque observatoire</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Totaux par observatoire</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>totals <span class="ot">&lt;-</span> tab <span class="sc">%&gt;%</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Observatory) <span class="sc">%&gt;%</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">j4bis =</span> <span class="st">"Ensemble"</span>,</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">sum</span>(n),</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">Percent =</span> <span class="dv">100</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(tab, totals) <span class="sc">%&gt;%</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Observatory, <span class="fu">desc</span>(j4bis <span class="sc">!=</span> <span class="st">"Ensemble"</span>), <span class="fu">desc</span>(n))</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Créer le tableau gt avec regroupement par observatoire</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>gt_tab <span class="ot">&lt;-</span> <span class="fu">gt</span>(tab, <span class="at">groupname_col =</span> <span class="st">"Observatory"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Répartition des ménages par hameau selon les observatoires"</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> Percent,</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">1</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">j4bis =</span> <span class="st">"Hameau"</span>,</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="st">"Nombre"</span>,</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">Percent =</span> <span class="st">"Pourcentage (%)"</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Style pour les lignes Totaux</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_fill</span>(<span class="at">color =</span> <span class="st">"#CECECE"</span>)   <span class="co"># gris clair</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_body</span>(<span class="at">rows =</span> j4bis <span class="sc">==</span> <span class="st">"Ensemble"</span>)</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="co"># Style pour les en-têtes de colonnes</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_fill</span>(<span class="at">color =</span> <span class="st">"#4682B4"</span>)   <span class="co"># Stellblue</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> <span class="fu">everything</span>())</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Style pour les observatoires</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_fill</span>(<span class="at">color =</span> <span class="st">"#B0E0E6"</span>)   <span class="co"># Bleu poudre</span></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_row_groups</span>()</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Style pour le titre principal</span></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>),</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>      <span class="fu">cell_fill</span>(<span class="at">color =</span> <span class="st">"#FFF2CC"</span>)   <span class="co"># beige clair / jaune pâle</span></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_title</span>(<span class="at">groups =</span> <span class="st">"title"</span>)</span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>gt_tab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="gmprdgbppg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#gmprdgbppg table {
+<div id="isvdvollol" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#isvdvollol table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#gmprdgbppg thead, #gmprdgbppg tbody, #gmprdgbppg tfoot, #gmprdgbppg tr, #gmprdgbppg td, #gmprdgbppg th {
+#isvdvollol thead, #isvdvollol tbody, #isvdvollol tfoot, #isvdvollol tr, #isvdvollol td, #isvdvollol th {
   border-style: none;
 }
 
-#gmprdgbppg p {
+#isvdvollol p {
   margin: 0;
   padding: 0;
 }
 
-#gmprdgbppg .gt_table {
+#isvdvollol .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -917,12 +966,12 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   border-left-color: #D3D3D3;
 }
 
-#gmprdgbppg .gt_caption {
+#isvdvollol .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#gmprdgbppg .gt_title {
+#isvdvollol .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -934,7 +983,7 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   border-bottom-width: 0;
 }
 
-#gmprdgbppg .gt_subtitle {
+#isvdvollol .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -946,7 +995,7 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   border-top-width: 0;
 }
 
-#gmprdgbppg .gt_heading {
+#isvdvollol .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -958,13 +1007,13 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   border-right-color: #D3D3D3;
 }
 
-#gmprdgbppg .gt_bottom_border {
+#isvdvollol .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#gmprdgbppg .gt_col_headings {
+#isvdvollol .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -979,7 +1028,7 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   border-right-color: #D3D3D3;
 }
 
-#gmprdgbppg .gt_col_heading {
+#isvdvollol .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -999,7 +1048,7 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   overflow-x: hidden;
 }
 
-#gmprdgbppg .gt_column_spanner_outer {
+#isvdvollol .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1011,15 +1060,15 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   padding-right: 4px;
 }
 
-#gmprdgbppg .gt_column_spanner_outer:first-child {
+#isvdvollol .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#gmprdgbppg .gt_column_spanner_outer:last-child {
+#isvdvollol .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#gmprdgbppg .gt_column_spanner {
+#isvdvollol .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1031,11 +1080,11 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   width: 100%;
 }
 
-#gmprdgbppg .gt_spanner_row {
+#isvdvollol .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#gmprdgbppg .gt_group_heading {
+#isvdvollol .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1061,7 +1110,7 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   text-align: left;
 }
 
-#gmprdgbppg .gt_empty_group_heading {
+#isvdvollol .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1076,15 +1125,15 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   vertical-align: middle;
 }
 
-#gmprdgbppg .gt_from_md > :first-child {
+#isvdvollol .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#gmprdgbppg .gt_from_md > :last-child {
+#isvdvollol .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#gmprdgbppg .gt_row {
+#isvdvollol .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1103,7 +1152,7 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   overflow-x: hidden;
 }
 
-#gmprdgbppg .gt_stub {
+#isvdvollol .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1116,7 +1165,7 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   padding-right: 5px;
 }
 
-#gmprdgbppg .gt_stub_row_group {
+#isvdvollol .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1130,15 +1179,15 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   vertical-align: top;
 }
 
-#gmprdgbppg .gt_row_group_first td {
+#isvdvollol .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#gmprdgbppg .gt_row_group_first th {
+#isvdvollol .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#gmprdgbppg .gt_summary_row {
+#isvdvollol .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1148,16 +1197,16 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   padding-right: 5px;
 }
 
-#gmprdgbppg .gt_first_summary_row {
+#isvdvollol .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#gmprdgbppg .gt_first_summary_row.thick {
+#isvdvollol .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#gmprdgbppg .gt_last_summary_row {
+#isvdvollol .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1167,7 +1216,7 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   border-bottom-color: #D3D3D3;
 }
 
-#gmprdgbppg .gt_grand_summary_row {
+#isvdvollol .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1177,7 +1226,7 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   padding-right: 5px;
 }
 
-#gmprdgbppg .gt_first_grand_summary_row {
+#isvdvollol .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1187,7 +1236,7 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   border-top-color: #D3D3D3;
 }
 
-#gmprdgbppg .gt_last_grand_summary_row_top {
+#isvdvollol .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1197,11 +1246,11 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   border-bottom-color: #D3D3D3;
 }
 
-#gmprdgbppg .gt_striped {
+#isvdvollol .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#gmprdgbppg .gt_table_body {
+#isvdvollol .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1210,7 +1259,7 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   border-bottom-color: #D3D3D3;
 }
 
-#gmprdgbppg .gt_footnotes {
+#isvdvollol .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1224,7 +1273,7 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   border-right-color: #D3D3D3;
 }
 
-#gmprdgbppg .gt_footnote {
+#isvdvollol .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1233,7 +1282,7 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   padding-right: 5px;
 }
 
-#gmprdgbppg .gt_sourcenotes {
+#isvdvollol .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1247,7 +1296,7 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   border-right-color: #D3D3D3;
 }
 
-#gmprdgbppg .gt_sourcenote {
+#isvdvollol .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1255,72 +1304,72 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
   padding-right: 5px;
 }
 
-#gmprdgbppg .gt_left {
+#isvdvollol .gt_left {
   text-align: left;
 }
 
-#gmprdgbppg .gt_center {
+#isvdvollol .gt_center {
   text-align: center;
 }
 
-#gmprdgbppg .gt_right {
+#isvdvollol .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#gmprdgbppg .gt_font_normal {
+#isvdvollol .gt_font_normal {
   font-weight: normal;
 }
 
-#gmprdgbppg .gt_font_bold {
+#isvdvollol .gt_font_bold {
   font-weight: bold;
 }
 
-#gmprdgbppg .gt_font_italic {
+#isvdvollol .gt_font_italic {
   font-style: italic;
 }
 
-#gmprdgbppg .gt_super {
+#isvdvollol .gt_super {
   font-size: 65%;
 }
 
-#gmprdgbppg .gt_footnote_marks {
+#isvdvollol .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#gmprdgbppg .gt_asterisk {
+#isvdvollol .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#gmprdgbppg .gt_indent_1 {
+#isvdvollol .gt_indent_1 {
   text-indent: 5px;
 }
 
-#gmprdgbppg .gt_indent_2 {
+#isvdvollol .gt_indent_2 {
   text-indent: 10px;
 }
 
-#gmprdgbppg .gt_indent_3 {
+#isvdvollol .gt_indent_3 {
   text-indent: 15px;
 }
 
-#gmprdgbppg .gt_indent_4 {
+#isvdvollol .gt_indent_4 {
   text-indent: 20px;
 }
 
-#gmprdgbppg .gt_indent_5 {
+#isvdvollol .gt_indent_5 {
   text-indent: 25px;
 }
 
-#gmprdgbppg .katex-display {
+#isvdvollol .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#gmprdgbppg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#isvdvollol div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1328,100 +1377,92 @@ Table&nbsp;1.1: Répartition des ménages selon les observatoires. Source : enqu
 <table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 <tr class="header gt_heading">
-<th colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">Répartition des ménages par hameau selon les observatoires</th>
+<th colspan="3" class="gt_heading gt_title gt_font_normal gt_bottom_border" style="font-weight: bold; background-color: #FFF2CC">Répartition des ménages par hameau selon les observatoires</th>
 </tr>
 <tr class="odd gt_col_headings">
-<th id="Observatory" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Observatory</th>
-<th id="j4bis" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Hameau</th>
-<th id="n" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">n</th>
-<th id="Percent" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Percent<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+<th id="j4bis" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #4682B4" scope="col">Hameau</th>
+<th id="n" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #4682B4" scope="col">Nombre</th>
+<th id="Percent" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #4682B4" scope="col">Pourcentage (%)</th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
+<tr class="odd gt_group_heading_row">
+<td colspan="3" id="Alaotra" class="gt_group_heading" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #B0E0E6" scope="colgroup">Alaotra</td>
+</tr>
+<tr class="even gt_row_group_first">
+<td class="gt_row gt_left" headers="Alaotra  j4bis">Avaradrano</td>
+<td class="gt_row gt_right" headers="Alaotra  n">90</td>
+<td class="gt_row gt_right" headers="Alaotra  Percent">17.8</td>
+</tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
-<td class="gt_row gt_left" headers="j4bis">Ampijoroa</td>
-<td class="gt_row gt_right" headers="n">143</td>
-<td class="gt_row gt_right" headers="Percent">14</td>
+<td class="gt_row gt_left" headers="Alaotra  j4bis">Feramanga Atsimo</td>
+<td class="gt_row gt_right" headers="Alaotra  n">89</td>
+<td class="gt_row gt_right" headers="Alaotra  Percent">17.6</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
-<td class="gt_row gt_left" headers="j4bis">Madiromiongana</td>
-<td class="gt_row gt_right" headers="n">137</td>
-<td class="gt_row gt_right" headers="Percent">13</td>
+<td class="gt_row gt_left" headers="Alaotra  j4bis">Mangabe</td>
+<td class="gt_row gt_right" headers="Alaotra  n">73</td>
+<td class="gt_row gt_right" headers="Alaotra  Percent">14.4</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
-<td class="gt_row gt_left" headers="j4bis">Bepako</td>
-<td class="gt_row gt_right" headers="n">123</td>
-<td class="gt_row gt_right" headers="Percent">12</td>
+<td class="gt_row gt_left" headers="Alaotra  j4bis">Ambatomanga</td>
+<td class="gt_row gt_right" headers="Alaotra  n">68</td>
+<td class="gt_row gt_right" headers="Alaotra  Percent">13.4</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="Observatory">Marovoay</td>
-<td class="gt_row gt_left" headers="j4bis">Maroala</td>
-<td class="gt_row gt_right" headers="n">116</td>
-<td class="gt_row gt_right" headers="Percent">11</td>
+<td class="gt_row gt_left" headers="Alaotra  j4bis">Ambodivoara</td>
+<td class="gt_row gt_right" headers="Alaotra  n">58</td>
+<td class="gt_row gt_right" headers="Alaotra  Percent">11.4</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
-<td class="gt_row gt_left" headers="j4bis">Avaradrano</td>
-<td class="gt_row gt_right" headers="n">90</td>
-<td class="gt_row gt_right" headers="Percent">9</td>
+<td class="gt_row gt_left" headers="Alaotra  j4bis">Ambohidrony</td>
+<td class="gt_row gt_right" headers="Alaotra  n">52</td>
+<td class="gt_row gt_right" headers="Alaotra  Percent">10.3</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
-<td class="gt_row gt_left" headers="j4bis">Feramanga Atsimo</td>
-<td class="gt_row gt_right" headers="n">89</td>
-<td class="gt_row gt_right" headers="Percent">9</td>
+<td class="gt_row gt_left" headers="Alaotra  j4bis">Analamiranga</td>
+<td class="gt_row gt_right" headers="Alaotra  n">46</td>
+<td class="gt_row gt_right" headers="Alaotra  Percent">9.1</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
-<td class="gt_row gt_left" headers="j4bis">Mangabe</td>
-<td class="gt_row gt_right" headers="n">73</td>
-<td class="gt_row gt_right" headers="Percent">7</td>
+<td class="gt_row gt_left" headers="Alaotra  j4bis">Ambatoharanana</td>
+<td class="gt_row gt_right" headers="Alaotra  n">31</td>
+<td class="gt_row gt_right" headers="Alaotra  Percent">6.1</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
-<td class="gt_row gt_left" headers="j4bis">Ambatomanga</td>
-<td class="gt_row gt_right" headers="n">68</td>
-<td class="gt_row gt_right" headers="Percent">7</td>
+<td class="gt_row gt_left" headers="Alaotra  j4bis" style="font-weight: bold; background-color: #CECECE">Ensemble</td>
+<td class="gt_row gt_right" headers="Alaotra  n" style="font-weight: bold; background-color: #CECECE">507</td>
+<td class="gt_row gt_right" headers="Alaotra  Percent" style="font-weight: bold; background-color: #CECECE">100.0</td>
+</tr>
+<tr class="odd gt_group_heading_row">
+<td colspan="3" id="Marovoay" class="gt_group_heading" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #B0E0E6" scope="colgroup">Marovoay</td>
+</tr>
+<tr class="even gt_row_group_first">
+<td class="gt_row gt_left" headers="Marovoay  j4bis">Ampijoroa</td>
+<td class="gt_row gt_right" headers="Marovoay  n">143</td>
+<td class="gt_row gt_right" headers="Marovoay  Percent">27.6</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
-<td class="gt_row gt_left" headers="j4bis">Ambodivoara</td>
-<td class="gt_row gt_right" headers="n">58</td>
-<td class="gt_row gt_right" headers="Percent">6</td>
+<td class="gt_row gt_left" headers="Marovoay  j4bis">Madiromiongana</td>
+<td class="gt_row gt_right" headers="Marovoay  n">137</td>
+<td class="gt_row gt_right" headers="Marovoay  Percent">26.4</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
-<td class="gt_row gt_left" headers="j4bis">Ambohidrony</td>
-<td class="gt_row gt_right" headers="n">52</td>
-<td class="gt_row gt_right" headers="Percent">5</td>
+<td class="gt_row gt_left" headers="Marovoay  j4bis">Bepako</td>
+<td class="gt_row gt_right" headers="Marovoay  n">123</td>
+<td class="gt_row gt_right" headers="Marovoay  Percent">23.7</td>
 </tr>
 <tr class="odd">
-<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
-<td class="gt_row gt_left" headers="j4bis">Analamiranga</td>
-<td class="gt_row gt_right" headers="n">46</td>
-<td class="gt_row gt_right" headers="Percent">4</td>
+<td class="gt_row gt_left" headers="Marovoay  j4bis">Maroala</td>
+<td class="gt_row gt_right" headers="Marovoay  n">116</td>
+<td class="gt_row gt_right" headers="Marovoay  Percent">22.4</td>
 </tr>
 <tr class="even">
-<td class="gt_row gt_left" headers="Observatory">Alaotra</td>
-<td class="gt_row gt_left" headers="j4bis">Ambatoharanana</td>
-<td class="gt_row gt_right" headers="n">31</td>
-<td class="gt_row gt_right" headers="Percent">3</td>
+<td class="gt_row gt_left" headers="Marovoay  j4bis" style="font-weight: bold; background-color: #CECECE">Ensemble</td>
+<td class="gt_row gt_right" headers="Marovoay  n" style="font-weight: bold; background-color: #CECECE">519</td>
+<td class="gt_row gt_right" headers="Marovoay  Percent" style="font-weight: bold; background-color: #CECECE">100.0</td>
 </tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="Observatory">Total</td>
-<td class="gt_row gt_left" headers="j4bis">NA</td>
-<td class="gt_row gt_right" headers="n">1026</td>
-<td class="gt_row gt_right" headers="Percent">100</td>
-</tr>
-</tbody><tfoot class="gt_footnotes">
-<tr class="odd">
-<td colspan="4" class="gt_footnote"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> Percent (%)</td>
-</tr>
-</tfoot>
-
+</tbody>
 </table>
 
 </div>

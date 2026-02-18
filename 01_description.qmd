@@ -67,9 +67,8 @@ Nombre de ménages enquêtés par observatoire. Voir @tbl-men-obs.
 
 ```{r}
 #| tbl-cap: |
-#|    Répartition des ménages selon les observatoires.     
-#|    Source : enquête
-#| tbl-cap-location: bottom
+#|    <strong>Répartition des ménages selon les observatoires</strong>     
+#| tbl-cap-location: top
 #| label: tbl-men-obs
 
 # Tableau de répartition des ménages selon les observatoires
@@ -78,43 +77,58 @@ tab <- res_deb %>%
   summarise(n = n_distinct(j5), .groups = "drop") %>%
   arrange(desc(n)) %>%
   mutate(
-    Percent = round(n / sum(n) * 100, 1),
+    Pourcent = round(n / sum(n) * 100, 1),
     j0 = as.character(j0),
-    Observatory = case_when(
+    Observatoire = case_when(
       j0 == "3"  ~ "Marovoay",
       j0 == "21" ~ "Alaotra",
       TRUE       ~ j0
     )
   ) %>%
-  select(Observatory, n, Percent)
+  select(Observatoire, n, Pourcent)
 
 tab <- tab %>% 
-  tibble::add_row(Observatory = "Total", n = sum(tab$n), Percent = sum(tab$Percent, na.rm = TRUE))
+  tibble::add_row(Observatoire = "Ensemble", n = sum(tab$n), Pourcent = sum(tab$Pourcent, na.rm = TRUE))
 
 # Créer un tableau avec gt 
 gt_tab <- gt(tab) %>% 
-  tab_header( 
-    title = "Répartition des ménages selon les observatoires",
-    ) %>% 
   fmt_number( 
-    columns = Percent, 
+    columns = Pourcent, 
     decimals = 0, 
     suffixing = TRUE ) %>%
   tab_footnote( 
-    footnote = "Percent (%)", 
-    locations = cells_column_labels(columns = Percent) 
+    footnote = "Pourcent (%)", 
+    locations = cells_column_labels(columns = Pourcent) 
+    ) %>% 
+  cols_label(
+    n = "Effectif"
+  ) %>% 
+  # Mettre en gras + couleur la ligne des colonnes et "ensemble"
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#B0E0E6")   # Bleu poudre
+    ),
+  locations = list (
+      cells_column_labels(columns = everything()),
+      cells_body(rows = Observatoire == "Ensemble")
     )
+  ) %>% 
+        # Ajouter une note de source en bas du tableau
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+
+  )
 gt_tab 
 ```
 
-=\> A ajouter dans les tableaux : les sous-totaux
-
 Nombre de ménages enquêtés par hameaux
 
+
 ```{r}
-# Tableau de répartition des ménages enquêtés par hameau selon les observatoires
+# Calcul des hameaux avec pourcentage interne
 tab <- res_deb %>%
-    mutate(
+  mutate(
     j4bis = case_when(
       str_starts(str_to_lower(j4), "bepako") ~ "Bepako",
       str_starts(str_to_lower(j4), "ampijoroa") ~ "Ampijoroa",
@@ -129,39 +143,72 @@ tab <- res_deb %>%
       TRUE       ~ j0
     )
   ) %>%
-  group_by(Observatory,j4bis) %>%
-  summarise(n = n_distinct(j5), .groups = "drop") %>%
-  arrange(desc(n)) %>%
+  group_by(Observatory, j4bis) %>%
+  summarise(n = n_distinct(j5), .groups = "drop_last") %>%
   mutate(
-    Percent = round(n / sum(n) * 100, 1) 
-  ) %>% 
-  select(Observatory,j4bis, n, Percent)
+    Percent = round(n / sum(n) * 100, 1)   # pourcentage interne à chaque observatoire
+  ) %>%
+  ungroup()
 
-tab <- tab %>% 
-  tibble::add_row(Observatory = "Total", n = sum(tab$n), Percent = sum(tab$Percent, na.rm = TRUE))
+# Totaux par observatoire
+totals <- tab %>%
+  group_by(Observatory) %>%
+  summarise(
+    j4bis = "Ensemble",
+    n = sum(n),
+    Percent = 100
+  )
 
-# Créer un tableau avec gt 
-gt_tab <- gt(tab) %>% 
-  tab_header( 
-    title = "Répartition des ménages par hameau selon les observatoires",
-    ) %>% 
-  fmt_number( 
-    columns = Percent, 
-    decimals = 0, 
-    suffixing = TRUE ) %>%
-  tab_footnote( 
-    footnote = "Percent (%)", 
-    locations = cells_column_labels(columns = Percent) 
-    ) %>% 
-  cols_label( 
-    j4bis = "Hameau" )
-gt_tab 
+tab <- bind_rows(tab, totals) %>%
+  arrange(Observatory, desc(j4bis != "Ensemble"), desc(n))
+
+# Créer le tableau gt avec regroupement par observatoire
+gt_tab <- gt(tab, groupname_col = "Observatory") %>%
+  tab_header(
+    title = "Répartition des ménages par hameau selon les observatoires"
+  ) %>%
+  fmt_number(
+    columns = Percent,
+    decimals = 1
+  ) %>%
+  cols_label(
+    j4bis = "Hameau",
+    n = "Nombre",
+    Percent = "Pourcentage (%)"
+  ) %>%
+  # Style pour les lignes Totaux
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#CECECE")   # gris clair
+    ),
+    locations = cells_body(rows = j4bis == "Ensemble")
+  ) %>%
+# Style pour les en-têtes de colonnes
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#4682B4")   # Stellblue
+    ),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  # Style pour les observatoires
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#B0E0E6")   # Bleu poudre
+    ),
+    locations = cells_row_groups()
+  ) %>%
+  # Style pour le titre principal
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#FFF2CC")   # beige clair / jaune pâle
+    ),
+    locations = cells_title(groups = "title")
+  )
+gt_tab
+
 ```
 
-=\> A ajouter dans les tableaux :
-
--   une colonne avec les nombres de ménages enquêtés,
-
--   les sous-totaux
-
--   la totale
