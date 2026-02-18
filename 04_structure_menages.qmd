@@ -234,62 +234,6 @@ gt_hh_age
 
 -   Tableau à améliorer en ajoutant des sous-totaux et une ligne "total".
 
-Nous allons voir la répartition des ménages par tranche d'âge par hameau et par observatoire.
-
-```{r pyramide_age}
-# Tableau de répartition des ménages par tranche d'âge selon les observatoires
-
-hh_age <- res_deb %>%
-  left_join(res_m_a, by="j5") %>% 
-  mutate(
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    ),
-    AgeGroup = case_when(
-      m5 <= 10              ~ "0-10 ans",
-      between(m5, 11, 20)   ~ "11-20 ans",
-      between(m5, 21, 30)   ~ "21-30 ans",
-      between(m5, 31, 40)   ~ "31-40 ans",
-      between(m5, 41, 50)   ~ "41-50 ans",
-      between(m5, 51, 60)   ~ "51-60 ans",
-      between(m5, 61, 70)   ~ "61-70 ans",
-      m5 >= 71              ~ "71 ans et plus",
-      TRUE                  ~ NA_character_
-    )
-  ) %>%
-  group_by(Observatory, AgeGroup) %>%
-  summarise(
-    n = n(), 
-    .groups = "drop"
-  ) %>%
-  group_by(Observatory) %>%
-  mutate(
-    Percent = round(n / sum(n) * 100, 1)
-  ) %>%
-  arrange(Observatory, AgeGroup)
-
-
-# Créer un tableau avec gt 
-gt_hh_age <- gt(hh_age) %>% 
-  tab_header( 
-    title = "Répartition des ménages par tranche d'âge selon les observatoires",
-    ) %>% 
-  fmt_number( 
-    columns = Percent, 
-    decimals = 0, 
-    suffixing = TRUE ) %>%
-  tab_footnote( 
-    footnote = "Percent (%)", 
-    locations = cells_column_labels(columns = Percent) 
-    )
-gt_hh_age 
-```
-
-=\> On va voir les graphiques
-
 ```{r}
 # Histogramme : nombre de ménages par tranche d’âge et observatoire 
 ggplot(hh_age, aes(x = AgeGroup, y = n, fill = Observatory)) + 
@@ -301,17 +245,47 @@ ggplot(hh_age, aes(x = AgeGroup, y = n, fill = Observatory)) +
     ) + theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-# Histogramme avec pourcentages 
-ggplot(hh_age, aes(x = AgeGroup, y = Percent, fill = Observatory)) + 
-  geom_col(position = "dodge") + 
-  labs( 
-    title = "Répartition des ménages enquêtés par tranche d’âge", 
-    x = "Tranche d’âge", 
-    y = "Pourcentage (%)" 
-    ) + 
-  theme_minimal() + 
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# Histogramme séparé par observatoire
+ggplot(hh_age, aes(x = AgeGroup, y = n, fill = AgeGroup)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~Observatory) +
+  labs(
+    title = "Répartition des ménages par tranche d’âge selon les observatoires",
+    x = "Tranche d’âge",
+    y = "Nombre de ménages"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text  = element_text(face = "bold")
+  )
 
+
+# Camembert séparé par observatoire avec pourcentages affichés
+ggplot(hh_age, aes(x = "", y = Percent, fill = AgeGroup)) +
+  geom_col(width = 1, color = "white") +
+  geom_text(aes(label = paste0(Percent, "%")),
+            position = position_stack(vjust = 0.5),
+            color = "black", size = 3) +
+  coord_polar(theta = "y") +
+  facet_wrap(~Observatory) +
+  labs(
+    title = "Répartition des ménages enquêtés par tranche d’âge selon les observatoires",
+    fill  = "Tranche d’âge"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.x  = element_blank(),
+    axis.text.y  = element_blank(),
+    panel.grid   = element_blank(),
+    strip.text   = element_text(face = "bold")
+  )
+
+```
+
+```{r}
 # Pyramide des âges par sexe et observatoire
 hh_age_sex <- res_deb %>%
   left_join(res_m_a, by = "j5") %>% 
@@ -361,7 +335,134 @@ ggplot(hh_age_sex, aes(x = AgeGroup, y = Percent, fill = Sexe)) +
   theme_minimal()
 ```
 
-REMARQUE : - A revoir l'âge si on utilise la moyenne des âges.
+
+Nous allons voir la répartition des ménages par tranche d'âge par hameau et par observatoire.
+
+
+```{r age_hameau}
+# Répartition des ménages par tranche d'âge selon les observatoires et hameaux
+hh_age_village <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    AgeGroup = case_when(
+      m5 <= 10              ~ "0-10 ans",
+      between(m5, 11, 20)   ~ "11-20 ans",
+      between(m5, 21, 30)   ~ "21-30 ans",
+      between(m5, 31, 40)   ~ "31-40 ans",
+      between(m5, 41, 50)   ~ "41-50 ans",
+      between(m5, 51, 60)   ~ "51-60 ans",
+      between(m5, 61, 70)   ~ "61-70 ans",
+      m5 >= 71              ~ "71 ans et plus",
+      TRUE                  ~ NA_character_
+    ),
+    j4bis = case_when(
+      str_starts(str_to_lower(j4), "bepako")        ~ "Bepako",
+      str_starts(str_to_lower(j4), "ampijoroa")     ~ "Ampijoroa",
+      str_starts(str_to_lower(j4), "maroala")       ~ "Maroala",
+      str_starts(str_to_lower(j4), "madiromiongana")~ "Madiromiongana",
+      TRUE                                          ~ j4
+    ),
+    Obs_Hameau = paste(Observatory, j4bis, sep = " - ")
+  ) %>%
+group_by(Obs_Hameau, AgeGroup) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(Obs_Hameau) %>%
+  mutate(Percent = round(n / sum(n) * 100, 1)) %>%
+  arrange(Obs_Hameau, AgeGroup) %>%
+  group_modify(~ bind_rows(
+    .x,
+    tibble(
+      Obs_Hameau = unique(.x$Obs_Hameau),
+      AgeGroup   = "Total",
+      n          = sum(.x$n),
+      Percent    = 100
+    )
+  )) %>%
+  ungroup()
+
+# Tableau gt avec regroupement
+gt_hh_age_village <- gt(hh_age_village, 
+                        rowname_col = "AgeGroup", 
+                        groupname_col = "Obs_Hameau") %>%
+  tab_header(
+    title = md("**Répartition des ménages par tranche d'âge selon les observatoires et hameaux**")
+  ) %>%
+  cols_label(
+    n       = "Effectif",
+    Percent = "Pourcentage"
+  ) %>%
+  fmt_number(columns = Percent, decimals = 1) %>%
+  # Mettre en gras + fond gris clair pour les titres de groupe
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#f0f0f0")
+    ),
+    locations = cells_row_groups()
+  ) %>%
+  # Mettre en gras + fond bleu pâle pour la ligne Total
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#e8f4f8")
+    ),
+    locations = cells_body(rows = AgeGroup == "Total")
+  ) %>%
+  # Stub "Total" en gras + fond bleu pâle (case entière colorée)
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#e8f4f8")
+    ),
+    locations = cells_stub(rows = AgeGroup == "Total")
+  ) %>%
+# Mettre en gras + fond beige pour les en-têtes Effectif et Pourcentage
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#f9f2e7")
+    ),
+    locations = cells_column_labels(columns = c(n, Percent))
+  ) %>%
+  # Mettre en gras + fond gris clair pour le titre principal
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#f5f5f5")
+    ),
+    locations = cells_title(groups = "title")
+  ) %>%
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
+
+gt_hh_age_village
+```
+Histogrammes par hameau (panneaux séparés)
+```{r}
+ggplot(hh_age_village %>% filter(AgeGroup != "Total"),
+       aes(x = AgeGroup, y = n, fill = AgeGroup)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~Obs_Hameau) +
+  labs(
+    title = "Répartition des ménages par tranche d’âge selon les hameaux",
+    x = "Tranche d’âge",
+    y = "Nombre de ménages"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text  = element_text(face = "bold")
+  )
+
+```
+
 
 ### Origine
 
@@ -670,6 +771,7 @@ gt_hh_combined <- hh_combined %>%
 
 gt_hh_combined
 ```
+
 
 ### Niveau d'éducation
 
