@@ -641,8 +641,9 @@ origin_gt_data <- origin_table %>%
     `Conjoint %` = `Conjoint_percentage`
   ) %>%
   select(Observatory, Origine, `Chef N`, `Chef %`, `Conjoint N`, `Conjoint %`)
-
+###############################################
 # GT tab
+##############################################"
 gt_origin <- origin_gt_data %>%
   gt(groupname_col = "Observatory") %>%
   tab_header(
@@ -680,11 +681,16 @@ gt_origin <- origin_gt_data %>%
   tab_footnote(
     footnote = "Les pourcentages sont calculés par catégorie (chef ou conjoint) au sein de chaque observatoire",
     locations = cells_title(groups = "title")
+  ) %>%
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
   )
 
 gt_origin
 
+#####################################################
 # Histogramme avec pourcentages
+#####################################################
 ggplot(origin_table, aes(x = Origine, y = percentage, fill = Member_Type)) +
   geom_col(position = "dodge") +
   facet_wrap(~Observatory) +
@@ -699,6 +705,88 @@ ggplot(origin_table, aes(x = Origine, y = percentage, fill = Member_Type)) +
     axis.text.x = element_text(angle = 45, hjust = 1),
     plot.title = element_text(hjust = 0.5, face = "bold")
   )
+
+```
+
+AMELIORATION 1 +++++++
+
+```{r}
+#AMELIORATION1
+# Ajouter une ligne "Ensemble" par observatoire
+origin_totals <- origin_table %>%
+  group_by(Observatory) %>%
+  summarise(
+    Origine = "Ensemble",
+    `Chef N` = sum(count[Member_Type == "Chef de ménage"]),
+    `Chef %` = 100,
+    `Conjoint N` = sum(count[Member_Type == "Conjoint"]),
+    `Conjoint %` = 100,
+    .groups = "drop"
+  )
+
+# Reformatage des données pour GT
+origin_gt_data <- origin_table %>%
+  complete(Observatory, Member_Type, Origine, fill = list(count = 0, percentage = 0)) %>%
+  select(-total) %>%
+  pivot_wider(
+    names_from = Member_Type,
+    values_from = c(count, percentage),
+    names_glue = "{Member_Type}_{.value}",
+    values_fill = 0
+  ) %>%
+  rename(
+    `Chef N` = `Chef de ménage_count`,
+    `Chef %` = `Chef de ménage_percentage`,
+    `Conjoint N` = `Conjoint_count`,
+    `Conjoint %` = `Conjoint_percentage`
+  ) %>%
+  select(Observatory, Origine, `Chef N`, `Chef %`, `Conjoint N`, `Conjoint %`) %>%
+  bind_rows(origin_totals) %>%   # <-- ajout des lignes Ensemble
+  arrange(Observatory, Origine == "Ensemble", Origine)
+
+# Tableau GT
+gt_origin <- origin_gt_data %>%
+  gt(groupname_col = "Observatory") %>%
+  tab_header(
+    title = "Origine des chefs de ménage et conjoints par observatoire",
+    subtitle = "Nombres et pourcentages"
+  ) %>%
+  cols_label(
+    Origine = "Origine",
+    `Chef N` = "Nombre",
+    `Chef %` = "(%)",
+    `Conjoint N` = "Nombre",
+    `Conjoint %` = "(%)"
+  ) %>%
+  tab_spanner(
+    label = "Chefs de ménage",
+    columns = c(`Chef N`, `Chef %`)
+  ) %>%
+  tab_spanner(
+    label = "Conjoints",
+    columns = c(`Conjoint N`, `Conjoint %`)
+  ) %>%
+  fmt_number(columns = c(`Chef N`, `Conjoint N`), decimals = 0) %>%
+  fmt_number(columns = c(`Chef %`, `Conjoint %`), decimals = 1) %>%
+  # Style pour les lignes Ensemble
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#e8f5e9")),
+    locations = cells_body(rows = Origine == "Ensemble")
+  ) %>%
+  # Style alterné pour les autres lignes
+  tab_style(
+    style = cell_fill(color = "#f0f0f0"),
+    locations = cells_body(rows = seq(1, nrow(origin_gt_data), 2))
+  ) %>%
+  tab_footnote(
+    footnote = "Les pourcentages sont calculés par catégorie (chef ou conjoint) au sein de chaque observatoire",
+    locations = cells_title(groups = "title")
+  ) %>%
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
+
+gt_origin
 
 ```
 
