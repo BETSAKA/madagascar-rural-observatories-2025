@@ -1147,7 +1147,6 @@ ggplot(reason_table, aes(x = reason, y = percentage, fill = Member_Type)) +
 
 ```
 
-
 ## Caractéristiques des chefs de ménages
 
 ### Situation matrimoniale
@@ -1211,6 +1210,25 @@ sexe_table <- sexe_stats %>%
   rename(Sexe = Sexe) %>%
   mutate(Caractéristique = "Sexe", .before = Sexe) %>%
   rename(Catégorie = Sexe)
+
+# Ajouter une ligne Total pour Sexe
+sexe_totals <- sexe_stats %>%
+  group_by(Observatory) %>%
+  summarise(count = sum(count), .groups = "drop") %>%
+  mutate(
+    percentage = 100,
+    Valeur = paste0(count, " (", percentage, "%)")
+  ) %>%
+  select(Observatory, Valeur) %>%
+  pivot_wider(
+    names_from = Observatory,
+    values_from = Valeur,
+    values_fill = "-"
+  ) %>%
+  mutate(Caractéristique = "Sexe", Catégorie = "Total")
+
+# Fusionner Sexe avec Total
+sexe_table <- bind_rows(sexe_table, sexe_totals)
 
 # Age tab
 age_stats <- hh_m_status %>%
@@ -1285,40 +1303,36 @@ gt_hh_combined <- hh_combined %>%
     Alaotra = "Alaotra",
     Marovoay = "Marovoay"
   ) %>%
-  # GRAS : Titre
-  tab_style(
-    style = cell_text(weight = "bold", size = "large"),
-    locations = cells_title(groups = "title")
-  ) %>%
-  # GRAS : Sous-titre
-  tab_style(
-    style = cell_text(weight = "bold", size = "medium"),
-    locations = cells_title(groups = "subtitle")
-  ) %>%
-  # GRAS : En-têtes de colonnes
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_column_labels()
-  ) %>%
-  # GRAS : Noms des groupes (Sexe, Âge, Statut matrimonial)
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_row_groups()
-  ) %>%
-  # Alternance de couleurs
-  tab_style(
-    style = cell_fill(color = "#e8f4f8"),
-    locations = cells_body(rows = seq(1, nrow(hh_combined), 2))
-  ) %>%
+# GRAS + couleur bleu ciel clair : Titre
+tab_style(
+  style = list(cell_text(weight = "bold", size = "large"), cell_fill(color = "#87CEEB")), # bleu ciel clair
+  locations = cells_title(groups = "title")
+) %>%
+# GRAS + couleur : En-têtes de colonnes
+tab_style(
+  style = list(cell_text(weight = "bold", color = "white"), cell_fill(color = "#4F81BD")),
+  locations = cells_column_labels()
+) %>%
+# GRAS + couleur marron : Noms des groupes (Sexe, Âge, Statut matrimonial)
+tab_style(
+  style = list(cell_text(weight = "bold"), cell_fill(color = "#D2B48C")),
+  locations = cells_row_groups()
+) %>%
+# GRAS + couleur jaune clair : Ligne Total du bloc Sexe
+tab_style(
+  style = list(cell_text(weight = "bold"), cell_fill(color = "#FFFFE0")), # jaune clair
+  locations = cells_body(rows = Catégorie == "Total" & Caractéristique == "Sexe")
+) %>%
   tab_footnote(
     footnote = "Sexe et Statut matrimonial : en nombres et pourcentages. Âge : statistiques descriptives (minimum, mode, médiane, moyenne, maximum)",
     locations = cells_title(groups = "title")
   ) %>% 
-    tab_source_note(
+  tab_source_note(
     source_note = md("**Source : Enquête auprès des OR 2025**")
   )
 
 gt_hh_combined
+
 ```
 
 
@@ -1409,7 +1423,8 @@ gt_educ <- educ_table %>%
   tab_footnote(
     footnote = "Les pourcentages sont calculés par rapport au total des chefs de ménage de chaque observatoire",
     locations = cells_title(groups = "title")
-  )
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 
 gt_educ
 
@@ -1519,7 +1534,8 @@ gt_educ <- educ_table %>%
   tab_footnote(
     footnote = "Les pourcentages sont calculés par rapport au total des chefs de ménage de chaque sexe et observatoire",
     locations = cells_title(groups = "title")
-  )
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 
 gt_educ
 ```
