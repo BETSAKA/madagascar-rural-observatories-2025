@@ -361,7 +361,6 @@ ggplot(hh_age, aes(x = AgeGroup, y = n, fill = AgeGroup)) +
     strip.text  = element_text(face = "bold")
   )
 
-
 # Camembert séparé par observatoire avec pourcentages affichés
 ggplot(hh_age, aes(x = "", y = Percent, fill = AgeGroup)) +
   geom_col(width = 1, color = "white") +
@@ -492,7 +491,7 @@ gt_hh_age_village <- gt(hh_age_village,
                         rowname_col = "AgeGroup", 
                         groupname_col = "Obs_Hameau") %>%
   tab_header(
-    title = md("**Répartition des ménages par tranche d'âge selon les observatoires et hameaux**")
+    title = md("**Répartition des membres des ménages par tranche d'âge selon les observatoires et hameaux**")
   ) %>%
   cols_label(
     n       = "Effectif",
@@ -545,6 +544,10 @@ gt_hh_age_village <- gt(hh_age_village,
 
 gt_hh_age_village
 ```
+**REMARQUE**  
+- Rajouter des lignes totals pour chaque bloc si c'est nécessaire
+
+
 Histogrammes par hameau (panneaux séparés)
 ```{r}
 ggplot(hh_age_village %>% filter(AgeGroup != "Total"),
@@ -560,7 +563,7 @@ ggplot(hh_age_village %>% filter(AgeGroup != "Total"),
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
     strip.text  = element_text(face = "bold")
-  )
+  ) 
 
 ```
 
