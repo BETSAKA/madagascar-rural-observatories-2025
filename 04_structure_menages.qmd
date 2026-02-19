@@ -760,15 +760,203 @@ ggplot(origin_table, aes(x = Origine, y = percentage, fill = Member_Type)) +
     axis.text.x = element_text(angle = 45, hjust = 1),
     plot.title = element_text(hjust = 0.5, face = "bold")
   )
+```
 
+Raison d'implantation (Mg4a)
+
+```{r}
+# Household settlement reason by household heads and spouses, by observatory
+
+hh_reason <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 %in% c(1, 2)) %>%  # Keep only CM= 1 and spouse = 2
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    Member_Type = case_when(
+      m6 == 1 ~ "Chef de ménage",
+      m6 == 2 ~ "Conjoint",
+      TRUE    ~ NA_character_
+    ),
+    reason = case_when(
+      mg4a == 1 ~ "Né ici",
+      mg4a == 2 ~ "Mariage",
+      mg4a == 3 ~ "Travail/Etudes",
+      mg4a == 4 ~ "Rapprochement familial/Rapatriement",
+      mg4a == 5 ~ "Problème écologique dans la région d'origine",
+      mg4a == 6 ~ "Insécurité",
+      mg4a == 7 ~ "Recherche de ressources",
+      mg4a == 8 ~ "Inconnu",
+      TRUE    ~ NA_character_
+    )
+  ) %>%
+  select(Observatory, j5, Member_Type, reason)
+
+# Créer le tableau d'analyse par observatoire et raison d'implantation
+reason_table <- hh_reason %>%
+  group_by(Observatory, Member_Type, reason) %>%
+  summarise(
+    count = n(),
+    .groups = 'drop'
+  ) %>%
+  group_by(Observatory, Member_Type) %>%
+  mutate(
+    total = sum(count),
+    percentage = round((count / total) * 100, 1)
+  ) %>%
+  ungroup() %>%
+  arrange(Observatory, Member_Type, desc(count))
+
+# Ajouter une ligne "Ensemble" par observatoire
+reason_totals <- reason_table %>%
+  group_by(Observatory) %>%
+  summarise(
+    reason = "Ensemble",
+    `Chef N` = sum(count[Member_Type == "Chef de ménage"]),
+    `Chef %` = 100,
+    `Conjoint N` = sum(count[Member_Type == "Conjoint"]),
+    `Conjoint %` = 100,
+    .groups = "drop"
+  )
+
+# Ajouter une ligne Total globale
+grand_total <- reason_totals %>%
+  summarise(
+    Observatory = "zzzTotal",   # valeur technique pour le tri
+    reason = "Total",
+    `Chef N` = sum(`Chef N`),
+    `Chef %` = 100,
+    `Conjoint N` = sum(`Conjoint N`),
+    `Conjoint %` = 100
+  )
+
+# Tableau GT - Réorganiser les données pour GT
+reason_gt_data <- reason_table %>%
+  complete(Observatory, Member_Type, reason, fill = list(count = 0, percentage = 0)) %>%
+  select(-total) %>%
+  pivot_wider(
+    names_from = Member_Type,
+    values_from = c(count, percentage),
+    names_glue = "{Member_Type}_{.value}",
+    values_fill = 0
+  ) %>%
+  rename(
+    `Chef N` = `Chef de ménage_count`,
+    `Chef %` = `Chef de ménage_percentage`,
+    `Conjoint N` = `Conjoint_count`,
+    `Conjoint %` = `Conjoint_percentage`
+  ) %>%
+  select(Observatory, reason, `Chef N`, `Chef %`, `Conjoint N`, `Conjoint %`) %>%
+  bind_rows(reason_totals, grand_total) %>%   # <-- réintégration des lignes Ensemble et Total
+  mutate(order_flag = ifelse(Observatory == "zzzTotal", 2, 1)) %>%
+  arrange(order_flag, Observatory, reason == "Ensemble", reason) %>%
+  arrange(order_flag, Observatory, desc(`Chef N`), desc(`Conjoint N`)) %>% # <-- tri décroissant
+  select(-order_flag) %>%
+  mutate(Observatory = ifelse(Observatory == "zzzTotal", "", Observatory)) # éviter le groupe vide
+
+###############################################
+# GT tab
+##############################################
+
+gt_reason <- reason_gt_data %>%
+  gt(groupname_col = "Observatory") %>%
+  tab_header(
+    title = "Raison d'implantation des chefs de ménage et conjoints par observatoire",
+    subtitle = "Nombres et pourcentages"
+  ) %>%
+  cols_label(
+    reason = "Raison d'implantation",
+    `Chef N` = "Nombre",
+    `Chef %` = "(%)",
+    `Conjoint N` = "Nombre",
+    `Conjoint %` = "(%)"
+  ) %>%
+  tab_spanner(
+    label = "Chefs de ménage",
+    columns = c(`Chef N`, `Chef %`)
+  ) %>%
+  tab_spanner(
+    label = "Conjoints",
+    columns = c(`Conjoint N`, `Conjoint %`)
+  ) %>%
+  fmt_number(columns = c(`Chef N`, `Conjoint N`), decimals = 0) %>%
+  fmt_number(columns = c(`Chef %`, `Conjoint %`), decimals = 1) %>%
+  # Style pour les lignes Ensemble (vert clair discret)
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#808000")),
+    locations = cells_body(rows = reason == "Ensemble")
+  ) %>%
+  # Style pour la ligne Total finale (jaune pâle)
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#FFFF99")),
+    locations = cells_body(rows = reason == "Total")
+  ) %>%
+  # Style alterné pour les autres lignes
+  tab_style(
+    style = cell_fill(color = "#f0f0f0"),
+    locations = cells_body(
+      rows = seq(1, nrow(reason_gt_data), 2) & !(reason %in% c("Ensemble", "Total"))
+    )
+  ) %>%
+  # Mettre en gras + couleur pour le titre principal
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#FFF2CC")),
+    locations = cells_title(groups = "title")
+  ) %>%
+  # Mettre en gras + couleur pour la ligne des colonnes
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#4682B4")),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  # Mettre en gras + couleur pour les observatoires
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
+    locations = cells_row_groups()
+  ) %>%
+  # Mettre en gras + couleur pour les spanners ("Chefs de ménage" et "Conjoints")
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#D3D3D3")),
+    locations = cells_column_spanners(spanners = everything())
+  ) %>%
+  tab_footnote(
+    footnote = "Les pourcentages sont calculés par catégorie (chef ou conjoint) au sein de chaque observatoire",
+    locations = cells_title(groups = "title")
+  ) %>%
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
+
+gt_reason
+```
+
+Il y beaucoup moins de conjoints que de chefs de ménages (748/1026 = 73%).
+
+```{r}
+#####################################################
+# Histogramme avec pourcentages
+#####################################################
+ggplot(reason_table, aes(x = reason, y = percentage, fill = Member_Type)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~Observatory) +
+  labs(
+    title = "Distribution (%) des raisons d'implantation \n des chefs de ménage et de leurs conjoints \n par observatoire",
+    x = "Raison d'implantation",
+    y = "Pourcentage (%)",
+    fill = "Catégorie"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  )
 
 ```
 
-
-
-
-
-Raison d'implantation (Mg4a)
 
 ## Caractéristiques des chefs de ménages
 
@@ -935,6 +1123,9 @@ gt_hh_combined <- hh_combined %>%
   tab_footnote(
     footnote = "Sexe et Statut matrimonial : en nombres et pourcentages. Âge : statistiques descriptives (minimum, mode, médiane, moyenne, maximum)",
     locations = cells_title(groups = "title")
+  ) %>% 
+    tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
   )
 
 gt_hh_combined
