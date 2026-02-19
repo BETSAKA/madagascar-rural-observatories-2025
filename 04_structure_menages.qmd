@@ -231,10 +231,9 @@ gt(hh_size_combined, groupname_col = "Observatory") %>%
 #### Au niveau des observatoires
 Nous allons voir la répartition des ménages par tranche d'âge par observatoire.
 
-
 ```{r}
 # CORRECTION3
-# Tableau de répartition des ménages par tranche d'âge selon les observatoires
+# Tableau de répartition des membres du ménage par tranche d'âge selon les observatoires
 hh_age <- res_deb %>%
   left_join(res_m_a, by="j5") %>%
   mutate(
@@ -274,8 +273,25 @@ hh_age_combined <- hh_age %>%
   bind_rows(hh_age, .) %>%
   arrange(Observatory, AgeGroup == "Ensemble", AgeGroup)
 
-# Créer un tableau avec gt
-gt_hh_age <- gt(hh_age_combined, groupname_col = "Observatory") %>%
+# Ligne Total globale
+grand_total <- hh_age_combined %>%
+  filter(AgeGroup == "Ensemble") %>%
+  summarise(
+    Observatory = "zzzTotal",   # valeur technique pour le tri
+    AgeGroup = "Total",
+    n = sum(n),
+    Percent = 100
+  )
+
+# Fusionner tout
+hh_age_final <- bind_rows(hh_age_combined, grand_total) %>%
+  mutate(order_flag = ifelse(Observatory == "zzzTotal", 2, 1)) %>%
+  arrange(order_flag, Observatory, AgeGroup == "Ensemble", AgeGroup) %>%
+  select(-order_flag) %>%
+  mutate(Observatory = ifelse(Observatory == "zzzTotal", "", Observatory)) # éviter le groupe vide
+
+# Créer le tableau gt
+gt_hh_age <- gt(hh_age_final, groupname_col = "Observatory") %>%
   tab_header(
     title = "Répartition des membres du ménage par tranche d'âge selon les observatoires"
   ) %>%
@@ -285,19 +301,31 @@ gt_hh_age <- gt(hh_age_combined, groupname_col = "Observatory") %>%
     Percent  = "Pourcent",
     AgeGroup = "Tranche d'âge"
   ) %>%
-tab_style(
+  # Style pour les sous-totaux "Ensemble"
+  tab_style(
     style = list(cell_text(weight = "bold"), cell_fill(color = "#e8f5e9")),
-    locations = cells_body(rows = AgeGroup == "Ensemble")
+    locations = cells_body(rows = AgeGroup == "Ensemble" & Observatory != "")
   ) %>%
+  # Style pour la ligne Total finale
   tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_title(groups = "title")
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#FFD700")),
+    locations = cells_body(rows = AgeGroup == "Total")
   ) %>%
+  # Style pour les en-têtes de colonnes
   tab_style(
-    style = cell_text(weight = "bold"),
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#4682B4")),
     locations = cells_column_labels(columns = everything())
   ) %>%
-  tab_options(row_group.font.weight = "bold") %>%
+  # Style pour les observatoires
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
+    locations = cells_row_groups()
+  ) %>%
+  # Style pour le titre principal
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#FFF2CC")),
+    locations = cells_title(groups = "title")
+  ) %>%
   tab_source_note(
     source_note = md("**Source : Enquête auprès des OR 2025**")
   )
@@ -306,15 +334,11 @@ gt_hh_age
 
 ```
 
-
-
-
-
 **Remarques :**
 
 -   2 "NA" trouvé dans tranche d'âge à corriger pour Alaotra;
 
--   Tableau à améliorer en ajoutant des sous-totaux et une ligne "total".
+-   A supprimer l'une des lignes "Total" qui reprend la ligne "Ensemble" pour Alaotra
 
 ```{r}
 # Histogramme séparé par observatoire
