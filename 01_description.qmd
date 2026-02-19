@@ -195,10 +195,6 @@ gt_tab
 
 ```
 
-
-
-
-
 Nombre de ménages enquêtés par hameaux
 
 
@@ -236,8 +232,22 @@ totals <- tab %>%
     Percent = 100
   )
 
-tab <- bind_rows(tab, totals) %>%
-  arrange(Observatory, desc(j4bis != "Ensemble"), desc(n))
+# Total global (somme des "Ensemble") 
+grand_total <- totals %>% 
+  summarise( 
+    Observatory = "zzzTotal", # valeur spéciale pour le tri
+    j4bis = "Total",
+    n = sum(n), 
+    Percent = 100 
+    ) 
+
+# Fusionner tout 
+tab <- bind_rows(tab, totals, grand_total) %>% 
+  mutate(order_flag = ifelse(Observatory == "zzzTotal", 2, 1)) %>% 
+  arrange(order_flag, Observatory, desc(j4bis != "Ensemble"), desc(n)) %>%
+  select(-order_flag) %>%  # enlever la colonne temporaire
+# remplacer "zzzTotal" par "" pour éviter le groupe vide 
+  mutate(Observatory = ifelse(Observatory == "zzzTotal", "", Observatory))
 
 # Créer le tableau gt avec regroupement par observatoire
 gt_tab <- gt(tab, groupname_col = "Observatory") %>%
@@ -253,14 +263,22 @@ gt_tab <- gt(tab, groupname_col = "Observatory") %>%
     n = "Nombre",
     Percent = "Pourcentage (%)"
   ) %>%
-  # Style pour les lignes Totaux
-  tab_style(
+  # Style pour les sous-totaux 
+  tab_style( 
     style = list(
-      cell_text(weight = "bold"),
-      cell_fill(color = "#CECECE")   # gris clair
-    ),
-    locations = cells_body(rows = j4bis == "Ensemble")
-  ) %>%
+      cell_text(weight = "bold"), 
+      cell_fill(color = "#CECECE")
+      ), 
+    locations = cells_body(rows = j4bis == "Ensemble" & Observatory != "") 
+    ) %>% 
+  # Style pour la ligne Total finale 
+  tab_style( 
+    style = list(
+      cell_text(weight = "bold"), 
+      cell_fill(color = "#FFD700")
+      ), 
+    locations = cells_body(rows = j4bis == "Total") 
+    ) %>% 
 # Style pour les en-têtes de colonnes
   tab_style(
     style = list(
