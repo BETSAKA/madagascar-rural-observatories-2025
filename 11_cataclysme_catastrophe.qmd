@@ -6,11 +6,11 @@ editor_options:
 
 # Cataclysmes et catastrophes
 
-Les ménages ruraux de Madagascar sont régulièrement exposés à des aléas climatiques et biologiques : sécheresse, cyclones, inondations, invasions de criquets ou de rats, etc. Ce chapitre analyse la prévalence et la sévérité des cataclysmes subis par les ménages des observatoires d'Alaotra et de Marovoay au cours de la campagne 2025 (octobre 2024 – septembre 2025).
+Les ménages ruraux de Madagascar sont régulièrement exposés à des aléas climatiques et biologiques : sécheresse, cyclones, inondations, invasions de criquets ou de rats, etc. Ce chapitre analyse la prévalence et la sévérité des cataclysmes subis par les ménages des observatoires d'Alaotra et de Marovoay au cours de la campagne 2025 (octobre 2024-septembre 2025).
 
 Deux fichiers de données sont mobilisés :
 
-- **`res_cc`** : un enregistrement par ménage et par type de cataclysme (survenu ou non), avec les dégâts sur le logement, l'élevage et les personnes ;
+- **`res_cc`** : un enregistrement par ménage et par type de cataclysme, avec les dégâts sur le logement, l'élevage et les personnes ;
 - **`res_cca`** : les dégâts agricoles détaillés par culture et par type d'aléa (champs et stocks).
 
 ```{r data_loading_cc}
@@ -90,7 +90,7 @@ events <- res_cc %>% filter(cc11 == 1)
 
 ### Taux d'exposition global
 
-Sur les 1 026 ménages enquêtés, combien ont été touchés par au moins un cataclysme au cours de la campagne ?
+Quelle part des ménages enquêtés ont été touchés par au moins un cataclysme au cours de la campagne ?
 
 ```{r t1_prevalence_globale}
 # T1 : % de ménages touchés par au moins un cataclysme, par observatoire
@@ -138,7 +138,7 @@ menages_touches_all %>%
   )
 ```
 
-Le taux d'exposition aux cataclysmes est très élevé dans les deux observatoires, ce qui reflète la vulnérabilité structurelle des ménages ruraux malgaches.
+Le taux d'exposition aux cataclysmes est très élevé dans les deux observatoires.
 
 ### Prévalence par type de cataclysme
 
@@ -190,7 +190,7 @@ prev_type_wide %>%
   )
 ```
 
-La sécheresse est de loin le cataclysme le plus fréquemment cité, suivi des maladies (cultures/élevage), des rats et des facteurs humains (vol, dégradation). Les cyclones et inondations, bien que redoutés, touchent un nombre plus limité de ménages dans ces deux observatoires pour cette campagne.
+La sécheresse est de loin le cataclysme le plus fréquemment cité, suivi des maladies (cultures/élevage), des rats et des facteurs humains (vol, dégradation). Les cyclones et inondations, bien que redoutés, ont touché un nombre plus limité de ménages dans ces deux observatoires pour cette campagne.
 
 ```{r g1_prevalence_type}
 # G1 : Barres horizontales — types de cataclysmes les plus fréquents
