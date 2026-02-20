@@ -1542,9 +1542,11 @@ gt_educ
 
 ### Activités principales des Chefs de ménage
 
-Tout d'abord, on va vérifier les effectifs des activités principales (a1) des Chefs de ménage
+Tout d'abord, on va vérifier les effectifs des activités principales (a1) des Chefs de ménage.  
+Le tableau suivant permet d’identifier l’activité la plus fréquente.
+On peut le supprimer à la fin des analyses.
 
-```{r hhh-activite}
+```{r}
 # All main activities of the household head
 all_hh_main_act <- res_deb %>%
   left_join(res_m_a, by = "j5") %>%
@@ -1558,15 +1560,28 @@ all_hh_main_act <- res_deb %>%
       TRUE       ~ j0
     ),
     # Extraire les labels des activités et corriger l'encodage
-    Activite = iconv(as.character(to_factor(a1)), from = "latin1", to = "UTF-8"),
+    Activite = iconv(as.character(labelled::to_factor(a1)), from = "latin1", to = "UTF-8"),
     Activite = gsub("&#39;", "'", Activite, fixed = TRUE)
   ) %>%
   group_by(Observatory, Activite) %>% 
   summarise(n = n(), .groups = "drop") %>% 
   mutate( 
     Percent = round(n / sum(n) * 100, 1) 
-    ) %>% 
-  arrange(Observatory, desc(n), desc(Percent)) 
+  ) %>% 
+  arrange(Observatory, desc(n), desc(Percent))
+
+# Ajouter une ligne "Total" par observatoire
+totals <- all_hh_main_act %>%
+  group_by(Observatory) %>%
+  summarise(
+    n = sum(n),
+    Percent = 100,
+    Activite = "Total",
+    .groups = "drop"
+  )
+
+all_hh_main_act <- bind_rows(all_hh_main_act, totals) %>%
+  arrange(Observatory, desc(Activite == "Total"), desc(n))
 
 # Display with gt
 all_hh_main_act %>%
@@ -1586,8 +1601,35 @@ all_hh_main_act %>%
   tab_options(
     table.font.size = 12,
     table.width = pct(100)
-  )
+  ) %>%
+  # GRAS + couleur bleu ciel clair : Titre principal
+  tab_style(
+    style = list(cell_text(weight = "bold", size = "large"), cell_fill(color = "#87CEEB")),
+    locations = cells_title(groups = "title")
+  ) %>%
+  # GRAS + couleur bleu foncé : En-têtes de colonnes
+  tab_style(
+    style = list(cell_text(weight = "bold", color = "white"), cell_fill(color = "#4F81BD")),
+    locations = cells_column_labels()
+  ) %>%
+  # GRAS + couleur beige clair : Noms des groupes (Observatoires)
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#F5F5DC")),
+    locations = cells_row_groups()
+  ) %>%
+  # GRAS + couleur vert clair : Ligne "Total"
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DFFFD6")),
+    locations = cells_body(
+      columns = everything(),
+      rows = Activite == "Total"
+    )
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+
 ```
+
 
 -   Les cultivateurs exploitants (code = 95), les ouvriers agricoles (salariés agricoles) (code = 76) et commercants (code = 45) sont majoritaires tant à Alaotra et à Marovoay.
 
@@ -1701,9 +1743,12 @@ tab_style(
                   ), 
     locations = cells_column_labels( columns = everything() 
                                      ) 
-    )
+    )%>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 
+########################################################
 # Histogramm per observatory and sex
+######################################################
 ggplot(hh_main_act_final, aes(x = Act_principal, y = Percent, fill = Sexe)) +
   geom_col(position = "dodge") +
   facet_wrap(~Observatory) +
