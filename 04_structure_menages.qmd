@@ -4,7 +4,13 @@ editor_options:
   chunk_output_type: console
 ---
 
+  
+
 # Caractéristiques socio-démographiques des ménages
+
+**REMARQUE :**  
+Les tableaux nous serviront d'apporter plus de precision à la compréhension des graphiques.  
+A la fin, on peut supprimer les tableaux et les graphiques non pertinentes.
 
 Le ménage est l'unité de base de l'enquête.
 
@@ -18,6 +24,7 @@ library(haven)
 library(dplyr)
 library (gt) # Easily create presentation - ready display tables
 library(ggplot2)
+library(labelled)
 
 # Loading observatories data
 res_deb <- read_dta("data/res_deb.dta")
@@ -80,7 +87,11 @@ Qu’en est-il des codes ménages aux positions 6 et 7 de J5 ?
 Calculons la taille des ménages par observatoire
 
 ```{r}
-
+#| tbl-cap: |
+#|    <strong>Taille moyenne des ménages par observatoire</strong> 
+#| tbl-cap-location: top
+#| label: tbl-men-obs
+#| 
 hh_size_obs <- res_m_a %>% 
   left_join(res_deb, by = "j5") %>% 
   group_by(j0, j5) %>% 
@@ -98,19 +109,46 @@ hh_size_obs <- res_m_a %>%
   ) %>% 
   select(Observatory, mean_hh_size)
 
+# Ajouter la moyenne globale
+hh_size_obs <- hh_size_obs %>%
+  bind_rows(
+    tibble(
+      Observatory   = "Ensemble",
+      mean_hh_size  = mean(hh_size_obs$mean_hh_size)
+    )
+  )
 # Displaying with gt
-hh_size_obs_tab <- gt(hh_size_obs) %>% 
-  tab_header( 
-    title = "Taille moyenne des ménages par observatoire",
-    ) %>% 
-  fmt_number( 
-    columns = mean_hh_size, 
-    decimals = 2, 
-    suffixing = TRUE ) %>%
-  cols_label( 
-    mean_hh_size = "Taille moyenne" )
+hh_size_obs_tab <- gt(hh_size_obs) %>%
+  fmt_number(
+    columns = mean_hh_size,
+    decimals = 2,
+    suffixing = TRUE
+  ) %>%
+  cols_label(
+    mean_hh_size = "Taille moyenne",
+    Observatory = "Observatoire"
+  ) %>% 
+  # Mettre en gras + fond bleu pâle pour la ligne Ensemble
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#e8f4f8")
+    ),
+    locations = cells_body(rows = Observatory == "Ensemble")
+  ) %>%
+   # Mettre les en-têtes de colonnes en gras
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#7fb")
+    ),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+# Ajouter une note de source en bas du tableau
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
 hh_size_obs_tab
-
 ```
 
 ### Taille des ménages par hameau et par observatoire
@@ -161,25 +199,43 @@ gt(hh_size_combined, groupname_col = "Observatory") %>%
   # on utilise n_hh pour calculer la moyenne par observatoire, mais on le 
   # masque car cette information est déjà fournie plus haut
   cols_hide(columns = n_hh) %>%
+  # Ligne Ensemble en gras + fond bleu pâle
   tab_style(
-    style = list(cell_text(weight = "bold"), cell_fill(color = "#F0F0F0")),
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#e8f4f8")),
     locations = cells_body(rows = j4bis == "Ensemble")
   ) %>%
+  # Titre principal en gras + fond beige clair
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#f9f2e7")),
+    locations = cells_title(groups = "title")
+  ) %>%
+  # En-têtes de colonnes en gras + fond beige foncé
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#d2b48c")),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  # Groupes d'observatoires en gras + fond gris clair
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#b2df2b")),
+    locations = cells_row_groups()
+  ) %>%
   tab_options(row_group.font.weight = "bold") %>%
-  cols_label(mean_hh_size = "Taille moyenne", j4bis = "Hameau")
-
+  cols_label(mean_hh_size = "Taille moyenne", j4bis = "Hameau")%>% 
+        # Ajouter une note de source en bas du tableau
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
 
 ```
-
 ### Structure par âge
-
+#### Au niveau des observatoires
 Nous allons voir la répartition des ménages par tranche d'âge par observatoire.
 
 ```{r}
-# Tableau de répartition des ménages par tranche d'âge selon les observatoires
-
+# CORRECTION3
+# Tableau de répartition des membres du ménage par tranche d'âge selon les observatoires
 hh_age <- res_deb %>%
-  left_join(res_m_a, by="j5") %>% 
+  left_join(res_m_a, by="j5") %>%
   mutate(
     j0 = as.character(j0),
     Observatory = case_when(
@@ -199,118 +255,137 @@ hh_age <- res_deb %>%
       TRUE                  ~ NA_character_
     )
   ) %>%
-  group_by(Observatory, AgeGroup) %>%
-  summarise(
-    n = n(), 
-    .groups = "drop"
-  ) %>%
+group_by(Observatory, AgeGroup) %>%
+  summarise(n = n(), .groups = "drop") %>%
   group_by(Observatory) %>%
-  mutate(
-    Percent = round(n / sum(n) * 100, 1)
-  ) %>%
+  mutate(Percent = round(n / sum(n) * 100, 1)) %>%
   arrange(Observatory, AgeGroup)
 
+# Ajouter une ligne "Ensemble" par observatoire
+hh_age_combined <- hh_age %>%
+  group_by(Observatory) %>%
+  summarise(
+    AgeGroup = "Ensemble",
+    n = sum(n),
+    Percent = 100,
+    .groups = "drop"
+  ) %>%
+  bind_rows(hh_age, .) %>%
+  arrange(Observatory, AgeGroup == "Ensemble", AgeGroup)
 
-# Créer un tableau avec gt 
-gt_hh_age <- gt(hh_age) %>% 
-  tab_header( 
-    title = "Répartition des ménages par tranche d'âge selon les observatoires",
-    ) %>% 
-  fmt_number( 
-    columns = Percent, 
-    decimals = 0, 
-    suffixing = TRUE ) %>%
-  tab_footnote( 
-    footnote = "Percent (%)", 
-    locations = cells_column_labels(columns = Percent) 
-    )
-gt_hh_age 
+# Ligne Total globale
+grand_total <- hh_age_combined %>%
+  filter(AgeGroup == "Ensemble") %>%
+  summarise(
+    Observatory = "zzzTotal",   # valeur technique pour le tri
+    AgeGroup = "Total",
+    n = sum(n),
+    Percent = 100
+  )
+
+# Fusionner tout
+hh_age_final <- bind_rows(hh_age_combined, grand_total) %>%
+  mutate(order_flag = ifelse(Observatory == "zzzTotal", 2, 1)) %>%
+  arrange(order_flag, Observatory, AgeGroup == "Ensemble", AgeGroup) %>%
+  select(-order_flag) %>%
+  mutate(Observatory = ifelse(Observatory == "zzzTotal", "", Observatory)) # éviter le groupe vide
+
+# Créer le tableau gt
+gt_hh_age <- gt(hh_age_final, groupname_col = "Observatory") %>%
+  tab_header(
+    title = "Répartition des membres du ménage par tranche d'âge selon les observatoires"
+  ) %>%
+  fmt_number(columns = Percent, decimals = 0) %>%
+  cols_label(
+    n        = "Effectif",
+    Percent  = "Pourcent",
+    AgeGroup = "Tranche d'âge"
+  ) %>%
+  # Style pour les sous-totaux "Ensemble"
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#e8f5e9")),
+    locations = cells_body(rows = AgeGroup == "Ensemble" & Observatory != "")
+  ) %>%
+  # Style pour la ligne Total finale
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#FFD700")),
+    locations = cells_body(rows = AgeGroup == "Total")
+  ) %>%
+  # Style pour les en-têtes de colonnes
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#4682B4")),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  # Style pour les observatoires
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
+    locations = cells_row_groups()
+  ) %>%
+  # Style pour le titre principal
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#FFF2CC")),
+    locations = cells_title(groups = "title")
+  ) %>%
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
+
+gt_hh_age
+
 ```
 
 **Remarques :**
 
 -   2 "NA" trouvé dans tranche d'âge à corriger pour Alaotra;
 
--   Tableau à améliorer en ajoutant des sous-totaux et une ligne "total".
+-   A supprimer l'une des lignes "Total" qui reprend la ligne "Ensemble" pour Alaotra  
 
-Nous allons voir la répartition des ménages par tranche d'âge par hameau et par observatoire.
-
-```{r pyramide_age}
-# Tableau de répartition des ménages par tranche d'âge selon les observatoires
-
-hh_age <- res_deb %>%
-  left_join(res_m_a, by="j5") %>% 
-  mutate(
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    ),
-    AgeGroup = case_when(
-      m5 <= 10              ~ "0-10 ans",
-      between(m5, 11, 20)   ~ "11-20 ans",
-      between(m5, 21, 30)   ~ "21-30 ans",
-      between(m5, 31, 40)   ~ "31-40 ans",
-      between(m5, 41, 50)   ~ "41-50 ans",
-      between(m5, 51, 60)   ~ "51-60 ans",
-      between(m5, 61, 70)   ~ "61-70 ans",
-      m5 >= 71              ~ "71 ans et plus",
-      TRUE                  ~ NA_character_
-    )
-  ) %>%
-  group_by(Observatory, AgeGroup) %>%
-  summarise(
-    n = n(), 
-    .groups = "drop"
-  ) %>%
-  group_by(Observatory) %>%
-  mutate(
-    Percent = round(n / sum(n) * 100, 1)
-  ) %>%
-  arrange(Observatory, AgeGroup)
+REMARQUES FIGURES  
+Pour les histogrammes et camembert, mettre un titre et source à chaque fois, et mettre en gras les titres
 
 
-# Créer un tableau avec gt 
-gt_hh_age <- gt(hh_age) %>% 
-  tab_header( 
-    title = "Répartition des ménages par tranche d'âge selon les observatoires",
-    ) %>% 
-  fmt_number( 
-    columns = Percent, 
-    decimals = 0, 
-    suffixing = TRUE ) %>%
-  tab_footnote( 
-    footnote = "Percent (%)", 
-    locations = cells_column_labels(columns = Percent) 
-    )
-gt_hh_age 
-```
-
-=\> On va voir les graphiques
 
 ```{r}
-# Histogramme : nombre de ménages par tranche d’âge et observatoire 
-ggplot(hh_age, aes(x = AgeGroup, y = n, fill = Observatory)) + 
-  geom_col(position = "dodge") + 
-  labs( 
-    title = "Répartition des ménages enquêtés par tranche d’âge", 
-    x = "Tranche d’âge", 
-    y = "Nombre de ménages" 
-    ) + theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# Histogramme séparé par observatoire
+ggplot(hh_age, aes(x = AgeGroup, y = n, fill = AgeGroup)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~Observatory) +
+  labs(
+    title = "Répartition des membres des ménages par tranche d’âge selon les observatoires",
+    x = "Tranche d’âge",
+    y = "Nombre de ménages"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text  = element_text(face = "bold")
+  )
 
-# Histogramme avec pourcentages 
-ggplot(hh_age, aes(x = AgeGroup, y = Percent, fill = Observatory)) + 
-  geom_col(position = "dodge") + 
-  labs( 
-    title = "Répartition des ménages enquêtés par tranche d’âge", 
-    x = "Tranche d’âge", 
-    y = "Pourcentage (%)" 
-    ) + 
-  theme_minimal() + 
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# Camembert séparé par observatoire avec pourcentages affichés
+ggplot(hh_age, aes(x = "", y = Percent, fill = AgeGroup)) +
+  geom_col(width = 1, color = "white") +
+  geom_text(aes(label = paste0(Percent, "%")),
+            position = position_stack(vjust = 0.5),
+            color = "black", size = 3) +
+  coord_polar(theta = "y") +
+  facet_wrap(~Observatory) +
+  labs(
+    title = "Répartition des membres des ménages enquêtés par tranche d’âge selon les observatoires",
+    fill  = "Tranche d’âge"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.x  = element_blank(),
+    axis.text.y  = element_blank(),
+    panel.grid   = element_blank(),
+    strip.text   = element_text(face = "bold")
+  )
 
+```
+
+```{r}
 # Pyramide des âges par sexe et observatoire
 hh_age_sex <- res_deb %>%
   left_join(res_m_a, by = "j5") %>% 
@@ -352,7 +427,7 @@ ggplot(hh_age_sex, aes(x = AgeGroup, y = Percent, fill = Sexe)) +
   coord_flip() + 
   facet_wrap(~Observatory) +
   labs( 
-    title = "Pyramide des âges des ménages enquêtés par observatoire",
+    title = "Pyramide des âges des membres des ménages enquêtés par observatoire",
     x = "Tranche d'âge",
     y = "Pourcentage (%)" 
     ) + 
@@ -360,7 +435,138 @@ ggplot(hh_age_sex, aes(x = AgeGroup, y = Percent, fill = Sexe)) +
   theme_minimal()
 ```
 
-REMARQUE : - A revoir l'âge si on utilise la moyenne des âges.
+#### Au niveau des hameaux
+Nous allons voir la répartition des ménages par tranche d'âge par hameau et par observatoire.
+
+
+```{r age_hameau}
+# Répartition des ménages par tranche d'âge selon les observatoires et hameaux
+hh_age_village <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    AgeGroup = case_when(
+      m5 <= 10              ~ "0-10 ans",
+      between(m5, 11, 20)   ~ "11-20 ans",
+      between(m5, 21, 30)   ~ "21-30 ans",
+      between(m5, 31, 40)   ~ "31-40 ans",
+      between(m5, 41, 50)   ~ "41-50 ans",
+      between(m5, 51, 60)   ~ "51-60 ans",
+      between(m5, 61, 70)   ~ "61-70 ans",
+      m5 >= 71              ~ "71 ans et plus",
+      TRUE                  ~ NA_character_
+    ),
+    j4bis = case_when(
+      str_starts(str_to_lower(j4), "bepako")        ~ "Bepako",
+      str_starts(str_to_lower(j4), "ampijoroa")     ~ "Ampijoroa",
+      str_starts(str_to_lower(j4), "maroala")       ~ "Maroala",
+      str_starts(str_to_lower(j4), "madiromiongana")~ "Madiromiongana",
+      TRUE                                          ~ j4
+    ),
+    Obs_Hameau = paste(Observatory, j4bis, sep = " - ")
+  ) %>%
+group_by(Obs_Hameau, AgeGroup) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(Obs_Hameau) %>%
+  mutate(Percent = round(n / sum(n) * 100, 1)) %>%
+  arrange(Obs_Hameau, AgeGroup) %>%
+  group_modify(~ bind_rows(
+    .x,
+    tibble(
+      Obs_Hameau = unique(.x$Obs_Hameau),
+      AgeGroup   = "Total",
+      n          = sum(.x$n),
+      Percent    = 100
+    )
+  )) %>%
+  ungroup()
+
+# Tableau gt avec regroupement
+gt_hh_age_village <- gt(hh_age_village, 
+                        rowname_col = "AgeGroup", 
+                        groupname_col = "Obs_Hameau") %>%
+  tab_header(
+    title = md("**Répartition des membres des ménages par tranche d'âge selon les observatoires et hameaux**")
+  ) %>%
+  cols_label(
+    n       = "Effectif",
+    Percent = "Pourcentage"
+  ) %>%
+  fmt_number(columns = Percent, decimals = 1) %>%
+  # Mettre en gras + fond gris clair pour les titres de groupe
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#f0f0f0")
+    ),
+    locations = cells_row_groups()
+  ) %>%
+  # Mettre en gras + fond bleu pâle pour la ligne Total
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#e8f4f8")
+    ),
+    locations = cells_body(rows = AgeGroup == "Total")
+  ) %>%
+  # Stub "Total" en gras + fond bleu pâle (case entière colorée)
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#e8f4f8")
+    ),
+    locations = cells_stub(rows = AgeGroup == "Total")
+  ) %>%
+# Mettre en gras + fond beige pour les en-têtes Effectif et Pourcentage
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#f9f2e7")
+    ),
+    locations = cells_column_labels(columns = c(n, Percent))
+  ) %>%
+  # Mettre en gras + fond gris clair pour le titre principal
+  tab_style(
+    style = list(
+      cell_text(weight = "bold"),
+      cell_fill(color = "#f5f5f5")
+    ),
+    locations = cells_title(groups = "title")
+  ) %>%
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
+
+gt_hh_age_village
+```
+**REMARQUE**  
+- Rajouter des lignes totals pour chaque bloc si c'est nécessaire
+
+
+Histogrammes par hameau (panneaux séparés)
+```{r}
+ggplot(hh_age_village %>% filter(AgeGroup != "Total"),
+       aes(x = AgeGroup, y = n, fill = AgeGroup)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~Obs_Hameau) +
+  labs(
+    title = "Répartition des ménages par tranche d’âge selon les hameaux",
+    x = "Tranche d’âge",
+    y = "Nombre de ménages"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text  = element_text(face = "bold")
+  ) 
+
+```
+
 
 ### Origine
 
@@ -372,12 +578,12 @@ m6 : rohim-pihavanana, 1 : CM, 2 : sa femme
 
 m3 : origine
 
-```{r hhh-spouse-origin}
+```{r}
 # Origin of household heads and spouses by observatory
 
 hh_origine <- res_deb %>%
   left_join(res_m_a, by = "j5") %>%
-  arrange (j5) %>% 
+  arrange(j5) %>% 
   filter(m6 %in% c(1, 2)) %>%  # Keep only CM= 1 and spouse = 2
   mutate(
     j0 = as.character(j0),
@@ -417,9 +623,31 @@ origin_table <- hh_origine %>%
   ungroup() %>%
   arrange(Observatory, Member_Type, desc(count))
 
+# Ajouter une ligne "Ensemble" par observatoire
+origin_totals <- origin_table %>%
+  group_by(Observatory) %>%
+  summarise(
+    Origine = "Ensemble",
+    `Chef N` = sum(count[Member_Type == "Chef de ménage"]),
+    `Chef %` = 100,
+    `Conjoint N` = sum(count[Member_Type == "Conjoint"]),
+    `Conjoint %` = 100,
+    .groups = "drop"
+  )
+
+# Ajouter une ligne Total globale
+grand_total <- origin_totals %>%
+  summarise(
+    Observatory = "zzzTotal",   # valeur technique pour le tri
+    Origine = "Total",
+    `Chef N` = sum(`Chef N`),
+    `Chef %` = 100,
+    `Conjoint N` = sum(`Conjoint N`),
+    `Conjoint %` = 100
+  )
+
 # Tableau GT - Réorganiser les données pour GT
 origin_gt_data <- origin_table %>%
-  # S'assurer que toutes les combinaisons existent
   complete(Observatory, Member_Type, Origine, fill = list(count = 0, percentage = 0)) %>%
   select(-total) %>%
   pivot_wider(
@@ -434,9 +662,17 @@ origin_gt_data <- origin_table %>%
     `Conjoint N` = `Conjoint_count`,
     `Conjoint %` = `Conjoint_percentage`
   ) %>%
-  select(Observatory, Origine, `Chef N`, `Chef %`, `Conjoint N`, `Conjoint %`)
+  select(Observatory, Origine, `Chef N`, `Chef %`, `Conjoint N`, `Conjoint %`) %>%
+  bind_rows(origin_totals, grand_total) %>%   # <-- réintégration des lignes Ensemble et Total
+  mutate(order_flag = ifelse(Observatory == "zzzTotal", 2, 1)) %>%
+  arrange(order_flag, Observatory, Origine == "Ensemble", Origine) %>%
+  select(-order_flag) %>%
+  mutate(Observatory = ifelse(Observatory == "zzzTotal", "", Observatory)) # éviter le groupe vide
 
+###############################################
 # GT tab
+##############################################
+
 gt_origin <- origin_gt_data %>%
   gt(groupname_col = "Observatory") %>%
   tab_header(
@@ -458,33 +694,251 @@ gt_origin <- origin_gt_data %>%
     label = "Conjoints",
     columns = c(`Conjoint N`, `Conjoint %`)
   ) %>%
-  fmt_number(
-    columns = c(`Chef N`, `Conjoint N`),
-    decimals = 0
+  fmt_number(columns = c(`Chef N`, `Conjoint N`), decimals = 0) %>%
+  fmt_number(columns = c(`Chef %`, `Conjoint %`), decimals = 1) %>%
+  # Style pour les lignes Ensemble (vert clair discret)
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#808000")),
+    locations = cells_body(rows = Origine == "Ensemble")
   ) %>%
-  fmt_number(
-    columns = c(`Chef %`, `Conjoint %`),
-    decimals = 1,
-    suffixing = TRUE
+  # Style pour la ligne Total finale (jaune pâle)
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#FFFF99")),
+    locations = cells_body(rows = Origine == "Total")
   ) %>%
+  # Style alterné pour les autres lignes
   tab_style(
     style = cell_fill(color = "#f0f0f0"),
-    locations = cells_body(rows = seq(1, nrow(origin_gt_data), 2))
+    locations = cells_body(
+      rows = seq(1, nrow(origin_gt_data), 2) & !(Origine %in% c("Ensemble", "Total"))
+    )
+  ) %>%
+  # Mettre en gras + couleur pour le titre principal
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#FFF2CC")),
+    locations = cells_title(groups = "title")
+  ) %>%
+  # Mettre en gras + couleur pour la ligne des colonnes
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#4682B4")),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  # Mettre en gras + couleur pour les observatoires
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
+    locations = cells_row_groups()
+  ) %>%
+  # Mettre en gras + couleur pour les spanners ("Chefs de ménage" et "Conjoints")
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#D3D3D3")),
+    locations = cells_column_spanners(spanners = everything())
   ) %>%
   tab_footnote(
     footnote = "Les pourcentages sont calculés par catégorie (chef ou conjoint) au sein de chaque observatoire",
     locations = cells_title(groups = "title")
+  ) %>%
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
   )
 
 gt_origin
 
+#####################################################
 # Histogramme avec pourcentages
+#####################################################
 ggplot(origin_table, aes(x = Origine, y = percentage, fill = Member_Type)) +
   geom_col(position = "dodge") +
   facet_wrap(~Observatory) +
   labs(
-    title = "Distribution (%) de l'origine des chefs de ménage et conjoints par observatoire",
+    title = "Distribution (%) de l'origine \n des chefs de ménage et de leurs conjoints \n par observatoire",
     x = "Origine",
+    y = "Pourcentage (%)",
+    fill = "Catégorie"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  )
+```
+
+
+```{r}
+# Origin region of household heads and spouses by observatory
+
+hh_homeland <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 %in% c(1, 2)) %>%  # Keep only CM= 1 and spouse = 2
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    Member_Type = case_when(
+      m6 == 1 ~ "Chef de ménage",
+      m6 == 2 ~ "Conjoint",
+      TRUE    ~ NA_character_
+    ),
+    homeland = case_when(
+      m3a == 1 ~ "Fokontany dans la même commune",
+      m3a == 2 ~ "Commune dans le même district",
+      m3a == 3 ~ "Autre district",
+      TRUE    ~ NA_character_
+    )
+  ) %>%
+  select(Observatory, j5, Member_Type, homeland)
+
+# Créer le tableau d'analyse par observatoire et la région d'origine
+homeland_table <- hh_homeland %>%
+  group_by(Observatory, Member_Type, homeland) %>%
+  summarise(
+    count = n(),
+    .groups = 'drop'
+  ) %>%
+  group_by(Observatory, Member_Type) %>%
+  mutate(
+    total = sum(count),
+    percentage = round((count / total) * 100, 1)
+  ) %>%
+  ungroup() %>%
+  arrange(Observatory, Member_Type, desc(count))
+
+# Ajouter une ligne "Ensemble" par observatoire
+homeland_totals <- homeland_table %>%
+  group_by(Observatory) %>%
+  summarise(
+    homeland = "Ensemble",
+    `Chef N` = sum(count[Member_Type == "Chef de ménage"]),
+    `Chef %` = 100,
+    `Conjoint N` = sum(count[Member_Type == "Conjoint"]),
+    `Conjoint %` = 100,
+    .groups = "drop"
+  )
+
+# Ajouter une ligne Total globale
+grand_total <- homeland_totals %>%
+  summarise(
+    Observatory = "zzzTotal",   # valeur technique pour le tri
+    homeland = "Total",
+    `Chef N` = sum(`Chef N`),
+    `Chef %` = 100,
+    `Conjoint N` = sum(`Conjoint N`),
+    `Conjoint %` = 100
+  )
+
+# Tableau GT - Réorganiser les données pour GT
+homeland_gt_data <- homeland_table %>%
+  complete(Observatory, Member_Type, homeland, fill = list(count = 0, percentage = 0)) %>%
+  select(-total) %>%
+  pivot_wider(
+    names_from = Member_Type,
+    values_from = c(count, percentage),
+    names_glue = "{Member_Type}_{.value}",
+    values_fill = 0
+  ) %>%
+  rename(
+    `Chef N` = `Chef de ménage_count`,
+    `Chef %` = `Chef de ménage_percentage`,
+    `Conjoint N` = `Conjoint_count`,
+    `Conjoint %` = `Conjoint_percentage`
+  ) %>%
+  select(Observatory, homeland, `Chef N`, `Chef %`, `Conjoint N`, `Conjoint %`) %>%
+  bind_rows(homeland_totals, grand_total) %>%   # <-- réintégration des lignes Ensemble et Total
+  mutate(order_flag = ifelse(Observatory == "zzzTotal", 2, 1)) %>%
+  arrange(order_flag, Observatory, homeland == "Ensemble", homeland) %>%
+  arrange(order_flag, Observatory, desc(`Chef N`), desc(`Conjoint N`)) %>% # <-- tri décroissant
+  select(-order_flag) %>%
+  mutate(Observatory = ifelse(Observatory == "zzzTotal", "", Observatory)) # éviter le groupe vide
+
+###############################################
+# GT tab
+##############################################
+
+gt_homeland <- homeland_gt_data %>%
+  gt(groupname_col = "Observatory") %>%
+  tab_header(
+    title = "Régions d'origine des chefs de ménage et conjoints par observatoire",
+    subtitle = "Nombres et pourcentages"
+  ) %>%
+  cols_label(
+    homeland = "Région",
+    `Chef N` = "Nombre",
+    `Chef %` = "(%)",
+    `Conjoint N` = "Nombre",
+    `Conjoint %` = "(%)"
+  ) %>%
+  tab_spanner(
+    label = "Chefs de ménage",
+    columns = c(`Chef N`, `Chef %`)
+  ) %>%
+  tab_spanner(
+    label = "Conjoints",
+    columns = c(`Conjoint N`, `Conjoint %`)
+  ) %>%
+  fmt_number(columns = c(`Chef N`, `Conjoint N`), decimals = 0) %>%
+  fmt_number(columns = c(`Chef %`, `Conjoint %`), decimals = 1) %>%
+  # Style pour les lignes Ensemble (vert clair discret)
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#808000")),
+    locations = cells_body(rows = homeland == "Ensemble")
+  ) %>%
+  # Style pour la ligne Total finale (jaune pâle)
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#FFFF99")),
+    locations = cells_body(rows = homeland == "Total")
+  ) %>%
+  # Style alterné pour les autres lignes
+  tab_style(
+    style = cell_fill(color = "#f0f0f0"),
+    locations = cells_body(
+      rows = seq(1, nrow(homeland_gt_data), 2) & !(homeland %in% c("Ensemble", "Total"))
+    )
+  ) %>%
+  # Mettre en gras + couleur pour le titre principal
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#FFF2CC")),
+    locations = cells_title(groups = "title")
+  ) %>%
+  # Mettre en gras + couleur pour la ligne des colonnes
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#4682B4")),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  # Mettre en gras + couleur pour les observatoires
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
+    locations = cells_row_groups()
+  ) %>%
+  # Mettre en gras + couleur pour les spanners ("Chefs de ménage" et "Conjoints")
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#D3D3D3")),
+    locations = cells_column_spanners(spanners = everything())
+  ) %>%
+  tab_footnote(
+    footnote = "Les pourcentages sont calculés par catégorie (chef ou conjoint) au sein de chaque observatoire",
+    locations = cells_title(groups = "title")
+  ) %>%
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
+
+gt_homeland
+```
+A VERIFIER SI C'EST VRAIMENT "NA" OU "INCONNU" => si c'est "INCONNU" quels en sont les raisons.
+
+```{r}
+#####################################################
+# Histogramme avec pourcentages
+#####################################################
+ggplot(homeland_table, aes(x = homeland, y = percentage, fill = Member_Type)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~Observatory) +
+  labs(
+    title = "Distribution (%) des régions d'origine \n des chefs de ménage et de leurs conjoints \n par observatoire",
+    x = "Région",
     y = "Pourcentage (%)",
     fill = "Catégorie"
   ) +
@@ -495,10 +949,203 @@ ggplot(origin_table, aes(x = Origine, y = percentage, fill = Member_Type)) +
   )
 
 ```
-
-REMARQUE : - A corriger tableau des origines pour conjoint =\> affichage en parallèle avec CM - "NA" à traiter
+La majorité des ménages provient des autres districts.  
 
 Raison d'implantation (Mg4a)
+
+```{r}
+# Household settlement reason by household heads and spouses, by observatory
+
+hh_reason <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 %in% c(1, 2)) %>%  # Keep only CM= 1 and spouse = 2
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    Member_Type = case_when(
+      m6 == 1 ~ "Chef de ménage",
+      m6 == 2 ~ "Conjoint",
+      TRUE    ~ NA_character_
+    ),
+    reason = case_when(
+      mg4a == 1 ~ "Né ici",
+      mg4a == 2 ~ "Mariage",
+      mg4a == 3 ~ "Travail/Etudes",
+      mg4a == 4 ~ "Rapprochement familial/Rapatriement",
+      mg4a == 5 ~ "Problème écologique dans la région d'origine",
+      mg4a == 6 ~ "Insécurité",
+      mg4a == 7 ~ "Recherche de ressources",
+      mg4a == 8 ~ "Inconnu",
+      TRUE    ~ NA_character_
+    )
+  ) %>%
+  select(Observatory, j5, Member_Type, reason)
+
+# Créer le tableau d'analyse par observatoire et raison d'implantation
+reason_table <- hh_reason %>%
+  group_by(Observatory, Member_Type, reason) %>%
+  summarise(
+    count = n(),
+    .groups = 'drop'
+  ) %>%
+  group_by(Observatory, Member_Type) %>%
+  mutate(
+    total = sum(count),
+    percentage = round((count / total) * 100, 1)
+  ) %>%
+  ungroup() %>%
+  arrange(Observatory, Member_Type, desc(count))
+
+# Ajouter une ligne "Ensemble" par observatoire
+reason_totals <- reason_table %>%
+  group_by(Observatory) %>%
+  summarise(
+    reason = "Ensemble",
+    `Chef N` = sum(count[Member_Type == "Chef de ménage"]),
+    `Chef %` = 100,
+    `Conjoint N` = sum(count[Member_Type == "Conjoint"]),
+    `Conjoint %` = 100,
+    .groups = "drop"
+  )
+
+# Ajouter une ligne Total globale
+grand_total <- reason_totals %>%
+  summarise(
+    Observatory = "zzzTotal",   # valeur technique pour le tri
+    reason = "Total",
+    `Chef N` = sum(`Chef N`),
+    `Chef %` = 100,
+    `Conjoint N` = sum(`Conjoint N`),
+    `Conjoint %` = 100
+  )
+
+# Tableau GT - Réorganiser les données pour GT
+reason_gt_data <- reason_table %>%
+  complete(Observatory, Member_Type, reason, fill = list(count = 0, percentage = 0)) %>%
+  select(-total) %>%
+  pivot_wider(
+    names_from = Member_Type,
+    values_from = c(count, percentage),
+    names_glue = "{Member_Type}_{.value}",
+    values_fill = 0
+  ) %>%
+  rename(
+    `Chef N` = `Chef de ménage_count`,
+    `Chef %` = `Chef de ménage_percentage`,
+    `Conjoint N` = `Conjoint_count`,
+    `Conjoint %` = `Conjoint_percentage`
+  ) %>%
+  select(Observatory, reason, `Chef N`, `Chef %`, `Conjoint N`, `Conjoint %`) %>%
+  bind_rows(reason_totals, grand_total) %>%   # <-- réintégration des lignes Ensemble et Total
+  mutate(order_flag = ifelse(Observatory == "zzzTotal", 2, 1)) %>%
+  arrange(order_flag, Observatory, reason == "Ensemble", reason) %>%
+  arrange(order_flag, Observatory, desc(`Chef N`), desc(`Conjoint N`)) %>% # <-- tri décroissant
+  select(-order_flag) %>%
+  mutate(Observatory = ifelse(Observatory == "zzzTotal", "", Observatory)) # éviter le groupe vide
+
+###############################################
+# GT tab
+##############################################
+
+gt_reason <- reason_gt_data %>%
+  gt(groupname_col = "Observatory") %>%
+  tab_header(
+    title = "Raison d'implantation des chefs de ménage et conjoints par observatoire",
+    subtitle = "Nombres et pourcentages"
+  ) %>%
+  cols_label(
+    reason = "Raison d'implantation",
+    `Chef N` = "Nombre",
+    `Chef %` = "(%)",
+    `Conjoint N` = "Nombre",
+    `Conjoint %` = "(%)"
+  ) %>%
+  tab_spanner(
+    label = "Chefs de ménage",
+    columns = c(`Chef N`, `Chef %`)
+  ) %>%
+  tab_spanner(
+    label = "Conjoints",
+    columns = c(`Conjoint N`, `Conjoint %`)
+  ) %>%
+  fmt_number(columns = c(`Chef N`, `Conjoint N`), decimals = 0) %>%
+  fmt_number(columns = c(`Chef %`, `Conjoint %`), decimals = 1) %>%
+  # Style pour les lignes Ensemble (vert clair discret)
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#808000")),
+    locations = cells_body(rows = reason == "Ensemble")
+  ) %>%
+  # Style pour la ligne Total finale (jaune pâle)
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#FFFF99")),
+    locations = cells_body(rows = reason == "Total")
+  ) %>%
+  # Style alterné pour les autres lignes
+  tab_style(
+    style = cell_fill(color = "#f0f0f0"),
+    locations = cells_body(
+      rows = seq(1, nrow(reason_gt_data), 2) & !(reason %in% c("Ensemble", "Total"))
+    )
+  ) %>%
+  # Mettre en gras + couleur pour le titre principal
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#FFF2CC")),
+    locations = cells_title(groups = "title")
+  ) %>%
+  # Mettre en gras + couleur pour la ligne des colonnes
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#4682B4")),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  # Mettre en gras + couleur pour les observatoires
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
+    locations = cells_row_groups()
+  ) %>%
+  # Mettre en gras + couleur pour les spanners ("Chefs de ménage" et "Conjoints")
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#D3D3D3")),
+    locations = cells_column_spanners(spanners = everything())
+  ) %>%
+  tab_footnote(
+    footnote = "Les pourcentages sont calculés par catégorie (chef ou conjoint) au sein de chaque observatoire",
+    locations = cells_title(groups = "title")
+  ) %>%
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
+
+gt_reason
+```
+
+Il y beaucoup moins de conjoints que de chefs de ménages (748/1026 = 73%).
+Bien que la majorité soient des migrants, la plupart sont nés dans l’observatoire.  
+
+```{r}
+#####################################################
+# Histogramme avec pourcentages
+#####################################################
+ggplot(reason_table, aes(x = reason, y = percentage, fill = Member_Type)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~Observatory) +
+  labs(
+    title = "Distribution (%) des raisons d'implantation \n des chefs de ménage et de leurs conjoints \n par observatoire",
+    x = "Raison d'implantation",
+    y = "Pourcentage (%)",
+    fill = "Catégorie"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  )
+
+```
 
 ## Caractéristiques des chefs de ménages
 
@@ -563,6 +1210,25 @@ sexe_table <- sexe_stats %>%
   rename(Sexe = Sexe) %>%
   mutate(Caractéristique = "Sexe", .before = Sexe) %>%
   rename(Catégorie = Sexe)
+
+# Ajouter une ligne Total pour Sexe
+sexe_totals <- sexe_stats %>%
+  group_by(Observatory) %>%
+  summarise(count = sum(count), .groups = "drop") %>%
+  mutate(
+    percentage = 100,
+    Valeur = paste0(count, " (", percentage, "%)")
+  ) %>%
+  select(Observatory, Valeur) %>%
+  pivot_wider(
+    names_from = Observatory,
+    values_from = Valeur,
+    values_fill = "-"
+  ) %>%
+  mutate(Caractéristique = "Sexe", Catégorie = "Total")
+
+# Fusionner Sexe avec Total
+sexe_table <- bind_rows(sexe_table, sexe_totals)
 
 # Age tab
 age_stats <- hh_m_status %>%
@@ -637,38 +1303,38 @@ gt_hh_combined <- hh_combined %>%
     Alaotra = "Alaotra",
     Marovoay = "Marovoay"
   ) %>%
-  # GRAS : Titre
-  tab_style(
-    style = cell_text(weight = "bold", size = "large"),
-    locations = cells_title(groups = "title")
-  ) %>%
-  # GRAS : Sous-titre
-  tab_style(
-    style = cell_text(weight = "bold", size = "medium"),
-    locations = cells_title(groups = "subtitle")
-  ) %>%
-  # GRAS : En-têtes de colonnes
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_column_labels()
-  ) %>%
-  # GRAS : Noms des groupes (Sexe, Âge, Statut matrimonial)
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_row_groups()
-  ) %>%
-  # Alternance de couleurs
-  tab_style(
-    style = cell_fill(color = "#e8f4f8"),
-    locations = cells_body(rows = seq(1, nrow(hh_combined), 2))
-  ) %>%
+# GRAS + couleur bleu ciel clair : Titre
+tab_style(
+  style = list(cell_text(weight = "bold", size = "large"), cell_fill(color = "#87CEEB")), # bleu ciel clair
+  locations = cells_title(groups = "title")
+) %>%
+# GRAS + couleur : En-têtes de colonnes
+tab_style(
+  style = list(cell_text(weight = "bold", color = "white"), cell_fill(color = "#4F81BD")),
+  locations = cells_column_labels()
+) %>%
+# GRAS + couleur marron : Noms des groupes (Sexe, Âge, Statut matrimonial)
+tab_style(
+  style = list(cell_text(weight = "bold"), cell_fill(color = "#D2B48C")),
+  locations = cells_row_groups()
+) %>%
+# GRAS + couleur jaune clair : Ligne Total du bloc Sexe
+tab_style(
+  style = list(cell_text(weight = "bold"), cell_fill(color = "#FFFFE0")), # jaune clair
+  locations = cells_body(rows = Catégorie == "Total" & Caractéristique == "Sexe")
+) %>%
   tab_footnote(
     footnote = "Sexe et Statut matrimonial : en nombres et pourcentages. Âge : statistiques descriptives (minimum, mode, médiane, moyenne, maximum)",
     locations = cells_title(groups = "title")
+  ) %>% 
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
   )
 
 gt_hh_combined
+
 ```
+
 
 ### Niveau d'éducation
 
@@ -757,7 +1423,8 @@ gt_educ <- educ_table %>%
   tab_footnote(
     footnote = "Les pourcentages sont calculés par rapport au total des chefs de ménage de chaque observatoire",
     locations = cells_title(groups = "title")
-  )
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 
 gt_educ
 
@@ -867,16 +1534,19 @@ gt_educ <- educ_table %>%
   tab_footnote(
     footnote = "Les pourcentages sont calculés par rapport au total des chefs de ménage de chaque sexe et observatoire",
     locations = cells_title(groups = "title")
-  )
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 
 gt_educ
 ```
 
 ### Activités principales des Chefs de ménage
 
-Tout d'abord, on va vérifier les effectifs des activités principales (a1) des Chefs de ménage
+Tout d'abord, on va vérifier les effectifs des activités principales (a1) des Chefs de ménage.  
+Le tableau suivant permet d’identifier l’activité la plus fréquente.
+On peut le supprimer à la fin des analyses.
 
-```{r hhh-activite}
+```{r}
 # All main activities of the household head
 all_hh_main_act <- res_deb %>%
   left_join(res_m_a, by = "j5") %>%
@@ -890,15 +1560,28 @@ all_hh_main_act <- res_deb %>%
       TRUE       ~ j0
     ),
     # Extraire les labels des activités et corriger l'encodage
-    Activite = iconv(as.character(to_factor(a1)), from = "latin1", to = "UTF-8"),
+    Activite = iconv(as.character(labelled::to_factor(a1)), from = "latin1", to = "UTF-8"),
     Activite = gsub("&#39;", "'", Activite, fixed = TRUE)
   ) %>%
   group_by(Observatory, Activite) %>% 
   summarise(n = n(), .groups = "drop") %>% 
   mutate( 
     Percent = round(n / sum(n) * 100, 1) 
-    ) %>% 
-  arrange(Observatory, desc(n), desc(Percent)) 
+  ) %>% 
+  arrange(Observatory, desc(n), desc(Percent))
+
+# Ajouter une ligne "Total" par observatoire
+totals <- all_hh_main_act %>%
+  group_by(Observatory) %>%
+  summarise(
+    n = sum(n),
+    Percent = 100,
+    Activite = "Total",
+    .groups = "drop"
+  )
+
+all_hh_main_act <- bind_rows(all_hh_main_act, totals) %>%
+  arrange(Observatory, desc(Activite == "Total"), desc(n))
 
 # Display with gt
 all_hh_main_act %>%
@@ -918,8 +1601,35 @@ all_hh_main_act %>%
   tab_options(
     table.font.size = 12,
     table.width = pct(100)
-  )
+  ) %>%
+  # GRAS + couleur bleu ciel clair : Titre principal
+  tab_style(
+    style = list(cell_text(weight = "bold", size = "large"), cell_fill(color = "#87CEEB")),
+    locations = cells_title(groups = "title")
+  ) %>%
+  # GRAS + couleur bleu foncé : En-têtes de colonnes
+  tab_style(
+    style = list(cell_text(weight = "bold", color = "white"), cell_fill(color = "#4F81BD")),
+    locations = cells_column_labels()
+  ) %>%
+  # GRAS + couleur beige clair : Noms des groupes (Observatoires)
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#F5F5DC")),
+    locations = cells_row_groups()
+  ) %>%
+  # GRAS + couleur vert clair : Ligne "Total"
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DFFFD6")),
+    locations = cells_body(
+      columns = everything(),
+      rows = Activite == "Total"
+    )
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+
 ```
+
 
 -   Les cultivateurs exploitants (code = 95), les ouvriers agricoles (salariés agricoles) (code = 76) et commercants (code = 45) sont majoritaires tant à Alaotra et à Marovoay.
 
@@ -1033,9 +1743,12 @@ tab_style(
                   ), 
     locations = cells_column_labels( columns = everything() 
                                      ) 
-    )
+    )%>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 
+########################################################
 # Histogramm per observatory and sex
+######################################################
 ggplot(hh_main_act_final, aes(x = Act_principal, y = Percent, fill = Sexe)) +
   geom_col(position = "dodge") +
   facet_wrap(~Observatory) +
