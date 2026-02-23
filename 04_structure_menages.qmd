@@ -1542,8 +1542,8 @@ gt_educ
 ```
 
 
-#### Savoir lire-écrire selon les chefs de ménages
-
+#### Savoir lire-écrire 
+##### Savoir lire-écrire selon les chefs de ménages
 ```{r}
 # Savoir lire-écrire selon les  CM
 hh_literacy <- res_deb %>%
@@ -1600,7 +1600,7 @@ hh_literacy %>%
 
 ```
 
-#### Savoir lire-écrire selon le genre des Chefs de ménages
+##### Savoir lire-écrire selon le genre des Chefs de ménages
 ```{r}
 ## Savoir lire-écrire par sexe des CM
 # Préparation des données
@@ -1716,6 +1716,361 @@ hh_literacy %>%
   ) +
   scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e"))
 ```
+
+#### Savoir lire 
+##### Savoir lire selon les chefs de ménages
+
+```{r}
+# Savoir lire selon les  CM
+hh_literacy <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 == 1 & s1a == 1) %>%  # Keep only CM = 1 who knows reading 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+    )%>%
+  group_by(Observatory) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) 
+# Add a total column
+hh_literacy <- hh_literacy %>% 
+  bind_rows( 
+    hh_literacy %>%
+    summarise( 
+      Observatory = "Total", 
+      count = sum(count), 
+      percentage = 100 
+      )
+  ) 
+
+# GT tab display
+hh_literacy %>%
+  gt() %>%  
+  tab_header(
+    title = "Savoir lire selon les chefs de ménages"
+  ) %>%
+  cols_label(
+    Observatory = "Observatoire",
+    count = "Effectif",
+    percentage = "Pourcentage (%)"
+  ) %>%
+  fmt_number(
+    columns = percentage,
+    decimals = 1
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      rows = Observatory == "Total",
+      columns = everything()
+    )
+  )%>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+```
+
+##### Savoir lire selon le genre des Chefs de ménages
+```{r}
+## Savoir lire par sexe des CM
+# Préparation des données
+hh_literacy <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 == 1 & s1a == 1 ) %>%
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    m4 = as.character(m4),
+    Sexe = case_when(
+      m4 == "1" ~ "Homme",
+      m4 == "2" ~ "Femme",
+      TRUE ~ "Autre"
+    )
+  ) %>%
+  group_by(Observatory, Sexe) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  group_by(Observatory) %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) %>%
+  ungroup() %>%
+  group_split(Observatory) %>%
+  lapply(function(df) {
+    bind_rows(
+      df,
+      summarise(df,
+        Observatory = unique(df$Observatory),
+        Sexe = "Ensemble",
+        count = sum(df$count),
+        percentage = 100
+      )
+    )
+  }) %>%
+  bind_rows() %>%
+  bind_rows(
+    tibble(
+      Observatory = "Total",
+      Sexe = "Total",
+      count = sum(.$count[.$Sexe != "Total"]),
+      percentage = 100
+    )
+  )
+
+# Création du tableau gt
+hh_literacy %>%
+  gt() %>%
+  tab_header(
+    title = "Savoir lire selon le genre des chefs de ménages par sexe"
+  ) %>%
+  cols_label(
+    Observatory = "Observatoire",
+    Sexe        = "Sexe",
+    count       = "Effectif",
+    percentage  = "Pourcentage (%)"
+  ) %>%
+  fmt_number(
+    columns = percentage,
+    decimals = 1
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      rows = Sexe %in% c("Ensemble", "Total"),
+      columns = everything()
+    )
+  ) %>%
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
+
+# Histogramme des effectifs
+
+hh_literacy %>%
+  filter(!Sexe %in% c("Ensemble", "Total")) %>%   # on enlève les lignes de synthèse
+  ggplot(aes(x = Observatory, y = count, fill = Sexe)) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "Effectifs des chefs de ménages sachant lire par sexe",
+    x = "Observatoire",
+    y = "Effectif"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e"))
+
+# Camembert
+hh_literacy %>%
+  filter(!Sexe %in% c("Ensemble", "Total")) %>%
+  ggplot(aes(x = "", y = percentage, fill = Sexe)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  facet_wrap(~Observatory) +
+  geom_text(
+    aes(label = paste0(percentage, "%")),
+    position = position_stack(vjust = 0.5),
+    color = "white",
+    fontface = "bold"
+  ) +
+  labs(
+    title = "Répartition en pourcentage des chefs de ménages sachant lire par sexe",
+    fill = "Sexe"
+  ) +
+  theme_void() +
+  theme(
+    strip.text = element_text(face = "bold"),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  ) +
+  scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e"))
+```
+
+#### Savoir écrire 
+##### Savoir écrire selon les chefs de ménages
+```{r}
+# Savoir écrire selon les  CM
+hh_literacy <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 == 1 & s1b == 1) %>%  # Keep only CM = 1 who knows writing
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+    )%>%
+  group_by(Observatory) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) 
+# Add a total column
+hh_literacy <- hh_literacy %>% 
+  bind_rows( 
+    hh_literacy %>%
+    summarise( 
+      Observatory = "Total", 
+      count = sum(count), 
+      percentage = 100 
+      )
+  ) 
+
+# GT tab display
+hh_literacy %>%
+  gt() %>%  
+  tab_header(
+    title = "Savoir écrire selon les chefs de ménages"
+  ) %>%
+  cols_label(
+    Observatory = "Observatoire",
+    count = "Effectif",
+    percentage = "Pourcentage (%)"
+  ) %>%
+  fmt_number(
+    columns = percentage,
+    decimals = 1
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      rows = Observatory == "Total",
+      columns = everything()
+    )
+  )%>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+```
+
+##### Savoir écrire selon le genre des Chefs de ménages
+```{r}
+## Savoir écrire par sexe des CM
+# Préparation des données
+hh_literacy <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 == 1 & s1b == 1) %>%
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    m4 = as.character(m4),
+    Sexe = case_when(
+      m4 == "1" ~ "Homme",
+      m4 == "2" ~ "Femme",
+      TRUE ~ "Autre"
+    )
+  ) %>%
+  group_by(Observatory, Sexe) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  group_by(Observatory) %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) %>%
+  ungroup() %>%
+  group_split(Observatory) %>%
+  lapply(function(df) {
+    bind_rows(
+      df,
+      summarise(df,
+        Observatory = unique(df$Observatory),
+        Sexe = "Ensemble",
+        count = sum(df$count),
+        percentage = 100
+      )
+    )
+  }) %>%
+  bind_rows() %>%
+  bind_rows(
+    tibble(
+      Observatory = "Total",
+      Sexe = "Total",
+      count = sum(.$count[.$Sexe != "Total"]),
+      percentage = 100
+    )
+  )
+
+# Création du tableau gt
+hh_literacy %>%
+  gt() %>%
+  tab_header(
+    title = "Savoir écrire selon le genre des chefs de ménages"
+  ) %>%
+  cols_label(
+    Observatory = "Observatoire",
+    Sexe        = "Sexe",
+    count       = "Effectif",
+    percentage  = "Pourcentage (%)"
+  ) %>%
+  fmt_number(
+    columns = percentage,
+    decimals = 1
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      rows = Sexe %in% c("Ensemble", "Total"),
+      columns = everything()
+    )
+  ) %>%
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
+
+# Histogramme des effectifs
+
+hh_literacy %>%
+  filter(!Sexe %in% c("Ensemble", "Total")) %>%   # on enlève les lignes de synthèse
+  ggplot(aes(x = Observatory, y = count, fill = Sexe)) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "Effectifs des chefs de ménages sachant écrire par sexe",
+    x = "Observatoire",
+    y = "Effectif"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e"))
+
+# Camembert
+hh_literacy %>%
+  filter(!Sexe %in% c("Ensemble", "Total")) %>%
+  ggplot(aes(x = "", y = percentage, fill = Sexe)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  facet_wrap(~Observatory) +
+  geom_text(
+    aes(label = paste0(percentage, "%")),
+    position = position_stack(vjust = 0.5),
+    color = "white",
+    fontface = "bold"
+  ) +
+  labs(
+    title = "Répartition en pourcentage des chefs de ménages sachant écrire par sexe",
+    fill = "Sexe"
+  ) +
+  theme_void() +
+  theme(
+    strip.text = element_text(face = "bold"),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  ) +
+  scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e"))
+```
+
+
+
+
 
 ### Activités principales des Chefs de ménage
 
@@ -1921,8 +2276,6 @@ ggplot(hh_main_act_final %>% filter(Act_principal != "Total"),
   )
 
 ```
-
-
 #### Activités principales des chefs de ménages par sexe
 
 ```{r}
@@ -2064,6 +2417,7 @@ ggplot(hh_main_act_final %>% filter(Act_principal != "Total"),
 ### Activités principales
 
 Activités principales des autres membres (de 15 ans et plus) des ménages (%)
+=> REMARQUE : pour vérification voir si on a vraiment pris en compte les 15 ans et plus
 
 On va voir d'abord toutes les activités des autres membres de ménages sans limite d'âge.
 
