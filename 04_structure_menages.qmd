@@ -1149,7 +1149,7 @@ ggplot(reason_table, aes(x = reason, y = percentage, fill = Member_Type)) +
 
 ## Caractéristiques des chefs de ménages
 
-### Situation matrimoniale
+### Caractéristiques socio-démographiques
 
 m4 :sexe m5 : age m5 : situation matrimoniale
 
@@ -1335,15 +1335,14 @@ gt_hh_combined
 
 ```
 
-
 ### Niveau d'éducation
-
+#### Niveau d'éducation du Chef de ménage
 ```{r}
-# Niveau d'éducation des CM
+# Niveau d'éducation des chefs de ménage
 hh_educ <- res_deb %>%
   left_join(res_m_a, by = "j5") %>%
   arrange(j5) %>% 
-  filter(m6 == 1) %>%  # Keep only CM = 1
+  filter(m6 == 1) %>%  # garder uniquement les chefs de ménage
   mutate(
     j0 = as.character(j0),
     Observatory = case_when(
@@ -1351,46 +1350,63 @@ hh_educ <- res_deb %>%
       j0 == "21" ~ "Alaotra",
       TRUE       ~ j0
     ),
-      Niv_education = case_when(
-      s3a >= 1 & s3a <= 5 | s3a == 99~ "Primaire",
+    Niv_education = case_when(
+      s3a >= 1 & s3a <= 5 | s3a == 99 ~ "Primaire",
       s3a >= 6 & s3a <= 9 ~ "Secondaire 1er cycle",
-      s3a >= 10 & s3a <= 12 ~ "Secondaire 2ème cycle",
       s3a >= 10 & s3a <= 12 ~ "Secondaire 2ème cycle",
       s3a >= 13 & s3a <= 22 ~ "Universitaire",
       TRUE ~ NA_character_
-     ), 
-    )%>%
-  select(Observatory, j5, Niv_education )
-  
-# Education level tab
-hh_educ_level <- hh_educ %>%
-  mutate(
-    Niv_education = replace_na(Niv_education, "Inconnu")
+    )
   ) %>%
+  select(Observatory, j5, Niv_education)
+
+# Calcul par observatoire
+hh_educ_level <- hh_educ %>%
+  mutate(Niv_education = replace_na(Niv_education, "Inconnu")) %>%
   group_by(Observatory, Niv_education) %>%
   summarise(count = n(), .groups = 'drop') %>%
   group_by(Observatory) %>%
-  mutate(
-    percentage = round((count / sum(count)) * 100, 1)
-  ) %>%
+  mutate(percentage = round((count / sum(count)) * 100, 1)) %>%
   ungroup()
 
-# GT tab
-educ_table <- hh_educ_level %>%
+# Calcul du total global par niveau d'éducation
+total_global <- hh_educ %>%
+  mutate(Niv_education = replace_na(Niv_education, "Inconnu")) %>%
+  group_by(Niv_education) %>%
+  summarise(count = n(), .groups = "drop") %>%
   mutate(
-    Valeur = paste0(count, " (", percentage, "%)")
-  ) %>%
+    percentage = round((count / sum(count)) * 100, 1),
+    Observatory = "Total"
+  )
+
+# Calcul du total par observatoire
+total_obs <- hh_educ %>%
+  mutate(Niv_education = "Total observatoire") %>%  # ligne spéciale
+  group_by(Observatory, Niv_education) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  mutate(percentage = 100) %>%   # le total = 100% par observatoire
+  ungroup()
+
+# Fusion avec les totaux
+hh_educ_level <- bind_rows(hh_educ_level, total_obs, total_global) %>%
+  arrange(Observatory, 
+          factor(Niv_education, 
+                 levels = c("Primaire", "Secondaire 1er cycle", 
+                            "Secondaire 2ème cycle", "Universitaire", 
+                            "Inconnu", "Total observatoire")))
+
+# Tableau GT
+educ_table <- hh_educ_level %>%
+  mutate(Valeur = paste0(count, " (", percentage, "%)")) %>%
   select(Observatory, Niv_education, Valeur) %>%
   pivot_wider(
     names_from = Observatory,
     values_from = Valeur,
     values_fill = "-"
   ) %>%
-  rename(
-    `Niveau d'éducation` = Niv_education
-  )
+  rename(`Niveau d'éducation` = Niv_education)
 
-# GT tab display
+# Affichage GT
 gt_educ <- educ_table %>%
   gt() %>%
   tab_header(
@@ -1399,35 +1415,25 @@ gt_educ <- educ_table %>%
   cols_label(
     `Niveau d'éducation` = "Niveau d'éducation",
     Alaotra = "Alaotra",
-    Marovoay = "Marovoay"
+    Marovoay = "Marovoay",
+    Total = "Total"
   ) %>%
-  # GRAS : Titre
   tab_style(
     style = cell_text(weight = "bold", size = "large"),
     locations = cells_title(groups = "title")
   ) %>%
-  # GRAS : Sous-titre
-  tab_style(
-    style = cell_text(weight = "bold", size = "medium"),
-    locations = cells_title(groups = "subtitle")
-  ) %>%
-  # GRAS : En-têtes de colonnes
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
   ) %>%
-  # Alternance de couleurs
   tab_style(
     style = cell_fill(color = "#e8f4f8"),
     locations = cells_body(rows = seq(1, nrow(educ_table), 2))
   ) %>%
-  tab_footnote(
-    footnote = "Les pourcentages sont calculés par rapport au total des chefs de ménage de chaque observatoire",
-    locations = cells_title(groups = "title")
-  ) %>%
   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 
 gt_educ
+
 
 ```
 
@@ -2410,11 +2416,931 @@ ggplot(hh_main_act_final %>% filter(Act_principal != "Total"),
 
 ## Caractéristiques des autres membres de ménages
 
-### Situation socio-démographique
+### Caractéristiques socio-démographiques
+
+```{r}
+# Marital status of other household members
+hh_m_status2 <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 != 1) %>%  # Keep the other household members
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    Sexe = case_when(
+      m4 == 1 ~ "Homme",
+      m4 == 2 ~ "Femme",
+      TRUE    ~ NA_character_
+    ),
+    Age = m5,
+    Statut_matrimonial = case_when(
+      m7 == 1 ~ "Célibataire",
+      m7 == 2 ~ "Marié(e) selon la tradition",
+      m7 == 3 ~ "En concubinage",
+      m7 == 4 ~ "Divorcé(e)",
+      m7 == 5 ~ "Veuf(ve)",
+      m7 == 6 ~ "Polygame",
+      m7 == 7 ~ "Marié(e) civilement",
+      m7 == 8 ~ "Marié(e) religieusement",
+      TRUE    ~ NA_character_
+    )
+  ) %>%
+  select(Observatory, Sexe, Age, Statut_matrimonial)
+
+# Sexe tab
+sexe_stats2 <- hh_m_status2 %>%
+  group_by(Observatory, Sexe) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  group_by(Observatory) %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) %>%
+  ungroup()
+
+sexe_table2 <- sexe_stats2 %>%
+  select(Observatory, Sexe, count, percentage) %>%
+  mutate(
+    Valeur = paste0(count, " (", percentage, "%)")
+  ) %>%
+  select(Observatory, Sexe, Valeur) %>%
+  pivot_wider(
+    names_from = Observatory,
+    values_from = Valeur,
+    values_fill = "-"
+  ) %>%
+  rename(Sexe = Sexe) %>%
+  mutate(Caractéristique = "Sexe", .before = Sexe) %>%
+  rename(Catégorie = Sexe)
+
+# Ajouter une ligne Total pour Sexe
+sexe_totals2 <- sexe_stats2 %>%
+  group_by(Observatory) %>%
+  summarise(count = sum(count), .groups = "drop") %>%
+  mutate(
+    percentage = 100,
+    Valeur = paste0(count, " (", percentage, "%)")
+  ) %>%
+  select(Observatory, Valeur) %>%
+  pivot_wider(
+    names_from = Observatory,
+    values_from = Valeur,
+    values_fill = "-"
+  ) %>%
+  mutate(Caractéristique = "Sexe", Catégorie = "Total")
+
+# Fusionner Sexe avec Total
+sexe_table2 <- bind_rows(sexe_table2, sexe_totals2)
+
+# Age tab
+age_stats2 <- hh_m_status2 %>%
+  group_by(Observatory) %>%
+  summarise(
+    Médiane = median(Age, na.rm = TRUE),
+    Moyenne = round(mean(Age, na.rm = TRUE), 1),
+    Mode = as.numeric(names(sort(table(Age), decreasing = TRUE)[1])),
+    Minimum = min(Age, na.rm = TRUE),
+    Maximum = max(Age, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+age_table2 <- age_stats2 %>%
+  pivot_longer(
+    cols = -Observatory,
+    names_to = "Statistique",
+    values_to = "Valeur"
+  ) %>%
+  pivot_wider(
+    names_from = Observatory,
+    values_from = Valeur
+  ) %>%
+  mutate(
+    Statistique = factor(Statistique, 
+      levels = c("Minimum", "Mode", "Médiane", "Moyenne", "Maximum"))
+  ) %>%
+  arrange(Statistique) %>%
+  mutate(
+    Alaotra = as.character(round(Alaotra, 0)),
+    Marovoay = as.character(round(Marovoay, 0))
+  ) %>%
+  mutate(Caractéristique = "Âge", .before = Statistique) %>%
+  rename(Catégorie = Statistique)
+
+# Marital status tab
+statut_stats2 <- hh_m_status2 %>%
+  group_by(Observatory, Statut_matrimonial) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  group_by(Observatory) %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) %>%
+  ungroup()
+
+statut_table2 <- statut_stats2 %>%
+  select(Observatory, Statut_matrimonial, percentage) %>%
+  pivot_wider(
+    names_from = Observatory,
+    values_from = percentage,
+    values_fill = 0
+  ) %>%
+  mutate(across(-Statut_matrimonial, ~paste0(., "%"))) %>%
+  mutate(Caractéristique = "Statut matrimonial", .before = Statut_matrimonial) %>%
+  rename(Catégorie = Statut_matrimonial)
+
+# Merge tab
+hh_combined2 <- bind_rows(
+  sexe_table2,
+  age_table2,
+  statut_table2
+)
+
+# GT tab avec formatage en gras
+gt_hh_combined2 <- hh_combined2 %>%
+  gt(groupname_col = "Caractéristique") %>%
+  tab_header(
+    title = "Caractéristiques des autres membres de ménages"
+  ) %>%
+  cols_label(
+    Catégorie = "Catégorie",
+    Alaotra = "Alaotra",
+    Marovoay = "Marovoay"
+  ) %>%
+# GRAS + couleur bleu ciel clair : Titre
+tab_style(
+  style = list(cell_text(weight = "bold", size = "large"), cell_fill(color = "#87CEEB")), # bleu ciel clair
+  locations = cells_title(groups = "title")
+) %>%
+# GRAS + couleur : En-têtes de colonnes
+tab_style(
+  style = list(cell_text(weight = "bold", color = "white"), cell_fill(color = "#4F81BD")),
+  locations = cells_column_labels()
+) %>%
+# GRAS + couleur marron : Noms des groupes (Sexe, Âge, Statut matrimonial)
+tab_style(
+  style = list(cell_text(weight = "bold"), cell_fill(color = "#D2B48C")),
+  locations = cells_row_groups()
+) %>%
+# GRAS + couleur jaune clair : Ligne Total du bloc Sexe
+tab_style(
+  style = list(cell_text(weight = "bold"), cell_fill(color = "#FFFFE0")), # jaune clair
+  locations = cells_body(rows = Catégorie == "Total" & Caractéristique == "Sexe")
+) %>%
+  tab_footnote(
+    footnote = "Sexe et Statut matrimonial : en nombres et pourcentages. Âge : statistiques descriptives (minimum, mode, médiane, moyenne, maximum)",
+    locations = cells_title(groups = "title")
+  ) %>% 
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
+
+gt_hh_combined2
+
+```
+
+REMARQUE :  
+- A verifier à quoi correspondent les "NA" dans situation matrimoniale correspondent au moins de 15 ans.  
+
 
 ### Education et scolarisation
+#### Niveau d'éducation des autres membres du ménage
+```{r}
+# Niveau d'éducation des autres membres du ménage
+hh_educ2 <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 != 1) %>%  # garder les autres membres sauf le chef
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    Niv_education = case_when(
+      s3a >= 1 & s3a <= 5 | s3a == 99 ~ "Primaire",
+      s3a >= 6 & s3a <= 9 ~ "Secondaire 1er cycle",
+      s3a >= 10 & s3a <= 12 ~ "Secondaire 2ème cycle",
+      s3a >= 13 & s3a <= 22 ~ "Universitaire",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  select(Observatory, j5, Niv_education)
+
+# Calcul par observatoire
+hh_educ_level2 <- hh_educ2 %>%
+  mutate(Niv_education = replace_na(Niv_education, "Inconnu")) %>%
+  group_by(Observatory, Niv_education) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  group_by(Observatory) %>%
+  mutate(percentage = round((count / sum(count)) * 100, 1)) %>%
+  ungroup()
+
+# Calcul du total global par niveau d'éducation
+total_global <- hh_educ2 %>%
+  mutate(Niv_education = replace_na(Niv_education, "Inconnu")) %>%
+  group_by(Niv_education) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1),
+    Observatory = "Total"
+  )
+
+# Calcul du total par observatoire (nouveau)
+total_obs <- hh_educ2 %>%
+  mutate(Niv_education = "Total observatoire") %>%  # ligne spéciale
+  group_by(Observatory, Niv_education) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  group_by(Observatory) %>%
+  mutate(percentage = round((count / sum(count)) * 100, 1)) %>%
+  ungroup()
+
+# Fusion avec le total global et les totaux par observatoire
+hh_educ_level2 <- bind_rows(hh_educ_level2, total_global, total_obs)
+
+# Tableau GT
+educ_table2 <- hh_educ_level2 %>%
+  mutate(Valeur = paste0(count, " (", percentage, "%)")) %>%
+  select(Observatory, Niv_education, Valeur) %>%
+  pivot_wider(
+    names_from = Observatory,
+    values_from = Valeur,
+    values_fill = "-"
+  ) %>%
+  rename(`Niveau d'éducation` = Niv_education)
+
+# Affichage GT
+gt_educ2 <- educ_table2 %>%
+  gt() %>%
+  tab_header(
+    title = "Répartition des autres membres de ménages selon leur niveau d'éducation",
+  ) %>%
+  cols_label(
+    `Niveau d'éducation` = "Niveau d'éducation",
+    Alaotra = "Alaotra",
+    Marovoay = "Marovoay",
+    Total = "Total"
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold", size = "large"),
+    locations = cells_title(groups = "title")
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "#e8f4f8"),
+    locations = cells_body(rows = seq(1, nrow(educ_table2), 2))
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+gt_educ2
 
 
+```
+
+REMARQUE :  
+- A revoir modalité des niveaux d'éducation  
+- A voir les "NAs"
+
+#### Niveau d'éducation des autres membres de ménages par sexe
+
+```{r}
+# Niveau d'éduation des autres membres de ménages par sexe
+hh_educ_sexe2 <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 != 1) %>%  # Keep the others household members
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    Sexe = case_when(
+      m4 == 1 ~ "Homme",
+      m4 == 2 ~ "Femme",
+      TRUE    ~ NA_character_
+    ),
+    Niv_education = case_when(
+      s3a >= 1 & s3a <= 5 | s3a == 99 ~ "Primaire",
+      s3a >= 6 & s3a <= 9 ~ "Secondaire 1er cycle",
+      s3a >= 10 & s3a <= 12 ~ "Secondaire 2ème cycle",
+      s3a >= 13 & s3a <= 22 ~ "Universitaire",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  select(Observatory, Sexe, j5, Niv_education)
+
+# Education level tab with sex
+hh_educ_level2 <- hh_educ_sexe2 %>%
+  mutate(
+    Niv_education = replace_na(Niv_education, "Inconnu")
+  ) %>%
+  group_by(Observatory, Sexe, Niv_education) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  group_by(Observatory, Sexe) %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) %>%
+  ungroup()
+
+# GT tab
+educ_table2 <- hh_educ_level2 %>%
+  mutate(
+    Valeur = paste0(count, " (", percentage, "%)")
+  ) %>%
+  select(Observatory, Sexe, Niv_education, Valeur) %>%
+  pivot_wider(
+    names_from = c(Observatory, Sexe),
+    values_from = Valeur,
+    names_glue = "{Observatory}_{Sexe}",
+    values_fill = "-"
+  ) %>%
+  rename(
+    `Niveau d'éducation` = Niv_education
+  )
+
+# GT tab display
+gt_educ2 <- educ_table2 %>%
+  gt() %>%
+  tab_header(
+    title = "Répartition des autres membres de ménage selon leur niveau d'éducation et sexe"
+  ) %>%
+  cols_label(
+    `Niveau d'éducation` = "Niveau d'éducation",
+    Alaotra_Homme = "Homme",
+    Alaotra_Femme = "Femme",
+    Marovoay_Homme = "Homme",
+    Marovoay_Femme = "Femme"
+  ) %>%
+  tab_spanner(
+    label = "Alaotra",
+    columns = c(Alaotra_Homme, Alaotra_Femme)
+  ) %>%
+  tab_spanner(
+    label = "Marovoay",
+    columns = c(Marovoay_Homme, Marovoay_Femme)
+  ) %>%
+  # GRAS : Titre
+  tab_style(
+    style = cell_text(weight = "bold", size = "large"),
+    locations = cells_title(groups = "title")
+  ) %>%
+  # GRAS : En-têtes de colonnes
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  ) %>%
+  # GRAS : Spanners (Alaotra, Marovoay)
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_spanners()
+  ) %>%
+  # Alternance de couleurs
+  tab_style(
+    style = cell_fill(color = "#e8f4f8"),
+    locations = cells_body(rows = seq(1, nrow(educ_table), 2))
+  ) %>%
+  tab_footnote(
+    footnote = "Les pourcentages sont calculés par rapport au total des effectifs des autres membres de ménage de chaque sexe et observatoire",
+    locations = cells_title(groups = "title")
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+gt_educ2
+```
+
+
+#### Savoir lire-écrire 
+##### Savoir lire-écrire des autres membres de ménages
+```{r}
+# Savoir lire-écrire selon les  CM
+hh_literacy2 <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 != 1 & s1a == 1 & s1b == 1) %>%  # Keep the others household members who knows reading and writing
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+    )%>%
+  group_by(Observatory) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) 
+# Add a total column
+hh_literacy2 <- hh_literacy2 %>% 
+  bind_rows( 
+    hh_literacy2 %>%
+    summarise( 
+      Observatory = "Total", 
+      count = sum(count), 
+      percentage = 100 
+      )
+  ) 
+
+# GT tab display
+hh_literacy2 %>%
+  gt() %>%  
+  tab_header(
+    title = "Savoir lire et écrire des autres membres de ménages"
+  ) %>%
+  cols_label(
+    Observatory = "Observatoire",
+    count = "Effectif",
+    percentage = "Pourcentage (%)"
+  ) %>%
+  fmt_number(
+    columns = percentage,
+    decimals = 1
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      rows = Observatory == "Total",
+      columns = everything()
+    )
+  )%>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+```
+
+##### Savoir lire-écrire des autres membres de ménage selon le genre 
+```{r}
+## Savoir lire-écrire des autres membres de ménage par sexe
+# Préparation des données
+hh_literacy3 <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 != 1 & s1a == 1 & s1b == 1) %>%
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    m4 = as.character(m4),
+    Sexe = case_when(
+      m4 == "1" ~ "Homme",
+      m4 == "2" ~ "Femme",
+      TRUE ~ "Autre"
+    )
+  ) %>%
+  group_by(Observatory, Sexe) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  group_by(Observatory) %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) %>%
+  ungroup() %>%
+  group_split(Observatory) %>%
+  lapply(function(df) {
+    bind_rows(
+      df,
+      summarise(df,
+        Observatory = unique(df$Observatory),
+        Sexe = "Ensemble",
+        count = sum(df$count),
+        percentage = 100
+      )
+    )
+  }) %>%
+  bind_rows() %>%
+  bind_rows(
+    tibble(
+      Observatory = "Total",
+      Sexe = "Total",
+      count = sum(.$count[.$Sexe != "Total"]),
+      percentage = 100
+    )
+  )
+
+# Création du tableau gt
+hh_literacy3 %>%
+  gt() %>%
+  tab_header(
+    title = "Savoir lire et écrire des autres membres de ménage selon le genre"
+  ) %>%
+  cols_label(
+    Observatory = "Observatoire",
+    Sexe        = "Sexe",
+    count       = "Effectif",
+    percentage  = "Pourcentage (%)"
+  ) %>%
+  fmt_number(
+    columns = percentage,
+    decimals = 1
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      rows = Sexe %in% c("Ensemble", "Total"),
+      columns = everything()
+    )
+  ) %>%
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
+
+# Histogramme des effectifs
+
+hh_literacy3 %>%
+  filter(!Sexe %in% c("Ensemble", "Total")) %>%   # on enlève les lignes de synthèse
+  ggplot(aes(x = Observatory, y = count, fill = Sexe)) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "Effectifs des autres membres de ménage sachant lire-écrire par genre",
+    x = "Observatoire",
+    y = "Effectif"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e"))
+
+# Camembert
+hh_literacy3 %>%
+  filter(!Sexe %in% c("Ensemble", "Total")) %>%
+  ggplot(aes(x = "", y = percentage, fill = Sexe)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  facet_wrap(~Observatory) +
+  geom_text(
+    aes(label = paste0(percentage, "%")),
+    position = position_stack(vjust = 0.5),
+    color = "white",
+    fontface = "bold"
+  ) +
+  labs(
+    title = "Répartition en pourcentage des autres membres de ménage sachant lire-écrire par sexe",
+    fill = "Sexe"
+  ) +
+  theme_void() +
+  theme(
+    strip.text = element_text(face = "bold"),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  ) +
+  scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e"))
+```
+
+#### Savoir lire 
+##### Savoir lire des autres membres de ménages
+
+```{r}
+# Savoir lire des autres membres de ménage
+hh_literacy4 <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 != 1 & s1a == 1) %>%  # Keep the other household members who knows reading 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+    )%>%
+  group_by(Observatory) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) 
+# Add a total column
+hh_literacy4 <- hh_literacy4 %>% 
+  bind_rows( 
+    hh_literacy4 %>%
+    summarise( 
+      Observatory = "Total", 
+      count = sum(count), 
+      percentage = 100 
+      )
+  ) 
+
+# GT tab display
+hh_literacy4 %>%
+  gt() %>%  
+  tab_header(
+    title = "Savoir lire des autres membres de ménage"
+  ) %>%
+  cols_label(
+    Observatory = "Observatoire",
+    count = "Effectif",
+    percentage = "Pourcentage (%)"
+  ) %>%
+  fmt_number(
+    columns = percentage,
+    decimals = 1
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      rows = Observatory == "Total",
+      columns = everything()
+    )
+  )%>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+```
+
+##### Savoir lire des autres membres de ménages selon le genre 
+```{r}
+## Savoir lire des autres membres de ménages par sexe
+# Préparation des données
+hh_literacy5 <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 == 1 & s1a == 1 ) %>%
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    m4 = as.character(m4),
+    Sexe = case_when(
+      m4 == "1" ~ "Homme",
+      m4 == "2" ~ "Femme",
+      TRUE ~ "Autre"
+    )
+  ) %>%
+  group_by(Observatory, Sexe) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  group_by(Observatory) %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) %>%
+  ungroup() %>%
+  group_split(Observatory) %>%
+  lapply(function(df) {
+    bind_rows(
+      df,
+      summarise(df,
+        Observatory = unique(df$Observatory),
+        Sexe = "Ensemble",
+        count = sum(df$count),
+        percentage = 100
+      )
+    )
+  }) %>%
+  bind_rows() %>%
+  bind_rows(
+    tibble(
+      Observatory = "Total",
+      Sexe = "Total",
+      count = sum(.$count[.$Sexe != "Total"]),
+      percentage = 100
+    )
+  )
+
+# Création du tableau gt
+hh_literacy5 %>%
+  gt() %>%
+  tab_header(
+    title = "Savoir lire des autres membres de ménages par sexe"
+  ) %>%
+  cols_label(
+    Observatory = "Observatoire",
+    Sexe        = "Sexe",
+    count       = "Effectif",
+    percentage  = "Pourcentage (%)"
+  ) %>%
+  fmt_number(
+    columns = percentage,
+    decimals = 1
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      rows = Sexe %in% c("Ensemble", "Total"),
+      columns = everything()
+    )
+  ) %>%
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
+
+# Histogramme des effectifs
+
+hh_literacy5 %>%
+  filter(!Sexe %in% c("Ensemble", "Total")) %>%   # on enlève les lignes de synthèse
+  ggplot(aes(x = Observatory, y = count, fill = Sexe)) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "Effectifs des autres membres de ménage sachant lire par sexe",
+    x = "Observatoire",
+    y = "Effectif"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e"))
+
+# Camembert
+hh_literacy5 %>%
+  filter(!Sexe %in% c("Ensemble", "Total")) %>%
+  ggplot(aes(x = "", y = percentage, fill = Sexe)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  facet_wrap(~Observatory) +
+  geom_text(
+    aes(label = paste0(percentage, "%")),
+    position = position_stack(vjust = 0.5),
+    color = "white",
+    fontface = "bold"
+  ) +
+  labs(
+    title = "Répartition en pourcentage des autres membres de ménages sachant lire par sexe",
+    fill = "Sexe"
+  ) +
+  theme_void() +
+  theme(
+    strip.text = element_text(face = "bold"),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  ) +
+  scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e"))
+```
+
+#### Savoir écrire 
+##### Savoir écrire des autres membres de ménages
+```{r}
+# Savoir écrire des autres membres de ménages
+hh_literacy7 <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 != 1 & s1b == 1) %>%  # Keep other household members who knows writing
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+    )%>%
+  group_by(Observatory) %>%
+  summarise(count = n(), .groups = 'drop') %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) 
+# Add a total column
+hh_literacy7 <- hh_literacy7 %>% 
+  bind_rows( 
+    hh_literacy7 %>%
+    summarise( 
+      Observatory = "Total", 
+      count = sum(count), 
+      percentage = 100 
+      )
+  ) 
+
+# GT tab display
+hh_literacy7 %>%
+  gt() %>%  
+  tab_header(
+    title = "Savoir écrire des autres membres de ménages"
+  ) %>%
+  cols_label(
+    Observatory = "Observatoire",
+    count = "Effectif",
+    percentage = "Pourcentage (%)"
+  ) %>%
+  fmt_number(
+    columns = percentage,
+    decimals = 1
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      rows = Observatory == "Total",
+      columns = everything()
+    )
+  )%>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+```
+
+##### Savoir écrire des autres membres de ménages par genre
+```{r}
+## Savoir écrire des autres membres de ménages par sexe 
+# Préparation des données
+hh_literacy8 <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 == 1 & s1b == 1) %>%
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    m4 = as.character(m4),
+    Sexe = case_when(
+      m4 == "1" ~ "Homme",
+      m4 == "2" ~ "Femme",
+      TRUE ~ "Autre"
+    )
+  ) %>%
+  group_by(Observatory, Sexe) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  group_by(Observatory) %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  ) %>%
+  ungroup() %>%
+  group_split(Observatory) %>%
+  lapply(function(df) {
+    bind_rows(
+      df,
+      summarise(df,
+        Observatory = unique(df$Observatory),
+        Sexe = "Ensemble",
+        count = sum(df$count),
+        percentage = 100
+      )
+    )
+  }) %>%
+  bind_rows() %>%
+  bind_rows(
+    tibble(
+      Observatory = "Total",
+      Sexe = "Total",
+      count = sum(.$count[.$Sexe != "Total"]),
+      percentage = 100
+    )
+  )
+
+# Création du tableau gt
+hh_literacy8 %>%
+  gt() %>%
+  tab_header(
+    title = "Savoir écrire des autres membres de ménages selon le genre "
+  ) %>%
+  cols_label(
+    Observatory = "Observatoire",
+    Sexe        = "Sexe",
+    count       = "Effectif",
+    percentage  = "Pourcentage (%)"
+  ) %>%
+  fmt_number(
+    columns = percentage,
+    decimals = 1
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      rows = Sexe %in% c("Ensemble", "Total"),
+      columns = everything()
+    )
+  ) %>%
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
+
+# Histogramme des effectifs
+
+hh_literacy8 %>%
+  filter(!Sexe %in% c("Ensemble", "Total")) %>%   # on enlève les lignes de synthèse
+  ggplot(aes(x = Observatory, y = count, fill = Sexe)) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "Effectifs des autres membres de ménages sachant écrire par sexe",
+    x = "Observatoire",
+    y = "Effectif"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e"))
+
+# Camembert
+hh_literacy8 %>%
+  filter(!Sexe %in% c("Ensemble", "Total")) %>%
+  ggplot(aes(x = "", y = percentage, fill = Sexe)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  facet_wrap(~Observatory) +
+  geom_text(
+    aes(label = paste0(percentage, "%")),
+    position = position_stack(vjust = 0.5),
+    color = "white",
+    fontface = "bold"
+  ) +
+  labs(
+    title = "Répartition en pourcentage des autres membres de ménages sachant écrire par sexe",
+    fill = "Sexe"
+  ) +
+  theme_void() +
+  theme(
+    strip.text = element_text(face = "bold"),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  ) +
+  scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e"))
+```
 
 
 
