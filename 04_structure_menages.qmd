@@ -1816,6 +1816,115 @@ all_hh_main_act %>%
 
 Nous allons voir les effectifs des activités principales comme "Cultivateur", "Eleveur", et "Commerçant"
 
+
+```{r}
+# Activités principales du chef de ménage
+hh_main_act <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 == 1) %>%  # garder uniquement chef de ménage
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    Act_principal = case_when(
+      a1 == 95 ~ "Cultivateur",
+      a1 == 76 ~ "Ouvrier agricole",
+      a1 == 45 ~ "Commerçant",
+      a1 == 96 ~ "Eleveur",
+      TRUE     ~ "Autres"
+    )
+  ) %>%
+  group_by(Observatory, Act_principal) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  group_by(Observatory) %>% 
+  mutate(Percent = round(n / sum(n) * 100, 1)) %>% 
+  arrange(Observatory, desc(n))
+
+# Totaux par observatoire
+totaux <- hh_main_act %>% 
+  group_by(Observatory) %>% 
+  summarise(
+    Act_principal = "Total",
+    n = sum(n),
+    Percent = 100,
+    .groups = "drop"
+  )
+
+# Fusion données détaillées + totaux
+hh_main_act_final <- bind_rows(hh_main_act, totaux) %>%
+  arrange(Observatory, desc(Act_principal))
+
+# Tableau GT
+hh_main_act_final %>%
+  gt(groupname_col = "Observatory") %>%
+  tab_header(
+    title = md("**Activités principales du chef de ménage par observatoire**")
+  ) %>%
+  cols_label(
+    Act_principal = "Activité principale",
+    n = "Effectif",
+    Percent = "Pourcentage (%)"
+  ) %>%
+  fmt_number(
+    columns = Percent,
+    decimals = 1
+  ) %>%
+  tab_options(
+    table.font.size = 12,
+    table.width = pct(100)
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#f0f0f0")),
+    locations = cells_row_groups(groups = c("Alaotra", "Marovoay"))
+  ) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#e6f2ff")),
+    locations = cells_body(rows = Act_principal == "Total")
+  ) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#d9e2ef")),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+########################################################
+# Camembert par observatoire
+########################################################
+ggplot(hh_main_act_final %>% filter(Act_principal != "Total"),
+       aes(x = "", y = Percent, fill = Act_principal)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  facet_wrap(~Observatory) +
+  geom_text(
+    aes(label = paste0(Percent, "%")),
+    position = position_stack(vjust = 0.5),
+    color = "white",
+    fontface = "bold",
+    size = 4
+  ) +
+  labs(
+    title = "Répartition des activités principales \n des chefs de ménage par observatoire (%)",
+    fill = "Activité principale"
+  ) +
+  theme_void() +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 12),
+    strip.text = element_text(face = "bold")
+  )
+
+```
+
+
+#### Activités principales des chefs de ménages par sexe
+
 ```{r}
 # Main activities of the household head
 hh_main_act <- res_deb %>%
