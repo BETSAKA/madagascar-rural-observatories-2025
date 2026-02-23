@@ -3344,16 +3344,186 @@ hh_literacy8 %>%
 
 
 
-
-
 REMARQUES :   
 A voir aussi  
 
-Taux de scolarisation des enfants de 6 à 14 ans (%
+#### Taux de scolarisation des enfants de 6 à 14 ans (%)
+```{r}
+# Taux de scolarisation des enfants de 6 à 14 ans (%)
 
-Classe suivie pendant l’année scolaire 2024 - 2025 suivant les catégories d’âge
+# Préparation des données
+school_enrollment_rate <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m5 >= 6 & m5 <= 14 & m6 != 1 & s2 == 1 ) %>%
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  ) %>%
+  group_by(Observatory) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  ungroup() %>%
+  mutate(
+    percentage = round((count / sum(count)) * 100, 1)
+  )
 
-Raisons de non fréquentation de l’école pour les 6 à 15 ans
+# Ajout du total global
+total_global <- school_enrollment_rate %>%
+  summarise(count = sum(count)) %>%
+  mutate(
+    percentage = 100,
+    Observatory = "Total"
+  )
+
+school_enrollment_rate <- bind_rows(school_enrollment_rate, total_global)
+
+# Préparation du tableau GT
+school_table <- school_enrollment_rate %>%
+  mutate(Valeur = paste0(count, " (", percentage, "%)")) %>%
+  select(Observatory, Valeur)
+
+# Affichage GT
+gt_school <- school_table %>%
+  gt() %>%
+  tab_header(
+    title = "Taux de scolarisation des enfants de 6 à 14 ans"
+  ) %>%
+  cols_label(
+    Observatory = "Observatoire",
+    Valeur = "Nombre ( % )"
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold", size = "large"),
+    locations = cells_title(groups = "title")
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "#e8f4f8"),
+    locations = cells_body(rows = seq(1, nrow(school_table), 2))
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+gt_school
+
+
+
+```
+
+
+
+#### Classe suivie pendant l’année scolaire 2024 - 2025 suivant les catégories d’âge
+```{r}
+# Classe suivie pendant l'année scolaire 2024-2025 selon les catégories d'âge
+
+# Préparation des données
+class_attended_2425 <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m5 >= 3 & m5 <= 25 & m6 != 1 & sco1 == 1 ) %>%
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    AgeGroup2 = case_when(
+      between(m5, 3, 5)   ~ "3-5 ans",
+      between(m5, 6, 10)  ~ "6-10 ans",
+      between(m5, 11, 14) ~ "11-14 ans",
+      between(m5, 15, 17) ~ "15-17 ans",
+      between(m5, 18, 25) ~ "18-25 ans",
+      TRUE                ~ NA_character_
+    ),
+    Niv_education2 = case_when(
+      sco2 >= 1 & sco2 <= 5 | sco2 == 99 ~ "Primaire",
+      sco2 >= 6 & sco2 <= 9 ~ "Secondaire 1er cycle",
+      sco2 >= 10 & sco2 <= 12 ~ "Secondaire 2ème cycle",
+      sco2 >= 13 & sco2 <= 22 ~ "Universitaire",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  group_by(Observatory, AgeGroup2, Niv_education2) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  group_by(Observatory, AgeGroup2) %>%
+  mutate(percentage = round((count / sum(count)) * 100, 1)) %>%
+  ungroup()
+
+# Ajout du total par catégorie d'âge et observatoire (ensemble scolarisés)
+total_age_obs <- class_attended_2425 %>%
+  group_by(Observatory, AgeGroup2) %>%
+  summarise(percentage = 100, .groups = "drop") %>%
+  mutate(Niv_education2 = "Ensemble scolarisés")
+
+# Fusion et ordre des colonnes
+class_attended_2425 <- bind_rows(class_attended_2425, total_age_obs) %>%
+  arrange(Observatory,
+          factor(AgeGroup2, 
+                 levels = c("3-5 ans","6-10 ans","11-14 ans","15-17 ans","18-25 ans")),
+          factor(Niv_education2, 
+                 levels = c("Primaire","Secondaire 1er cycle","Secondaire 2ème cycle","Universitaire","Ensemble scolarisés")))
+
+# Préparation du tableau GT
+class_table <- class_attended_2425 %>%
+  mutate(Valeur = paste0(percentage, "%")) %>%
+  select(Observatory, AgeGroup2, Niv_education2, Valeur) %>%
+  pivot_wider(
+    names_from = Niv_education2,
+    values_from = Valeur,
+    values_fill = "-"
+  ) %>%
+  select(Observatory,
+         `Catégorie d'âge` = AgeGroup2,
+         Primaire,
+         `Secondaire 1er cycle`,
+         `Secondaire 2nd cycle` = `Secondaire 2ème cycle`,
+         Universitaire,
+         `Ensemble scolarisés`)   # <-- forcé à la fin
+
+# Affichage GT
+gt_class <- class_table %>%
+  gt() %>%
+  tab_header(
+    title = "Classe suivie pendant l’année scolaire 2024-2025 suivant les catégories d’âge"
+  ) %>%
+  cols_label(
+    Observatory = "Observatoire",
+    `Catégorie d'âge` = "Catégorie d'âge",
+    Primaire = "Primaire",
+    `Secondaire 1er cycle` = "Secondaire 1er cycle",
+    `Secondaire 2nd cycle` = "Secondaire 2nd cycle",
+    Universitaire = "Universitaire",
+    `Ensemble scolarisés` = "Ensemble scolarisés"
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold", size = "large"),
+    locations = cells_title(groups = "title")
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels()
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "#e8f4f8"),
+    locations = cells_body(rows = seq(1, nrow(class_table), 2))
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+gt_class
+```
+REMARQUES :   
+- Voir NAs ou arrondis dans "Alaotra	6-10 ans	94.3%	4.3%	-	-	100%
+Alaotra	11-14 ans	43.7%	54.1%	1.5%	-	100%
+Alaotra	15-17 ans	2.6%	68.4%	28.9%" => Leurs sommes ne font pas 100%.
+
+#### Raisons de non fréquentation de l’école pour les 6 à 15 ans
 
 
 ### Activités principales des autres membres de ménages
