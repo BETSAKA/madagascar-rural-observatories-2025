@@ -3525,14 +3525,386 @@ Alaotra	15-17 ans	2.6%	68.4%	28.9%" => Leurs sommes ne font pas 100%.
 
 #### Raisons de non fréquentation de l’école pour les 6 à 15 ans
 
+```{r}
+# Raisons de non fréquentation de l’école pour les 6 à 15 ans
+# Préparation des données
+
+# class_attended_2425 <- res_deb %>%
+#   left_join(res_m_a, by = "j5") %>%
+#   arrange(j5) %>% 
+#   filter(m5 >= 6 & m5 <= 15 & m6 != 1 & s2 == 2 ) %>%
+#   mutate(
+#     j0 = as.character(j0),
+#     Observatory = case_when(
+#       j0 == "3"  ~ "Marovoay",
+#       j0 == "21" ~ "Alaotra",
+#       TRUE       ~ j0
+#     ),
+#     m4 = as.character(m4),
+#     Observatory = case_when(
+#       m4 == "1"  ~ "Fille",
+#       m4 == "2" ~ "Garçon",
+#       TRUE       ~ m4
+#     ),
+#     # Extraire les labels des activités et corriger l'encodage
+#     Activite = iconv(as.character(labelled::to_factor(a1)), from = "latin1", to = "UTF-8"),
+#     Activite = gsub("&#39;", "'", Activite, fixed = TRUE)
+#   ) %>%
+#   group_by(Observatory, Activite) %>% 
+#   summarise(n = n(), .groups = "drop") %>% 
+#   mutate( 
+#     Percent = round(n / sum(n) * 100, 1) 
+#   ) %>% 
+#   arrange(Observatory, desc(n), desc(Percent))
+```
 
 ### Activités principales des autres membres de ménages
 
-Activités principales des autres membres (de 15 ans et plus) des ménages (%)
-=> REMARQUE : pour vérification voir si on a vraiment pris en compte les 15 ans et plus
+Tout d'abord, on va vérifier les effectifs des activités principales (a1) des autres membres de ménages.  
+Le tableau suivant permet d’identifier les activités les plus fréquentes.
+On peut le supprimer à la fin des analyses.
 
-On va voir d'abord toutes les activités des autres membres de ménages sans limite d'âge.
+```{r}
+# All main activities of the other household members
+all_hh_main_act2 <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 != 1) %>%  # Keep the other household members
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    # Extraire les labels des activités et corriger l'encodage
+    Activite = iconv(as.character(labelled::to_factor(a1)), from = "latin1", to = "UTF-8"),
+    Activite = gsub("&#39;", "'", Activite, fixed = TRUE)
+  ) %>%
+  group_by(Observatory, Activite) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate( 
+    Percent = round(n / sum(n) * 100, 1) 
+  ) %>% 
+  arrange(Observatory, desc(n), desc(Percent))
+
+# Ajouter une ligne "Total" par observatoire
+totals2 <- all_hh_main_act2 %>%
+  group_by(Observatory) %>%
+  summarise(
+    n = sum(n),
+    Percent = 100,
+    Activite = "Total",
+    .groups = "drop"
+  )
+
+all_hh_main_act2 <- bind_rows(all_hh_main_act2, totals2) %>%
+  arrange(Observatory, desc(Activite == "Total"), desc(n))
+
+# Display with gt
+all_hh_main_act2 %>%
+  gt(groupname_col = "Observatory") %>%
+  tab_header(
+    title = "Principales activités des autres membres de ménages par observatoire"
+  ) %>%
+  cols_label(
+    Activite = "Activité principale",
+    n = "Effectif",
+    Percent = "Pourcentage (%)"
+  ) %>%
+  fmt_number(
+    columns = Percent,
+    decimals = 1
+  ) %>%
+  tab_options(
+    table.font.size = 12,
+    table.width = pct(100)
+  ) %>%
+  # GRAS + couleur bleu ciel clair : Titre principal
+  tab_style(
+    style = list(cell_text(weight = "bold", size = "large"), cell_fill(color = "#87CEEB")),
+    locations = cells_title(groups = "title")
+  ) %>%
+  # GRAS + couleur bleu foncé : En-têtes de colonnes
+  tab_style(
+    style = list(cell_text(weight = "bold", color = "white"), cell_fill(color = "#4F81BD")),
+    locations = cells_column_labels()
+  ) %>%
+  # GRAS + couleur beige clair : Noms des groupes (Observatoires)
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#F5F5DC")),
+    locations = cells_row_groups()
+  ) %>%
+  # GRAS + couleur vert clair : Ligne "Total"
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DFFFD6")),
+    locations = cells_body(
+      columns = everything(),
+      rows = Activite == "Total"
+    )
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
 
 
-#### Activités des autres membres du ménage selon l'âge 
-Pour vérifier si les NA correspondent avec les moins de 15 ans.
+-   Les cultivateurs exploitants (code = 95), les ouvriers agricoles (salariés agricoles) (code = 76) et commercants (code = 45), les étudiants (code=14) sont majoritaires tant à Alaotra et à Marovoay.
+
+
+Nous allons voir les effectifs des activités principales comme "Cultivateur", "Eleveur", et "Commerçant"
+
+
+```{r}
+# Activités principales des autres membres de ménages
+hh_main_act3 <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 != 1) %>%  # garder les autres membres de ménages
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    Act_principal = case_when(
+      a1 == 95 ~ "Cultivateur",
+      a1 == 76 ~ "Ouvrier agricole",
+      a1 == 45 ~ "Commerçant",
+      a1 == 14 ~ "Etudiant",
+      a1 == 00 ~ "Chômeur",
+      a1 == 96 ~ "Eleveur",
+      a1 == 99 ~ "Pêcheur exploitant",
+      TRUE     ~ "Autres"
+    )
+  ) %>%
+  group_by(Observatory, Act_principal) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  group_by(Observatory) %>% 
+  mutate(Percent = round(n / sum(n) * 100, 1)) %>% 
+  arrange(Observatory, Act_principal, desc(n), desc(Percent))
+
+# Totaux par observatoire
+totaux3 <- hh_main_act3 %>% 
+  group_by(Observatory) %>% 
+  summarise(
+    Act_principal = "Total",
+    n = sum(n),
+    Percent = 100,
+    .groups = "drop"
+  )
+
+# Fusion données détaillées + totaux
+hh_main_act_final3 <- bind_rows(hh_main_act3, totaux3) %>%
+  arrange(Observatory, desc(Act_principal))
+
+# Tableau GT
+hh_main_act_final3 %>%
+  gt(groupname_col = "Observatory") %>%
+  tab_header(
+    title = md("**Activités principales des autres membres de ménage par observatoire**")
+  ) %>%
+  cols_label(
+    Act_principal = "Activité principale",
+    n = "Effectif",
+    Percent = "Pourcentage (%)"
+  ) %>%
+  fmt_number(
+    columns = Percent,
+    decimals = 1
+  ) %>%
+  tab_options(
+    table.font.size = 12,
+    table.width = pct(100)
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#f0f0f0")),
+    locations = cells_row_groups(groups = c("Alaotra", "Marovoay"))
+  ) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#e6f2ff")),
+    locations = cells_body(rows = Act_principal == "Total")
+  ) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#d9e2ef")),
+    locations = cells_column_labels(columns = everything())
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+########################################################
+# Camembert par observatoire
+########################################################
+ggplot(hh_main_act_final3 %>% filter(Act_principal != "Total"),
+       aes(x = "", y = Percent, fill = Act_principal)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  facet_wrap(~Observatory) +
+  geom_text(
+    aes(label = paste0(Percent, "%")),
+    position = position_stack(vjust = 0.5),
+    color = "white",
+    fontface = "bold",
+    size = 4
+  ) +
+  labs(
+    title = "Répartition des activités principales \n des autres membres de ménage par observatoire (%)",
+    fill = "Activité principale"
+  ) +
+  theme_void() +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 12),
+    strip.text = element_text(face = "bold")
+  )
+
+```
+REMARQUE :  
+- A corriger effectif et pourcentage dans tableau par ordre décroissant.
+
+
+#### Activités principales des chefs de ménages par sexe
+
+```{r}
+# Main activities of the other household members per sex
+hh_main_act4 <- res_deb %>%
+  left_join(res_m_a, by = "j5") %>%
+  arrange(j5) %>% 
+  filter(m6 != 1) %>%  # Keep other household members
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    Act_principal = case_when(
+      a1 == 95 ~ "Cultivateur",
+      a1 == 76 ~ "Ouvrier agricole",
+      a1 == 45 ~ "Commerçant",
+      a1 == 14 ~ "Etudiant",
+      a1 == 00 ~ "Chômeur",
+      a1 == 96 ~ "Eleveur",
+      a1 == 99 ~ "Pêcheur exploitant",
+      TRUE     ~ "Autres"
+    ),
+     Sexe = case_when(
+      m4 == 1 ~ "Homme",
+      m4 == 2 ~ "Femme",
+      TRUE    ~ "Autres"
+    ),
+  ) %>%
+  group_by(Observatory, Sexe, Act_principal) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  group_by(Observatory, Sexe) %>% 
+  mutate( 
+    Percent = round(n / sum(n) * 100, 1) 
+    ) %>% 
+  arrange(Observatory, Sexe, desc(n)) 
+
+ # Calculate totals by observatory and sex
+  totaux4 <- hh_main_act4 %>% 
+  group_by(Observatory, Sexe) %>% 
+  summarise( 
+    Act_principal = "Total", 
+    n = sum(n), 
+    Percent = 100, 
+    .groups = "drop" 
+    ) 
+# Merge detailed data with totals
+hh_main_act_final4 <- bind_rows(hh_main_act4, totaux4) %>%
+  arrange(Observatory, Sexe, desc(Act_principal))
+
+# Pivot to have Male/Female in columns
+hh_wide4 <- hh_main_act_final4 %>% 
+  pivot_wider( 
+    names_from = Sexe, 
+    values_from = c(n, Percent) 
+    )
+
+hh_wide4 %>%
+  gt(groupname_col = "Observatory") %>%
+  tab_header(
+    title = md("**Activités principales des autres membres de ménages par observatoire et par sexe**")
+  ) %>%
+  cols_label(
+    Act_principal = "Activité principale",
+    n_Homme = "Effectif Homme",
+    Percent_Homme = "Pourcentage Homme (%)",
+    n_Femme = "Effectif Femme",
+    Percent_Femme = "Pourcentage Femme (%)"
+  ) %>%
+  fmt_number(
+    columns = starts_with("Percent"),
+    decimals = 1
+  ) %>%
+  tab_options(
+    table.font.size = 12,
+    table.width = pct(100)
+  ) %>% 
+# Make the headers bold
+  tab_style( 
+    style = cell_text(weight = "bold"), 
+    locations = cells_column_labels( 
+      columns = everything() 
+      ) 
+    ) %>% 
+
+# Group titles (Alaotra, Marovoay) in bold + light gray background
+tab_style( 
+  style = list( cell_text(weight = "bold"), 
+                cell_fill(color = "#f0f0f0") 
+                ), 
+  locations = cells_row_groups(groups = c("Alaotra", "Marovoay")
+                               ) 
+  ) %>% 
+ # "Total" row and its content in bold + light blue background
+  tab_style( 
+    style = list( cell_text(weight = "bold"), 
+                  cell_fill(color = "#e6f2ff") 
+                  ), 
+    locations = cells_body( rows = Act_principal == "Total" ) 
+    ) %>% 
+# Column headers in bold + bluish gray background
+  tab_style( 
+    style = list( cell_text(weight = "bold"), 
+                  cell_fill(color = "#d9e2ef") 
+                  ), 
+    locations = cells_column_labels( columns = everything() 
+                                     ) 
+    )%>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+########################################################
+# Camembert par observatoire et sexe
+########################################################
+ggplot(hh_main_act_final4 %>% filter(Act_principal != "Total"),
+       aes(x = "", y = Percent, fill = Act_principal)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  facet_grid(Observatory ~ Sexe) +
+  geom_text(
+    aes(label = paste0(Percent, "%")),
+    position = position_stack(vjust = 0.5),
+    color = "white",
+    fontface = "bold",
+    size = 3
+  ) +
+  labs(
+    title = "Répartition des activités principales \n des autres membres de ménages selon l'observatoire et par sexe (%)",
+    fill = "Activité principale"
+  ) +
+  theme_void() +
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5, size = 12),
+    strip.text = element_text(face = "bold")
+  )
+
+```
+
+
+REMARQUES :  
+- A corriger dans tableaux, les "n_autres" et "percent_autres" dans la ligne des colonnes,  
+- Activités des autres membres du ménage selon l'âge : Pour vérifier si les NA correspondent avec les moins de 15 ans.  
+- Est-ce pertinent de voir les activités agricoles et non-agricoles?? (aa2, aa3, aa4, aa5) avec les SAC
