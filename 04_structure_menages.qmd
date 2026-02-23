@@ -2068,10 +2068,6 @@ hh_literacy %>%
   scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e"))
 ```
 
-
-
-
-
 ### Activités principales des Chefs de ménage
 
 Tout d'abord, on va vérifier les effectifs des activités principales (a1) des Chefs de ménage.  
@@ -2414,314 +2410,33 @@ ggplot(hh_main_act_final %>% filter(Act_principal != "Total"),
 
 ## Caractéristiques des autres membres de ménages
 
-### Activités principales
+### Situation socio-démographique
+
+### Education et scolarisation
+
+
+
+
+
+
+
+REMARQUES :   
+A voir aussi  
+
+Taux de scolarisation des enfants de 6 à 14 ans (%
+
+Classe suivie pendant l’année scolaire 2024 - 2025 suivant les catégories d’âge
+
+Raisons de non fréquentation de l’école pour les 6 à 15 ans
+
+
+### Activités principales des autres membres de ménages
 
 Activités principales des autres membres (de 15 ans et plus) des ménages (%)
 => REMARQUE : pour vérification voir si on a vraiment pris en compte les 15 ans et plus
 
 On va voir d'abord toutes les activités des autres membres de ménages sans limite d'âge.
 
-```{r hhm-activites}
-# All main activities of the others household member
-all_hh_main_act <- res_deb %>%
-  left_join(res_m_a, by = "j5") %>%
-  arrange(j5) %>% 
-  filter(m6 != 1) %>%  # Don't keep the household head = 1
-  mutate(
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    ),
-    # Extraire les labels des activités et corriger l'encodage
-      Activite = iconv(as.character(to_factor(a1)), from = "latin1", to = "UTF-8"),
-      Activite = gsub("&#39;", "'", Activite, fixed = TRUE)
-  ) %>%
-  group_by(Observatory, Activite) %>% 
-  summarise(n = n(), .groups = "drop") %>% 
-  group_by(Observatory) %>%
-  mutate(Percent = round(n / sum(n) * 100, 1)) %>%
-  ungroup() %>%
-  # Pivoter pour avoir les observatoires en colonnes
-  pivot_wider(
-    names_from = Observatory,
-    values_from = c(n, Percent),
-    values_fill = 0
-  ) %>%
-  arrange(desc(n_Alaotra + n_Marovoay))
 
-# Display with gt
-all_hh_main_act %>%
-  gt() %>%
-  tab_header(
-    title = "Principales activités des autres membres du ménage par observatoire"
-  ) %>%
-  tab_spanner(
-    label = "Alaotra",
-    columns = c(n_Alaotra, Percent_Alaotra)
-  ) %>%
-  tab_spanner(
-    label = "Marovoay",
-    columns = c(n_Marovoay, Percent_Marovoay)
-  ) %>%
-  cols_label(
-    Activite = "Activité principale",
-    n_Alaotra = "Effectif",
-    Percent_Alaotra = "%",
-    n_Marovoay = "Effectif",
-    Percent_Marovoay = "%"
-  ) %>%
-  fmt_number(
-    columns = starts_with("Percent"),
-    decimals = 1
-  ) %>%
-  tab_options(
-    table.font.size = 12,
-    table.width = pct(100)
-  )
-```
-Nous allons voir les activités des autres membres du ménage selon le lien avec le Chef du ménage.  
-Variable concernée : m6, annexe 3
-
-```{r}
-# Main activities of other household members according to their relationship with the head of household
-
-all_hh_main_act <- res_deb %>%
-  left_join(res_m_a, by = "j5") %>%
-  arrange(j5) %>% 
-  filter(m6 != 1) %>%  # Don't keep only household head = 1
-  mutate(
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    ),
-    m6 = as.character(m6),
-    lien_CM = case_when(
-      m6 == "2" ~ "Conjoint",
-      m6 == "3" ~ "Enfant",
-      m6 == "5" ~ "Petit enfant",
-      m6 == "6" ~ "Mère/Père",
-      m6 == "7" ~ "Frère/Soeur",
-      TRUE      ~ "Autres"
-    ),
-  ) %>%
-  group_by(Observatory, lien_CM, a1) %>% 
-  summarise(n = n(), .groups = "drop") %>% 
-  mutate( 
-    Percent = round(n / sum(n) * 100, 1) 
-    ) %>% 
-  arrange(Observatory, lien_CM, desc(n), desc(Percent)) 
-
-# Display with gt
-all_hh_main_act %>%
-  gt(groupname_col = "Observatory") %>%
- tab_header(
-  title = "Principales activités des autres membres du ménage par observatoire et selon leur lien avec le Chef du ménage"
-) %>%
-  cols_label(
-    lien_CM = "Lien de parenté avec le Chef de ménage",
-    a1 = "Main activity",
-    n = "Count",
-    Percent = "Percentage (%)"
-  ) %>%
-  fmt_number(
-    columns = Percent,
-    decimals = 1
-  ) %>%
-  tab_options(
-    table.font.size = 12,
-    table.width = pct(100)
-  )
-```
-REMARQUE :
-A revoir forme du tableau : titre en gras, nuance de couleurs
-
-Activités des autres membres du ménages selon le sexe
-```{r}
-# Activities of other household members by sex
-all_hh_main_act <- res_deb %>%
-  left_join(res_m_a, by = "j5") %>%
-  arrange(j5) %>% 
-  filter(m6 != 1) %>%  # Don't keep only household head = 1
-  mutate(
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    ),
-    m4 = as.character(m4),
-    Sexe = case_when(
-      m4 == "1" ~ "Homme",
-      m4 == "2" ~ "Femme",
-      TRUE      ~ NA_character_
-    ),
-  ) %>%
-  group_by(Observatory, Sexe, a1) %>% 
-  summarise(n = n(), .groups = "drop") %>% 
-  mutate( 
-    Percent = round(n / sum(n) * 100, 1) 
-    ) %>% 
-  arrange(Observatory, Sexe, desc(n), desc(Percent)) 
-
-# Display with gt
-all_hh_main_act %>%
-  gt(groupname_col = "Observatory") %>%
- tab_header(
-  title = "Principales activités des autres membres du ménage par observatoire et selon leur lien avec le Chef du ménage"
-) %>%
-  cols_label(
-    a1 = "Main activity",
-    n = "Count",
-    Percent = "Percentage (%)"
-  ) %>%
-  fmt_number(
-    columns = Percent,
-    decimals = 1
-  ) %>%
-  tab_options(
-    table.font.size = 12,
-    table.width = pct(100)
-  )
-```
-
-Tableau moins détaillé
-
-```{r}
-# Activities of other household members by sex
-all_hh_main_act <- res_deb %>%
-  left_join(res_m_a, by = "j5") %>%
-  arrange(j5) %>% 
-  filter(m6 != 1) %>%  # Don't keep household head = 1
-  mutate(
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    ),
-    m4 = as.character(m4),
-    Sexe = case_when(
-      m4 == "1" ~ "Homme",
-      m4 == "2" ~ "Femme",
-      TRUE      ~ NA_character_
-    ),
-    a1 = as.character(a1),
-    Activité = case_when(
-      a1 == "0" ~ "Chômeur",
-      a1 == "14" ~ "Elève/Etudiant",
-      a1 == "45" ~ "Commerçant",
-      a1 == "76" ~ "Ouvrier agricole",
-      a1 == "95" ~ "Cultivateur exploitant",
-      TRUE      ~ "Autres"
-    ),
-  ) %>%
-  group_by(Observatory, Sexe, Activité) %>% 
-  summarise(n = n(), .groups = "drop") %>% 
-  mutate( 
-    Percent = round(n / sum(n) * 100, 1) 
-    ) %>% 
-  arrange(Observatory, Sexe, desc(n), desc(Percent)) 
-
-# Display with gt
-all_hh_main_act %>%
-  gt(groupname_col = "Observatory") %>%
- tab_header(
-  title = "Principales activités des autres membres du ménage par observatoire et selon leur lien avec le Chef du ménage"
-) %>%
-  cols_label(
-    # a1 = "Main activity",
-    n = "Count",
-    Percent = "Percentage (%)"
-  ) %>%
-  fmt_number(
-    columns = Percent,
-    decimals = 1
-  ) %>%
-  tab_options(
-    table.font.size = 12,
-    table.width = pct(100)
-  )
-```
-
-Graphique
-
-```{r}
-# Activities of other household members by sex
-all_hh_main_act <- res_deb %>%
-  left_join(res_m_a, by = "j5") %>%
-  arrange(j5) %>% 
-  filter(m6 != 1) %>%  # Don't keep household head = 1
-  mutate(
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    ),
-    m4 = as.character(m4),
-    Sexe = case_when(
-      m4 == "1" ~ "Homme",
-      m4 == "2" ~ "Femme",
-      TRUE      ~ NA_character_
-    ),
-    a1 = as.character(a1),
-    Activité = case_when(
-      a1 == "0" ~ "Chômeur",
-      a1 == "14" ~ "Elève/Etudiant",
-      a1 == "45" ~ "Commerçant",
-      a1 == "76" ~ "Ouvrier agricole",
-      a1 == "95" ~ "Cultivateur exploitant",
-      TRUE      ~ "Autres"
-    ),
-  ) %>%
-  group_by(Observatory, Sexe, Activité) %>% 
-  summarise(n = n(), .groups = "drop") %>% 
-  mutate( 
-    Percent = round(n / sum(n) * 100, 1) 
-    ) %>% 
-  arrange(Observatory, Sexe, desc(n), desc(Percent)) 
-
-# Desplay histogram (en %)
-all_hh_main_act %>%
-  ggplot(aes(x = Activité, y = Percent, fill = Sexe)) +
-  geom_col(position = "dodge") +
-  facet_wrap(~Observatory) +
-  labs(
-    title = "Principales activités des autres membres du ménages par observatoire et par sexe",
-    x = "Activité",
-    y = "Percentage (%)"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    plot.title = element_text(face = "bold", size = 14)
-  )
-
-```
-
-REMARQUE :  
-- A corriger NA dans sexe  
-- 
-
-Activités des autres membres du ménage selon l'âge et le sexe
-
-Activités des autres membres du ménage selon l'âge
-
-Activités des autres membres du ménage selon le lien de parenté, l'âge
-
-
-
-Activités des autres membres du ménage selon le lien de parenté, l'âge et le sexe
-
-
-### Education et scolarisation
-
-Taux de scolarisation des enfants de 6 à 14 ans (%
-
-Classe suivie pendant l’année scolaire 2020 - 2021 suivant les catégories d’âge
-
-Raisons de non fréquentation de l’école pour les 6 à 15 ans
+#### Activités des autres membres du ménage selon l'âge 
+Pour vérifier si les NA correspondent avec les moins de 15 ans.
