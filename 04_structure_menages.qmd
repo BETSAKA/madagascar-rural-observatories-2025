@@ -2033,22 +2033,30 @@ tab_style(
   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 
 ########################################################
-# Histogramm per observatory and sex
-######################################################
-ggplot(hh_main_act_final, aes(x = Act_principal, y = Percent, fill = Sexe)) +
-  geom_col(position = "dodge") +
-  facet_wrap(~Observatory) +
+# Camembert par observatoire et sexe
+########################################################
+ggplot(hh_main_act_final %>% filter(Act_principal != "Total"),
+       aes(x = "", y = Percent, fill = Act_principal)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  facet_grid(Observatory ~ Sexe) +
+  geom_text(
+    aes(label = paste0(Percent, "%")),
+    position = position_stack(vjust = 0.5),
+    color = "white",
+    fontface = "bold",
+    size = 3
+  ) +
   labs(
     title = "Répartition des activités principales \n des chefs de ménage selon l'observatoire et par sexe (%)",
-    x = "Activité principale",
-    y = "Pourcentage (%)"
+    fill = "Activité principale"
   ) +
-  scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e")) +
-  theme_minimal(base_size = 14) +
+  theme_void() +
   theme(
     plot.title = element_text(face = "bold", hjust = 0.5, size = 12),
-    axis.text.x = element_text(angle = 45, hjust = 1)
+    strip.text = element_text(face = "bold")
   )
+
 ```
 
 ## Caractéristiques des autres membres de ménages
