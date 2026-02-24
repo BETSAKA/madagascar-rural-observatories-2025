@@ -1,0 +1,738 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+# Variable computation
+
+In this chapter we build a harmonized dataset of household-level variables across all ROS survey years (1995–2015). This involves three steps: (i) georeferencing households, (ii) constructing demographic, educational, and food security indicators, and (iii) reconstructing income variables. Each step requires dealing with inconsistencies across years in the structure of the questionnaires and the naming of variables.
+
+## Georeferencing households
+
+We begin by linking household identifiers (`j5`) with locality codes and administrative boundaries. Because the format of identifiers changed in early survey years, we implement corrections using the 1996 survey as a reference to align identifiers from 1995.
+
+```{r load_align_hh_ids}
+
+library(tidyverse)
+library(sf)
+library(haven)
+library(readxl)
+library(labelled)
+
+
+# Load the locality correspondence table with administrative codes
+locality_reference <- readr::read_rds("output/correspondence_table5.rds") %>% 
+  select(j0, j42, j4, ADM3_PCODE, ADM3_EN, ADM4_PCODE, ADM4_clean)
+
+# Load observatory names and match them to their codes
+observatory_labels <- read_xlsx("data/observatory_names.xlsx") %>%
+  mutate(code = as.character(code)) %>%
+  select(code, name)
+
+# Function to rename variables using a named list
+# e.g. renames = list("j0" = c("obsr", "obsr96"))
+rename_all_custom <- function(df, renames) {
+  if (length(renames) == 0) return(df)
+  for (new_name in names(renames)) {
+    # Skip renaming if new_name already exists in df
+    if (new_name %in% names(df)) next
+    old_names <- renames[[new_name]]
+    matched_old <- old_names[old_names %in% names(df)]
+    if (length(matched_old) > 0) {
+      df <- df %>% rename(!!new_name := all_of(matched_old[1]))
+    }
+  }
+  return(df)
+}
+
+# Generic function to load and standardize records from any year
+# Arguments:
+#   - year: numeric year of the survey
+#   - vars: vector of variables to select (after renaming)
+#   - renames: named list of renaming rules (new_name = c(possible_old_names))
+load_records <- function(year, file_name, vars, renames = list()) {
+  path <- paste0("data/ROS_MDG_microdata/", year, "/")
+  df <- read_dta(paste0(path, file_name))
+
+  df <- rename_all_custom(df, renames)
+
+  # Ensure all expected vars exist (fill missing with NA)
+  missing_vars <- setdiff(vars, names(df))
+  df[missing_vars] <- NA
+
+  # Handle j0 if not in original file
+  if (!"j0" %in% names(df)) {
+    df <- df %>%
+      mutate(j0 = substr(j5, 1, 2)) %>% 
+      mutate(j0 = as.character(as.numeric(j0)))
+  }
+
+  df %>%
+    mutate(j0 = as.character(as.numeric(j0))) %>%
+    select(any_of(vars))
+}
+
+# Define variables to extract from res_deb files
+vars_res_deb <- c("year", "j0", "j5", "j4", "j42")
+renames_res_deb <- list("j0" = c("obsr", "obsr96"))
+# Load res_deb for all years using the same generic function
+household_locality_all <- map_dfr(
+  1995:2015,
+  ~load_records(.x, file_name = "res_deb.dta", vars = vars_res_deb, 
+                renames = renames_res_deb)
+) %>%
+  distinct(year, j0, j5, .keep_all = TRUE) %>%
+  mutate(across(any_of(c("j0", "j4", "j42", "j5")), as.character))
+
+# Correction des identifiants j5 pour 1995 à l’aide du fichier de 1996
+hh_96 <- read_dta("data/ROS_MDG_microdata/1996/res_deb.dta") %>%
+  mutate(j0 = as.character(j0)) %>%
+  select(j0, year = NULL, j5_96 = j5, j_1995, j12b) %>%
+  filter(j_1995 == 1) %>%
+  mutate(year = 1995) %>%
+  distinct(j0, j12b, .keep_all = TRUE)
+
+household_locality_all <- household_locality_all %>%
+  left_join(hh_96, by = c("j0", "year", "j5" = "j12b")) %>%
+  mutate(j5 = ifelse(year == 1995 & !is.na(j5_96), j5_96, j5)) %>%
+  select(-j5_96)
+
+# Join with geographical references and add observatory names
+household_geolocated <- household_locality_all %>%
+  left_join(locality_reference, by = c("j0", "j4", "j42")) %>%
+  left_join(observatory_labels, by = c("j0" = "code")) %>%
+  relocate(name, .after = j0)
+```
+
+We now have a table where each household is uniquely identified by (year, j5) and linked to its administrative location and observatory label.
+
+## Observatory-level segmentation and attrition
+
+Once georeferenced, we segment households by observatory and site. We compute attrition rates, i.e., the share of households that drop out between consecutive survey years. We also identify the modal administrative unit (ADM4) of each site in each year to track potential shifts in the effective coverage of the panel.
+
+```{r obs_attrition}
+# Extract rural observatories and site IDs
+household_geolocated <- household_geolocated %>%
+  mutate(ro_id = str_sub(j5, 1, 2),
+         site_id = str_sub(j5, 1, 3))
+
+# Prepare household-site-year-ADM4 data
+hh_site <- household_geolocated %>%
+  distinct(ro_id, site_id, j5, year, ADM4_clean)
+
+# Compute household attrition per site_id ---
+hh_by_site <- hh_site %>%
+  group_by(ro_id, site_id, year) %>%
+  summarise(j5_list = list(j5), .groups = "drop") %>%
+  mutate(j5_count = map_int(j5_list, length)) %>%
+  group_by(ro_id, site_id) %>%
+  mutate(previous_year = lag(year)) %>%
+  ungroup()
+
+attrition <- hh_by_site %>%
+  left_join(hh_by_site %>%
+              select(ro_id, site_id, year, 
+                     prev_j5 = j5_list, prev_count = j5_count),
+            by = c("ro_id", "site_id", "previous_year" = "year")) %>%
+  mutate(repeated = map2_int(j5_list, prev_j5, ~length(intersect(.x, .y))),
+         attrition_percent = 100 * (prev_count - repeated) / prev_count)
+
+# Compute modal ADM4 per site_id and year ---
+modal_adm4 <- hh_site %>%
+  filter(!is.na(ADM4_clean)) %>%
+  group_by(ro_id, site_id, year, ADM4_clean) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(ro_id, site_id, year) %>%
+  mutate(modal_adm4 = ADM4_clean[which.max(n)],
+         modal_adm_percent = 100 * max(n) / sum(n)) %>%
+  slice(1) %>%
+  ungroup() %>%
+  select(ro_id, site_id, year, modal_adm4, modal_adm_percent)
+
+# Combine everything ---
+summary_by_site <- attrition %>%
+  select(ro_id, site_id, year, j5_count, attrition_percent) %>%
+  left_join(modal_adm4, by = c("ro_id", "site_id", "year"))  %>%
+  rename(n = j5_count) %>%
+  arrange(ro_id, site_id, year)
+```
+
+The recurrent challenges of ROS data is maintaining longitudinal comparability despite household replacement and site-level redefinitions.
+
+## Household composition
+
+We then move to the individual-level files (`m*` identifiers) to reconstruct household size and demographic profiles. Information on sex (`m4`), age (`m5`), and household headship (`m6 == 1`) is aggregated to build indicators at the household level.
+
+
+```{r hh_structure}
+
+# Load and clean individual data ---------------------------------
+
+# Define variables of interest to extract and standardize
+vars_indiv <- c("year", "j0", "j5", "m", "m4", "m5", "m6", "m2a")  
+
+renames_indiv <- list(
+  "j0" = c("obsr", "obsr96"),
+  "m2a" = c("m2a1", "m2a")  # sera renommée selon l'année
+)
+
+years <- 1995:2015
+
+individuals_all_years <- map_dfr(years, function(y) {
+  f <- if (y == 1995) "res_m.dta" else "res_m_a.dta"
+  
+  # Dans certaines années, la variable m2a est absente
+  vars_year <- setdiff(vars_indiv, "m2a")  # par défaut, on l’enlève
+  renames_year <- renames_indiv
+  
+  # On ajoute m2a uniquement si elle est disponible
+  if (y %in% c(1996, 1997, 2005:2015)) {
+    vars_year <- vars_indiv
+  }
+
+  load_records(
+    year = y,
+    file_name = f,
+    vars = vars_year,
+    renames = renames_year
+  ) %>%
+    mutate(m2a = if (!"m2a" %in% names(.)) NA_integer_ else m2a)
+})
+# Count household members -------------------------------------
+
+# Remove duplicates and retain valid members (with age or relationship info)
+individuals_cleaned <- individuals_all_years %>%
+  distinct(year, j0, j5, m, .keep_all = TRUE) %>%
+  filter(!is.na(m4) | !is.na(m6))
+
+# Count the number of members per household
+household_size <- individuals_cleaned %>%
+  group_by(year, j0, j5) %>%
+  summarise(n_membres = n(), .groups = "drop")
+
+# Check for duplicate household identifiers across observatories
+if (sum(duplicated(paste(household_size$year, household_size$j5))) != 0) {
+  warning("Certains numéros de ménage sont dupliqués entre observatoires")
+} else {
+  message("Aucun numéro de ménage dupliqué entre observatoires")
+}
+
+# Identify household heads ----------------------------------
+
+# Select individuals who are head of household (m6 == 1)
+household_heads_raw <- individuals_cleaned %>%
+  filter(m6 == 1, is.na(m2a) | m2a == 1) %>%
+  select(year, j0, j5, m, hhh_sex = m4, hhh_age = m5)
+
+# Identify households with more than one head
+duplicated_heads <- household_heads_raw %>%
+  group_by(year, j5) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  filter(n > 1)
+
+# Keep only the first occurrence per household (ordered by member ID)
+household_heads_clean <- household_heads_raw %>%
+  arrange(year, j5, m) %>%
+  distinct(year, j0, j5, .keep_all = TRUE) %>%
+  select(-m)
+```
+
+We know have a description of the household and hh head demographical characteristics. 
+
+## Education
+
+Education variables (`s1a`, `s1b`, `s2`, `s3a`) were not collected consistently across years. For example, reading and writing were not asked in 1996 and 1998, and spurious values appear in some years (e.g., code 0 in 2003). We document these differences, recode consistently, and aggregate to the household level.
+
+```{r check_educ_coding}
+
+# Check education coding across years --------------------
+
+# Define education variables
+
+edu_vars <- c("s1a", "s1b", "s2", "s3a")
+years_educ <- setdiff(1995:2015, 1996)
+
+# Function to extract unique values for each variable in a given year
+extract_edu_values <- function(year) {
+  file_name <- if (year == 1995) "res_m.dta" else "res_m_a.dta"
+  file_path <- file.path("data/ROS_MDG_microdata", as.character(year), file_name)
+  
+  if (!file.exists(file_path)) return(tibble())
+  
+  df <- read_dta(file_path)
+  present_vars <- intersect(edu_vars, names(df))
+  
+  if (length(present_vars) == 0) return(tibble())
+  
+  map_dfr(present_vars, function(var) {
+    tibble(
+      year = year,
+      variable = var,
+      value = df[[var]] %>% unique() %>% na.omit() %>% as.integer()
+    )
+  })
+}
+
+# Extract all values across years
+edu_values_all <- map_dfr(years_educ, extract_edu_values)
+
+# Now: one table per variable, with values as columns and years as rows
+edu_presence_tables <- edu_values_all %>%
+  mutate(value = as.character(value), present = TRUE) %>%
+  group_split(variable) %>%
+  map(function(df) {
+    df %>%
+      select(-variable) %>%
+      pivot_wider(
+        names_from = value,
+        values_from = present,
+        values_fill = FALSE
+      ) %>%
+      arrange(year)
+  }) %>%
+  set_names(unique(edu_values_all$variable))
+
+# Example: print the presence table for s1a
+years_educ <- setdiff(1995:2015, 1996)
+
+# Function to extract unique values for each variable in a given year
+extract_edu_values <- function(year) {
+  file_name <- if (year == 1995) "res_m.dta" else "res_m_a.dta"
+  file_path <- file.path("data/ROS_MDG_microdata", as.character(year), file_name)
+  
+  if (!file.exists(file_path)) return(tibble())
+  
+  df <- read_dta(file_path)
+  present_vars <- intersect(edu_vars, names(df))
+  
+  if (length(present_vars) == 0) return(tibble())
+  
+  map_dfr(present_vars, function(var) {
+    tibble(
+      year = year,
+      variable = var,
+      value = df[[var]] %>% unique() %>% na.omit() %>% as.integer()
+    )
+  })
+}
+
+# Extract all values across years
+edu_values_all <- map_dfr(years_educ, extract_edu_values)
+
+# Now: one table per variable, with values as columns and years as rows
+edu_presence_tables <- edu_values_all %>%
+  mutate(value = as.character(value), present = TRUE) %>%
+  group_split(variable) %>%
+  map(function(df) {
+    df %>%
+      select(-variable) %>%
+      pivot_wider(
+        names_from = value,
+        values_from = present,
+        values_fill = FALSE
+      ) %>%
+      arrange(year)
+  }) %>%
+  set_names(unique(edu_values_all$variable))
+
+```
+
+Les variables d'éducation sont manquantes pour l'année 1996.J'ai cherché dans le dictionnaire et vérifié les fichiers sources. Après vérification du questionnaire administré en 1996 (dans la documentation), il ressort que ces questions n'ont pas été posées cette année-là (j'imagine qu'on a préféré ne pas reposer la réponse pour les ménages déjà interrogés l'année précédente).
+
+On a donc :
+
+-   s1a : savez-vous lire ? 1 = oui ; 2 = se débrouille ; 3 = non. Manquant en 1996 et 1998. Valeur 0 présente en 2003 (pas présente dans le questionnaire).
+-   s1b savez-vous écrire ? 1 = oui ; 2 = se débrouille ; 3 = non. Manquant en 1996 et 1998. Valeur 0 présente en 2003 (pas présente dans le questionnaire).
+-   s2 : avez-vous été ou allez-vous à l'école primaire. 1 = oui, 2 = non. Manquant en 1996.
+-   s3a : nombre d'années d'études. Manquant en 1996.
+
+On extrait et on recode donc ces variables en fonction de ces informations.
+
+```{r extract_recode_educ}
+# Define education variables and identifiers
+vars_educ <- c("year", "j0", "j5", "m", "s1a", "s1b", "s2", "s3a")
+
+# Rename j0 if needed
+renames_educ <- list("j0" = c("obsr", "obsr96"))
+
+# 3. Define years to include (excluding 1996)
+years_educ <- setdiff(1995:2015, 1996)
+
+# 4. Load education data across years
+education_all_years <- map_dfr(years_educ, function(y) {
+  f <- if (y == 1995) "res_m.dta" else "res_m_a.dta"
+  load_records(y, file_name = f, vars = vars_educ, renames = renames_educ)
+})
+
+# clean and recode
+education_cleaned <- education_all_years %>%
+  mutate(
+    # delete variables not defined in the questionnaire (in 2003 only)
+    s1a = na_if(s1a, 0),
+    s1b = na_if(s1b, 0),
+    
+    # recode reading/writing variables
+    s1a_cat = case_when(
+      s1a == 1 ~ "oui",
+      s1a == 2 ~ "se débrouille",
+      s1a == 3 ~ "non",
+      TRUE ~ NA_character_
+    ),
+    s1b_cat = case_when(
+      s1b == 1 ~ "oui",
+      s1b == 2 ~ "se débrouille",
+      s1b == 3 ~ "non",
+      TRUE ~ NA_character_
+    ),
+    
+    # recode schooling variable
+    s2_bin = case_when(
+      s2 == 1 ~ TRUE,
+      s2 == 2 ~ FALSE,
+      TRUE ~ NA_integer_
+    ),
+    
+    # s3a est conservé tel quel (nombre d'années d'étude)
+    s3a = na_if(s3a, 0)  # 0 n'est pas une valeur valide
+  ) %>%
+  distinct(year, j0, j5, m, .keep_all = TRUE)
+  
+
+# join with individual data
+individuals_with_education <- individuals_cleaned %>%
+  left_join(
+    education_cleaned %>%
+      select(year, j0, j5, m, s1a_cat, s1b_cat, s2_bin, s3a),
+    by = c("year", "j0", "j5", "m")
+  )
+
+education_household_summary <- individuals_with_education %>%
+  group_by(year, j0, j5) %>%
+  summarise(
+    # Presence of any literate adult (age ≥ 15 and reads "oui")
+    any_literate_adult = any(s1a_cat == "oui" & m5 >= 15, na.rm = TRUE),
+    
+    # Highest education in household (max years)
+    max_years_edu = max(s3a, na.rm = TRUE),
+    
+    # Mean years of education (all members)
+    mean_years_edu = mean(s3a, na.rm = TRUE),
+    
+    # Share of members with any schooling (age ≥ 6 and s2_bin == TRUE)
+    pct_with_schooling = mean(s2_bin[m5 >= 6], na.rm = TRUE),
+    
+    # Presence of adult who can read
+    any_adult_can_read = any(s1a_cat %in% c("oui", "se débrouille") & m5 >= 15, na.rm = TRUE),
+    
+    # Average years of education among adults (age ≥ 15)
+    mean_years_edu_adults = mean(s3a[m5 >= 15], na.rm = TRUE),
+    
+    # Education variables for household head
+    hhh_s1a = first(s1a_cat[m6 == 1]),
+    hhh_s1b = first(s1b_cat[m6 == 1]),
+    hhh_s2 = first(s2_bin[m6 == 1]),
+    hhh_s3a = first(s3a[m6 == 1])
+  ) %>%
+  ungroup()
+
+```
+
+Nous avons donc construit un jeu additionnel `education_household_summary` avec plusieurs indicateurs synthétiques au niveau du ménage à partir des informations individuelles sur l’éducation. Ces indicateurs incluent :
+
+-   la présence d’au moins un adulte sachant lire (`any_literate_adult`), défini comme ayant répondu "oui" à la question sur la lecture (`s1a_cat`) et ayant 15 ans ou plus,
+-   la présence d’au moins un adulte pouvant lire, qu’il sache lire ou "se débrouille" (`any_reading_adult`),
+-   le nombre d’années d’éducation le plus élevé observé dans le ménage (`max_years_schooling`),
+-   le nombre moyen d’années d’éducation parmi les membres du ménage (`mean_years_schooling`),
+-   la proportion de membres âgés de 6 ans ou plus ayant déjà été ou allant à l’école (`share_with_any_schooling`),
+-   ainsi que le nombre moyen d’années d’éducation parmi les adultes de 15 ans ou plus (`mean_years_schooling_adult`).
+
+Par ailleurs, nous extrayons pour chaque ménage les quatre variables d’éducation relatives au chef de ménage : sa capacité à lire (`hhh_s1a_cat`), à écrire (`hhh_s1b_cat`), sa déclaration de fréquentation de l’école (`hhh_s2_bin`) et le nombre d’années d’éducation déclarées (`hhh_s3a`).
+
+
+## Agricultural activities
+
+A key dimension of household livelihoods is the degree of engagement in agriculture and related activities. To capture this, we exploit the individual activity codes (a1) recorded for each household member. Before using these variables, it is necessary to verify the consistency of activity codes across survey years.
+
+We begin by extracting the list of activity codes from each year (1996–2015) and checking whether their labels remained stable over time.
+
+```{r}
+extract_a1_labels <- function(year) {
+  file_path <- file.path("data/ROS_MDG_microdata", as.character(year), 
+                         "res_m_a.dta")
+ read_dta(file_path) %>%
+    select(code = a1) %>%
+    unique() %>%
+    mutate(year = year,
+           label = to_character(code))
+}
+
+# Appliquer aux années disponibles
+years <- 1996:2015
+a1_labels_all_years <- map_dfr(years, extract_a1_labels)
+
+# Pivot large : lignes = codes, colonnes = années, cellules = libellés
+a1_labels_table <- a1_labels_all_years %>%
+  mutate(label = as.character(label)) %>%
+  pivot_wider(
+    names_from = year,
+    values_from = label,
+    values_fill = list(label = "-")
+  ) %>%
+  arrange(code)
+```
+
+We then extract individual activity information for all available years. For most surveys (1996–2015), the variable `a1` directly identifies the main activity of each individual.
+
+```{r}
+# Années pour lesquelles on dispose des activités individuelles
+years_activ_indiv <- 1996:2015
+
+# Définir les variables à extraire
+vars_activ_indiv <- c("year", "j0", "j5", "m", "a1")
+renames_vars_activ_indiv <- list("j0" = "obsr96")
+# Charger les données avec load_records
+activ_indiv_all_years <- map_dfr(years_activ_indiv, function(x) {
+  load_records(
+    year = x,
+    file_name = "res_m_a.dta",
+    vars = vars_activ_indiv,
+    renames = renames_vars_activ_indiv
+  )
+})
+```
+
+The 1995 survey did not follow the same format. Instead of asking each individual for their main activity, the questionnaires identified the household’s main and secondary activities, as well as which members were involved. We therefore reconstruct individual activities from two separate files (`res_apm.dta` and `res_asm.dta`), prioritizing main activities when both are available.
+
+```{r}
+# Charger les deux fichiers de 1995
+apm_1995 <- read_dta("data/ROS_MDG_microdata/1995/res_apm.dta")
+asm_1995 <- read_dta("data/ROS_MDG_microdata/1995/res_asm.dta")
+
+# Nettoyage de l'activité principale du ménage (res_apm)
+activ_1995_main <- apm_1995 %>%
+  transmute(
+    year = 1995,
+    j5 = j5,
+    m = as.integer(apm12a),
+    a1 = as.numeric(apm11),
+    source = "main"
+  )
+
+# Nettoyage de l'activité secondaire du ménage (res_asm)
+activ_1995_secondary <- asm_1995 %>%
+  transmute(
+    year = 1995,
+    j5 = j5,
+    m = as.integer(asm31),
+    a1 = as.numeric(asm32),
+    source = "secondary"
+  )
+
+# Combiner les deux et ne garder qu'une ligne par individu
+activ_1995_unique <- bind_rows(activ_1995_main, activ_1995_secondary) %>%
+  arrange(j5, m, desc(source)) %>%  # priorité à "main"
+  distinct(j5, m, .keep_all = TRUE)  # on garde la première occurrence
+
+# Fusion avec les autres années
+activ_indiv_all_years <- bind_rows(activ_indiv_all_years, activ_1995_unique %>% 
+                                     select(-source))
+```
+
+Once the individual-level activity table is harmonized, we aggregate it at the household–year level. We distinguish between two levels of agricultural engagement:
+
+- Stricto sensu agriculture (`agro_stricto`): farming or livestock rearing, coded as `95` and `96`.
+- Lato sensu agriculture (`agro_lato`): a broader set of codes encompassing farming, livestock, fishing, gathering, apiculture, and agriculture-related crafts.
+
+```{r}
+# Codes d'activité pour les regroupements
+codes_agro_stricto <- c(95, 96)
+codes_agro_lato <- c(4, 5, 6, 13, 20, 21, 24, 25, 32, 59, 70, 76, 85, 95, 96, 
+                     97, 98, 99)
+
+# Agrégation par ménage et année
+activ_menage_annee <- activ_indiv_all_years %>%
+  mutate(
+    is_agro_stricto = a1 %in% codes_agro_stricto,
+    is_agro_lato = a1 %in% codes_agro_lato
+  ) %>%
+  group_by(year, j5) %>%
+  summarise(
+    hhh_activ = {
+      chef_vals <- a1[which(m == 1)]
+      if (length(chef_vals) > 0) chef_vals[1] else NA_real_
+    },
+    hhh_activ_agro_stricto = hhh_activ %in% codes_agro_stricto,
+    hhh_activ_agro_lato = hhh_activ %in% codes_agro_lato,
+    hh_any_agro_stricto = any(is_agro_stricto, na.rm = TRUE),
+    hh_any_agro_lato = any(is_agro_lato, na.rm = TRUE),
+    .groups = "drop"
+  )
+```
+
+The resulting table `activ_menage_annee` includes several household-level indicators:
+
+- `hhh_activ`: the main activity of the household head,
+- `hhh_activ_agro_stricto`: whether the household head is strictly engaged in farming or livestock,
+- `hhh_activ_agro_lato`: whether the household head is engaged in agriculture more broadly,
+- `hh_any_agro_stricto`: whether at least one member of the household is strictly engaged in farming or livestock,=
+- `hh_any_agro_lato`: whether at least one member of the household is broadly engaged in agricultural or related activities.
+
+This classification makes it possible to characterize households according to their insertion in the agricultural sector, capturing both specialization (stricto sensu) and diversification into related activities (lato sensu).
+
+## Food security
+
+Food security questions were phrased differently across years, but one consistent element is the number of months of self-sufficiency from household production. We harmonize all available questions into a single measure, food_selfsuff_months, capped at 12 months.
+
+
+Les questions relatives à la sécurité alimentaire ont beaucoup varié d'une année à l'autre dans les enquêtes ROS. Néanmoins, une question reste globalement comparable : la durée (en mois) pendant laquelle la production vivrière du ménage suffit à couvrir ses besoins alimentaires. Selon les années, cette information est captée de manière légèrement différente :
+
+-   1995 (`sa3a`) : "Combien de mois votre production en aliment de base vous suffit-il ?"
+-   1996–1997 (`sa2`) : "Combien de mois de l'année votre production en aliment de base vous suffit ?"
+-   1998–2015 (`sa2a`, `sa2b`, `sa2c`) : Nombre de mois d’autosuffisance en riz (1ère et 2ème saison) et en maïs.
+
+Nous agrégeons ici toutes ces variables dans une seule mesure standardisée : `food_selfsuff_months`, plafonnée à 12 mois.
+
+```{r}
+sa_95 <- load_records(
+  year = 1995,
+  file_name = "res_sa2.dta",
+  vars = c("year", "j5", "food_selfsuff_months"),
+  renames = c("food_selfsuff_months" = "sa3a")
+  ) %>%
+  mutate(source_food_selfsuff = "sa3a") 
+
+sa_9697 <- map_dfr(1996:1997, ~load_records(
+  year = .x,
+  file_name = "res_sa2.dta",
+  vars = c("year", "j5", "food_selfsuff_months"),
+  renames = list("food_selfsuff_months" = "sa2")
+) %>%
+  mutate(
+    source_food_selfsuff = "sa2"
+  ) 
+)
+
+sa_9814 <- map(1998:2014, ~load_records(
+  year = .x,
+  file_name = "res_sa2.dta",
+  vars = c("year", "j5", "sa2a", "sa2b", "sa2c")
+)) %>%
+  map(~.x %>%
+  mutate(
+    sa2a = as.numeric(sa2a),
+    sa2b = as.numeric(sa2b),
+    sa2c = as.numeric(sa2c)
+  )
+) %>%
+  bind_rows() %>%
+  mutate(
+    food_selfsuff_months = rowSums(across(c(sa2a, sa2b, sa2c)), na.rm = TRUE),
+    source_food_selfsuff = "sa2a+sa2b+sa2c"
+  ) %>%
+  select(year, j5, food_selfsuff_months, source_food_selfsuff)
+
+sa_15 <- load_records(
+  year = 2015,
+  file_name = "res_sa2_2015.dta",
+  vars = c("year", "j5", "sa2a", "sa2b", "sa2c")
+  ) %>%
+  mutate(
+    food_selfsuff_months = rowSums(across(c(sa2a, sa2b, sa2c)), na.rm = TRUE),
+    source_food_selfsuff = "sa2a+sa2b+sa2c"
+  ) %>%
+  select(year, j5, food_selfsuff_months, source_food_selfsuff)
+
+# Bind and cap to 12 months
+sa_all <- bind_rows(sa_95, sa_9697, sa_9814, sa_15) %>%
+  mutate(food_selfsuff_months = pmin(food_selfsuff_months, 12))
+
+```
+
+Lorsque plusieurs cultures sont prises en compte (riz 1ère saison, 2ème saison, maïs), nous additionnons les mois d'autosuffisance déclarés, tout en plafonnant la somme à 12 mois pour éviter les surestimations. La variable `source_food_selfsuff` permet de tracer l’origine des données selon l’année.
+
+## Incomes
+
+We reconstructed the various components of rural Malagasy household income based on ROS surveys (1995–2015), reproducing the processing carried out in Stata in for the latest surveys. The aim aim to produce a total income that is consistent and comparable over time, taking into account the specific characteristics of each survey wave. The main difficulty lies in the heterogeneity of the questionnaires and data structures between years: changing variable names, divergent formats, and the absence or presence of specific modules.
+
+```{r}
+#| output: false
+
+# Chargement des fonctions
+source("calc_incomes_all_years.R")
+
+# Chargement + nettoyage immédiat
+revenus <- compute_income_all_years()
+```
+
+The reference script Calc_revenus_all_years.R contains a suite of functions, each dedicated to one component of income:
+
+- `revppal`: income from the main activity,
+- `revsec`: income from secondary activities,
+- `rev_riz`: net rice income (production minus charges),
+- `rev_cu`: net income from other crops,
+- `revel`: livestock income,
+- `revpeche`: fishing income (2015 only),
+- `rente_riz`, rente_cu: land rents,
+- `autre_rev`: miscellaneous incomes,
+- `himo`: high labor intensity public works (HIMO),
+- `decap`: exceptional sales (land, cattle, equipment, durables),
+- `transrecmo` and `transrecnomo`: transfers (monetary and non-monetary).
+
+These functions rely on harmonized household identifiers and systematically handle missing files, variable name changes, and differences in questionnaire design. They make it possible to reconstruct three aggregate measures:
+
+- Current income (`revcou`) = `revppal` + `revsec` + `rev_riz` + `rev_cu` + `revel` + `revpeche`
+- Exceptional income (`revexcept`) = `rente_riz` + `rente_cu` + `autre_rev` + `himo` + `decap` +  `vte_biens` + `transrecmo` + `transrecnomo`
+- Total income (`revtot`) = `revcou` + `revexcept`
+
+## Consolidation
+
+Finally, we merge all household-level variables — demographic, educational, food security, and income — into a single consolidated dataset. We ensure that (year, j5) is unique, check for potential duplications, and save the result for further analysis.
+
+```{r}
+# Harmonisation des identifiants dans les autres tables
+
+# Une fonction pour forcer l'unicité j5 + year
+clean_all_components <- function(df) {
+  df %>%
+    mutate(j5 = as.character(j5), year = as.integer(year)) %>%
+    mutate(across(where(is.logical), as.numeric)) %>% 
+    group_by(year, j5) %>%
+    summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE)), .groups = "drop")
+}
+
+revenus_clean <- clean_all_components(revenus) 
+household_size <- clean_all_components(household_size)
+household_heads_clean <- clean_all_components(household_heads_clean)
+education_household_summary <- clean_all_components(education_household_summary)
+activ_menage_annee <- clean_all_components(activ_menage_annee) 
+sa_all <- clean_all_components(sa_all) 
+revenus <- clean_all_components(revenus) 
+household_geolocated <- clean_all_components(household_geolocated) 
+
+# Étape 2 – Fusion avec les autres sources de données
+household_consolidated <- household_geolocated %>%
+  left_join(household_size, by = c("year", "j5")) %>%
+  left_join(household_heads_clean, by = c("year", "j5")) %>%
+  left_join(education_household_summary, by = c("year", "j5")) %>%
+  left_join(activ_menage_annee, by = c("year", "j5")) %>%
+  left_join(sa_all, by = c("year", "j5")) %>%
+  left_join(revenus_clean, by = c("year", "j5"))
+
+# Étape 3 – Vérification d’unicité
+dup_check <- household_consolidated %>%
+  count(year, j5) %>%
+  filter(n > 1)
+
+if (nrow(dup_check) == 0) {
+  message("Acune duplication détectée : l'identifiant (year, j5) est unique.")
+} else {
+  warning("Duplication détectée pour certains couples (year, j5). Vérifiez les sources.")
+  print(dup_check)
+}
+
+write_rds(household_consolidated, "data/household_consolidated.rds")
+```
+
+This dataset forms the backbone of our study, allowing us to assess the relationship between conservation policies and household living conditions in a harmonized longitudinal perspective.
