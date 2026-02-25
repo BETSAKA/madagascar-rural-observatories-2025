@@ -13,28 +13,142 @@ library(tidyverse)
 library(haven)
 library(dplyr)
 library (gt) # Easily create presentation - ready display tables
+library(ggplot2)
 
 # Loading observatories data
 res_deb <- read_dta("data/res_deb.dta")
 # Loading household data
 res_m_a <- read_dta("data/res_m_a.dta")
+# Loading habitat data including kitchen (h)
+res_h <- read_dta("data/res_h.dta") # year, j5 
+# Loading indicateur de confort (v), equipement , communication (tm1, ut1, snw), equipement agricole (e0) data
+res_v <- read_dta("data/res_v.dta") # year, j5 
 ```
 
 ## Habitat
 
+### Accès au logement d'habitation
+
 ```{r}
-# Loading habitat data including kitchen (h)
-res_h <- read_dta("data/res_h.dta") # year, j5 
+# Statut d'occupation du logement par observatoire
+housing_statut <- res_h %>% 
+  left_join(res_deb, by = "j5") %>% 
+  group_by(j0, h0) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    h0 = as.character(h0),
+    statut = case_when(
+      h0 == "1"  ~ "En propriété",
+      h0 == "2"  ~ "En location",
+      h0 == "3"  ~ "Prêtée",
+      h0 == "4"  ~ "Autre",
+      TRUE       ~ h0
+    )
+  ) %>% 
+  group_by(Observatory) %>% 
+  mutate(
+    Total = sum(n),
+    Percentage = round(100 * n / Total, 1)
+  ) %>% 
+  select(Observatory, statut, n, Percentage) %>% 
+  ungroup()
+
+# Ajouter les lignes "Total" par observatoire
+housing_statut <- bind_rows(
+  housing_statut,
+  housing_statut %>% 
+    group_by(Observatory) %>% 
+    summarise(
+      statut = "Total",
+      n = sum(n),
+      Percentage = 100,
+      .groups = "drop"
+    )
+) %>% 
+  arrange(Observatory, desc(statut == "Total"))
+
+# Ajouter une ligne "Total global"
+housing_statut <- bind_rows(
+  housing_statut,
+  housing_statut %>% 
+    summarise(
+      Observatory = "Total global",
+      statut = "Total",
+      n = sum(n),
+      Percentage = 100,
+      .groups = "drop"
+    )
+)
+
+# Créer un tableau formaté avec gt
+housing_statut %>% 
+  gt(rowname_col = "statut") %>% 
+  tab_header(
+    title = "Statut d'occupation du logement par observatoire"
+  ) %>% 
+  fmt_number(
+    columns = vars(n),
+    sep_mark = " ",
+    decimals = 0
+  ) %>% 
+  fmt_number(
+    columns = vars(Percentage),
+    decimals = 1
+  ) %>% 
+  cols_label(
+    statut = "Statut",
+    n = "Nombre",
+    Percentage = "%"
+  )
+
+# Camembert display 
+
+housing_statut %>% 
+  filter(Observatory %in% c("Marovoay", "Alaotra"), statut != "Total") %>% 
+  ggplot(aes(x = "", y = Percentage, fill = statut)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y") +
+  geom_text(aes(label = paste0(Percentage, "%")),
+            position = position_stack(vjust = 0.5)) +
+  facet_wrap(~Observatory) +
+  labs(title = "Répartition (%) des ménages par statut d'occupation selon l'observatoire") +
+  theme_void() +
+  theme(legend.title = element_blank(),
+        plot.title = element_text(hjust = 0.5))
+
 ```
 
+
+### Nombres de chambres
+
+### mur
+
+### tafo
+
+### gorodona
+
+
+### Type de latrine
+
+
+### Accès à l'eau de source améliorée et à l'électricité
+Mode d'éclairage
+
+
+### Cuisine
+
+### Energie
+
+
+### Accès à l'eau
 ## Niveau de vie
 
-### Indicateur de confort
-
-```{r}
-# Loading indicateur de confort (v), equipement , communication (tm1, ut1, snw), equipement agricole (e0) data
-res_v <- read_dta("data/res_v.dta") # year, j5 
-```
 
 ### Equipement
 
@@ -44,7 +158,16 @@ res_e <- read_dta("data/res_e.dta") # year, j5 # Equipement module next part
 
 Les équipements agricoles sont dans "res_v.dta" avec "e0" uniquement comme variable.
 
-### Communication
+#### Taux de possession des biens de confort courant
+
+#### Equipement agricole des ménages : taux d’équipement et nombre d’outils
+
+
+### Accès à la communication audiovisuelle et à la télécommunication
+
+#### Accès à la communication audiovisuelle et à la télécommunication par observatoire
+
+#### Accès à la communication audiovisuelle et à la télécommunication par observatoire et selon les caractéristiques des chefs de ménages
 
 Les données de communication sont dans "res_v.dta".
 
