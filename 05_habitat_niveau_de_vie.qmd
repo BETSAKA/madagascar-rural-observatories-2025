@@ -14,6 +14,7 @@ library(haven)
 library(dplyr)
 library (gt) # Easily create presentation - ready display tables
 library(ggplot2)
+library(forcats)
 
 # Loading observatories data
 res_deb <- read_dta("data/res_deb.dta")
@@ -42,15 +43,10 @@ latrine_type <- res_h %>%
       j0 == "21" ~ "Alaotra",
       TRUE       ~ j0
     ),
-    h0 = as.character(h0),
-    statut = case_when(
-      h0 == "1"  ~ "En propriété",
-      h0 == "2"  ~ "En location",
-      h0 == "3"  ~ "Prêtée",
-      h0 == "4"  ~ "Autre",
-      TRUE       ~ h0
-    )
-  ) %>% 
+    # Extraire les labels des activités et corriger l'encodage
+    statut = iconv(as.character(labelled::to_factor(h0)), from = "latin1", to = "UTF-8"),
+    statut = gsub("&#39;", "'", statut, fixed = TRUE)
+  ) %>%
   group_by(Observatory) %>% 
   mutate(
     Total = sum(n),
@@ -88,7 +84,7 @@ latrine_type <- bind_rows(
 
 # Créer un tableau formaté avec gt
 latrine_type %>% 
-  gt(rowname_col = "statut") %>% 
+  gt(rowname_col = "Statut") %>% 
   tab_header(
     title = "Statut d'occupation du logement par observatoire"
   ) %>% 
@@ -137,33 +133,30 @@ latrine_type %>%
 ### Type de latrine
 
 ```{r}
-# Type de latrine par observatoire
+# Calcul des types de latrine par observatoire
 latrine_type <- res_h %>% 
+  mutate(
+    h5_factor = haven::as_factor(h5),
+    type = iconv(as.character(h5_factor), from = "latin1", to = "UTF-8"),
+    Type = gsub("&#39;", "'", type, fixed = TRUE)
+  ) %>% 
   left_join(res_deb, by = "j5") %>% 
-  group_by(j0, h0) %>% 
-  summarise(n = n(), .groups = "drop") %>% 
   mutate(
     j0 = as.character(j0),
     Observatory = case_when(
       j0 == "3"  ~ "Marovoay",
       j0 == "21" ~ "Alaotra",
       TRUE       ~ j0
-    ),
-    h0 = as.character(h0),
-    statut = case_when(
-      h0 == "1"  ~ "En propriété",
-      h0 == "2"  ~ "En location",
-      h0 == "3"  ~ "Prêtée",
-      h0 == "4"  ~ "Autre",
-      TRUE       ~ h0
     )
   ) %>% 
+  group_by(Observatory, Type) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
   group_by(Observatory) %>% 
   mutate(
     Total = sum(n),
-    Percentage = round(100 * n / Total, 1)
+    Percentage_raw = 100 * n / Total,
+    Percentage = round(Percentage_raw, 1)
   ) %>% 
-  select(Observatory, statut, n, Percentage) %>% 
   ungroup()
 
 # Ajouter les lignes "Total" par observatoire
@@ -172,13 +165,14 @@ latrine_type <- bind_rows(
   latrine_type %>% 
     group_by(Observatory) %>% 
     summarise(
-      statut = "Total",
+      Type = "Total",
       n = sum(n),
+      Percentage_raw = 100,
       Percentage = 100,
       .groups = "drop"
     )
 ) %>% 
-  arrange(Observatory, desc(statut == "Total"))
+  arrange(Observatory, desc(n))
 
 # Ajouter une ligne "Total global"
 latrine_type <- bind_rows(
@@ -186,51 +180,54 @@ latrine_type <- bind_rows(
   latrine_type %>% 
     summarise(
       Observatory = "Total global",
-      statut = "Total",
+      Type = "Total",
       n = sum(n),
+      Percentage_raw = 100,
       Percentage = 100,
       .groups = "drop"
     )
 )
 
-# Créer un tableau formaté avec gt
+# Tableau formaté avec gt (sans colonnes Total et Percentage_raw)
 latrine_type %>% 
-  gt(rowname_col = "statut") %>% 
+  select(Observatory, Type, n, Percentage) %>%   # ⚠️ on garde seulement les colonnes utiles
+  arrange(Observatory, desc(Percentage)) %>% 
+  gt(rowname_col = "Observatory") %>% 
   tab_header(
-    title = "Statut d'occupation du logement par observatoire"
+    title = "Types de latrine par observatoire"
   ) %>% 
   fmt_number(
-    columns = vars(n),
+    columns = c(n),
     sep_mark = " ",
     decimals = 0
   ) %>% 
   fmt_number(
-    columns = vars(Percentage),
+    columns = c(Percentage),
     decimals = 1
   ) %>% 
   cols_label(
-    statut = "Statut",
+    Type = "Type de latrine",
     n = "Nombre",
     Percentage = "%"
   )
 
-# Camembert display 
-
+# Camembert par observatoire (parts ordonnées par fréquence décroissante en pourcentage)
 latrine_type %>% 
-  filter(Observatory %in% c("Marovoay", "Alaotra"), statut != "Total") %>% 
-  ggplot(aes(x = "", y = Percentage, fill = statut)) +
+  filter(Observatory %in% c("Marovoay", "Alaotra"), Type != "Total") %>% 
+  arrange(Observatory, desc(Percentage)) %>% 
+  ggplot(aes(x = 1, y = Percentage, fill = fct_reorder(Type, -Percentage))) + 
   geom_bar(width = 1, stat = "identity") +
   coord_polar("y") +
   geom_text(aes(label = paste0(Percentage, "%")),
             position = position_stack(vjust = 0.5)) +
   facet_wrap(~Observatory) +
-  labs(title = "Répartition (%) des ménages par statut d'occupation selon l'observatoire") +
+  labs(title = "Types de latrine par observatoire") +
+  scale_fill_brewer(palette = "Set3") +   # palette harmonisée
   theme_void() +
   theme(legend.title = element_blank(),
         plot.title = element_text(hjust = 0.5))
 
 ```
-
 
 ### Accès à l'eau de source améliorée et à l'électricité
 Mode d'éclairage
