@@ -31,7 +31,7 @@ res_v <- read_dta("data/res_v.dta") # year, j5
 
 ```{r}
 # Statut d'occupation du logement par observatoire
-housing_statut <- res_h %>% 
+latrine_type <- res_h %>% 
   left_join(res_deb, by = "j5") %>% 
   group_by(j0, h0) %>% 
   summarise(n = n(), .groups = "drop") %>% 
@@ -60,9 +60,9 @@ housing_statut <- res_h %>%
   ungroup()
 
 # Ajouter les lignes "Total" par observatoire
-housing_statut <- bind_rows(
-  housing_statut,
-  housing_statut %>% 
+latrine_type <- bind_rows(
+  latrine_type,
+  latrine_type %>% 
     group_by(Observatory) %>% 
     summarise(
       statut = "Total",
@@ -74,9 +74,9 @@ housing_statut <- bind_rows(
   arrange(Observatory, desc(statut == "Total"))
 
 # Ajouter une ligne "Total global"
-housing_statut <- bind_rows(
-  housing_statut,
-  housing_statut %>% 
+latrine_type <- bind_rows(
+  latrine_type,
+  latrine_type %>% 
     summarise(
       Observatory = "Total global",
       statut = "Total",
@@ -87,7 +87,7 @@ housing_statut <- bind_rows(
 )
 
 # Créer un tableau formaté avec gt
-housing_statut %>% 
+latrine_type %>% 
   gt(rowname_col = "statut") %>% 
   tab_header(
     title = "Statut d'occupation du logement par observatoire"
@@ -109,7 +109,7 @@ housing_statut %>%
 
 # Camembert display 
 
-housing_statut %>% 
+latrine_type %>% 
   filter(Observatory %in% c("Marovoay", "Alaotra"), statut != "Total") %>% 
   ggplot(aes(x = "", y = Percentage, fill = statut)) +
   geom_bar(width = 1, stat = "identity") +
@@ -135,6 +135,101 @@ housing_statut %>%
 
 
 ### Type de latrine
+
+```{r}
+# Type de latrine par observatoire
+latrine_type <- res_h %>% 
+  left_join(res_deb, by = "j5") %>% 
+  group_by(j0, h0) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    h0 = as.character(h0),
+    statut = case_when(
+      h0 == "1"  ~ "En propriété",
+      h0 == "2"  ~ "En location",
+      h0 == "3"  ~ "Prêtée",
+      h0 == "4"  ~ "Autre",
+      TRUE       ~ h0
+    )
+  ) %>% 
+  group_by(Observatory) %>% 
+  mutate(
+    Total = sum(n),
+    Percentage = round(100 * n / Total, 1)
+  ) %>% 
+  select(Observatory, statut, n, Percentage) %>% 
+  ungroup()
+
+# Ajouter les lignes "Total" par observatoire
+latrine_type <- bind_rows(
+  latrine_type,
+  latrine_type %>% 
+    group_by(Observatory) %>% 
+    summarise(
+      statut = "Total",
+      n = sum(n),
+      Percentage = 100,
+      .groups = "drop"
+    )
+) %>% 
+  arrange(Observatory, desc(statut == "Total"))
+
+# Ajouter une ligne "Total global"
+latrine_type <- bind_rows(
+  latrine_type,
+  latrine_type %>% 
+    summarise(
+      Observatory = "Total global",
+      statut = "Total",
+      n = sum(n),
+      Percentage = 100,
+      .groups = "drop"
+    )
+)
+
+# Créer un tableau formaté avec gt
+latrine_type %>% 
+  gt(rowname_col = "statut") %>% 
+  tab_header(
+    title = "Statut d'occupation du logement par observatoire"
+  ) %>% 
+  fmt_number(
+    columns = vars(n),
+    sep_mark = " ",
+    decimals = 0
+  ) %>% 
+  fmt_number(
+    columns = vars(Percentage),
+    decimals = 1
+  ) %>% 
+  cols_label(
+    statut = "Statut",
+    n = "Nombre",
+    Percentage = "%"
+  )
+
+# Camembert display 
+
+latrine_type %>% 
+  filter(Observatory %in% c("Marovoay", "Alaotra"), statut != "Total") %>% 
+  ggplot(aes(x = "", y = Percentage, fill = statut)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y") +
+  geom_text(aes(label = paste0(Percentage, "%")),
+            position = position_stack(vjust = 0.5)) +
+  facet_wrap(~Observatory) +
+  labs(title = "Répartition (%) des ménages par statut d'occupation selon l'observatoire") +
+  theme_void() +
+  theme(legend.title = element_blank(),
+        plot.title = element_text(hjust = 0.5))
+
+```
 
 
 ### Accès à l'eau de source améliorée et à l'électricité
