@@ -32,7 +32,7 @@ res_v <- read_dta("data/res_v.dta") # year, j5
 
 ```{r}
 # Statut d'occupation du logement par observatoire
-latrine_type <- res_h %>% 
+water_access <- res_h %>% 
   left_join(res_deb, by = "j5") %>% 
   group_by(j0, h0) %>% 
   summarise(n = n(), .groups = "drop") %>% 
@@ -56,9 +56,9 @@ latrine_type <- res_h %>%
   ungroup()
 
 # Ajouter les lignes "Total" par observatoire
-latrine_type <- bind_rows(
-  latrine_type,
-  latrine_type %>% 
+water_access <- bind_rows(
+  water_access,
+  water_access %>% 
     group_by(Observatory) %>% 
     summarise(
       statut = "Total",
@@ -70,9 +70,9 @@ latrine_type <- bind_rows(
   arrange(Observatory, desc(statut == "Total"))
 
 # Ajouter une ligne "Total global"
-latrine_type <- bind_rows(
-  latrine_type,
-  latrine_type %>% 
+water_access <- bind_rows(
+  water_access,
+  water_access %>% 
     summarise(
       Observatory = "Total global",
       statut = "Total",
@@ -83,7 +83,7 @@ latrine_type <- bind_rows(
 )
 
 # Créer un tableau formaté avec gt
-latrine_type %>% 
+water_access %>% 
   gt(rowname_col = "Statut") %>% 
   tab_header(
     title = "Statut d'occupation du logement par observatoire"
@@ -105,7 +105,7 @@ latrine_type %>%
 
 # Camembert display 
 
-latrine_type %>% 
+water_access %>% 
   filter(Observatory %in% c("Marovoay", "Alaotra"), statut != "Total") %>% 
   ggplot(aes(x = "", y = Percentage, fill = statut)) +
   geom_bar(width = 1, stat = "identity") +
@@ -209,7 +209,8 @@ latrine_type %>%
     Type = "Type de latrine",
     n = "Nombre",
     Percentage = "%"
-  )
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 
 # Camembert par observatoire (parts ordonnées par fréquence décroissante en pourcentage)
 latrine_type %>% 
@@ -230,6 +231,113 @@ latrine_type %>%
 ```
 
 ### Accès à l'eau de source améliorée et à l'électricité
+
+Mode d'approvisionnement en eau
+```{r}
+# Calcul des modes d'approvisionnement en eau par observatoire
+water_access <- res_h %>% 
+  mutate(
+    h4_factor = haven::as_factor(h4),
+    type = as.character(h4_factor),
+    type_utf8 = iconv(type, from = "latin1", to = "UTF-8", sub = ""),   # conversion robuste en UTF-8
+    Type = gsub("&#39;", "'", type_utf8, fixed = TRUE)                  # remplacement des entités HTML
+  ) %>% 
+  left_join(res_deb, by = "j5") %>% 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  ) %>% 
+  group_by(Observatory, Type) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  group_by(Observatory) %>% 
+  mutate(
+    Total = sum(n),
+    Percentage_raw = 100 * n / Total,
+    Percentage = round(Percentage_raw, 1)
+  ) %>% 
+  ungroup()
+
+# Ajouter les lignes "Total" par observatoire
+water_access <- bind_rows(
+  water_access,
+  water_access %>% 
+    group_by(Observatory) %>% 
+    summarise(
+      Type = "Total",
+      n = sum(n),
+      Percentage_raw = 100,
+      Percentage = 100,
+      .groups = "drop"
+    )
+) %>% 
+  arrange(Observatory, desc(n))
+
+# Ajouter une ligne "Total global"
+water_access <- bind_rows(
+  water_access,
+  water_access %>% 
+    summarise(
+      Observatory = "Total global",
+      Type = "Total",
+      n = sum(n),
+      Percentage_raw = 100,
+      Percentage = 100,
+      .groups = "drop"
+    )
+)
+
+# Tableau formaté avec gt (sans colonnes Total et Percentage_raw)
+water_access %>% 
+  select(Observatory, Type, n, Percentage) %>%   # on garde seulement les colonnes utiles
+  arrange(Observatory, desc(Percentage)) %>% 
+  gt(rowname_col = "Observatory") %>% 
+  tab_header(
+    title = "Mode d'approvisionnement en eau par observatoire"
+  ) %>% 
+  fmt_number(
+    columns = c(n),
+    sep_mark = " ",
+    decimals = 0
+  ) %>% 
+  fmt_number(
+    columns = c(Percentage),
+    decimals = 1
+  ) %>% 
+  cols_label(
+    Type = "Type",
+    n = "Nombre",
+    Percentage = "%"
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+# Histogramme horizontal en % sans noms d'axes
+water_access %>% 
+  filter(Type != "Total", Observatory != "Total global") %>% 
+  ggplot(aes(x = fct_reorder(Type, Percentage), 
+             y = Percentage, 
+             fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  geom_text(aes(label = paste0(Percentage, "%")), 
+            position = position_dodge(width = 1), 
+            hjust = -0.1, size = 3) +
+  labs(title = "Modes d'approvisionnement en eau par observatoire",
+       x = NULL,   # pas de label pour l'axe X
+       y = NULL) + # pas de label pour l'axe Y
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        plot.title = element_text(hjust = 0.5))
+
+```
+
+
+
+
 Mode d'éclairage
 
 

@@ -300,7 +300,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Statut d'occupation du logement par observatoire</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>latrine_type <span class="ot">&lt;-</span> res_h <span class="sc">%&gt;%</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>water_access <span class="ot">&lt;-</span> res_h <span class="sc">%&gt;%</span> </span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(res_deb, <span class="at">by =</span> <span class="st">"j5"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(j0, h0) <span class="sc">%&gt;%</span> </span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span> </span>
@@ -324,9 +324,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Ajouter les lignes "Total" par observatoire</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>latrine_type <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  latrine_type,</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  latrine_type <span class="sc">%&gt;%</span> </span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>water_access <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  water_access,</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  water_access <span class="sc">%&gt;%</span> </span>
 <span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(Observatory) <span class="sc">%&gt;%</span> </span>
 <span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
 <span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">statut =</span> <span class="st">"Total"</span>,</span>
@@ -338,9 +338,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Observatory, <span class="fu">desc</span>(statut <span class="sc">==</span> <span class="st">"Total"</span>))</span>
 <span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Ajouter une ligne "Total global"</span></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>latrine_type <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  latrine_type,</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  latrine_type <span class="sc">%&gt;%</span> </span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>water_access <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  water_access,</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  water_access <span class="sc">%&gt;%</span> </span>
 <span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
 <span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>      <span class="at">Observatory =</span> <span class="st">"Total global"</span>,</span>
 <span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>      <span class="at">statut =</span> <span class="st">"Total"</span>,</span>
@@ -351,7 +351,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="co"># Créer un tableau formaté avec gt</span></span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>latrine_type <span class="sc">%&gt;%</span> </span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>water_access <span class="sc">%&gt;%</span> </span>
 <span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(<span class="at">rowname_col =</span> <span class="st">"Statut"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
 <span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Statut d'occupation du logement par observatoire"</span></span>
@@ -372,23 +372,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="ltfzjhuoib" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#ltfzjhuoib table {
+<div id="tibqoqohbl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#tibqoqohbl table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#ltfzjhuoib thead, #ltfzjhuoib tbody, #ltfzjhuoib tfoot, #ltfzjhuoib tr, #ltfzjhuoib td, #ltfzjhuoib th {
+#tibqoqohbl thead, #tibqoqohbl tbody, #tibqoqohbl tfoot, #tibqoqohbl tr, #tibqoqohbl td, #tibqoqohbl th {
   border-style: none;
 }
 
-#ltfzjhuoib p {
+#tibqoqohbl p {
   margin: 0;
   padding: 0;
 }
 
-#ltfzjhuoib .gt_table {
+#tibqoqohbl .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -414,12 +414,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#ltfzjhuoib .gt_caption {
+#tibqoqohbl .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ltfzjhuoib .gt_title {
+#tibqoqohbl .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -431,7 +431,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#ltfzjhuoib .gt_subtitle {
+#tibqoqohbl .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -443,7 +443,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#ltfzjhuoib .gt_heading {
+#tibqoqohbl .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -455,13 +455,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#ltfzjhuoib .gt_bottom_border {
+#tibqoqohbl .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ltfzjhuoib .gt_col_headings {
+#tibqoqohbl .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -476,7 +476,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#ltfzjhuoib .gt_col_heading {
+#tibqoqohbl .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -496,7 +496,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#ltfzjhuoib .gt_column_spanner_outer {
+#tibqoqohbl .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -508,15 +508,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#ltfzjhuoib .gt_column_spanner_outer:first-child {
+#tibqoqohbl .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ltfzjhuoib .gt_column_spanner_outer:last-child {
+#tibqoqohbl .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ltfzjhuoib .gt_column_spanner {
+#tibqoqohbl .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -528,11 +528,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#ltfzjhuoib .gt_spanner_row {
+#tibqoqohbl .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#ltfzjhuoib .gt_group_heading {
+#tibqoqohbl .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -558,7 +558,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#ltfzjhuoib .gt_empty_group_heading {
+#tibqoqohbl .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -573,15 +573,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#ltfzjhuoib .gt_from_md > :first-child {
+#tibqoqohbl .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ltfzjhuoib .gt_from_md > :last-child {
+#tibqoqohbl .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ltfzjhuoib .gt_row {
+#tibqoqohbl .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -600,7 +600,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#ltfzjhuoib .gt_stub {
+#tibqoqohbl .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -613,7 +613,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ltfzjhuoib .gt_stub_row_group {
+#tibqoqohbl .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -627,15 +627,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#ltfzjhuoib .gt_row_group_first td {
+#tibqoqohbl .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ltfzjhuoib .gt_row_group_first th {
+#tibqoqohbl .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#ltfzjhuoib .gt_summary_row {
+#tibqoqohbl .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -645,16 +645,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ltfzjhuoib .gt_first_summary_row {
+#tibqoqohbl .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ltfzjhuoib .gt_first_summary_row.thick {
+#tibqoqohbl .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ltfzjhuoib .gt_last_summary_row {
+#tibqoqohbl .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -664,7 +664,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#ltfzjhuoib .gt_grand_summary_row {
+#tibqoqohbl .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -674,7 +674,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ltfzjhuoib .gt_first_grand_summary_row {
+#tibqoqohbl .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -684,7 +684,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #D3D3D3;
 }
 
-#ltfzjhuoib .gt_last_grand_summary_row_top {
+#tibqoqohbl .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -694,11 +694,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#ltfzjhuoib .gt_striped {
+#tibqoqohbl .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ltfzjhuoib .gt_table_body {
+#tibqoqohbl .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -707,7 +707,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#ltfzjhuoib .gt_footnotes {
+#tibqoqohbl .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -721,7 +721,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#ltfzjhuoib .gt_footnote {
+#tibqoqohbl .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -730,7 +730,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ltfzjhuoib .gt_sourcenotes {
+#tibqoqohbl .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -744,7 +744,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#ltfzjhuoib .gt_sourcenote {
+#tibqoqohbl .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -752,72 +752,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ltfzjhuoib .gt_left {
+#tibqoqohbl .gt_left {
   text-align: left;
 }
 
-#ltfzjhuoib .gt_center {
+#tibqoqohbl .gt_center {
   text-align: center;
 }
 
-#ltfzjhuoib .gt_right {
+#tibqoqohbl .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ltfzjhuoib .gt_font_normal {
+#tibqoqohbl .gt_font_normal {
   font-weight: normal;
 }
 
-#ltfzjhuoib .gt_font_bold {
+#tibqoqohbl .gt_font_bold {
   font-weight: bold;
 }
 
-#ltfzjhuoib .gt_font_italic {
+#tibqoqohbl .gt_font_italic {
   font-style: italic;
 }
 
-#ltfzjhuoib .gt_super {
+#tibqoqohbl .gt_super {
   font-size: 65%;
 }
 
-#ltfzjhuoib .gt_footnote_marks {
+#tibqoqohbl .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#ltfzjhuoib .gt_asterisk {
+#tibqoqohbl .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ltfzjhuoib .gt_indent_1 {
+#tibqoqohbl .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ltfzjhuoib .gt_indent_2 {
+#tibqoqohbl .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ltfzjhuoib .gt_indent_3 {
+#tibqoqohbl .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ltfzjhuoib .gt_indent_4 {
+#tibqoqohbl .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ltfzjhuoib .gt_indent_5 {
+#tibqoqohbl .gt_indent_5 {
   text-indent: 25px;
 }
 
-#ltfzjhuoib .katex-display {
+#tibqoqohbl .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#ltfzjhuoib div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#tibqoqohbl div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -898,7 +898,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Camembert display </span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>latrine_type <span class="sc">%&gt;%</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>water_access <span class="sc">%&gt;%</span> </span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Observatory <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Marovoay"</span>, <span class="st">"Alaotra"</span>), statut <span class="sc">!=</span> <span class="st">"Total"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> Percentage, <span class="at">fill =</span> statut)) <span class="sc">+</span></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">width =</span> <span class="dv">1</span>, <span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
@@ -1013,26 +1013,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>    <span class="at">Type =</span> <span class="st">"Type de latrine"</span>,</span>
 <span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="st">"Nombre"</span>,</span>
 <span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>    <span class="at">Percentage =</span> <span class="st">"%"</span></span>
-<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_source_note</span>(<span class="at">source_note =</span> <span class="fu">md</span>(<span class="st">"**Source : Enquête auprès des OR 2025**"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="hpbqoebnra" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#hpbqoebnra table {
+<div id="tsnlgdksgh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#tsnlgdksgh table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#hpbqoebnra thead, #hpbqoebnra tbody, #hpbqoebnra tfoot, #hpbqoebnra tr, #hpbqoebnra td, #hpbqoebnra th {
+#tsnlgdksgh thead, #tsnlgdksgh tbody, #tsnlgdksgh tfoot, #tsnlgdksgh tr, #tsnlgdksgh td, #tsnlgdksgh th {
   border-style: none;
 }
 
-#hpbqoebnra p {
+#tsnlgdksgh p {
   margin: 0;
   padding: 0;
 }
 
-#hpbqoebnra .gt_table {
+#tsnlgdksgh .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1058,12 +1059,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#hpbqoebnra .gt_caption {
+#tsnlgdksgh .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#hpbqoebnra .gt_title {
+#tsnlgdksgh .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1075,7 +1076,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#hpbqoebnra .gt_subtitle {
+#tsnlgdksgh .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1087,7 +1088,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#hpbqoebnra .gt_heading {
+#tsnlgdksgh .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1099,13 +1100,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#hpbqoebnra .gt_bottom_border {
+#tsnlgdksgh .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hpbqoebnra .gt_col_headings {
+#tsnlgdksgh .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1120,7 +1121,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#hpbqoebnra .gt_col_heading {
+#tsnlgdksgh .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1140,7 +1141,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#hpbqoebnra .gt_column_spanner_outer {
+#tsnlgdksgh .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1152,15 +1153,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#hpbqoebnra .gt_column_spanner_outer:first-child {
+#tsnlgdksgh .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hpbqoebnra .gt_column_spanner_outer:last-child {
+#tsnlgdksgh .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hpbqoebnra .gt_column_spanner {
+#tsnlgdksgh .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1172,11 +1173,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#hpbqoebnra .gt_spanner_row {
+#tsnlgdksgh .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#hpbqoebnra .gt_group_heading {
+#tsnlgdksgh .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1202,7 +1203,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#hpbqoebnra .gt_empty_group_heading {
+#tsnlgdksgh .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1217,15 +1218,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#hpbqoebnra .gt_from_md > :first-child {
+#tsnlgdksgh .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hpbqoebnra .gt_from_md > :last-child {
+#tsnlgdksgh .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hpbqoebnra .gt_row {
+#tsnlgdksgh .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1244,7 +1245,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#hpbqoebnra .gt_stub {
+#tsnlgdksgh .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1257,7 +1258,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#hpbqoebnra .gt_stub_row_group {
+#tsnlgdksgh .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1271,15 +1272,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#hpbqoebnra .gt_row_group_first td {
+#tsnlgdksgh .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#hpbqoebnra .gt_row_group_first th {
+#tsnlgdksgh .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#hpbqoebnra .gt_summary_row {
+#tsnlgdksgh .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1289,16 +1290,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#hpbqoebnra .gt_first_summary_row {
+#tsnlgdksgh .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#hpbqoebnra .gt_first_summary_row.thick {
+#tsnlgdksgh .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#hpbqoebnra .gt_last_summary_row {
+#tsnlgdksgh .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1308,7 +1309,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#hpbqoebnra .gt_grand_summary_row {
+#tsnlgdksgh .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1318,7 +1319,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#hpbqoebnra .gt_first_grand_summary_row {
+#tsnlgdksgh .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1328,7 +1329,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #D3D3D3;
 }
 
-#hpbqoebnra .gt_last_grand_summary_row_top {
+#tsnlgdksgh .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1338,11 +1339,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#hpbqoebnra .gt_striped {
+#tsnlgdksgh .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hpbqoebnra .gt_table_body {
+#tsnlgdksgh .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1351,7 +1352,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#hpbqoebnra .gt_footnotes {
+#tsnlgdksgh .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1365,7 +1366,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#hpbqoebnra .gt_footnote {
+#tsnlgdksgh .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1374,7 +1375,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#hpbqoebnra .gt_sourcenotes {
+#tsnlgdksgh .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1388,7 +1389,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#hpbqoebnra .gt_sourcenote {
+#tsnlgdksgh .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1396,72 +1397,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#hpbqoebnra .gt_left {
+#tsnlgdksgh .gt_left {
   text-align: left;
 }
 
-#hpbqoebnra .gt_center {
+#tsnlgdksgh .gt_center {
   text-align: center;
 }
 
-#hpbqoebnra .gt_right {
+#tsnlgdksgh .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hpbqoebnra .gt_font_normal {
+#tsnlgdksgh .gt_font_normal {
   font-weight: normal;
 }
 
-#hpbqoebnra .gt_font_bold {
+#tsnlgdksgh .gt_font_bold {
   font-weight: bold;
 }
 
-#hpbqoebnra .gt_font_italic {
+#tsnlgdksgh .gt_font_italic {
   font-style: italic;
 }
 
-#hpbqoebnra .gt_super {
+#tsnlgdksgh .gt_super {
   font-size: 65%;
 }
 
-#hpbqoebnra .gt_footnote_marks {
+#tsnlgdksgh .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#hpbqoebnra .gt_asterisk {
+#tsnlgdksgh .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#hpbqoebnra .gt_indent_1 {
+#tsnlgdksgh .gt_indent_1 {
   text-indent: 5px;
 }
 
-#hpbqoebnra .gt_indent_2 {
+#tsnlgdksgh .gt_indent_2 {
   text-indent: 10px;
 }
 
-#hpbqoebnra .gt_indent_3 {
+#tsnlgdksgh .gt_indent_3 {
   text-indent: 15px;
 }
 
-#hpbqoebnra .gt_indent_4 {
+#tsnlgdksgh .gt_indent_4 {
   text-indent: 20px;
 }
 
-#hpbqoebnra .gt_indent_5 {
+#tsnlgdksgh .gt_indent_5 {
   text-indent: 25px;
 }
 
-#hpbqoebnra .katex-display {
+#tsnlgdksgh .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#hpbqoebnra div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#tsnlgdksgh div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1557,7 +1558,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td class="gt_row gt_right" headers="stub_1_13 n">2 052</td>
 <td class="gt_row gt_right" headers="stub_1_13 Percentage">100.0</td>
 </tr>
-</tbody>
+</tbody><tfoot class="gt_sourcenotes">
+<tr class="odd">
+<td colspan="4" class="gt_sourcenote"><strong>Source : Enquête auprès des OR 2025</strong></td>
+</tr>
+</tfoot>
+
 </table>
 
 </div>
@@ -1591,6 +1597,701 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="accès-à-leau-de-source-améliorée-et-à-lélectricité" class="level3" data-number="3.1.7">
 <h3 data-number="3.1.7" class="anchored" data-anchor-id="accès-à-leau-de-source-améliorée-et-à-lélectricité"><span class="header-section-number">3.1.7</span> Accès à l’eau de source améliorée et à l’électricité</h3>
+<p>Mode d’approvisionnement en eau</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcul des modes d'approvisionnement en eau par observatoire</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>water_access <span class="ot">&lt;-</span> res_h <span class="sc">%&gt;%</span> </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">h4_factor =</span> haven<span class="sc">::</span><span class="fu">as_factor</span>(h4),</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">type =</span> <span class="fu">as.character</span>(h4_factor),</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">type_utf8 =</span> <span class="fu">iconv</span>(type, <span class="at">from =</span> <span class="st">"latin1"</span>, <span class="at">to =</span> <span class="st">"UTF-8"</span>, <span class="at">sub =</span> <span class="st">""</span>),   <span class="co"># conversion robuste en UTF-8</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Type =</span> <span class="fu">gsub</span>(<span class="st">"&amp;#39;"</span>, <span class="st">"'"</span>, type_utf8, <span class="at">fixed =</span> <span class="cn">TRUE</span>)                  <span class="co"># remplacement des entités HTML</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(res_deb, <span class="at">by =</span> <span class="st">"j5"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">j0 =</span> <span class="fu">as.character</span>(j0),</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Observatory =</span> <span class="fu">case_when</span>(</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"3"</span>  <span class="sc">~</span> <span class="st">"Marovoay"</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>      j0 <span class="sc">==</span> <span class="st">"21"</span> <span class="sc">~</span> <span class="st">"Alaotra"</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span>       <span class="sc">~</span> j0</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Observatory, Type) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Observatory) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">Total =</span> <span class="fu">sum</span>(n),</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">Percentage_raw =</span> <span class="dv">100</span> <span class="sc">*</span> n <span class="sc">/</span> Total,</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">Percentage =</span> <span class="fu">round</span>(Percentage_raw, <span class="dv">1</span>)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Ajouter les lignes "Total" par observatoire</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>water_access <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  water_access,</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  water_access <span class="sc">%&gt;%</span> </span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(Observatory) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>      <span class="at">Type =</span> <span class="st">"Total"</span>,</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>      <span class="at">n =</span> <span class="fu">sum</span>(n),</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>      <span class="at">Percentage_raw =</span> <span class="dv">100</span>,</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>      <span class="at">Percentage =</span> <span class="dv">100</span>,</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Observatory, <span class="fu">desc</span>(n))</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="co"># Ajouter une ligne "Total global"</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>water_access <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>  water_access,</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>  water_access <span class="sc">%&gt;%</span> </span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>      <span class="at">Observatory =</span> <span class="st">"Total global"</span>,</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>      <span class="at">Type =</span> <span class="st">"Total"</span>,</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>      <span class="at">n =</span> <span class="fu">sum</span>(n),</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>      <span class="at">Percentage_raw =</span> <span class="dv">100</span>,</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>      <span class="at">Percentage =</span> <span class="dv">100</span>,</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="co"># Tableau formaté avec gt (sans colonnes Total et Percentage_raw)</span></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>water_access <span class="sc">%&gt;%</span> </span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Observatory, Type, n, Percentage) <span class="sc">%&gt;%</span>   <span class="co"># on garde seulement les colonnes utiles</span></span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Observatory, <span class="fu">desc</span>(Percentage)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(<span class="at">rowname_col =</span> <span class="st">"Observatory"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Mode d'approvisionnement en eau par observatoire"</span></span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(</span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">c</span>(n),</span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>    <span class="at">sep_mark =</span> <span class="st">" "</span>,</span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">0</span></span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(</span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">c</span>(Percentage),</span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">1</span></span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>    <span class="at">Type =</span> <span class="st">"Type"</span>,</span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="st">"Nombre"</span>,</span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>    <span class="at">Percentage =</span> <span class="st">"%"</span></span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_source_note</span>(<span class="at">source_note =</span> <span class="fu">md</span>(<span class="st">"**Source : Enquête auprès des OR 2025**"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="sagfoyjsqk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#sagfoyjsqk table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#sagfoyjsqk thead, #sagfoyjsqk tbody, #sagfoyjsqk tfoot, #sagfoyjsqk tr, #sagfoyjsqk td, #sagfoyjsqk th {
+  border-style: none;
+}
+
+#sagfoyjsqk p {
+  margin: 0;
+  padding: 0;
+}
+
+#sagfoyjsqk .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#sagfoyjsqk .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#sagfoyjsqk .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#sagfoyjsqk .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#sagfoyjsqk .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#sagfoyjsqk .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#sagfoyjsqk .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#sagfoyjsqk .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#sagfoyjsqk .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#sagfoyjsqk .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#sagfoyjsqk .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#sagfoyjsqk .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#sagfoyjsqk .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#sagfoyjsqk .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#sagfoyjsqk .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#sagfoyjsqk .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#sagfoyjsqk .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#sagfoyjsqk .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#sagfoyjsqk .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#sagfoyjsqk .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#sagfoyjsqk .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#sagfoyjsqk .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#sagfoyjsqk .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#sagfoyjsqk .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#sagfoyjsqk .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#sagfoyjsqk .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#sagfoyjsqk .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#sagfoyjsqk .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#sagfoyjsqk .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#sagfoyjsqk .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#sagfoyjsqk .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#sagfoyjsqk .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#sagfoyjsqk .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#sagfoyjsqk .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#sagfoyjsqk .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#sagfoyjsqk .gt_left {
+  text-align: left;
+}
+
+#sagfoyjsqk .gt_center {
+  text-align: center;
+}
+
+#sagfoyjsqk .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#sagfoyjsqk .gt_font_normal {
+  font-weight: normal;
+}
+
+#sagfoyjsqk .gt_font_bold {
+  font-weight: bold;
+}
+
+#sagfoyjsqk .gt_font_italic {
+  font-style: italic;
+}
+
+#sagfoyjsqk .gt_super {
+  font-size: 65%;
+}
+
+#sagfoyjsqk .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#sagfoyjsqk .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#sagfoyjsqk .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#sagfoyjsqk .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#sagfoyjsqk .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#sagfoyjsqk .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#sagfoyjsqk .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#sagfoyjsqk .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#sagfoyjsqk div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="header gt_heading">
+<th colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">Mode d'approvisionnement en eau par observatoire</th>
+</tr>
+<tr class="odd gt_col_headings">
+<th id="a::stub" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"></th>
+<th id="Type" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Type</th>
+<th id="n" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Nombre</th>
+<th id="Percentage" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">%</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td id="stub_1_1" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Alaotra</td>
+<td class="gt_row gt_left" headers="stub_1_1 Type">Total</td>
+<td class="gt_row gt_right" headers="stub_1_1 n">507</td>
+<td class="gt_row gt_right" headers="stub_1_1 Percentage">100.0</td>
+</tr>
+<tr class="even">
+<td id="stub_1_2" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Alaotra</td>
+<td class="gt_row gt_left" headers="stub_1_2 Type">Borne fontaine publique</td>
+<td class="gt_row gt_right" headers="stub_1_2 n">278</td>
+<td class="gt_row gt_right" headers="stub_1_2 Percentage">54.8</td>
+</tr>
+<tr class="odd">
+<td id="stub_1_3" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Alaotra</td>
+<td class="gt_row gt_left" headers="stub_1_3 Type">Puits non aménagé (trou d?eau)</td>
+<td class="gt_row gt_right" headers="stub_1_3 n">159</td>
+<td class="gt_row gt_right" headers="stub_1_3 Percentage">31.4</td>
+</tr>
+<tr class="even">
+<td id="stub_1_4" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Alaotra</td>
+<td class="gt_row gt_left" headers="stub_1_4 Type">Source</td>
+<td class="gt_row gt_right" headers="stub_1_4 n">32</td>
+<td class="gt_row gt_right" headers="stub_1_4 Percentage">6.3</td>
+</tr>
+<tr class="odd">
+<td id="stub_1_5" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Alaotra</td>
+<td class="gt_row gt_left" headers="stub_1_5 Type">Puits (margelle)</td>
+<td class="gt_row gt_right" headers="stub_1_5 n">15</td>
+<td class="gt_row gt_right" headers="stub_1_5 Percentage">3.0</td>
+</tr>
+<tr class="even">
+<td id="stub_1_6" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Alaotra</td>
+<td class="gt_row gt_left" headers="stub_1_6 Type">Eau courante dans la maison/dans la cour</td>
+<td class="gt_row gt_right" headers="stub_1_6 n">8</td>
+<td class="gt_row gt_right" headers="stub_1_6 Percentage">1.6</td>
+</tr>
+<tr class="odd">
+<td id="stub_1_7" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Alaotra</td>
+<td class="gt_row gt_left" headers="stub_1_7 Type">Autre ____________________________</td>
+<td class="gt_row gt_right" headers="stub_1_7 n">7</td>
+<td class="gt_row gt_right" headers="stub_1_7 Percentage">1.4</td>
+</tr>
+<tr class="even">
+<td id="stub_1_8" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Alaotra</td>
+<td class="gt_row gt_left" headers="stub_1_8 Type">Cours d?eau</td>
+<td class="gt_row gt_right" headers="stub_1_8 n">7</td>
+<td class="gt_row gt_right" headers="stub_1_8 Percentage">1.4</td>
+</tr>
+<tr class="odd">
+<td id="stub_1_9" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Alaotra</td>
+<td class="gt_row gt_left" headers="stub_1_9 Type">NA</td>
+<td class="gt_row gt_right" headers="stub_1_9 n">1</td>
+<td class="gt_row gt_right" headers="stub_1_9 Percentage">0.2</td>
+</tr>
+<tr class="even">
+<td id="stub_1_10" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Marovoay</td>
+<td class="gt_row gt_left" headers="stub_1_10 Type">Total</td>
+<td class="gt_row gt_right" headers="stub_1_10 n">519</td>
+<td class="gt_row gt_right" headers="stub_1_10 Percentage">100.0</td>
+</tr>
+<tr class="odd">
+<td id="stub_1_11" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Marovoay</td>
+<td class="gt_row gt_left" headers="stub_1_11 Type">Cours d?eau</td>
+<td class="gt_row gt_right" headers="stub_1_11 n">194</td>
+<td class="gt_row gt_right" headers="stub_1_11 Percentage">37.4</td>
+</tr>
+<tr class="even">
+<td id="stub_1_12" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Marovoay</td>
+<td class="gt_row gt_left" headers="stub_1_12 Type">Puits non aménagé (trou d?eau)</td>
+<td class="gt_row gt_right" headers="stub_1_12 n">143</td>
+<td class="gt_row gt_right" headers="stub_1_12 Percentage">27.6</td>
+</tr>
+<tr class="odd">
+<td id="stub_1_13" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Marovoay</td>
+<td class="gt_row gt_left" headers="stub_1_13 Type">Borne fontaine publique</td>
+<td class="gt_row gt_right" headers="stub_1_13 n">95</td>
+<td class="gt_row gt_right" headers="stub_1_13 Percentage">18.3</td>
+</tr>
+<tr class="even">
+<td id="stub_1_14" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Marovoay</td>
+<td class="gt_row gt_left" headers="stub_1_14 Type">Puits (margelle)</td>
+<td class="gt_row gt_right" headers="stub_1_14 n">58</td>
+<td class="gt_row gt_right" headers="stub_1_14 Percentage">11.2</td>
+</tr>
+<tr class="odd">
+<td id="stub_1_15" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Marovoay</td>
+<td class="gt_row gt_left" headers="stub_1_15 Type">Source</td>
+<td class="gt_row gt_right" headers="stub_1_15 n">24</td>
+<td class="gt_row gt_right" headers="stub_1_15 Percentage">4.6</td>
+</tr>
+<tr class="even">
+<td id="stub_1_16" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Marovoay</td>
+<td class="gt_row gt_left" headers="stub_1_16 Type">Eau courante dans la maison/dans la cour</td>
+<td class="gt_row gt_right" headers="stub_1_16 n">4</td>
+<td class="gt_row gt_right" headers="stub_1_16 Percentage">0.8</td>
+</tr>
+<tr class="odd">
+<td id="stub_1_17" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Marovoay</td>
+<td class="gt_row gt_left" headers="stub_1_17 Type">Impluvium</td>
+<td class="gt_row gt_right" headers="stub_1_17 n">1</td>
+<td class="gt_row gt_right" headers="stub_1_17 Percentage">0.2</td>
+</tr>
+<tr class="even">
+<td id="stub_1_18" class="gt_row gt_left gt_stub" data-quarto-table-cell-role="th" scope="row">Total global</td>
+<td class="gt_row gt_left" headers="stub_1_18 Type">Total</td>
+<td class="gt_row gt_right" headers="stub_1_18 n">2 052</td>
+<td class="gt_row gt_right" headers="stub_1_18 Percentage">100.0</td>
+</tr>
+</tbody><tfoot class="gt_sourcenotes">
+<tr class="even">
+<td colspan="4" class="gt_sourcenote"><strong>Source : Enquête auprès des OR 2025</strong></td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Histogramme horizontal en % sans noms d'axes</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>water_access <span class="sc">%&gt;%</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Type <span class="sc">!=</span> <span class="st">"Total"</span>, Observatory <span class="sc">!=</span> <span class="st">"Total global"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Type, Percentage), </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> Percentage, </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(Percentage, <span class="st">"%"</span>)), </span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="at">width =</span> <span class="dv">1</span>), </span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.1</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Modes d'approvisionnement en eau par observatoire"</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="cn">NULL</span>,   <span class="co"># pas de label pour l'axe X</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="cn">NULL</span>) <span class="sc">+</span> <span class="co"># pas de label pour l'axe Y</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">expand =</span> <span class="fu">expansion</span>(<span class="at">mult =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.1</span>))) <span class="sc">+</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_habitat_niveau_de_vie_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 <p>Mode d’éclairage</p>
 </section>
 <section id="cuisine" class="level3" data-number="3.1.8">
@@ -1610,7 +2311,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res_e <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">"data/res_e.dta"</span>) <span class="co"># year, j5 # Equipement module next part</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>res_e <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">"data/res_e.dta"</span>) <span class="co"># year, j5 # Equipement module next part</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Les équipements agricoles sont dans “res_v.dta” avec “e0” uniquement comme variable.</p>
@@ -1636,9 +2337,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Loading savings and loan data</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>res_pp0 <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">"data/res_pp0.dta"</span>) <span class="co"># year, j5 </span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>res_pp <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">"data/res_pp.dta"</span>) <span class="co"># year, j5 </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Loading savings and loan data</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>res_pp0 <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">"data/res_pp0.dta"</span>) <span class="co"># year, j5 </span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>res_pp <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">"data/res_pp.dta"</span>) <span class="co"># year, j5 </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -1647,10 +2348,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Loading trasfers data</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>res_t <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">"data/res_t.dta"</span>) <span class="co"># year, j5 </span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>res_t1 <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">"data/res_t1.dta"</span>) <span class="co"># year, j5 </span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>res_t2 <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">"data/res_t2.dta"</span>) <span class="co"># year, j5 </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Loading trasfers data</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>res_t <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">"data/res_t.dta"</span>) <span class="co"># year, j5 </span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>res_t1 <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">"data/res_t1.dta"</span>) <span class="co"># year, j5 </span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>res_t2 <span class="ot">&lt;-</span> <span class="fu">read_dta</span>(<span class="st">"data/res_t2.dta"</span>) <span class="co"># year, j5 </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
