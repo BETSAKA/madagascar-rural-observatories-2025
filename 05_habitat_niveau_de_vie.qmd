@@ -13,28 +13,557 @@ library(tidyverse)
 library(haven)
 library(dplyr)
 library (gt) # Easily create presentation - ready display tables
+library(ggplot2)
+library(forcats)
+library(stringr)
+library(labelled)
 
 # Loading observatories data
 res_deb <- read_dta("data/res_deb.dta")
 # Loading household data
 res_m_a <- read_dta("data/res_m_a.dta")
+# Loading habitat data including kitchen (h)
+res_h <- read_dta("data/res_h.dta") # year, j5 
+# Loading indicateur de confort (v), equipement , communication (tm1, ut1, snw), equipement agricole (e0) data
+res_v <- read_dta("data/res_v.dta") # year, j5 
 ```
 
 ## Habitat
 
+### Accès au logement d'habitation
+
 ```{r}
-# Loading habitat data including kitchen (h)
-res_h <- read_dta("data/res_h.dta") # year, j5 
+# Statut d'occupation du logement par observatoire
+house_status <- res_h %>% 
+  left_join(res_deb, by = "j5") %>% 
+  group_by(j0, h0) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    # Extraire les labels des activités et corriger l'encodage
+    statut = iconv(as.character(labelled::to_factor(h0)), from = "latin1", to = "UTF-8"),
+    statut = gsub("&#39;", "'", statut, fixed = TRUE)
+  ) %>%
+  group_by(Observatory) %>% 
+  mutate(
+    Total = sum(n),
+    Percentage = round(100 * n / Total, 1)
+  ) %>% 
+  select(Observatory, statut, n, Percentage) %>% 
+  ungroup()
+
+# Ajouter les lignes "Total" par observatoire
+house_status <- bind_rows(
+  house_status,
+  house_status %>% 
+    group_by(Observatory) %>% 
+    summarise(
+      statut = "Total",
+      n = sum(n),
+      Percentage = 100,
+      .groups = "drop"
+    )
+) %>% 
+  arrange(Observatory, desc(statut == "Total"))
+
+# Ajouter une ligne "Total global"
+house_status <- bind_rows(
+  house_status,
+  house_status %>% 
+    summarise(
+      Observatory = "Total global",
+      statut = "Total",
+      n = sum(n),
+      Percentage = 100,
+      .groups = "drop"
+    )
+)
+
+# Créer un tableau formaté avec gt
+house_status %>% 
+  gt(rowname_col = "Statut") %>% 
+  tab_header(
+    title = "Statut d'occupation du logement par observatoire"
+  ) %>% 
+  fmt_number(
+    columns = vars(n),
+    sep_mark = " ",
+    decimals = 0
+  ) %>% 
+  fmt_number(
+    columns = vars(Percentage),
+    decimals = 1
+  ) %>% 
+  cols_label(
+    statut = "Statut",
+    n = "Nombre",
+    Percentage = "%"
+  )
+
+# Camembert display 
+
+house_status %>% 
+  filter(Observatory %in% c("Marovoay", "Alaotra"), statut != "Total") %>% 
+  ggplot(aes(x = "", y = Percentage, fill = statut)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y") +
+  geom_text(aes(label = paste0(Percentage, "%")),
+            position = position_stack(vjust = 0.5)) +
+  facet_wrap(~Observatory) +
+  labs(title = "Répartition (%) des ménages par statut d'occupation selon l'observatoire") +
+  theme_void() +
+  theme(legend.title = element_blank(),
+        plot.title = element_text(hjust = 0.5))
+
 ```
+
+
+### Nombres de chambres
+
+### mur
+
+### tafo
+
+### gorodona
+
+
+### Type de latrine
+
+```{r}
+# Calcul des types de latrine par observatoire
+latrine_type <- res_h %>% 
+  mutate(
+    h5_factor = haven::as_factor(h5),
+    type = iconv(as.character(h5_factor), from = "latin1", to = "UTF-8"),
+    Type = gsub("&#39;", "'", type, fixed = TRUE)
+  ) %>% 
+  left_join(res_deb, by = "j5") %>% 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  ) %>% 
+  group_by(Observatory, Type) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  group_by(Observatory) %>% 
+  mutate(
+    Total = sum(n),
+    Percentage_raw = 100 * n / Total,
+    Percentage = round(Percentage_raw, 1)
+  ) %>% 
+  ungroup()
+
+# Ajouter les lignes "Total" par observatoire
+latrine_type <- bind_rows(
+  latrine_type,
+  latrine_type %>% 
+    group_by(Observatory) %>% 
+    summarise(
+      Type = "Total",
+      n = sum(n),
+      Percentage_raw = 100,
+      Percentage = 100,
+      .groups = "drop"
+    )
+) %>% 
+  arrange(Observatory, desc(n))
+
+# Ajouter une ligne "Total global"
+latrine_type <- bind_rows(
+  latrine_type,
+  latrine_type %>% 
+    summarise(
+      Observatory = "Total global",
+      Type = "Total",
+      n = sum(n),
+      Percentage_raw = 100,
+      Percentage = 100,
+      .groups = "drop"
+    )
+)
+
+# Tableau formaté avec gt (sans colonnes Total et Percentage_raw)
+latrine_type %>% 
+  select(Observatory, Type, n, Percentage) %>%   # ⚠️ on garde seulement les colonnes utiles
+  arrange(Observatory, desc(Percentage)) %>% 
+  gt(rowname_col = "Observatory") %>% 
+  tab_header(
+    title = "Types de latrine par observatoire"
+  ) %>% 
+  fmt_number(
+    columns = c(n),
+    sep_mark = " ",
+    decimals = 0
+  ) %>% 
+  fmt_number(
+    columns = c(Percentage),
+    decimals = 1
+  ) %>% 
+  cols_label(
+    Type = "Type de latrine",
+    n = "Nombre",
+    Percentage = "%"
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+# Camembert par observatoire (parts ordonnées par fréquence décroissante en pourcentage)
+latrine_type %>% 
+  filter(Observatory %in% c("Marovoay", "Alaotra"), Type != "Total") %>% 
+  arrange(Observatory, desc(Percentage)) %>% 
+  ggplot(aes(x = 1, y = Percentage, fill = fct_reorder(Type, -Percentage))) + 
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y") +
+  geom_text(aes(label = paste0(Percentage, "%")),
+            position = position_stack(vjust = 0.5)) +
+  facet_wrap(~Observatory) +
+  labs(title = "Types de latrine par observatoire") +
+  scale_fill_brewer(palette = "Set3") +   # palette harmonisée
+  theme_void() +
+  theme(legend.title = element_blank(),
+        plot.title = element_text(hjust = 0.5))
+
+```
+
+### Accès à l'eau de source améliorée et à l'électricité
+
+#### Mode d'approvisionnement en eau
+```{r}
+# Calcul des modes d'approvisionnement en eau par observatoire
+water_access <- res_h %>% 
+  mutate(
+    h4_factor = haven::as_factor(h4),
+    type = as.character(h4_factor),
+    type_utf8 = iconv(type, from = "latin1", to = "UTF-8", sub = ""),   # conversion robuste en UTF-8
+    Type = gsub("&#39;", "'", type_utf8, fixed = TRUE)                  # remplacement des entités HTML
+  ) %>% 
+  left_join(res_deb, by = "j5") %>% 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  ) %>% 
+  group_by(Observatory, Type) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  group_by(Observatory) %>% 
+  mutate(
+    Total = sum(n),
+    Percentage_raw = 100 * n / Total,
+    Percentage = round(Percentage_raw, 1)
+  ) %>% 
+  ungroup()
+
+# Ajouter les lignes "Total" par observatoire
+water_access <- bind_rows(
+  water_access,
+  water_access %>% 
+    group_by(Observatory) %>% 
+    summarise(
+      Type = "Total",
+      n = sum(n),
+      Percentage_raw = 100,
+      Percentage = 100,
+      .groups = "drop"
+    )
+) %>% 
+  arrange(Observatory, desc(n))
+
+# Ajouter une ligne "Total global"
+water_access <- bind_rows(
+  water_access,
+  water_access %>% 
+    summarise(
+      Observatory = "Total global",
+      Type = "Total",
+      n = sum(n),
+      Percentage_raw = 100,
+      Percentage = 100,
+      .groups = "drop"
+    )
+)
+
+# Tableau formaté avec gt (sans colonnes Total et Percentage_raw)
+water_access %>% 
+  select(Observatory, Type, n, Percentage) %>%   # on garde seulement les colonnes utiles
+  arrange(Observatory, desc(Percentage)) %>% 
+  gt(rowname_col = "Observatory") %>% 
+  tab_header(
+    title = "Mode d'approvisionnement en eau des ménages par observatoire"
+  ) %>% 
+  fmt_number(
+    columns = c(n),
+    sep_mark = " ",
+    decimals = 0
+  ) %>% 
+  fmt_number(
+    columns = c(Percentage),
+    decimals = 1
+  ) %>% 
+  cols_label(
+    Type = "Type",
+    n = "Nombre",
+    Percentage = "%"
+  ) %>%
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+# Histogramme horizontal en % sans noms d'axes
+water_access %>% 
+  filter(Type != "Total", Observatory != "Total global") %>% 
+  ggplot(aes(x = fct_reorder(Type, Percentage), 
+             y = Percentage, 
+             fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  geom_text(aes(label = paste0(Percentage, "%")), 
+            position = position_dodge(width = 1), 
+            hjust = -0.1, size = 3) +
+  labs(title = "Modes d'approvisionnement en eau des ménages par observatoire",
+       x = NULL,   # pas de label pour l'axe X
+       y = NULL) + # pas de label pour l'axe Y
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        plot.title = element_text(hjust = 0.5))
+
+```
+
+#### Mode d'éclairage
+
+```{r}
+##Mode d' éclairage
+# Extraction des labels propres
+labels_h7 <- tibble(
+  H7_var = names(res_h)[grepl("^h7", names(res_h))],
+  Type = sapply(res_h[grepl("^h7", names(res_h))], function(x) {
+    lab <- iconv(var_label(x), from = "latin1", to = "UTF-8")
+    if (grepl(":", lab)) {
+      lab <- sub(".*?:\\s*", "", lab)
+    }
+    lab
+  })
+)
+
+#Construction des données
+light_source <- res_h %>% 
+  mutate(across(starts_with("h7"), as.numeric)) %>% 
+  pivot_longer(
+    cols = starts_with("h7"),
+    names_to = "H7_var",
+    values_to = "value"
+  ) %>% 
+  filter(value == 1) %>% 
+  left_join(labels_h7, by = "H7_var") %>% 
+  left_join(res_deb, by = "j5") %>% 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  ) %>% 
+  group_by(Observatory, Type) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  group_by(Observatory) %>% 
+  mutate(
+    Percentage = round(100 * n / sum(n), 1)
+  ) %>% 
+  ungroup()
+
+# Correction encodage finale
+light_source <- light_source %>%
+  mutate(across(where(is.character),
+                ~ iconv(., from = "UTF-8", to = "UTF-8", sub = "")))
+
+#Totaux par observatoire
+total_by_observatory <- light_source %>%
+  group_by(Observatory) %>%
+  summarise(
+    Type = "Total",
+    n = sum(n),
+    Percentage = 100,
+    .groups = "drop"
+  )
+
+# Total global
+total_global <- light_source %>%
+  summarise(
+    Observatory = "Total global",
+    Type = "Total",
+    n = sum(n),
+    Percentage = 100
+  )
+
+# Fusion des données avec totaux
+light_source_final <- bind_rows(light_source, total_by_observatory, total_global)
+
+# Tableau final
+light_source_final %>% 
+  arrange(Observatory, desc(Percentage)) %>% 
+  gt(groupname_col = "Observatory") %>% 
+  fmt_number(
+    columns = n,
+    decimals = 0
+  ) %>% 
+  fmt_number(
+    columns = Percentage,
+    decimals = 1
+  ) %>% 
+  cols_label(
+    Type = "Type d'éclairage",
+    n = "Nombre",
+    Percentage = "%"
+  ) %>% 
+  tab_header(
+    title = "Modes d'éclairage des ménages par observatoire"
+  ) %>% 
+  tab_source_note(
+    source_note = md("**Source : Enquête auprès des OR 2025**")
+  )
+
+################################################
+## HISTOGRAMME
+###############################################
+
+# Filtrer les types réels (pas les totaux)
+light_source_plot <- light_source_final %>%
+  filter(Type != "Total", Observatory != "Total global") %>%
+  group_by(Observatory, Type) %>%
+  summarise(Percentage = first(Percentage), .groups = "drop")
+
+# Définir l'ordre des observatoires (Alaotra en haut, Marovoay en bas)
+light_source_plot <- light_source_plot %>%
+  mutate(
+    Observatory = factor(Observatory, levels = c("Alaotra", "Marovoay"))
+  )
+
+# Trier les types par pourcentage décroissant dans chaque observatoire
+light_source_plot <- light_source_plot %>%
+  group_by(Observatory) %>%
+  mutate(Type = factor(Type, levels = Type[order(-Percentage)])) %>%
+  ungroup()
+
+# Histogramme horizontal avec facettes et sans noms d'axes
+ggplot(light_source_plot, aes(x = Type, y = Percentage, fill = Observatory)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  facet_wrap(~ Observatory, ncol = 1, scales = "free_y") +
+  geom_text(aes(label = paste0(Percentage, "%")), hjust = -0.1, size = 4) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(
+    title = "Répartition des modes d'éclairage par observatoire",
+    x = NULL,
+    y = NULL
+  ) +
+  theme_minimal(base_size = 14)
+```
+
+
+### Cuisine
+```{r}
+## Mode de cuisson
+#| label: setup
+#| include: false
+
+# Extraction des labels pour h6
+labels_h6 <- tibble(
+  H6_var = names(res_h)[grepl("^h6", names(res_h))],
+  Type = sapply(res_h[grepl("^h6", names(res_h))], function(x) {
+    lab <- iconv(var_label(x), from = "latin1", to = "UTF-8")
+    if (grepl(":", lab)) lab <- sub(".*?:\\s*", "", lab)
+    lab <- str_to_title(lab)
+    str_squish(lab)
+  })
+)
+
+# Construction des données
+cooking_energy_source <- res_h %>% 
+  mutate(across(starts_with("h6"), as.numeric)) %>% 
+  pivot_longer(
+    cols = starts_with("h6"),
+    names_to = "H6_var",
+    values_to = "value"
+  ) %>% 
+  filter(value == 1) %>% 
+  left_join(labels_h6, by = "H6_var") %>% 
+  left_join(res_deb, by = "j5") %>% 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    # Nettoyer les espaces et remplacer "Autre Préciser"
+    Type = str_squish(Type),
+    Type = str_replace_all(Type, "[\u00A0]", " "),
+    Type = ifelse(Type == "Autre Préciser", "Autre", Type)
+  ) %>% 
+  group_by(Observatory, Type) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  group_by(Observatory) %>% 
+  mutate(Percentage = round(100 * n / sum(n), 1)) %>% 
+  ungroup()
+
+# Totaux par observatoire et total global
+# Totaux par observatoire
+totals_observatory <- cooking_energy_source %>%
+  group_by(Observatory) %>%
+  summarise(Type = "Total", n = sum(n), Percentage = 100, .groups = "drop")
+
+# Total global
+total_global <- cooking_energy_source %>%
+  summarise(Observatory = "Total global",
+            Type = "Total",
+            n = sum(n),
+            Percentage = 100)
+
+# Fusionner les données finales
+cooking_energy_source_final <- bind_rows(cooking_energy_source, totals_observatory, total_global)
+
+# Tableau gt
+cooking_energy_source_final %>% 
+  arrange(Observatory, desc(Percentage)) %>% 
+  gt(groupname_col = "Observatory") %>% 
+  fmt_number(columns = n, decimals = 0) %>% 
+  fmt_number(columns = Percentage, decimals = 1) %>% 
+  cols_label(Type = "Type de cuisson", n = "Nombre", Percentage = "%") %>% 
+  tab_header(title = "Modes de cuisson des ménages par observatoire") %>% 
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+# Histogramme horizontal
+cooking_energy_source_plot <- cooking_energy_source_final %>%
+  filter(Type != "Total", Observatory != "Total global") %>%
+  group_by(Observatory, Type) %>%
+  summarise(Percentage = first(Percentage), .groups = "drop") %>%
+  mutate(Observatory = factor(Observatory, levels = c("Alaotra", "Marovoay"))) %>%
+  group_by(Observatory) %>%
+  mutate(Type = factor(Type, levels = Type[order(-Percentage)])) %>%
+  ungroup()
+
+ggplot(cooking_energy_source_plot, aes(x = Type, y = Percentage, fill = Observatory)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  facet_wrap(~Observatory, ncol = 1, scales = "free_y") +
+  geom_text(aes(label = paste0(Percentage, "%")), hjust = -0.1, size = 4) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(title = "Répartition des modes de cuisson par observatoire", x = NULL, y = NULL) +
+  theme_minimal(base_size = 14)
+```
+
 
 ## Niveau de vie
 
-### Indicateur de confort
-
-```{r}
-# Loading indicateur de confort (v), equipement , communication (tm1, ut1, snw), equipement agricole (e0) data
-res_v <- read_dta("data/res_v.dta") # year, j5 
-```
 
 ### Equipement
 
@@ -44,7 +573,16 @@ res_e <- read_dta("data/res_e.dta") # year, j5 # Equipement module next part
 
 Les équipements agricoles sont dans "res_v.dta" avec "e0" uniquement comme variable.
 
-### Communication
+#### Taux de possession des biens de confort courant
+
+#### Equipement agricole des ménages : taux d’équipement et nombre d’outils
+
+
+### Accès à la communication audiovisuelle et à la télécommunication
+
+#### Accès à la communication audiovisuelle et à la télécommunication par observatoire
+
+#### Accès à la communication audiovisuelle et à la télécommunication par observatoire et selon les caractéristiques des chefs de ménages
 
 Les données de communication sont dans "res_v.dta".
 

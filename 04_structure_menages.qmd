@@ -39,7 +39,7 @@ Afin de s'assurer si les positions dans l’identifiant des ménages corresponde
 
 ```{r}
 # Vérification des nombres de position dans j0, j4_a, j41
-source("01_apurement_j5_j0_j4a_j41.R")
+source("utils/01_apurement_j5_j0_j4a_j41.R")
 result <- length_analysis(res_deb) 
 result$grouped_table %>% 
   gt() %>% 
@@ -232,7 +232,6 @@ gt(hh_size_combined, groupname_col = "Observatory") %>%
 Nous allons voir la répartition des ménages par tranche d'âge par observatoire.
 
 ```{r}
-# CORRECTION3
 # Tableau de répartition des membres du ménage par tranche d'âge selon les observatoires
 hh_age <- res_deb %>%
   left_join(res_m_a, by="j5") %>%
@@ -347,11 +346,15 @@ Pour les histogrammes et camembert, mettre un titre et source à chaque fois, et
 
 ```{r}
 # Histogramme séparé par observatoire
+#| fig-cap: "Répartition des membres des ménages par tranche d’âge selon les observatoires" 
+#| fig-cap-location: bottom
+#| label: fig-men-obs
+
+
 ggplot(hh_age, aes(x = AgeGroup, y = n, fill = AgeGroup)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~Observatory) +
   labs(
-    title = "Répartition des membres des ménages par tranche d’âge selon les observatoires",
     x = "Tranche d’âge",
     y = "Nombre de ménages"
   ) +
@@ -361,29 +364,9 @@ ggplot(hh_age, aes(x = AgeGroup, y = n, fill = AgeGroup)) +
     strip.text  = element_text(face = "bold")
   )
 
-# Camembert séparé par observatoire avec pourcentages affichés
-ggplot(hh_age, aes(x = "", y = Percent, fill = AgeGroup)) +
-  geom_col(width = 1, color = "white") +
-  geom_text(aes(label = paste0(Percent, "%")),
-            position = position_stack(vjust = 0.5),
-            color = "black", size = 3) +
-  coord_polar(theta = "y") +
-  facet_wrap(~Observatory) +
-  labs(
-    title = "Répartition des membres des ménages enquêtés par tranche d’âge selon les observatoires",
-    fill  = "Tranche d’âge"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.title.x = element_blank(),
-    axis.title.y = element_blank(),
-    axis.text.x  = element_blank(),
-    axis.text.y  = element_blank(),
-    panel.grid   = element_blank(),
-    strip.text   = element_text(face = "bold")
-  )
 
 ```
+
 
 ```{r}
 # Pyramide des âges par sexe et observatoire
@@ -3760,11 +3743,8 @@ ggplot(hh_main_act_final3 %>% filter(Act_principal != "Total"),
   )
 
 ```
-REMARQUE :  
-- A corriger effectif et pourcentage dans tableau par ordre décroissant.
 
-
-#### Activités principales des chefs de ménages par sexe
+#### Activités principales des autres membres de ménages par sexe
 
 ```{r}
 # Main activities of the other household members per sex
