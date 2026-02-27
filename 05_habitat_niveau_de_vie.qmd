@@ -264,7 +264,7 @@ inc |>
   tab_header(title = "Ménages à revenu courant ou total négatif ou nul")
 ```
 
-#### Évolution des revenus depuis 1995
+#### Évolution des revenus nominaux depuis 1995
 
 Les observatoires de Marovoay et d'Alaotra disposent de séries longues permettant de suivre l'évolution des revenus sur trois décennies. Les données couvrent 1995–2008 et 2010–2014 pour Marovoay, 1999–2008 et 2010–2014 pour Alaotra, ainsi que la campagne 2025 pour les deux. Les années 2009 et 2015 ne contiennent pas ces observatoires. Le calcul des agrégats est mis en cache dans un fichier intermédiaire (`output/inc_trends_obs.rds`) afin de ne pas retraiter les microdonnées à chaque exécution.
 
@@ -309,17 +309,69 @@ if (file.exists(trends_file)) {
       revpeche_mean  = mean(revpeche, na.rm = TRUE),
       .groups = "drop"
     )
+
+  # --- IPC Banque Mondiale (base 2010 = 100) ---
+  library(jsonlite)
+  wb_raw <- fromJSON(
+    "https://api.worldbank.org/v2/country/MDG/indicator/FP.CPI.TOTL?date=1995:2025&format=json&per_page=50"
+  )
+  cpi_wb <- tibble(
+    year = as.integer(wb_raw[[2]]$date),
+    cpi  = as.numeric(wb_raw[[2]]$value)
+  ) |> filter(!is.na(cpi)) |> arrange(year)
+
+  # Extrapolation 2024-2025 (~9 % par an)
+  cpi_full <- bind_rows(
+    cpi_wb,
+    tibble(year = 2024L, cpi = cpi_wb$cpi[cpi_wb$year == 2023] * 1.09),
+    tibble(year = 2025L, cpi = cpi_wb$cpi[cpi_wb$year == 2023] * 1.09^2)
+  )
+
+  # Déflation
+  trends <- trends |>
+    left_join(cpi_full, by = "year") |>
+    mutate(
+      deflator       = cpi / 100,
+      revcou_real    = revcou_mean / deflator,
+      revtot_real    = revtot_mean / deflator,
+      revexcept_real = revexcept_mean / deflator,
+      revppal_real   = revppal_mean / deflator,
+      revsec_real    = revsec_mean / deflator,
+      rev_indep_real = rev_indep_mean / deflator,
+      rev_riz_real   = rev_riz_mean / deflator,
+      rev_cu_real    = rev_cu_mean / deflator,
+      revel_real     = revel_mean / deflator,
+      revpeche_real  = revpeche_mean / deflator
+    )
+
   saveRDS(trends, trends_file)
 }
+
+# Déflation par le prix du paddy (propre à chaque observatoire)
+# Rebase : paddy 2010 = 1 par observatoire
+paddy_base_2010 <- trends |>
+  filter(year == 2010) |>
+  select(Observatory, paddy_base = prix_paddy_median)
+
+trends <- trends |>
+  left_join(paddy_base_2010, by = "Observatory") |>
+  mutate(
+    deflator_paddy  = prix_paddy_median / paddy_base,
+    revtot_paddy    = revtot_mean / deflator_paddy,
+    revcou_paddy    = revcou_mean / deflator_paddy,
+    revexcept_paddy = revexcept_mean / deflator_paddy
+  ) |>
+  select(-paddy_base)
+
+# Sous-ensembles pour le style des lignes
+trends_solid <- trends |> filter(year <= 2014)
+trends_gap   <- trends |> filter(year >= 2014)
 ```
 
 ```{r fig_trends_revtot}
 #| fig-cap: "Évolution du revenu total moyen par ménage (Ar courants)"
 #| fig-width: 9
 #| fig-height: 5
-
-trends_solid <- trends |> filter(year <= 2014)
-trends_gap   <- trends |> filter(year >= 2014)
 
 ggplot(mapping = aes(x = year, y = revtot_mean, colour = Observatory)) +
   geom_line(data = trends_solid, linewidth = 0.8) +
@@ -400,4 +452,192 @@ trends |>
   ))) +
   theme_minimal() +
   theme(legend.position = "bottom")
+```
+
+#### Revenus réels : déflation et indices de prix
+
+La comparaison des revenus sur longue période nécessite de tenir compte de l'inflation. Nous utilisons ici l'**IPC national** publié par la Banque Mondiale (indicateur `FP.CPI.TOTL`, base 2010 = 100). Cet indice est calculé à partir d'un panier de consommation urbain (principalement Antananarivo et quelques capitales provinciales) ; il ne reflète donc qu'imparfaitement l'évolution des prix en milieu rural. Pour 2024–2025, non encore publiés par la Banque Mondiale, l'IPC est extrapolé à +9 % par an.
+
+::: {.callout-note}
+Une prochaine version de ce rapport intégrera un IPC régional (Boeny pour Marovoay, Alaotra-Mangoro pour Alaotra), extrait des séries de l'INSTAT ou des enquêtes EPM, afin de mieux capter l'inflation locale.
+:::
+
+```{r fig_ipc_national}
+#| fig-cap: "Évolution de l'IPC national Madagascar (base 2010 = 100)"
+#| fig-width: 9
+#| fig-height: 4
+
+# Reconstituer la série IPC complète à partir des données en cache
+cpi_series <- trends |>
+  distinct(year, cpi) |>
+  filter(!is.na(cpi)) |>
+  arrange(year)
+
+cpi_series |>
+  ggplot(aes(x = year, y = cpi)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  geom_hline(yintercept = 100, linetype = "dashed", colour = "grey50") +
+  annotate("text", x = 2011, y = 105, label = "Base 2010 = 100",
+           hjust = 0, size = 3, colour = "grey40") +
+  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+  labs(x = NULL, y = "IPC national (base 2010 = 100)") +
+  theme_minimal()
+```
+
+#### Prix médian du paddy et comparaison avec l'IPC
+
+Le prix de vente médian du paddy, calculé à partir des ventes déclarées par les ménages (`dc24` dans `res_dc21`), fournit un indicateur complémentaire de l'inflation locale. Le riz étant le bien central de ces économies rurales, son évolution est comparée ci-dessous à l'IPC national (les deux rebassés à 100 en 2010).
+
+```{r fig_trends_paddy}
+#| fig-cap: "Évolution du prix médian du paddy (Ar/kg)"
+#| fig-width: 9
+#| fig-height: 5
+
+ggplot(trends, aes(x = year, y = prix_paddy_median, colour = Observatory)) +
+  geom_line(data = trends_solid, aes(y = prix_paddy_median), linewidth = 0.8) +
+  geom_line(data = trends_gap, aes(y = prix_paddy_median), linewidth = 0.8, linetype = "31") +
+  geom_point(size = 2) +
+  geom_line(data = tibble(year = NA_real_, prix_paddy_median = NA_real_),
+            aes(linetype = "Sans enquête"), colour = "black", linewidth = 0.8) +
+  scale_linetype_manual(values = c("Sans enquête" = "31")) +
+  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+  scale_y_continuous(labels = scales::label_comma()) +
+  labs(
+    x = NULL, y = "Prix médian du paddy (Ar/kg)",
+    colour = "Observatoire", linetype = NULL
+  ) +
+  theme_minimal()
+```
+
+```{r fig_ipc_vs_paddy}
+#| fig-cap: "Comparaison de l'IPC national et de l'indice du prix du paddy (base 100 en 2010)"
+#| fig-width: 9
+#| fig-height: 5
+
+# Rebase paddy price to 100 in 2010 per observatory
+paddy_2010 <- trends |>
+  filter(year == 2010) |>
+  select(Observatory, paddy_base = prix_paddy_median)
+
+index_paddy <- trends |>
+  left_join(paddy_2010, by = "Observatory") |>
+  mutate(indice_paddy = prix_paddy_median / paddy_base * 100) |>
+  select(year, Observatory, indice_paddy)
+
+# IPC rebased (already base 2010 = 100)
+index_cpi <- cpi_series |>
+  mutate(Indicateur = "IPC national") |>
+  rename(indice = cpi)
+
+# Combine
+index_all <- index_paddy |>
+  mutate(Indicateur = paste0("Prix paddy ", Observatory)) |>
+  rename(indice = indice_paddy) |>
+  select(year, Indicateur, indice) |>
+  bind_rows(index_cpi)
+
+index_all |>
+  ggplot(aes(x = year, y = indice, colour = Indicateur)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 1.5) +
+  geom_hline(yintercept = 100, linetype = "dashed", colour = "grey50") +
+  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+  labs(
+    x = NULL, y = "Indice (base 100 en 2010)",
+    colour = NULL
+  ) +
+  theme_minimal()
+```
+
+#### Revenus réels (déflatés par l'IPC national)
+
+Les revenus nominaux sont convertis en Ariary constants (base 2010) en divisant par l'IPC national. Ceci permet d'évaluer l'évolution du pouvoir d'achat, sous réserve des limites du déflateur urbain.
+
+```{r fig_trends_revtot_real}
+#| fig-cap: "Évolution du revenu total réel moyen par ménage (déflaté par l'IPC national, Ar constants 2010)"
+#| fig-width: 9
+#| fig-height: 5
+
+ggplot(mapping = aes(x = year, y = revtot_real, colour = Observatory)) +
+  geom_line(data = trends_solid, linewidth = 0.8) +
+  geom_line(data = trends_gap, linewidth = 0.8, linetype = "31") +
+  geom_point(data = trends, size = 2) +
+  geom_line(data = tibble(year = NA_real_, revtot_real = NA_real_),
+            aes(linetype = "Sans enquête"), colour = "black", linewidth = 0.8) +
+  scale_linetype_manual(values = c("Sans enquête" = "31")) +
+  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+  scale_y_continuous(labels = scales::label_comma()) +
+  labs(
+    x = NULL, y = "Revenu total réel moyen (Ar constants 2010/ménage/an)",
+    colour = "Observatoire", linetype = NULL
+  ) +
+  theme_minimal()
+```
+
+```{r fig_trends_revcou_real}
+#| fig-cap: "Évolution du revenu courant réel moyen par ménage (déflaté par l'IPC national, Ar constants 2010)"
+#| fig-width: 9
+#| fig-height: 5
+
+ggplot(mapping = aes(x = year, y = revcou_real, colour = Observatory)) +
+  geom_line(data = trends_solid, linewidth = 0.8) +
+  geom_line(data = trends_gap, linewidth = 0.8, linetype = "31") +
+  geom_point(data = trends, size = 2) +
+  geom_line(data = tibble(year = NA_real_, revcou_real = NA_real_),
+            aes(linetype = "Sans enquête"), colour = "black", linewidth = 0.8) +
+  scale_linetype_manual(values = c("Sans enquête" = "31")) +
+  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+  scale_y_continuous(labels = scales::label_comma()) +
+  labs(
+    x = NULL, y = "Revenu courant réel moyen (Ar constants 2010/ménage/an)",
+    colour = "Observatoire", linetype = NULL
+  ) +
+  theme_minimal()
+```
+
+#### Revenus réels (déflatés par le prix du paddy)
+
+Le prix du paddy, produit central de ces économies rizicoles, offre un déflateur alternatif plus proche de la réalité locale que l'IPC national. Les revenus sont ici exprimés en équivalent-paddy à prix 2010, c'est-à-dire divisés par l'indice du prix médian du paddy de chaque observatoire (base 2010 = 1). Ce déflateur est propre à chaque observatoire, contrairement à l'IPC national appliqué uniformément.
+
+```{r fig_trends_revtot_paddy}
+#| fig-cap: "Évolution du revenu total réel moyen par ménage (déflaté par le prix du paddy, Ar constants 2010)"
+#| fig-width: 9
+#| fig-height: 5
+
+ggplot(mapping = aes(x = year, y = revtot_paddy, colour = Observatory)) +
+  geom_line(data = trends_solid, linewidth = 0.8) +
+  geom_line(data = trends_gap, linewidth = 0.8, linetype = "31") +
+  geom_point(data = trends, size = 2) +
+  geom_line(data = tibble(year = NA_real_, revtot_paddy = NA_real_),
+            aes(linetype = "Sans enquête"), colour = "black", linewidth = 0.8) +
+  scale_linetype_manual(values = c("Sans enquête" = "31")) +
+  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+  scale_y_continuous(labels = scales::label_comma()) +
+  labs(
+    x = NULL, y = "Revenu total réel moyen (Ar constants paddy 2010/ménage/an)",
+    colour = "Observatoire", linetype = NULL
+  ) +
+  theme_minimal()
+```
+
+```{r fig_trends_revcou_paddy}
+#| fig-cap: "Évolution du revenu courant réel moyen par ménage (déflaté par le prix du paddy, Ar constants 2010)"
+#| fig-width: 9
+#| fig-height: 5
+
+ggplot(mapping = aes(x = year, y = revcou_paddy, colour = Observatory)) +
+  geom_line(data = trends_solid, linewidth = 0.8) +
+  geom_line(data = trends_gap, linewidth = 0.8, linetype = "31") +
+  geom_point(data = trends, size = 2) +
+  geom_line(data = tibble(year = NA_real_, revcou_paddy = NA_real_),
+            aes(linetype = "Sans enquête"), colour = "black", linewidth = 0.8) +
+  scale_linetype_manual(values = c("Sans enquête" = "31")) +
+  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+  scale_y_continuous(labels = scales::label_comma()) +
+  labs(
+    x = NULL, y = "Revenu courant réel moyen (Ar constants paddy 2010/ménage/an)",
+    colour = "Observatoire", linetype = NULL
+  ) +
+  theme_minimal()
 ```
