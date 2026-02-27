@@ -66,3 +66,156 @@ res_t2 <- read_dta("data/res_t2.dta") # year, j5
 ```
 
 ### Revenu
+
+Le revenu total du ménage (`revtot`) se décompose en revenu courant (`revcou`) et revenu exceptionnel (`revexcept`). Le revenu courant agrège les salaires agricoles (`revsec`), les salaires non-agricoles (`revppal`), les revenus indépendants (`rev_indep`), les revenus rizicoles (`rev_riz`), les cultures de rente (`rev_cu`), l'élevage (`revel`) et la pêche (`revpeche`). Le revenu exceptionnel regroupe les rentes foncières, les autres revenus, le travail HIMO, la décapitalisation et les transferts reçus.
+
+```{r income_compute}
+source("utils/calc_incomes_all_years.R")
+
+# Compute incomes for 2025
+inc_2025 <- compute_income_year(2025)
+
+# Join with observatory info
+res_deb <- read_dta("data/res_deb.dta") |>
+  mutate(
+    j5 = as.character(j5),
+    Observatory = case_when(
+      j0 == 3  ~ "Marovoay",
+      j0 == 21 ~ "Alaotra",
+      TRUE     ~ as.character(j0)
+    )
+  )
+
+inc <- inc_2025 |>
+  left_join(res_deb |> select(j5, Observatory), by = "j5")
+```
+
+#### Structure du revenu total
+
+```{r t_revtot_obs}
+# Statistiques descriptives du revenu total par observatoire
+inc |>
+  group_by(Observatory) |>
+  summarise(
+    `Nb ménages` = n(),
+    Moyenne = round(mean(revtot, na.rm = TRUE)),
+    Médiane = round(median(revtot, na.rm = TRUE)),
+    `Écart-type` = round(sd(revtot, na.rm = TRUE)),
+    Minimum = round(min(revtot, na.rm = TRUE)),
+    Maximum = round(max(revtot, na.rm = TRUE)),
+    .groups = "drop"
+  ) |>
+  gt() |>
+  tab_header(
+    title = "Revenu total des ménages par observatoire (Ar)",
+    subtitle = "Campagne 2025"
+  ) |>
+  fmt_number(columns = Moyenne:Maximum, use_seps = TRUE, decimals = 0)
+```
+
+#### Décomposition du revenu courant
+
+```{r t_revcou_decomp}
+# Part de chaque composante dans le revenu courant moyen, par observatoire
+inc |>
+  group_by(Observatory) |>
+  summarise(
+    `Salaires agricoles` = mean(revsec, na.rm = TRUE),
+    `Salaires non-agricoles` = mean(revppal, na.rm = TRUE),
+    `Revenus indépendants` = mean(rev_indep, na.rm = TRUE),
+    Riz = mean(rev_riz, na.rm = TRUE),
+    `Cultures de rente` = mean(rev_cu, na.rm = TRUE),
+    Élevage = mean(revel, na.rm = TRUE),
+    Pêche = mean(revpeche, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  pivot_longer(-Observatory, names_to = "Composante", values_to = "Montant") |>
+  pivot_wider(names_from = Observatory, values_from = Montant) |>
+  gt() |>
+  tab_header(
+    title = "Décomposition du revenu courant moyen (Ar)",
+    subtitle = "Campagne 2025"
+  ) |>
+  fmt_number(columns = where(is.numeric), use_seps = TRUE, decimals = 0)
+```
+
+#### Structure du revenu courant (graphique)
+
+```{r fig_revcou_shares}
+#| fig-cap: "Part des composantes dans le revenu courant moyen par observatoire"
+#| fig-width: 8
+#| fig-height: 5
+
+inc |>
+  group_by(Observatory) |>
+  summarise(
+    `Salaires agricoles` = mean(revsec, na.rm = TRUE),
+    `Salaires non-agricoles` = mean(revppal, na.rm = TRUE),
+    `Revenus indépendants` = mean(rev_indep, na.rm = TRUE),
+    Riz = mean(rev_riz, na.rm = TRUE),
+    `Cultures de rente` = mean(rev_cu, na.rm = TRUE),
+    Élevage = mean(revel, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  pivot_longer(-Observatory, names_to = "Composante", values_to = "Montant") |>
+  ggplot(aes(x = Observatory, y = Montant, fill = Composante)) +
+  geom_col(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  labs(x = NULL, y = "Part du revenu courant", fill = NULL) +
+  theme_minimal()
+```
+
+#### Distribution du revenu total
+
+```{r fig_revtot_dist}
+#| fig-cap: "Distribution du revenu total par observatoire (échelle log)"
+#| fig-width: 8
+#| fig-height: 5
+
+inc |>
+  filter(revtot > 0) |>
+  ggplot(aes(x = revtot, fill = Observatory)) +
+  geom_density(alpha = 0.5) +
+  scale_x_log10(labels = scales::label_comma()) +
+  labs(x = "Revenu total (Ar, échelle log)", y = "Densité", fill = "Observatoire") +
+  theme_minimal()
+```
+
+#### Revenu courant et revenu exceptionnel
+
+```{r t_revcou_revexcept}
+inc |>
+  group_by(Observatory) |>
+  summarise(
+    `Revenu courant` = round(mean(revcou, na.rm = TRUE)),
+    `Revenu exceptionnel` = round(mean(revexcept, na.rm = TRUE)),
+    `Revenu total` = round(mean(revtot, na.rm = TRUE)),
+    `Part courant (%)` = round(mean(revcou, na.rm = TRUE) / mean(revtot, na.rm = TRUE) * 100, 1),
+    .groups = "drop"
+  ) |>
+  gt() |>
+  tab_header(
+    title = "Revenu courant et revenu exceptionnel moyens (Ar)",
+    subtitle = "Campagne 2025"
+  ) |>
+  fmt_number(columns = c(`Revenu courant`, `Revenu exceptionnel`, `Revenu total`),
+             use_seps = TRUE, decimals = 0)
+```
+
+#### Ménages à revenu négatif ou nul
+
+Certains ménages présentent un revenu courant négatif, principalement en raison de charges agricoles supérieures aux produits (mauvaises récoltes, coûts d'intrants élevés).
+
+```{r t_rev_negatif}
+inc |>
+  group_by(Observatory) |>
+  summarise(
+    `Nb ménages` = n(),
+    `Revenu courant ≤ 0` = sum(revcou <= 0, na.rm = TRUE),
+    `% ≤ 0` = round(mean(revcou <= 0, na.rm = TRUE) * 100, 1),
+    `Revenu total ≤ 0` = sum(revtot <= 0, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  gt() |>
+  tab_header(title = "Ménages à revenu courant ou total négatif ou nul")
+```
