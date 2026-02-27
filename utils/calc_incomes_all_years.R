@@ -18,7 +18,8 @@ read_dta_j5 <- function(file) {
 }
 
 # In Stata:
-# gen revcou = revppal + revsec + rev_riz + rev_cu + revel + revpeche
+# gen revcou = revppal + revsec + rev_indep + rev_riz + rev_cu + revel + revpeche
+# NOTE: rev_indep (SAC5 self-employment) is new in 2025, 0 for historical years
 # gen revexcept = rente_riz + rente_cu + autre_rev + himo + decap + vte_biens + transrecmo + transrecnomo
 # gen revtot = revcou + revexcept
 
@@ -34,7 +35,7 @@ process_revppal <- function(year, path = "data/ROS_MDG_microdata/") {
       mutate(revppal = replace_na(sac410, 0)) %>%
       group_by(j5, year) %>%
       summarise(revppal = sum(revppal, na.rm = TRUE), .groups = "drop")
-  # From 2012: number of weeks * week income (in cash and in kind)
+    # From 2012: number of weeks * week income (in cash and in kind)
   } else if (year > 2011) {
     read_dta_j5(paste0(path, year, "/res_m_a.dta")) %>%
       mutate(across(c(a3b, a3c, a3e, a3f), ~ replace_na(.x, 0))) %>%
@@ -72,7 +73,7 @@ process_revsec <- function(year, path = "data/ROS_MDG_microdata/") {
       mutate(revsec = replace_na(sac3l, 0)) %>%
       group_by(j5, year) %>%
       summarise(revsec = sum(revsec, na.rm = TRUE), .groups = "drop")
-  # From 2011: income per culture in cash and in nature
+    # From 2011: income per culture in cash and in nature
   } else if (year > 2011) {
     read_dta_j5(paste0(path, year, "/res_as.dta")) %>%
       mutate(across(c(as4, as3, as4a, as3a), ~ replace_na(.x, 0))) %>%
@@ -107,6 +108,24 @@ process_revsec <- function(year, path = "data/ROS_MDG_microdata/") {
     return(tibble(j5 = character(), year = year, revsec = NA_real_))
   }
 }
+
+# rev_indep ---------------------------------------------------------------
+
+# Process independent/self-employment income (SAC5 module, 2025 only)
+# Historically this type of income was partly captured in autre_rev (res_rha)
+process_rev_indep <- function(year, path = "data/ROS_MDG_microdata/") {
+  # SAC5 module only exists in 2025
+  if (year == 2025) {
+    read_dta_j5(paste0(path, year, "/res_sac5.dta")) %>%
+      mutate(rev_indep = replace_na(sac5m, 0)) %>%
+      group_by(j5, year) %>%
+      summarise(rev_indep = sum(rev_indep, na.rm = TRUE), .groups = "drop")
+  } else {
+    # No equivalent standalone module in historical years
+    tibble(j5 = character(), year = integer(), rev_indep = numeric())
+  }
+}
+
 # rev_riz -----------------------------------------------------------------
 
 ## prod_riz_val ----------------------------------------------------
@@ -291,7 +310,9 @@ process_charge_riz <- function(year, path = "data/ROS_MDG_microdata/") {
 
     coutmetloc <- coutmetloc1 %>%
       left_join(coutmetloc2, by = c("j5", "year")) %>%
-      mutate(coutmetloc = coalesce(coutmetloc1, 0) + coalesce(coutmetloc2, 0)) %>%
+      mutate(
+        coutmetloc = coalesce(coutmetloc1, 0) + coalesce(coutmetloc2, 0)
+      ) %>%
       select(j5, year, coutmetloc)
 
     # Aggregate
@@ -301,8 +322,10 @@ process_charge_riz <- function(year, path = "data/ROS_MDG_microdata/") {
       by = c("j5", "year")
     ) %>%
       mutate(
-        charge_riz = rowSums(across(c(coutmori, coutint, coutmetloc),
-                                     ~ replace_na(.x, 0)))
+        charge_riz = rowSums(across(
+          c(coutmori, coutint, coutmetloc),
+          ~ replace_na(.x, 0)
+        ))
       ) %>%
       select(j5, year, charge_riz)
 
@@ -838,7 +861,7 @@ process_coutloccu <- function(year, path = "data/ROS_MDG_microdata/") {
 
     # Monetary rent (fr34n in 1000 Ar → multiply by 1000)
     coutloccu_argent <- fr34 %>%
-      filter(fr30c1 != 1) %>%  # exclude rice parcels
+      filter(fr30c1 != 1) %>% # exclude rice parcels
       mutate(coutloccu1 = replace_na(fr34n, 0) * 1000) %>%
       group_by(j5, year) %>%
       summarise(coutloccu1 = sum(coutloccu1, na.rm = TRUE), .groups = "drop")
@@ -864,15 +887,23 @@ process_coutloccu <- function(year, path = "data/ROS_MDG_microdata/") {
       filter(fr30c1 != 1) %>%
       mutate(kg_produit = replace_na(fr34o, 0)) %>%
       group_by(j5, year) %>%
-      summarise(kg_produit = sum(kg_produit, na.rm = TRUE), .groups = "drop") %>%
+      summarise(
+        kg_produit = sum(kg_produit, na.rm = TRUE),
+        .groups = "drop"
+      ) %>%
       left_join(household_to_obs, by = "j5") %>%
       left_join(px_paddy_obs, by = c("obs", "year")) %>%
       mutate(coutloccu2 = kg_produit * replace_na(pxpaddy_obs, 0)) %>%
       select(j5, year, coutloccu2)
 
-    coutloccu <- full_join(coutloccu_argent, coutloccu_produit,
-                           by = c("j5", "year")) %>%
-      mutate(coutloccu = replace_na(coutloccu1, 0) + replace_na(coutloccu2, 0)) %>%
+    coutloccu <- full_join(
+      coutloccu_argent,
+      coutloccu_produit,
+      by = c("j5", "year")
+    ) %>%
+      mutate(
+        coutloccu = replace_na(coutloccu1, 0) + replace_na(coutloccu2, 0)
+      ) %>%
       select(j5, year, coutloccu)
 
     return(coutloccu)
@@ -999,7 +1030,10 @@ process_revel <- function(year, path = "data/ROS_MDG_microdata/") {
       filter(!ele_lig %in% 1:3) %>%
       mutate(vente_otrani = replace_na(ele_i2, 0) * 1000) %>%
       group_by(j5, year) %>%
-      summarise(vente_otrani = sum(vente_otrani, na.rm = TRUE), .groups = "drop")
+      summarise(
+        vente_otrani = sum(vente_otrani, na.rm = TRUE),
+        .groups = "drop"
+      )
 
     # Ventes de produits animaux non-boeuf (pe_1i in Ar)
     # Exclude "Hena" (beef) which goes to vente_beef in decap
@@ -1007,7 +1041,10 @@ process_revel <- function(year, path = "data/ROS_MDG_microdata/") {
       filter(!pe_1 %in% c("Hena", "")) %>%
       mutate(vente_nobeef = replace_na(pe_1i, 0)) %>%
       group_by(j5, year) %>%
-      summarise(vente_nobeef = sum(vente_nobeef, na.rm = TRUE), .groups = "drop")
+      summarise(
+        vente_nobeef = sum(vente_nobeef, na.rm = TRUE),
+        .groups = "drop"
+      )
 
     # No autoconsommation (ele_e absent), no CIE, no animal purchases (ele_l2 absent)
     revel <- full_join(vente_otrani, vente_nobeef, by = c("j5", "year")) %>%
@@ -1354,8 +1391,8 @@ process_rente_riz <- function(year, path = "data/ROS_MDG_microdata/") {
     rente_riz <- fr33 %>%
       filter(fr33c == 1) %>%
       mutate(
-        rente_argent = replace_na(fr33m1, 0) * 1000,  # 1000 Ar → Ar
-        rente_produit = replace_na(fr33m2, 0) * 1000   # 1000 Ar → Ar
+        rente_argent = replace_na(fr33m1, 0) * 1000, # 1000 Ar → Ar
+        rente_produit = replace_na(fr33m2, 0) * 1000 # 1000 Ar → Ar
       ) %>%
       group_by(j5, year) %>%
       summarise(
@@ -1722,9 +1759,13 @@ process_vente_bovin <- function(year, path = "data/ROS_MDG_microdata/") {
   # 2025: ele_i2 is in 1000 Ar ("Millier d'Ar") → multiply by 1000
   if (year == 2025) {
     df %>%
-      mutate(vente_bovin = if_else(
-        ele_lig %in% 1:3, replace_na(as.numeric(ele_i2), 0) * 1000, 0
-      )) %>%
+      mutate(
+        vente_bovin = if_else(
+          ele_lig %in% 1:3,
+          replace_na(as.numeric(ele_i2), 0) * 1000,
+          0
+        )
+      ) %>%
       group_by(j5, year) %>%
       summarise(vente_bovin = sum(vente_bovin, na.rm = TRUE), .groups = "drop")
   } else {
@@ -1759,7 +1800,8 @@ process_vente_beef <- function(year, path = "data/ROS_MDG_microdata/") {
     if (!file.exists(f)) {
       return(tibble(j5 = character(), year = integer(), vente_beef = numeric()))
     }
-    pe <- read_dta_j5(f) %>% mutate(year = if (!"year" %in% names(.)) year else year)
+    pe <- read_dta_j5(f) %>%
+      mutate(year = if (!"year" %in% names(.)) year else year)
     if (!"pe_c" %in% names(pe)) {
       pe <- pe %>% mutate(pe_c = 1)
     } # safety, rare after 2011
@@ -1891,6 +1933,7 @@ compute_income_year <- function(year, path = "data/ROS_MDG_microdata/") {
   # core components
   revppal <- process_revppal(year, path)
   revsec <- process_revsec(year, path)
+  rev_indep <- process_rev_indep(year, path)
   rev_riz <- process_rev_riz(year, path)
   rev_cu <- process_rev_cu(year, path)
   revel <- process_revel(year, path)
@@ -1911,6 +1954,7 @@ compute_income_year <- function(year, path = "data/ROS_MDG_microdata/") {
     list(
       revppal,
       revsec,
+      rev_indep,
       rev_riz,
       rev_cu,
       revel,
@@ -1931,6 +1975,7 @@ compute_income_year <- function(year, path = "data/ROS_MDG_microdata/") {
       c(
         revppal,
         revsec,
+        rev_indep,
         rev_riz,
         rev_cu,
         revel,
@@ -1947,7 +1992,13 @@ compute_income_year <- function(year, path = "data/ROS_MDG_microdata/") {
       ~ replace_na(., 0)
     )) %>%
     mutate(
-      revcou = revppal + revsec + rev_riz + rev_cu + revel + revpeche,
+      revcou = revppal +
+        revsec +
+        rev_indep +
+        rev_riz +
+        rev_cu +
+        revel +
+        revpeche,
       revexcept = rente_riz +
         rente_cu +
         autre_rev +
