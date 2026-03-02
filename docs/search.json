@@ -332,11 +332,11 @@
   {
     "objectID": "13_enquete_qualite.html",
     "href": "13_enquete_qualite.html",
-    "title": "10  Evaluation de l’enquête des OR auprès des ménages ruraux",
+    "title": "10  Évaluation de la qualité de l’enquête",
     "section": "",
-    "text": "Cette partie concerne les opinions des ménages sur l’enquête réalisée en 2025.\n\n\nCode\nlibrary(tidyverse)\nlibrary(haven)\nlibrary(dplyr)\nlibrary (gt) # Easily create presentation - ready display tables\n\n# Loading observatories data\nres_deb &lt;- read_dta(\"data/res_deb.dta\")\n# Loading household data\nres_m_a &lt;- read_dta(\"data/res_m_a.dta\")\n\n\nNous allons charger les données de l’évaluation des enquêtes OR auprès des ménages ruraux d’Alaotra et de Marovoay.\n\n\nCode\n# Loading evaluation section data\nres_remq &lt;- read_dta(\"data/res_remq.dta\")",
+    "text": "10.1 Qualité perçue de l’entretien par l’enquêteur\nCette partie rassemble les indicateurs de qualité de la collecte : appréciation de l’entretien par l’enquêteur, qualité du répondant, qualité de la réponse et attitude du répondant telles qu’évaluées en fin de questionnaire.\nLa variable j11 renseigne l’appréciation de la qualité de l’entretien formulée par l’enquêteur à l’issue du questionnaire (1 = bonne, 2 = moyenne, 3 = mauvaise). La grande majorité des entretiens sont jugés de bonne qualité ou de qualité moyenne (Figure 10.1).\nCode\nqual &lt;- res_deb |&gt;\n  mutate(\n    Qualité = case_when(\n      j11 == 1 ~ \"Bonne\",\n      j11 == 2 ~ \"Moyenne\",\n      j11 == 3 ~ \"Mauvaise\",\n      TRUE ~ as.character(j11)\n    ),\n    Qualité = factor(Qualité, levels = c(\"Bonne\", \"Moyenne\", \"Mauvaise\"))\n  ) |&gt;\n  count(Observatory, Qualité)\n\nggplot(qual, aes(x = Qualité, y = n, fill = Observatory)) +\n  geom_col(position = \"dodge\") +\n  geom_text(\n    aes(label = n),\n    position = position_dodge(width = 0.9),\n    vjust = -0.3, size = 3\n  ) +\n  labs(x = NULL, y = \"Nombre d'entretiens\", fill = \"Observatoire\") +\n  theme_minimal()\n\n\n\n\n\n\n\n\nFigure 10.1: Appréciation de la qualité des entretiens par l’enquêteur",
     "crumbs": [
-      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Evaluation de l'enquête des OR auprès des ménages ruraux</span>"
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Évaluation de la qualité de l'enquête</span>"
     ]
   },
   {
@@ -397,6 +397,56 @@
     "text": "1.2 Méthodologie\nL’enquête reprend le protocole des campagnes antérieures des Observatoires Ruraux. Le questionnaire ménage couvre l’ensemble des dimensions socio-économiques : démographie, habitat, activités agricoles et non agricoles, foncier, revenus, sécurité alimentaire, environnement et événements climatiques.\nLes unités d’observation sont les ménages résidant dans les hameaux échantillonnés. L’échantillon de 2025 vise à reconstituer autant que possible le panel de ménages suivis lors des campagnes précédentes, complété par de nouveaux ménages en remplacement de ceux ayant quitté la zone ou disparus.\nLes enquêteurs ont été formés par les superviseurs avant le déploiement sur le terrain. La saisie des données a été réalisée à l’aide de masques de saisie dédiés.\n\n\n\n\n\n\nNote\n\n\n\nLe protocole éthique de l’enquête a fait l’objet d’une approbation, présentée en annexe du rapport.",
     "crumbs": [
       "<span class='chapter-number'>1</span>  <span class='chapter-title'>Description de l'enquête</span>"
+    ]
+  },
+  {
+    "objectID": "13_enquete_qualite.html#répondant",
+    "href": "13_enquete_qualite.html#répondant",
+    "title": "10  Évaluation de la qualité de l’enquête",
+    "section": "10.2 Répondant",
+    "text": "10.2 Répondant\nDans la plupart des cas, le répondant est le chef de ménage lui-même ou son conjoint. Quelques entretiens ont été réalisés avec un autre membre du ménage (Table 10.1).\n\n\nCode\nres_deb |&gt;\n  mutate(\n    Répondant = case_when(\n      j10 == 1  ~ \"Chef de ménage\",\n      j10 == 2  ~ \"Conjoint(e)\",\n      j10 == 3  ~ \"Autre membre\",\n      j10 == 91 ~ \"Autre\",\n      TRUE ~ paste0(\"Code \", j10)\n    )\n  ) |&gt;\n  count(Observatory, Répondant) |&gt;\n  pivot_wider(names_from = Observatory, values_from = n, values_fill = 0) |&gt;\n  gt() |&gt;\n  tab_style(\n    style = list(cell_text(weight = \"bold\"), cell_fill(color = \"#DCDCDC\")),\n    locations = cells_column_labels(columns = everything())\n  ) |&gt;\n  tab_source_note(source_note = md(\"**Source : Enquête auprès des OR 2025**\"))\n\n\n\n\nTable 10.1: Qualité du répondant par observatoire\n\n\n\n\n\n\n\n\n\nRépondant\nAlaotra\nMarovoay\n\n\n\n\nAutre\n11\n16\n\n\nChef de ménage\n282\n340\n\n\nCode NA\n2\n2\n\n\nConjoint(e)\n212\n157\n\n\nAutre membre\n0\n3\n\n\nCode 10\n0\n1\n\n\n\nSource : Enquête auprès des OR 2025",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Évaluation de la qualité de l'enquête</span>"
+    ]
+  },
+  {
+    "objectID": "13_enquete_qualite.html#qualité-de-la-réponse",
+    "href": "13_enquete_qualite.html#qualité-de-la-réponse",
+    "title": "10  Évaluation de la qualité de l’enquête",
+    "section": "10.3 Qualité de la réponse",
+    "text": "10.3 Qualité de la réponse\nLa variable qual1aa du module d’évaluation de fin de questionnaire (res_remq) renseigne la qualité globale de la réponse du ménage (1 = bonne, 2 = mauvaise). La Figure 10.2 montre la répartition par observatoire.\n\n\nCode\nqual_rep &lt;- res_remq |&gt;\n  filter(!is.na(qual1aa)) |&gt;\n  mutate(\n    Qualité = case_when(\n      qual1aa == 1 ~ \"Bonne\",\n      qual1aa == 2 ~ \"Mauvaise\",\n      TRUE ~ paste0(\"Code \", qual1aa)\n    ),\n    Qualité = factor(Qualité, levels = c(\"Bonne\", \"Mauvaise\"))\n  ) |&gt;\n  count(Observatory, Qualité)\n\nggplot(qual_rep, aes(x = Qualité, y = n, fill = Observatory)) +\n  geom_col(position = \"dodge\") +\n  geom_text(\n    aes(label = n),\n    position = position_dodge(width = 0.9),\n    vjust = -0.3, size = 3\n  ) +\n  labs(x = NULL, y = \"Nombre de ménages\", fill = \"Observatoire\") +\n  theme_minimal()\n\n\n\n\n\n\n\n\nFigure 10.2: Qualité de la réponse du ménage",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Évaluation de la qualité de l'enquête</span>"
+    ]
+  },
+  {
+    "objectID": "13_enquete_qualite.html#réaction-du-répondant",
+    "href": "13_enquete_qualite.html#réaction-du-répondant",
+    "title": "10  Évaluation de la qualité de l’enquête",
+    "section": "10.4 Réaction du répondant",
+    "text": "10.4 Réaction du répondant\nLa variable qual2aa évalue l’attitude du répondant au cours de l’entretien (1 = ouvert / à l’aise, 2 = neutre, 3 = méfiant). La Figure 10.3 présente cette répartition.\n\n\nCode\nreaction &lt;- res_remq |&gt;\n  filter(!is.na(qual2aa)) |&gt;\n  mutate(\n    Réaction = case_when(\n      qual2aa == 1 ~ \"Ouvert (à l'aise)\",\n      qual2aa == 2 ~ \"Neutre\",\n      qual2aa == 3 ~ \"Méfiant\",\n      TRUE ~ paste0(\"Code \", qual2aa)\n    ),\n    Réaction = factor(Réaction, levels = c(\"Ouvert (à l'aise)\", \"Neutre\", \"Méfiant\"))\n  ) |&gt;\n  count(Observatory, Réaction)\n\nggplot(reaction, aes(x = Réaction, y = n, fill = Observatory)) +\n  geom_col(position = \"dodge\") +\n  geom_text(\n    aes(label = n),\n    position = position_dodge(width = 0.9),\n    vjust = -0.3, size = 3\n  ) +\n  labs(x = NULL, y = \"Nombre de ménages\", fill = \"Observatoire\") +\n  theme_minimal()\n\n\n\n\n\n\n\n\nFigure 10.3: Réaction du répondant au cours de l’entretien",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Évaluation de la qualité de l'enquête</span>"
+    ]
+  },
+  {
+    "objectID": "13_enquete_qualite.html#synthèse-croisée",
+    "href": "13_enquete_qualite.html#synthèse-croisée",
+    "title": "10  Évaluation de la qualité de l’enquête",
+    "section": "10.5 Synthèse croisée",
+    "text": "10.5 Synthèse croisée\nLe Table 10.2 croise les deux indicateurs d’évaluation (qual1aa et qual2aa) par observatoire.\n\n\nCode\nres_remq |&gt;\n  filter(!is.na(qual1aa), !is.na(qual2aa)) |&gt;\n  mutate(\n    `Qualité réponse` = case_when(\n      qual1aa == 1 ~ \"Bonne\", qual1aa == 2 ~ \"Mauvaise\",\n      TRUE ~ paste0(\"Code \", qual1aa)\n    ),\n    `Réaction répondant` = case_when(\n      qual2aa == 1 ~ \"Ouvert\", qual2aa == 2 ~ \"Neutre\", qual2aa == 3 ~ \"Méfiant\",\n      TRUE ~ paste0(\"Code \", qual2aa)\n    )\n  ) |&gt;\n  count(Observatory, `Qualité réponse`, `Réaction répondant`) |&gt;\n  pivot_wider(names_from = Observatory, values_from = n, values_fill = 0) |&gt;\n  gt() |&gt;\n  tab_style(\n    style = list(cell_text(weight = \"bold\"), cell_fill(color = \"#DCDCDC\")),\n    locations = cells_column_labels(columns = everything())\n  ) |&gt;\n  tab_source_note(source_note = md(\"**Source : Enquête auprès des OR 2025**\"))\n\n\n\n\nTable 10.2: Synthèse des indicateurs de qualité par observatoire\n\n\n\n\n\n\n\n\n\nQualité réponse\nRéaction répondant\nAlaotra\nMarovoay\n\n\n\n\nBonne\nCode 4\n1\n0\n\n\nBonne\nMéfiant\n1\n0\n\n\nBonne\nNeutre\n9\n6\n\n\nBonne\nOuvert\n301\n211\n\n\nCode 3\nMéfiant\n3\n8\n\n\nMauvaise\nMéfiant\n6\n22\n\n\nMauvaise\nNeutre\n105\n184\n\n\nMauvaise\nOuvert\n80\n76\n\n\nCode 3\nNeutre\n0\n3\n\n\nCode 3\nOuvert\n0\n7\n\n\n\nSource : Enquête auprès des OR 2025",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Évaluation de la qualité de l'enquête</span>"
+    ]
+  },
+  {
+    "objectID": "13_enquete_qualite.html#remarques-générales",
+    "href": "13_enquete_qualite.html#remarques-générales",
+    "title": "10  Évaluation de la qualité de l’enquête",
+    "section": "10.6 Remarques générales",
+    "text": "10.6 Remarques générales\nLe champ rmq_gle recueille les remarques libres de l’enquêteur en fin d’entretien. Sur les 1026 ménages, 857 comportent une remarque substantielle (hors « RAS »). Ces remarques, rédigées en malgache, signalent notamment des difficultés rencontrées lors de l’entretien (répondant pressé, absences répétées, méfiance) ou apportent des précisions sur la situation du ménage.",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Évaluation de la qualité de l'enquête</span>"
     ]
   }
 ]
