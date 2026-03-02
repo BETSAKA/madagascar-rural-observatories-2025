@@ -26,6 +26,7 @@ res_m_a <- read_dta("data/res_m_a.dta")
 res_h <- read_dta("data/res_h.dta") # year, j5 
 # Loading indicateur de confort (v), equipement , communication (tm1, ut1, snw), equipement agricole (e0) data
 res_v <- read_dta("data/res_v.dta") # year, j5 
+res_e <- read_dta("data/res_e.dta") # year, j5 # Equipement module next part
 ```
 
 ## Habitat
@@ -567,16 +568,223 @@ ggplot(cooking_energy_source_plot, aes(x = Type, y = Percentage, fill = Observat
 
 ### Equipement
 
-```{r}
-res_e <- read_dta("data/res_e.dta") # year, j5 # Equipement module next part
-```
-
 Les équipements agricoles sont dans "res_v.dta" avec "e0" uniquement comme variable.
 
+#### A ESSAYER
+
 #### Taux de possession des biens de confort courant
+```{r}
+## Biens de confort
+#| label: setup
+#| include: false
+
+# Extraction des labels pour v
+lables_v <- tibble(
+  v_var = names(res_v)[grepl("^v", names(res_v))],
+  Type = sapply(res_v[grepl("^v", names(res_v))], function(x) {
+    lab <- iconv(var_label(x), from = "latin1", to = "UTF-8")
+    if (grepl(":", lab)) lab <- sub(".*?:\\s*", "", lab)
+    lab <- str_to_title(lab)
+    str_squish(lab)
+  })
+)
+
+# Construction des données
+hh_assets <- res_v %>% 
+  mutate(across(starts_with("v"), as.numeric)) %>% 
+  pivot_longer(
+    cols = starts_with("v"),
+    names_to = "v_var",
+    values_to = "value"
+  ) %>% 
+  filter(value == 1) %>% 
+  left_join(lables_v, by = "v_var") %>% 
+  left_join(res_deb, by = "j5") %>% 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    Type = str_squish(Type),
+    Type = str_replace_all(Type, "[\u00A0]", " "),
+    Type = ifelse(Type == "Autre Préciser", "Autre", Type)
+  ) %>% 
+  group_by(Observatory, Type) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  group_by(Observatory) %>% 
+  mutate(Percentage = round(100 * n / sum(n), 1)) %>% 
+  ungroup()
+
+# Totaux par observatoire
+totals_observatory <- hh_assets %>%
+  group_by(Observatory) %>%
+  summarise(Type = "Total", n = sum(n), Percentage = 100, .groups = "drop")
+
+# Total global
+total_global <- hh_assets %>%
+  summarise(
+    Observatory = "Total global",
+    Type = "Total",
+    n = sum(n),
+    Percentage = 100
+  )
+
+# Fusion des données finales
+hh_assets_final <- bind_rows(hh_assets, totals_observatory, total_global)
+
+# Tableau gt
+hh_assets_final %>% 
+  arrange(Observatory, desc(Percentage)) %>% 
+  gt(groupname_col = "Observatory") %>% 
+  fmt_number(columns = n, decimals = 0) %>% 
+  fmt_number(columns = Percentage, decimals = 1) %>% 
+  cols_label(Type = "Type", n = "Nombre", Percentage = "%") %>% 
+  tab_header(title = "Taux de possession de biens de confort courants par observatoire") %>% 
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+
+# Histogramme horizontal
+hh_assets_plot <- hh_assets_final %>%
+  filter(Type != "Total", Observatory != "Total global") %>%
+  group_by(Observatory, Type) %>%
+  summarise(Percentage = first(Percentage), .groups = "drop") %>%
+  mutate(Observatory = factor(Observatory, levels = c("Alaotra", "Marovoay"))) %>%
+  group_by(Observatory) %>%
+  mutate(Type = factor(Type, levels = Type[order(-Percentage)])) %>%
+  ungroup()
+
+ggplot(hh_assets_plot, aes(x = Type, y = Percentage, fill = Observatory)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  facet_wrap(~Observatory, ncol = 1, scales = "free_y") +
+  geom_text(aes(label = paste0(Percentage, "%")), hjust = -0.1, size = 4) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(
+    title = "Taux de possession de biens de confort courants par observatoire",
+    x = NULL,
+    y = NULL
+  ) +
+  theme_minimal(base_size = 14)
+```
 
 
 #### Equipement agricole des ménages : taux d’équipement et nombre d’outils
+
+```{r}
+## Taux de possessions d'équipement agricoles et nombre d'outils par observatoire
+
+#res_h <- read_dta("data/res_h.dta") # e0 no ato
+
+
+# -----------------------------
+# Taux de possession d'équipements agricoles par ménage
+# -----------------------------
+
+farm_equipment <- res_E %>% 
+  left_join(res_deb, by = "j5") %>% 
+  # Une ligne par ménage et type d'équipement
+  distinct(j5, j0, e11) %>%
+  group_by(j0, e11) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    # Extraire les labels et corriger l'encodage
+    f_equip = iconv(as.character(labelled::to_factor(e11)), from = "latin1", to = "UTF-8"),
+    f_equip = gsub("&#39;", "'", f_equip, fixed = TRUE)
+  ) %>%
+  group_by(Observatory) %>% 
+  mutate(
+    Total = sum(n),
+    Percentage = round(100 * n / Total, 1)
+  ) %>% 
+  select(Observatory, f_equip, n, Percentage) %>% 
+  ungroup()
+
+# Ajouter les lignes "Total" par observatoire
+farm_equipment <- bind_rows(
+  farm_equipment,
+  farm_equipment %>% 
+    group_by(Observatory) %>% 
+    summarise(
+      f_equip = "Total",
+      n = sum(n),
+      Percentage = 100,
+      .groups = "drop"
+    )
+) %>% 
+  arrange(Observatory, desc(f_equip == "Total"))
+
+# Ajouter une ligne "Total global"
+farm_equipment <- bind_rows(
+  farm_equipment,
+  farm_equipment %>% 
+    summarise(
+      Observatory = "Total global",
+      f_equip = "Total",
+      n = sum(n),
+      Percentage = 100,
+      .groups = "drop"
+    )
+)
+
+# Trier par nombre et % décroissants dans chaque observatoire
+farm_equipment <- farm_equipment %>%
+  group_by(Observatory) %>%
+  arrange(Observatory, desc(n), desc(Percentage)) %>%
+  ungroup()
+
+# -----------------------------
+# Tableau gt
+# -----------------------------
+farm_equipment %>% 
+  gt(rowname_col = "Type") %>% 
+  tab_header(
+    title = "Taux de possessions d'équipement agricoles et nombre d'outils par observatoire"
+  ) %>% 
+  fmt_number(
+    columns = vars(n),
+    sep_mark = " ",
+    decimals = 0
+  ) %>% 
+  fmt_number(
+    columns = vars(Percentage),
+    decimals = 1
+  ) %>% 
+  cols_label(
+    f_equip = "Type",
+    n = "Nombre",
+    Percentage = "%"
+  )
+
+# -----------------------------
+# Histogramme horizontal par observatoire (axes sans labels)
+# -----------------------------
+farm_equipment_plot <- farm_equipment %>%
+  filter(f_equip != "Total", Observatory != "Total global") %>%
+  group_by(Observatory) %>%
+  # Trier les types par % décroissant pour chaque observatoire
+  mutate(f_equip = factor(f_equip, levels = f_equip[order(-Percentage)])) %>%
+  ungroup()
+
+ggplot(farm_equipment_plot, aes(x = f_equip, y = Percentage, fill = Observatory)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  facet_wrap(~Observatory, ncol = 1, scales = "free_y") +
+  geom_text(aes(label = paste0(Percentage, "%")), hjust = -0.1, size = 4) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  labs(
+    title = "Répartition des équipements agricoles par observatoire",
+    x = NULL,
+    y = NULL    # supprime les labels des axes
+  ) +
+  theme_minimal(base_size = 14)
+```
 
 
 ### Accès à la communication audiovisuelle et à la télécommunication
