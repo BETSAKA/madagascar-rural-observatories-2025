@@ -4,25 +4,250 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Evaluation de l'enquête des OR auprès des ménages ruraux
+# Évaluation de la qualité de l'enquête
 
-Cette partie concerne les opinions des ménages sur l'enquête réalisée en 2025.
+Cette partie rassemble les indicateurs de qualité de la collecte. Les trois variables présentées ci-dessous sont **toutes renseignées par l'enquêteur** (et non par le ménage enquêté) :
 
-```{r}
+- `j11` — *« Qualité de l'enquête »* : appréciation globale de l'entretien, renseignée sur la page de couverture du questionnaire (fichier `res_deb`).
+- `qual1aa` — *« Qualité de la réponse en générale »* : évaluation de la qualité des réponses obtenues, renseignée dans le module de remarques en fin de questionnaire (fichier `res_remq`).
+- `qual2aa` — *« Réaction du répondant »* : appréciation de l'attitude du répondant pendant l'entretien, renseignée dans le même module de fin de questionnaire.
+
+```{r setup_qualite}
+#| include: false
 library(tidyverse)
 library(haven)
-library(dplyr)
-library (gt) # Easily create presentation - ready display tables
-
-# Loading observatories data
-res_deb <- read_dta("data/res_deb.dta")
-# Loading household data
-res_m_a <- read_dta("data/res_m_a.dta")
+library(labelled)
+library(gt)
 ```
 
-Nous allons charger les données de l'évaluation des enquêtes OR auprès des ménages ruraux d'Alaotra et de Marovoay.
+```{r data_qualite}
+#| include: false
+res_deb  <- read_dta("data/res_deb.dta")
+res_remq <- read_dta("data/res_remq.dta")
+
+res_deb <- res_deb |>
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  )
+
+res_remq <- res_remq |>
+  left_join(res_deb |> select(j5, Observatory), by = "j5")
+```
+
+## Qualité de l'enquête (évaluation par l'enquêteur, page de couverture)
+
+La variable `j11` — *« Qualité de l'enquête »* — est renseignée par l'enquêteur sur la page de couverture du questionnaire. Les modalités sont : 1 = bonne, 2 = moyenne, 3 = mauvaise. La grande majorité des entretiens sont jugés de bonne qualité ou de qualité moyenne (@fig-qualite).
 
 ```{r}
-# Loading evaluation section data
-res_remq <- read_dta("data/res_remq.dta")
+#| fig-cap: "Qualité de l'enquête selon l'enquêteur (j11, page de couverture)"
+#| fig-width: 8
+#| fig-height: 4
+#| label: fig-qualite
+
+qual <- res_deb |>
+  mutate(
+    Qualité = case_when(
+      j11 == 1 ~ "Bonne",
+      j11 == 2 ~ "Moyenne",
+      j11 == 3 ~ "Mauvaise",
+      TRUE ~ as.character(j11)
+    ),
+    Qualité = factor(Qualité, levels = c("Bonne", "Moyenne", "Mauvaise"))
+  ) |>
+  count(Observatory, Qualité)
+
+ggplot(qual, aes(x = Qualité, y = n, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  geom_text(
+    aes(label = n),
+    position = position_dodge(width = 0.9),
+    vjust = -0.3, size = 3
+  ) +
+  labs(x = NULL, y = "Nombre d'entretiens", fill = "Observatoire") +
+  theme_minimal()
 ```
+
+## Répondant
+
+Dans la plupart des cas, le répondant est le chef de ménage lui-même ou son conjoint. Quelques entretiens ont été réalisés avec un autre membre du ménage (@tbl-repondant).
+
+```{r}
+#| tbl-cap: "Qualité du répondant par observatoire"
+#| label: tbl-repondant
+
+res_deb |>
+  mutate(
+    Répondant = case_when(
+      j10 == 1  ~ "Chef de ménage",
+      j10 == 2  ~ "Conjoint(e)",
+      j10 == 3  ~ "Autre membre",
+      j10 == 91 ~ "Autre",
+      TRUE ~ paste0("Code ", j10)
+    )
+  ) |>
+  count(Observatory, Répondant) |>
+  pivot_wider(names_from = Observatory, values_from = n, values_fill = 0) |>
+  gt() |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+## Qualité de la réponse (évaluation par l'enquêteur, fin de questionnaire)
+
+La variable `qual1aa` — *« Qualité de la réponse en générale »* — est renseignée par l'enquêteur dans le module de remarques en fin de questionnaire. Les modalités prévues sont : **1 = bonne, 2 = mauvaise**. La @fig-qual-reponse présente la répartition par observatoire (les codes aberrants sont exclus, voir l'encadré ci-dessous).
+
+```{r}
+#| fig-cap: "Qualité de la réponse selon l'enquêteur (qual1aa, fin de questionnaire)"
+#| fig-width: 8
+#| fig-height: 4
+#| label: fig-qual-reponse
+
+qual_rep <- res_remq |>
+  filter(!is.na(qual1aa), qual1aa %in% c(1, 2)) |>
+  mutate(
+    Qualité = case_when(
+      qual1aa == 1 ~ "Bonne",
+      qual1aa == 2 ~ "Mauvaise"
+    ),
+    Qualité = factor(Qualité, levels = c("Bonne", "Mauvaise"))
+  ) |>
+  count(Observatory, Qualité)
+
+ggplot(qual_rep, aes(x = Qualité, y = n, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  geom_text(
+    aes(label = n),
+    position = position_dodge(width = 0.9),
+    vjust = -0.3, size = 3
+  ) +
+  labs(x = NULL, y = "Nombre de ménages", fill = "Observatoire") +
+  theme_minimal()
+```
+
+## Réaction du répondant (évaluation par l'enquêteur, fin de questionnaire)
+
+La variable `qual2aa` — *« Réaction du répondant »* — est renseignée par l'enquêteur dans le même module. Les modalités prévues sont : **1 = ouvert (à l'aise), 2 = neutre, 3 = méfiant**. La @fig-reaction présente la répartition (les codes aberrants sont exclus).
+
+```{r}
+#| fig-cap: "Réaction du répondant selon l'enquêteur (qual2aa, fin de questionnaire)"
+#| fig-width: 8
+#| fig-height: 4
+#| label: fig-reaction
+
+reaction <- res_remq |>
+  filter(!is.na(qual2aa), qual2aa %in% c(1, 2, 3)) |>
+  mutate(
+    Réaction = case_when(
+      qual2aa == 1 ~ "Ouvert (à l'aise)",
+      qual2aa == 2 ~ "Neutre",
+      qual2aa == 3 ~ "Méfiant"
+    ),
+    Réaction = factor(Réaction, levels = c("Ouvert (à l'aise)", "Neutre", "Méfiant"))
+  ) |>
+  count(Observatory, Réaction)
+
+ggplot(reaction, aes(x = Réaction, y = n, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  geom_text(
+    aes(label = n),
+    position = position_dodge(width = 0.9),
+    vjust = -0.3, size = 3
+  ) +
+  labs(x = NULL, y = "Nombre de ménages", fill = "Observatoire") +
+  theme_minimal()
+```
+
+## Codes aberrants à signaler pour l'apurement {#sec-codes-aberrants}
+
+::: {.callout-warning}
+## Erreurs de saisie détectées dans `qual1aa` et `qual2aa`
+
+**`qual1aa` = 3** (21 observations : 3 Alaotra, 18 Marovoay) — Le code 3 n'existe pas dans la grille de codage (`1 = Bonne`, `2 = Mauvaise`). L'hypothèse la plus probable est une **erreur de saisie** : l'enquêteur a noté `j11 = 3` (Mauvaise) sur la page de couverture et l'opérateur a reporté ce code par erreur dans `qual1aa`. On note d'ailleurs que 12 de ces 21 cas ont également `qual2aa = 3` (Méfiant) et que `j11` vaut 2 ou 3 dans la quasi-totalité des cas, ce qui confirme qu'il s'agit d'entretiens difficiles. **Action recommandée** : recoder ces 21 observations en `qual1aa = 2` (Mauvaise), ou les laisser en NA si l'on ne peut confirmer.
+
+**`qual2aa` = 4** (1 observation : j5 = 2121035, Alaotra, enquêteur 20, hameau Mangabe) — Le code 4 n'existe pas dans la grille (`1 = Ouvert`, `2 = Neutre`, `3 = Méfiant`). `qual1aa` vaut 1 (Bonne) et la remarque est vide. Il s'agit d'une **erreur de saisie isolée**. **Action recommandée** : recoder en NA.
+
+**Valeurs manquantes** : 3 ménages (j5 = 2111000, 320413, 320113) ont `qual1aa` et `qual2aa` à NA. Ces cas sont à vérifier auprès de l'équipe de saisie.
+:::
+
+```{r}
+#| tbl-cap: "Observations avec codes aberrants dans qual1aa ou qual2aa"
+#| label: tbl-codes-aberrants
+
+res_remq |>
+  left_join(res_deb |> select(j5, Observatory, j1, j4, j11), by = "j5") |>
+  filter(
+    (!qual1aa %in% c(1, 2) & !is.na(qual1aa)) |
+    (!qual2aa %in% c(1, 2, 3) & !is.na(qual2aa)) |
+    is.na(qual1aa) | is.na(qual2aa)
+  ) |>
+  mutate(
+    Enquêteur = paste0("E", sprintf("%02d", j1)),
+    j11_lbl = case_when(j11 == 1 ~ "Bonne", j11 == 2 ~ "Moyenne", j11 == 3 ~ "Mauvaise"),
+    qual1aa = as.numeric(qual1aa),
+    qual2aa = as.numeric(qual2aa)
+  ) |>
+  select(j5, Observatory, Enquêteur, Hameau = j4, j11 = j11_lbl, qual1aa, qual2aa) |>
+  gt() |>
+  cols_label(j5 = "ID ménage", Hameau = "Hameau", Enquêteur = "Enquêteur",
+             j11 = "j11 (couverture)", qual1aa = "qual1aa", qual2aa = "qual2aa") |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  sub_missing(missing_text = "NA") |>
+  tab_style(
+    style = cell_fill(color = "#FFCCCC"),
+    locations = cells_body(
+      columns = qual1aa,
+      rows = !qual1aa %in% c(1, 2) | is.na(qual1aa)
+    )
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#FFCCCC"),
+    locations = cells_body(
+      columns = qual2aa,
+      rows = !qual2aa %in% c(1, 2, 3) | is.na(qual2aa)
+    )
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025 — à corriger lors de l'apurement**"))
+```
+
+## Synthèse croisée
+
+Le @tbl-synthese-qualite croise les deux indicateurs d'évaluation de fin de questionnaire (`qual1aa` et `qual2aa`) par observatoire, en ne retenant que les codes valides.
+
+```{r}
+#| tbl-cap: "Synthèse croisée qualité de la réponse × réaction du répondant, par observatoire"
+#| label: tbl-synthese-qualite
+
+res_remq |>
+  filter(qual1aa %in% c(1, 2), qual2aa %in% c(1, 2, 3)) |>
+  mutate(
+    `Qualité réponse` = case_when(
+      qual1aa == 1 ~ "Bonne", qual1aa == 2 ~ "Mauvaise"
+    ),
+    `Réaction répondant` = case_when(
+      qual2aa == 1 ~ "Ouvert", qual2aa == 2 ~ "Neutre", qual2aa == 3 ~ "Méfiant"
+    )
+  ) |>
+  count(Observatory, `Qualité réponse`, `Réaction répondant`) |>
+  pivot_wider(names_from = Observatory, values_from = n, values_fill = 0) |>
+  gt() |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+## Remarques générales
+
+Le champ `rmq_gle` recueille les remarques libres de l'enquêteur en fin d'entretien. Sur les `r nrow(res_remq)` ménages, `r res_remq |> filter(rmq_gle != "" & !str_detect(str_to_upper(rmq_gle), "^R\\.?A\\.?S\\.?$")) |> nrow()` comportent une remarque substantielle (hors « RAS »). Ces remarques, rédigées en malgache, signalent notamment des difficultés rencontrées lors de l'entretien (répondant pressé, absences répétées, méfiance) ou apportent des précisions sur la situation du ménage.
