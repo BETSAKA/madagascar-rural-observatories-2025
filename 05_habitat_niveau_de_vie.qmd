@@ -86,21 +86,20 @@ house_status <- bind_rows(
 
 # Créer un tableau formaté avec gt
 house_status %>% 
-  gt(rowname_col = "Statut") %>% 
+  gt(rowname_col = "statut") %>% 
   tab_header(
     title = "Statut d'occupation du logement par observatoire"
   ) %>% 
   fmt_number(
-    columns = vars(n),
+    columns = c(n),
     sep_mark = " ",
     decimals = 0
   ) %>% 
   fmt_number(
-    columns = vars(Percentage),
+    columns = c(Percentage),
     decimals = 1
   ) %>% 
   cols_label(
-    statut = "Statut",
     n = "Nombre",
     Percentage = "%"
   )
