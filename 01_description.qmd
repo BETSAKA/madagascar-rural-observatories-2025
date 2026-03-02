@@ -4,306 +4,441 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Description
+# Description de l'enquête
 
-```{r data_loading}
+```{r setup_desc}
+#| include: false
 library(tidyverse)
 library(haven)
-library(dplyr)
-library (gt) # Easily create presentation - ready display tables
-
-# Loading observatories data
-res_deb <- read_dta("data/res_deb.dta")
-# Loading household data
-res_m_a <- read_dta("data/res_m_a.dta")
+library(labelled)
+library(gt)
+library(readODS)
+library(tmap)
+library(sf)
+library(lubridate)
+library(scales)
 ```
 
+## Contexte et objectifs
+
+Les Observatoires Ruraux (OR) de Madagascar sont un dispositif d'enquête longitudinale auprès de ménages ruraux, mis en place à partir de 1995 dans le cadre du réseau des observatoires ruraux coordonné par l'IRD et l'INSTAT, puis le Ministère de l'agriculture. Deux OR font l'objet de cette campagne d'enquête en 2025 :
+
+- **Alaotra**, situé dans la région Alaotra-Mangoro, dans les districts d'Ambatondrazaka et d'Amparafaravola. L'Alaotra est le premier grenier à riz de Madagascar, caractérisé par de vastes plaines irriguées et des périmètres aménagés.
+- **Marovoay** , situé dans la région Boeny, dans le district de Marovoay. Marovoay constitue le deuxième pôle rizicole du pays, avec une production reposant sur l'irrigation par les eaux du fleuve Betsiboka.
+
+Ces deux observatoires ont été enquêtés de manière régulière entre 1995 et 2014 (Marovoay) et 1999 et 2014 (Alaotra), avec une seule interruption l'année 2009 en raison de la crise politique qui a secoué le pays. La campagne 2025, réalisée par le projet BETSAKA, renoue avec ce suivi après une interruption de plus de dix ans. L'enquête conserve les instruments et la méthodologie des campagnes antérieures, tout en reprenant des ajustements faits dans le cadre de l'observatoire du Makay en 2022 et 2024, et en les adaptant au contexte actuel.
+
+> Introduire ici un paragraphe qui liste les modifications introduites pour cette campagne : allègement du questionnaire, modules développés pour le Makay qui ont été repris, nouveau formulaire de consentement éclairé...
+
+La période de référence couvre les douze mois précédant l'interview, soit du 1^er^ octobre 2024 au 30 septembre 2025.
+
+## Méthodologie
+
+L'enquête reprend le protocole des campagnes antérieures des Observatoires Ruraux. Le questionnaire ménage couvre l'ensemble des dimensions socio-économiques : démographie, habitat, activités agricoles et non agricoles, foncier, revenus, sécurité alimentaire, environnement et événements climatiques.
+
+Les unités d'observation sont les ménages résidant dans les hameaux échantillonnés. L'échantillon de 2025 vise à reconstituer autant que possible le panel de ménages suivis lors des campagnes précédentes, complété par de nouveaux ménages en remplacement de ceux ayant quitté la zone ou disparus.
+
+Les enquêteurs ont été formés par les superviseurs avant le déploiement sur le terrain. La saisie des données a été réalisée à l'aide de masques de saisie dédiés.
+
+::: {.callout-note}
+Le protocole éthique de l'enquête a fait l'objet d'une approbation, présentée en annexe du rapport.
+:::
 
 
-Il s'agit d'un chapitre préliminaire decrivant le déroulement de l'enquête ainsi que les methodologies déployées.
 
-Cette partie inclut des tables et figures sur :
+## Localisation des sites enquêtés
 
--   carte des localités enquêtées (avec coordonnées GPS saisies)
+Les coordonnées GPS des hameaux enquêtés ont été relevées lors de la campagne. La carte ci-dessous présente la localisation approximative de chaque fokontany, calculée comme le centroïde des hameaux qui le composent. Les deux observatoires se situent dans le nord-ouest (Marovoay) et le centre-est (Alaotra) de Madagascar.
 
--   dénombrement par localité
+```{r carte_sites}
+#| fig-cap: "Localisation approximative des fokontany enquêtés (centroïde des hameaux)"
 
--   nombre de ménages enquêtés par localité
+# --- Centroïdes des fokontany (moyennes des coordonnées GPS des hameaux) ---
+# Les coordonnées individuelles des hameaux ne sont pas diffusées pour des
+# raisons de confidentialité. Les centroïdes ci-dessous ont été calculés à
+# partir du fichier :
+#   documentation/Coordonnées_GPS_OR_Alaotra_Marovoay_2025.ods
+# Code original de calcul (commenté) :
+# gps_alaotra  <- read_ods(
+#   "documentation/Coordonnées_GPS_OR_Alaotra_Marovoay_2025.ods",
+#   sheet = "Alaotra 2025"
+# )
+# gps_marovoay <- read_ods(
+#   "documentation/Coordonnées_GPS_OR_Alaotra_Marovoay_2025.ods",
+#   sheet = "Marovoay 2025"
+# )
+# parse_dms <- function(dms_str) {
+#   s <- str_replace_all(dms_str, "\\n", " ")
+#   s <- str_replace_all(s, "[\"\u201d\u2033]", "'")
+#   pattern <- "(\\d+)[°](\\d+)'([\\d.]+)'?\\s*([NS])\\s+(\\d+)[°](\\d+)'([\\d.]+)'?\\s*([EW])"
+#   m <- str_match(s, pattern)
+#   if (is.na(m[1])) return(c(lat = NA_real_, lon = NA_real_))
+#   lat <- as.numeric(m[2]) + as.numeric(m[3]) / 60 + as.numeric(m[4]) / 3600
+#   if (m[5] == "S") lat <- -lat
+#   lon <- as.numeric(m[6]) + as.numeric(m[7]) / 60 + as.numeric(m[8]) / 3600
+#   if (m[9] == "W") lon <- -lon
+#   c(lat = lat, lon = lon)
+# }
+# coords_alaotra <- gps_alaotra |>
+#   rename(Localisation = 5) |> rowwise() |>
+#   mutate(coords = list(parse_dms(Localisation)),
+#          lat = coords[["lat"]], lon = coords[["lon"]]) |>
+#   ungroup() |> select(Hameaux, Fokontany, lat, lon) |>
+#   mutate(Hameaux = str_replace_all(Hameaux, "\\n", " ") |> str_squish(),
+#          Observatory = "Alaotra") |> filter(!is.na(lat))
+# parse_marovoay <- function(gps_str) {
+#   s <- str_replace_all(gps_str, "\\n", " ")
+#   lat_match <- str_match(s, "Latitude\\s+(-?[\\d.]+)")
+#   lon_match <- str_match(s, "Longitude\\s+(-?[\\d.]+)")
+#   c(lat = as.numeric(lat_match[2]), lon = as.numeric(lon_match[2]))
+# }
+# coords_marovoay <- gps_marovoay |>
+#   rename(GPS = `Coordonnées GPS`) |> rowwise() |>
+#   mutate(coords = list(parse_marovoay(GPS)),
+#          lat = coords[["lat"]], lon = coords[["lon"]]) |>
+#   ungroup() |> select(Hameaux, Fokontany, lat, lon) |>
+#   mutate(Observatory = "Marovoay") |> filter(!is.na(lat))
+# all_coords <- bind_rows(coords_alaotra, coords_marovoay)
+# fokontany_centroids <- all_coords |>
+#   summarise(lat = mean(lat), lon = mean(lon), n_hameaux = n(),
+#             .by = c(Observatory, Fokontany))
 
--   Taux de couverture des localités (nombre dobservations res-deb.dta / dénombrement de la localité)
+fokontany_centroids <- tribble(
+  ~Observatory, ~Fokontany,           ~lat,       ~lon, 
+  "Alaotra",    "Avaradrano",       -17.805414, 48.469958, 
+  "Alaotra",    "Feramanga Atsimo", -17.844153, 48.373383,  
+  "Alaotra",    "Mangabe",          -17.879586, 48.405244,  
+  "Alaotra",    "Analamiranga",     -17.572375, 48.200017,  
+  "Alaotra",    "Maritampona",      -17.603500, 48.207639,  
+  "Alaotra",    "Ambohidrony",      -17.729175, 48.208611,  
+  "Alaotra",    "Ambatomanga",      -17.741178, 48.200647,  
+  "Marovoay",   "Ampijoroa",        -16.233414, 46.477984,  
+  "Marovoay",   "Maroala",          -16.228857, 46.539738, 
+  "Marovoay",   "Madiromiongana",   -16.086480, 46.749270, 
+  "Marovoay",   "Bepako",           -16.163712, 46.658402
+)
 
--   chronogramme des enquêtes (à partir des dates saisies dans les questionnaires)
+# --- Carte interactive avec tmap ---
+foko_sf <- st_as_sf(fokontany_centroids, coords = c("lon", "lat"), crs = 4326)
 
--   nombre de questionnaire par enquêteur (anonymisés) et par agent de saisie
-
-On introduit avec une présentation des deux ORs Alaotra et Marovoay.
-
-Contexte notamment 02 greniers à riz et APs.
-
-Lien avec les ORs de 1995-2015
-
-Période de l'enquête : 01 octobre - 15 novembre 2025
-
-Période de référence : 01 octobre 2024 - 30 septembre 2025
-
-Présentation de la division administrative de Marovoay et Alaotra : région, district, commune, fokontany et hameau
-
-Zone de dénombrement / d'enquête =\> hameau
-
-Carte de Marovoay et d'Alaotra
-
-Méthodologie :
-
-Ethique =\> Approbation éthique en annexe
-
-Formation des superviseurs, des enquêteurs sur terrain, pas de formation pour les agents de saisie
-
-Selection des zones d'études
-
-Echantillonnage
-
-Nombre de ménages enquêtés par observatoire. Voir @tbl-men-obs.
-
-
-```{r}
-#| tbl-cap: |
-#|    <strong>Répartition des ménages selon les observatoires</strong>     
-#| tbl-cap-location: top
-#| label: tbl-men-obs
-
-# Tableau de répartition des ménages selon les observatoires
-tab <- res_deb %>%
-  group_by(j0) %>%
-  summarise(n = n_distinct(j5), .groups = "drop") %>%
-  arrange(desc(n)) %>%
-  mutate(
-    Pourcent = round(n / sum(n) * 100, 1),
-    j0 = as.character(j0),
-    Observatoire = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    )
-  ) %>%
-  select(Observatoire, n, Pourcent)
-
-tab <- tab %>% 
-  tibble::add_row(Observatoire = "Ensemble", n = sum(tab$n), Pourcent = sum(tab$Pourcent, na.rm = TRUE))
-
-# Créer un tableau avec gt 
-gt_tab <- gt(tab) %>% 
-  fmt_number( 
-    columns = Pourcent, 
-    decimals = 0, 
-    suffixing = TRUE ) %>%
-  tab_footnote( 
-    footnote = "Pourcent (%)", 
-    locations = cells_column_labels(columns = Pourcent) 
-    ) %>% 
-  cols_label(
-    n = "Effectif"
-  ) %>% 
-  # Mettre en gras + couleur la ligne des colonnes et "ensemble"
-  tab_style(
-    style = list(
-      cell_text(weight = "bold"),
-      cell_fill(color = "#B0E0E6")   # Bleu poudre
+tmap_mode("view")
+tm_shape(foko_sf) +
+  tm_dots(
+    fill = "Observatory",
+    fill.scale = tm_scale_categorical(
+      values = c("Alaotra" = "#E41A1C", "Marovoay" = "#377EB8")
     ),
-  locations = list (
-      cells_column_labels(columns = everything()),
-      cells_body(rows = Observatoire == "Ensemble")
-    )
-  ) %>% 
-        # Ajouter une note de source en bas du tableau
-  tab_source_note(
-    source_note = md("**Source : Enquête auprès des OR 2025**")
-
-  )
-gt_tab 
+    fill.legend = tm_legend(title = "Observatoire"),
+    size = 1,
+    id = "Fokontany",
+    popup.vars = c("Observatoire" = "Observatory", "Fokontany" = "Fokontany")
+  ) +
+  tm_basemap("OpenStreetMap") +
+  tm_scalebar(position = c("left", "bottom"))
 ```
-EN TENANT COMPTE DES INDIVIDUS
 
-```{r}
-# CORRECTIONS 4
-#| tbl-cap: |
-#|    <strong>Répartition des ménages et des individus selon les observatoires</strong>      
-#| tbl-cap-location: top
-#| label: tbl-men-obs
 
-# Tableau de répartition des ménages par tranche d'âge selon les observatoires
-# Recode j0 en Observatoire (labels) dans res_deb
-res_deb <- res_deb %>%
+## Ménages enquêtés
+
+```{r data_loading}
+res_deb <- read_dta("data/res_deb.dta")
+res_m_a <- read_dta("data/res_m_a.dta")
+
+res_deb <- res_deb |>
   mutate(
     j0 = as.character(j0),
-    Observatoire = case_when(
+    Observatory = case_when(
       j0 == "3"  ~ "Marovoay",
       j0 == "21" ~ "Alaotra",
       TRUE       ~ j0
-    )
-  )
-# Joindre l'info Observatoire à res_m_a via j5
-res_m_a <- res_m_a %>%
-  left_join(res_deb %>% select(j5, Observatoire), by = "j5")
-
-# Vérifier que la colonne Observatoire existe bien
-stopifnot("Observatoire" %in% names(res_m_a))
-# Tableau de répartition des ménages et individus selon les observatoires
-tab <- res_deb %>%
-  group_by(Observatoire) %>%
-  summarise(n_menages = n_distinct(j5), .groups = "drop") %>%
-  left_join(
-    res_m_a %>%
-      group_by(Observatoire) %>%
-      summarise(n_individus = n(), .groups = "drop"),
-    by = "Observatoire"
-  ) %>%
-  arrange(desc(n_menages)) %>%
-  mutate(
-    Pourcent_menages   = round(n_menages / sum(n_menages) * 100, 1),
-    Pourcent_individus = round(n_individus / sum(n_individus) * 100, 1)
-  )
-
-# Ajouter une ligne "Ensemble"
-tab <- tab %>%
-  tibble::add_row(
-    Observatoire       = "Ensemble",
-    n_menages          = sum(tab$n_menages),
-    Pourcent_menages   = 100,
-    n_individus        = sum(tab$n_individus),
-    Pourcent_individus = 100
-  )
-# Créer un tableau avec gt
-gt_tab <- gt(tab) %>%
-  fmt_number(columns = c(Pourcent_menages, Pourcent_individus), decimals = 0) %>%
-  cols_label(
-    n_menages          = "Effectif ménages",
-    Pourcent_menages   = "Pourcent ménages",
-    n_individus        = "Effectif individus",
-    Pourcent_individus = "Pourcent individus"
-  ) %>%
-  tab_style(
-    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
-    locations = cells_column_labels(columns = everything())
-  ) %>%
-  tab_style(
-    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
-    locations = cells_body(rows = Observatoire == "Ensemble")
-  ) %>%
-  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
-
-gt_tab
-
-```
-
-Nombre de ménages enquêtés par hameaux
-
-```{r}
-# Calcul des hameaux avec pourcentage interne
-tab <- res_deb %>%
-  mutate(
+    ),
     j4bis = case_when(
       str_starts(str_to_lower(j4), "bepako") ~ "Bepako",
       str_starts(str_to_lower(j4), "ampijoroa") ~ "Ampijoroa",
       str_starts(str_to_lower(j4), "maroala") ~ "Maroala",
       str_starts(str_to_lower(j4), "madiromiongana") ~ "Madiromiongana",
       TRUE ~ j4
-    ),
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
     )
-  ) %>%
-  group_by(Observatory, j4bis) %>%
-  summarise(n = n_distinct(j5), .groups = "drop_last") %>%
-  mutate(
-    Percent = round(n / sum(n) * 100, 1)   # pourcentage interne à chaque observatoire
-  ) %>%
-  ungroup()
-
-# Totaux par observatoire
-totals <- tab %>%
-  group_by(Observatory) %>%
-  summarise(
-    j4bis = "Ensemble",
-    n = sum(n),
-    Percent = 100
   )
 
-# Total global (somme des "Ensemble") 
-grand_total <- totals %>% 
-  summarise( 
-    Observatory = "zzzTotal", # valeur spéciale pour le tri
-    j4bis = "Total",
-    n = sum(n), 
-    Percent = 100 
-    ) 
+res_m_a <- res_m_a |>
+  left_join(res_deb |> select(j5, Observatory), by = "j5")
+```
 
-# Fusionner tout 
-tab <- bind_rows(tab, totals, grand_total) %>% 
-  mutate(order_flag = ifelse(Observatory == "zzzTotal", 2, 1)) %>% 
-  arrange(order_flag, Observatory, desc(j4bis != "Ensemble"), desc(n)) %>%
-  select(-order_flag) %>%  # enlever la colonne temporaire
-# remplacer "zzzTotal" par "" pour éviter le groupe vide 
-  mutate(Observatory = ifelse(Observatory == "zzzTotal", "", Observatory))
+Au total, `r nrow(res_deb)` ménages ont été enquêtés : `r sum(res_deb$j0 == "3")` à Marovoay et `r sum(res_deb$j0 == "21")` à Alaotra. Voir @tbl-men-obs.
 
-# Créer le tableau gt avec regroupement par observatoire
-gt_tab <- gt(tab, groupname_col = "Observatory") %>%
-  tab_header(
-    title = "Répartition des ménages par hameau selon les observatoires"
-  ) %>%
-  fmt_number(
-    columns = Percent,
-    decimals = 1
-  ) %>%
+```{r}
+#| tbl-cap: "Répartition des ménages et des individus selon les observatoires"
+#| tbl-cap-location: top
+#| label: tbl-men-obs
+
+tab <- res_deb |>
+  group_by(Observatory) |>
+  summarise(n_menages = n_distinct(j5), .groups = "drop") |>
+  left_join(
+    res_m_a |>
+      group_by(Observatory) |>
+      summarise(n_individus = n(), .groups = "drop"),
+    by = "Observatory"
+  ) |>
+  arrange(desc(n_menages)) |>
+  mutate(
+    Pourcent_menages   = round(n_menages / sum(n_menages) * 100, 1),
+    Pourcent_individus = round(n_individus / sum(n_individus) * 100, 1)
+  )
+
+tab <- tab |>
+  add_row(
+    Observatory        = "Ensemble",
+    n_menages          = sum(tab$n_menages),
+    Pourcent_menages   = 100,
+    n_individus        = sum(tab$n_individus),
+    Pourcent_individus = 100
+  )
+
+gt(tab) |>
+  fmt_number(columns = c(n_menages, n_individus), sep_mark = " ", decimals = 0) |>
+  fmt_number(columns = c(Pourcent_menages, Pourcent_individus), decimals = 1) |>
   cols_label(
-    j4bis = "Hameau",
-    n = "Nombre",
-    Percent = "Pourcentage (%)"
-  ) %>%
-  # Style pour les sous-totaux 
-  tab_style( 
-    style = list(
-      cell_text(weight = "bold"), 
-      cell_fill(color = "#CECECE")
-      ), 
-    locations = cells_body(rows = j4bis == "Ensemble" & Observatory != "") 
-    ) %>% 
-  # Style pour la ligne Total finale 
-  tab_style( 
-    style = list(
-      cell_text(weight = "bold"), 
-      cell_fill(color = "#FFD700")
-      ), 
-    locations = cells_body(rows = j4bis == "Total") 
-    ) %>% 
-# Style pour les en-têtes de colonnes
+    Observatory        = "Observatoire",
+    n_menages          = "Ménages",
+    Pourcent_menages   = "% ménages",
+    n_individus        = "Individus",
+    Pourcent_individus = "% individus"
+  ) |>
   tab_style(
-    style = list(
-      cell_text(weight = "bold"),
-      cell_fill(color = "#4682B4")   # Stellblue
-    ),
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
     locations = cells_column_labels(columns = everything())
-  ) %>%
-  # Style pour les observatoires
+  ) |>
   tab_style(
-    style = list(
-      cell_text(weight = "bold"),
-      cell_fill(color = "#B0E0E6")   # Bleu poudre
-    ),
-    locations = cells_row_groups()
-  ) %>%
-  # Style pour le titre principal
-  tab_style(
-    style = list(
-      cell_text(weight = "bold"),
-      cell_fill(color = "#FFF2CC")   # beige clair / jaune pâle
-    ),
-    locations = cells_title(groups = "title")
-  )%>%
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
+    locations = cells_body(rows = Observatory == "Ensemble")
+  ) |>
   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
-gt_tab
+```
 
+### Répartition par hameau
+
+Le @tbl-men-hameau détaille le nombre de ménages enquêtés dans chacun des hameaux, regroupés par site au sein de chaque observatoire.
+
+```{r}
+#| tbl-cap: "Répartition des ménages enquêtés par hameau"
+#| tbl-cap-location: top
+#| label: tbl-men-hameau
+
+tab_ham <- res_deb |>
+  group_by(Observatory, j4bis) |>
+  summarise(n = n_distinct(j5), .groups = "drop_last") |>
+  mutate(Percent = round(n / sum(n) * 100, 1)) |>
+  ungroup()
+
+totals <- tab_ham |>
+  group_by(Observatory) |>
+  summarise(j4bis = "Ensemble", n = sum(n), Percent = 100)
+
+grand_total <- tibble(
+  Observatory = "", j4bis = "Total",
+  n = sum(tab_ham$n), Percent = 100
+)
+
+tab_ham <- bind_rows(tab_ham, totals, grand_total) |>
+  mutate(order_flag = if_else(Observatory == "", 2, 1)) |>
+  arrange(order_flag, Observatory, desc(j4bis != "Ensemble"), desc(n)) |>
+  select(-order_flag)
+
+gt(tab_ham, groupname_col = "Observatory") |>
+  fmt_number(columns = Percent, decimals = 1) |>
+  cols_label(j4bis = "Hameau", n = "Ménages", Percent = "% obs.") |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
+    locations = cells_row_groups()
+  ) |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#CECECE")),
+    locations = cells_body(rows = j4bis %in% c("Ensemble", "Total"))
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+
+## Déroulement de l'enquête
+
+### Période de collecte
+
+Les entretiens se sont déroulés entre début octobre et mi-novembre 2025. Un entretien isolé a été réalisé à Marovoay le 3 septembre ; il est exclu du chronogramme ci-dessous qui ne retient que les dates à partir du 1^er^ octobre 2025. Le @fig-chronogramme présente l'évolution cumulée du nombre d'entretiens réalisés.
+
+```{r}
+#| fig-cap: "Fréquences cumulées des entretiens par observatoire (à partir du 1er octobre 2025)"
+#| fig-width: 10
+#| fig-height: 5
+#| label: fig-chronogramme
+
+chrono <- res_deb |>
+  mutate(
+    j14_str = sprintf("%08d", as.integer(j14)),
+    date_interview = dmy(j14_str)
+  ) |>
+  filter(!is.na(date_interview), date_interview >= as.Date("2025-10-01")) |>
+  count(Observatory, date_interview) |>
+  arrange(Observatory, date_interview) |>
+  mutate(cumul = cumsum(n), .by = Observatory)
+
+ggplot(chrono, aes(x = date_interview, y = cumul, color = Observatory)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 1.5) +
+  scale_x_date(
+    date_breaks = "1 week", date_labels = "%d %b",
+    expand = expansion(mult = c(0.01, 0.01))
+  ) +
+  labs(x = NULL, y = "Nombre cumulé d'entretiens", color = "Observatoire") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r}
+#| tbl-cap: "Période de collecte par observatoire"
+#| label: tbl-periode
+
+res_deb |>
+  mutate(
+    j14_str = sprintf("%08d", as.integer(j14)),
+    date_interview = dmy(j14_str)
+  ) |>
+  filter(date_interview >= as.Date("2025-10-01")) |>
+  group_by(Observatory) |>
+  summarise(
+    Début = min(date_interview, na.rm = TRUE),
+    Fin   = max(date_interview, na.rm = TRUE),
+    `Jours d'enquête` = n_distinct(date_interview),
+    Ménages = n(),
+    .groups = "drop"
+  ) |>
+  gt() |>
+  cols_label(Observatory = "Observatoire") |>
+  fmt_date(columns = c(Début, Fin), date_style = "day_month_year") |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+### Équipe d'enquête
+
+L'enquête a mobilisé 20 enquêteurs (10 par observatoire), encadrés par 6 superviseurs (3 par observatoire). La saisie des questionnaires a été assurée par 4 opérateurs. Le @fig-enqueteurs présente le nombre de questionnaires réalisés par chaque enquêteur (identifié par un code anonyme).
+
+```{r}
+#| fig-cap: "Nombre de questionnaires par enquêteur et observatoire"
+#| fig-width: 9
+#| fig-height: 5
+#| label: fig-enqueteurs
+
+enq <- res_deb |>
+  mutate(Enquêteur = paste0("E", sprintf("%02d", j1))) |>
+  count(Observatory, Enquêteur)
+
+ggplot(enq, aes(x = fct_reorder(Enquêteur, n), y = n, fill = Observatory)) +
+  geom_col() +
+  coord_flip() +
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "Questionnaires réalisés", fill = "Observatoire") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+```{r}
+#| tbl-cap: "Nombre de questionnaires supervisés par superviseur"
+#| label: tbl-superviseurs
+
+res_deb |>
+  mutate(Superviseur = paste0("S", sprintf("%02d", j3))) |>
+  count(Observatory, Superviseur) |>
+  pivot_wider(names_from = Observatory, values_from = n, values_fill = 0) |>
+  gt() |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+```{r}
+#| tbl-cap: "Nombre de questionnaires saisis par opérateur de saisie"
+#| label: tbl-saisie
+
+res_deb |>
+  mutate(Opérateur = paste0("OP", sprintf("%02d", j2))) |>
+  count(Opérateur, name = "Questionnaires") |>
+  gt() |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+### Qualité perçue de l'enquête
+
+La variable `j11` renseigne l'appréciation de la qualité de l'entretien par l'enquêteur (1 = bonne, 2 = moyenne, 3 = mauvaise). La grande majorité des entretiens sont jugés de bonne qualité ou de qualité moyenne.
+
+```{r}
+#| fig-cap: "Appréciation de la qualité des entretiens par l'enquêteur"
+#| fig-width: 8
+#| fig-height: 4
+#| label: fig-qualite
+
+qual <- res_deb |>
+  mutate(
+    Qualité = case_when(
+      j11 == 1 ~ "Bonne",
+      j11 == 2 ~ "Moyenne",
+      j11 == 3 ~ "Mauvaise",
+      TRUE ~ as.character(j11)
+    ),
+    Qualité = factor(Qualité, levels = c("Bonne", "Moyenne", "Mauvaise"))
+  ) |>
+  count(Observatory, Qualité)
+
+ggplot(qual, aes(x = Qualité, y = n, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  geom_text(
+    aes(label = n),
+    position = position_dodge(width = 0.9),
+    vjust = -0.3, size = 3
+  ) +
+  labs(x = NULL, y = "Nombre d'entretiens", fill = "Observatoire") +
+  theme_minimal()
+```
+
+### Répondant
+
+Dans la plupart des cas, le répondant est le chef de ménage lui-même ou son conjoint. Quelques entretiens ont été réalisés avec un autre membre du ménage.
+
+```{r}
+#| tbl-cap: "Qualité du répondant par observatoire"
+#| label: tbl-repondant
+
+res_deb |>
+  mutate(
+    Répondant = case_when(
+      j10 == 1  ~ "Chef de ménage",
+      j10 == 2  ~ "Conjoint(e)",
+      j10 == 3  ~ "Autre membre",
+      j10 == 91 ~ "Autre",
+      TRUE ~ paste0("Code ", j10)
+    )
+  ) |>
+  count(Observatory, Répondant) |>
+  pivot_wider(names_from = Observatory, values_from = n, values_fill = 0) |>
+  gt() |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 ```
 
