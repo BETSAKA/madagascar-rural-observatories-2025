@@ -87,21 +87,20 @@ house_status <- bind_rows(
 
 # Créer un tableau formaté avec gt
 house_status %>% 
-  gt(rowname_col = "Statut") %>% 
+  gt(rowname_col = "statut") %>% 
   tab_header(
     title = "Statut d'occupation du logement par observatoire"
   ) %>% 
   fmt_number(
-    columns = vars(n),
+    columns = c(n),
     sep_mark = " ",
     decimals = 0
   ) %>% 
   fmt_number(
-    columns = vars(Percentage),
+    columns = c(Percentage),
     decimals = 1
   ) %>% 
   cols_label(
-    statut = "Statut",
     n = "Nombre",
     Percentage = "%"
   )
@@ -1057,6 +1056,23 @@ if (file.exists(trends_file)) {
       .groups = "drop"
     )
 
+  # --- Prix médian du paddy par observatoire ---
+  paddy_prices <- map_dfr(c(1995:2015, 2025), function(yr) {
+    f <- paste0("data/ROS_MDG_microdata/", yr, "/res_dc21.dta")
+    if (!file.exists(f)) return(tibble())
+    d <- read_dta(f) |> mutate(j5 = as.character(j5), year = yr)
+    if (!"dc24" %in% names(d)) return(tibble())
+    d |>
+      left_join(obs_lookup |> filter(year == yr), by = c("j5", "year")) |>
+      filter(j0 %in% c(3, 21), !is.na(dc24), dc24 > 0) |>
+      mutate(Observatory = if_else(j0 == 3, "Marovoay", "Alaotra")) |>
+      summarise(prix_paddy_median = median(dc24, na.rm = TRUE),
+                .by = c(year, Observatory))
+  })
+
+  trends <- trends |>
+    left_join(paddy_prices, by = c("year", "Observatory"))
+
   # --- IPC Banque Mondiale (base 2010 = 100) ---
   library(jsonlite)
   wb_raw <- fromJSON(
@@ -1074,7 +1090,7 @@ if (file.exists(trends_file)) {
     tibble(year = 2025L, cpi = cpi_wb$cpi[cpi_wb$year == 2023] * 1.09^2)
   )
 
-  # Déflation
+  # Déflation par l'IPC
   trends <- trends |>
     left_join(cpi_full, by = "year") |>
     mutate(
