@@ -4,81 +4,1095 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Rapport des ménages ruraux avec l'environnement en particulier les AP
+# Rapport des ménages ruraux avec l'environnement
 
-Les ménages ruraux ont des rapports à l'environnement en particulier les aires protéges.
+Les deux observatoires sont situés à proximité d'aires protégées majeures : Pour Alaotra la Nouvelle Aire Protégée du lac Alaotra et le Corridor Ankeniheny Zahamena et pour Marovoay le Parc National d'Ankarafantsika. Ce chapitre analyse les représentations, les usages, les pratiques (notamment le feu) et les opinions des ménages concernant la protection de l'environnement.
 
-Nous allons d'abord charger les informations collectées relatives à la relation de ces ménages avec l'environnement.
-
-```{r}
+```{r setup_env}
+#| include: false
 library(tidyverse)
 library(haven)
-library(dplyr)
-library (gt) # Easily create presentation - ready display tables
+library(labelled)
+library(gt)
 
-# Loading observatories data
-res_deb <- read_dta("data/res_deb.dta")
-# Loading household data
-res_m_a <- read_dta("data/res_m_a.dta")
+# --- Données de base ---
+res_deb <- read_dta("data/res_deb.dta") |>
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  )
 
+# --- Données environnement ---
+res_ap_def     <- read_dta("data/res_ap_def.dta")
+res_biodiv     <- read_dta("data/res_biodiv.dta")
+res_op_env     <- read_dta("data/res_op_env.dta")
+res_ef         <- read_dta("data/res_ef.dta")
+res_um1        <- read_dta("data/res_um1.dta")
+res_um2        <- read_dta("data/res_um2.dta")
+res_feubrousse <- read_dta("data/res_feubrousse.dta")
+res_ap         <- read_dta("data/res_ap.dta")
+res_ap2        <- read_dta("data/res_ap2.dta")
+
+# Ajout de l'observatoire à chaque fichier
+add_obs <- function(df) {
+  df |> left_join(res_deb |> select(j5, Observatory), by = "j5")
+}
+
+res_ap_def     <- add_obs(res_ap_def)
+res_biodiv     <- add_obs(res_biodiv)
+res_op_env     <- add_obs(res_op_env)
+res_ef         <- add_obs(res_ef)
+res_um1        <- add_obs(res_um1)
+res_um2        <- add_obs(res_um2)
+res_feubrousse <- add_obs(res_feubrousse)
+res_ap         <- add_obs(res_ap)
+res_ap2        <- add_obs(res_ap2)
+
+n_men <- nrow(res_deb)
+
+# Fonction utilitaire : % de Oui (code 1) par observatoire + total
+pct_oui <- function(df, var, label) {
+  var_sym <- sym(var)
+  df |>
+    summarise(
+      pct = round(sum(!!var_sym == 1, na.rm = TRUE) / sum(!is.na(!!var_sym)) * 100, 0),
+      .by = Observatory
+    ) |>
+    pivot_wider(names_from = Observatory, values_from = pct) |>
+    mutate(
+      Total = df |>
+        summarise(p = round(sum(!!var_sym == 1, na.rm = TRUE) / sum(!is.na(!!var_sym)) * 100, 0)) |>
+        pull(p),
+      Item = label
+    ) |>
+    select(Item, Alaotra, Marovoay, Total)
+}
+
+# Labels mois
+mois_labs <- c("Jan", "Fév", "Mar", "Avr", "Mai", "Jun",
+               "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc")
 ```
 
-## Représentation de l'Aire protégée par les ménages
+
+## Représentation de la zone protégée par les ménages {#sec-representation}
+
+### Caractérisation de la zone : disponibilité des ressources
+
+Les ménages ont été interrogés sur la disponibilité de dix catégories de ressources naturelles dans la zone protégée à proximité de leur village. La @fig-ressources-dispo résume les réponses, distinguant les ressources jugées abondantes, en quantité normale ou rares.
 
 ```{r}
-# Loading  household representation of Protected area
-res_ap_def <- read_dta("data/res_ap_def.dta") # year, j5 #rm2_a - rm2c
-res_biodiv <- read_dta("data/res_biodiv.dta") # year, j5 #rm2_cat, rm2_d, rm2_e
-res_op_env <- read_dta("data/res_op_env.dta") # year, j5 #rm3-rm5
+#| fig-cap: "Disponibilité perçue des ressources naturelles dans la zone protégée, par observatoire"
+#| fig-width: 10
+#| fig-height: 6
+#| label: fig-ressources-dispo
+
+res_labels <- tribble(
+  ~rm2_lig, ~Ressource,
+  1,  "Animaux (sauvages)",
+  2,  "Plantes (comestibles)",
+  3,  "Plantes (médicinales)",
+  4,  "Forêt (surface)",
+  5,  "Bois",
+  6,  "Eau",
+  7,  "Terre de culture",
+  8,  "Terre de pâturage",
+  9,  "Autre",
+  10, "Ensemble (global)"
+)
+
+dispo <- res_ap_def |>
+  filter(rm2_lig %in% 1:10) |>
+  left_join(res_labels, by = "rm2_lig") |>
+  mutate(
+    Disponibilité = case_when(
+      rm2_a == 1 ~ "Abondant",
+      rm2_a == 2 ~ "Normal",
+      rm2_a == 3 ~ "Peu ou pas"
+    ),
+    Disponibilité = factor(Disponibilité, levels = c("Abondant", "Normal", "Peu ou pas"))
+  ) |>
+  filter(!is.na(Disponibilité)) |>
+  count(Observatory, Ressource, Disponibilité) |>
+  mutate(pct = n / sum(n) * 100, .by = c(Observatory, Ressource))
+
+ggplot(dispo, aes(x = fct_reorder(Ressource, pct, .fun = max), y = pct, fill = Disponibilité)) +
+  geom_col(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_manual(values = c("Abondant" = "#2ca02c", "Normal" = "#ffbf00", "Peu ou pas" = "#d62728")) +
+  coord_flip() +
+  facet_wrap(~Observatory) +
+  labs(x = NULL, y = NULL, fill = "Disponibilité") +
+  theme_minimal()
 ```
 
-###	Représentation
+### Évolution perçue des ressources
 
-###	Ressources
-
-## Exploitation forestière et usage de l'Aire protégée
+Les ménages estiment l'évolution de ces ressources sur les trois et cinq dernières années. La @fig-evolution-ressources présente la tendance à 3 ans.
 
 ```{r}
-# Loading forestry exploitation data
-res_ef <- read_dta("data/res_ef.dta") # year, j5
-# Loading using of Protected area 
-res_um1 <- read_dta("data/res_um1.dta") # year, j5
-res_um2 <- read_dta("data/res_um2.dta") # year, j5
+#| fig-cap: "Évolution perçue des ressources naturelles au cours des 3 dernières années"
+#| fig-width: 10
+#| fig-height: 6
+#| label: fig-evolution-ressources
+
+evol <- res_ap_def |>
+  filter(rm2_lig %in% 1:10) |>
+  left_join(res_labels, by = "rm2_lig") |>
+  mutate(
+    Évolution = case_when(
+      rm2_b == 1 ~ "En augmentation",
+      rm2_b == 2 ~ "Stable",
+      rm2_b == 3 ~ "En diminution"
+    ),
+    Évolution = factor(Évolution, levels = c("En augmentation", "Stable", "En diminution"))
+  ) |>
+  filter(!is.na(Évolution)) |>
+  count(Observatory, Ressource, Évolution) |>
+  mutate(pct = n / sum(n) * 100, .by = c(Observatory, Ressource))
+
+ggplot(evol, aes(x = fct_reorder(Ressource, pct, .fun = max), y = pct, fill = Évolution)) +
+  geom_col(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_manual(values = c("En augmentation" = "#2ca02c", "Stable" = "#ffbf00", "En diminution" = "#d62728")) +
+  coord_flip() +
+  facet_wrap(~Observatory) +
+  labs(x = NULL, y = NULL, fill = "Évolution (3 ans)") +
+  theme_minimal()
 ```
 
-###	Exploitation des ressources naturelles
-#### Collecte de bois
+### Appartenance perçue de la zone
 
-#### Chasse et pêche
-A voir si on met "Chasse et pêche" dans la partie "Agriculture".
-
-#### Ceuillette sauvage et jardin de case
-A voir si on met "Ceuillette sauvage et jardin de case" dans la partie "Agriculture".
-
-
-###	Usage de l’aire protégée
-
-
-## Feu
+La question RM3 demande à qui appartient la zone protégée (réponses multiples). La @fig-appartenance montre les réponses par observatoire.
 
 ```{r}
-# Loading bushfire data
-res_feubrousse <- read_dta("data/res_feubrousse.dta") # year, j5
+#| fig-cap: "À qui appartient la zone protégée ? (% de Oui, réponses multiples)"
+#| fig-width: 9
+#| fig-height: 5
+#| label: fig-appartenance
+
+rm3_items <- tribble(
+  ~var,    ~label,
+  "rm3_1", "État (Fanjakana)",
+  "rm3_2", "Riverains",
+  "rm3_3", "Riverains non migrants",
+  "rm3_4", "Étrangers",
+  "rm3_5", "Gestionnaire",
+  "rm3_6", "Esprits / ancêtres"
+)
+
+appart <- rm3_items |>
+  pmap_dfr(\(var, label) {
+    pct_oui(res_op_env, var, label)
+  }) |>
+  pivot_longer(c(Alaotra, Marovoay, Total), names_to = "Groupe", values_to = "pct")
+
+ggplot(appart |> filter(Groupe != "Total"),
+       aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = paste0(pct, "%")),
+            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 100)) +
+  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  theme_minimal()
 ```
 
-###	Pratiques du feu
-###	Avis sur le feu
-
-## Protection de l'Aire protégée
+### Menaces perçues et responsables
 
 ```{r}
-# Loading Protected area data
-res_ap <- read_dta("data/res_ap.dta") #year, j5
-res_ap2 <- read_dta("data/res_ap2.dta") #year, j5
+#| tbl-cap: "Menaces perçues sur l'environnement et responsables identifiés (% de Oui)"
+#| label: tbl-menaces
 
+menace_global <- pct_oui(res_op_env, "rm4", "Considèrent que l'environnement est menacé")
+
+# Filtrer ceux qui considèrent menacé (rm4 == 1)
+op_menace <- res_op_env |> filter(rm4 == 1)
+
+menace_items <- tribble(
+  ~var,      ~label,
+  "rm4a_e",  "Feux",
+  "rm4a_a",  "Défrichage",
+  "rm4a_c",  "Prélèvement (faune)",
+  "rm4a_d",  "Prélèvement (flore)",
+  "rm4a_h",  "Prospection minière",
+  "rm4a_g",  "Nomadisme (passage non-résidents)",
+  "rm4a_b",  "Zébu / pâturage",
+  "rm4a_f",  "Tourisme"
+)
+
+resp_items <- tribble(
+  ~var,      ~label,
+  "rm4b_a",  "L'ensemble des riverains",
+  "rm4b_b",  "Les riverains migrants",
+  "rm4b_c",  "L'État (Fanjakana)",
+  "rm4b_h",  "Les braconniers",
+  "rm4b_e",  "Le gestionnaire",
+  "rm4b_i",  "Les nomades ou semi-nomades",
+  "rm4b_d",  "Les ONG ou entreprises",
+  "rm4b_g",  "Les chercheurs",
+  "rm4b_f",  "Les touristes"
+)
+
+menaces <- menace_items |>
+  pmap_dfr(\(var, label) pct_oui(op_menace, var, label))
+resps <- resp_items |>
+  pmap_dfr(\(var, label) pct_oui(op_menace, var, label))
+
+bind_rows(
+  menace_global |> mutate(Section = ""),
+  menaces |> mutate(Section = "Principales menaces (parmi ceux qui déclarent menacé)"),
+  resps |> mutate(Section = "Principaux responsables")
+) |>
+  select(Section, Item, Alaotra, Marovoay, Total) |>
+  gt(groupname_col = "Section") |>
+  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay", Total = "Total") |>
+  fmt_number(columns = c(Alaotra, Marovoay, Total), decimals = 0, pattern = "{x} %") |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
+    locations = cells_row_groups()
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 ```
 
-###	Demande de protection
-###	Connaissance des actions
+### Ce que représente la zone pour les ménages
+
+La question `RM5` interroge les ménages sur ce que la zone protégée représente pour eux (réponses multiples).
+
+```{r}
+#| fig-cap: "Que représente la zone protégée pour les ménages ? (% de Oui)"
+#| fig-width: 10
+#| fig-height: 6
+#| label: fig-representation
+
+rm5_items <- tribble(
+  ~var,    ~label,
+  "rm5_a", "Source d'alimentation",
+  "rm5_b", "Activités agricoles",
+  "rm5_c", "Élevage",
+  "rm5_d", "Source de bois",
+  "rm5_e", "Source d'eau",
+  "rm5_f", "Plantes médicinales",
+  "rm5_g", "Source de revenus",
+  "rm5_h", "Lieu touristique",
+  "rm5_i", "Espace sauvage",
+  "rm5_j", "Lieu sacré",
+  "rm5_k", "Lieu interdit",
+  "rm5_l", "Loisir / détente / beauté"
+)
+
+repr <- rm5_items |>
+  pmap_dfr(\(var, label) pct_oui(res_op_env, var, label)) |>
+  pivot_longer(c(Alaotra, Marovoay, Total), names_to = "Groupe", values_to = "pct")
+
+ggplot(repr |> filter(Groupe != "Total"),
+       aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = paste0(pct, "%")),
+            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 100)) +
+  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  theme_minimal()
+```
 
 
+## Exploitation forestière et usage de l'Aire protégée {#sec-exploitation}
+
+### Collecte de bois et charbon
+
+Le fichier `res_ef` recense les produits forestiers collectés par les ménages : charbon (*saribao*), bois de chauffe (*kitay*) et bois d'oeuvre. La @fig-ef-produits présente le pourcentage de ménages concernés par chaque produit et la @fig-ef-origine distingue l'origine (dans ou hors aire protégée).
+
+```{r}
+#| fig-cap: "Pourcentage de ménages pratiquant la collecte de produits forestiers, par observatoire"
+#| fig-width: 9
+#| fig-height: 4
+#| label: fig-ef-produits
+
+ef_labels <- tribble(
+  ~ef_lig, ~Produit,
+  1, "Charbon (saribao)",
+  2, "Bois de chauffe (kitay)",
+  3, "Bois d'œuvre"
+)
+
+ef_men <- res_ef |>
+  filter(ef_lig %in% 1:3) |>
+  left_join(ef_labels, by = "ef_lig") |>
+  distinct(j5, Observatory, Produit)
+
+ef_pct <- ef_men |>
+  count(Observatory, Produit) |>
+  left_join(res_deb |> count(Observatory, name = "n_tot"), by = "Observatory") |>
+  mutate(pct = round(n / n_tot * 100, 1))
+
+ggplot(ef_pct, aes(x = Produit, y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = paste0(round(pct, 0), "%")),
+            position = position_dodge(width = 0.9), vjust = -0.3, size = 3) +
+  labs(x = NULL, y = "% des ménages", fill = "Observatoire") +
+  theme_minimal()
+```
+
+```{r}
+#| fig-cap: "Origine des produits forestiers collectés (dans ou hors Aire Protégée)"
+#| fig-width: 9
+#| fig-height: 4
+#| label: fig-ef-origine
+
+ef_orig <- res_ef |>
+  filter(ef_lig %in% 1:3, efb %in% c(1, 2)) |>
+  left_join(ef_labels, by = "ef_lig") |>
+  mutate(
+    Origine = case_when(
+      efb == 1 ~ "Dans l'AP",
+      efb == 2 ~ "Hors AP"
+    )
+  ) |>
+  count(Observatory, Produit, Origine) |>
+  mutate(pct = n / sum(n) * 100, .by = c(Observatory, Produit))
+
+ggplot(ef_orig, aes(x = Produit, y = pct, fill = Origine)) +
+  geom_col(position = "stack") +
+  facet_wrap(~Observatory) +
+  scale_fill_manual(values = c("Dans l'AP" = "#d62728", "Hors AP" = "#2ca02c")) +
+  labs(x = NULL, y = "% des activités de collecte", fill = "Origine") +
+  theme_minimal()
+```
+
+### Saisonnalité de la collecte forestière
+
+```{r}
+#| fig-cap: "Saisonnalité de la collecte de produits forestiers (% de ménages actifs par mois)"
+#| fig-width: 10
+#| fig-height: 5
+#| label: fig-ef-saison
+
+mois_cols <- paste0("efe_", sprintf("%02d", 1:12))
+
+ef_saison <- res_ef |>
+  filter(ef_lig %in% 1:3) |>
+  left_join(ef_labels, by = "ef_lig") |>
+  pivot_longer(cols = all_of(mois_cols), names_to = "mois_var", values_to = "actif") |>
+  mutate(
+    mois_num = as.integer(str_extract(mois_var, "\\d+$")),
+    Mois = factor(mois_labs[mois_num], levels = mois_labs),
+    actif = if_else(actif == 1, 1, 0, missing = 0)
+  ) |>
+  summarise(n_actif = sum(actif), n_total = n(), .by = c(Observatory, Produit, Mois)) |>
+  mutate(pct = n_actif / n_total * 100)
+
+ggplot(ef_saison, aes(x = Mois, y = pct, color = Produit, group = Produit)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 1.5) +
+  facet_wrap(~Observatory) +
+  labs(x = NULL, y = "% actifs", color = "Produit") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Commercialisation des produits forestiers
+
+```{r}
+#| tbl-cap: "Part des ménages vendant les produits forestiers et montant moyen de vente (Ar)"
+#| label: tbl-ef-vente
+
+ef_vente <- res_ef |>
+  filter(ef_lig %in% 1:3) |>
+  left_join(ef_labels, by = "ef_lig") |>
+  mutate(vend = if_else(efc > 0 & !is.na(efc), TRUE, FALSE)) |>
+  summarise(
+    pct_vendeurs = round(sum(vend) / n() * 100, 0),
+    pct_vente_moyen = round(mean(efc[vend], na.rm = TRUE), 0),
+    montant_moyen = round(mean(efd[vend], na.rm = TRUE), 0),
+    .by = c(Observatory, Produit)
+  )
+
+ef_vente |>
+  gt(groupname_col = "Observatory") |>
+  cols_label(
+    Produit = "Produit",
+    pct_vendeurs = "% de vendeurs",
+    pct_vente_moyen = "% vendu (moyen)",
+    montant_moyen = "Montant moyen (Ar)"
+  ) |>
+  fmt_number(columns = montant_moyen, decimals = 0, sep_mark = " ") |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
+    locations = cells_row_groups()
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+
+### Fréquentation de l'Aire protégée
+
+La variable `UM1` indique si le ménage se rend dans la zone protégée. Le @tbl-frequentation résume la fréquentation et ses caractéristiques.
+
+```{r}
+#| tbl-cap: "Fréquentation et connaissance de l'Aire protégée"
+#| label: tbl-frequentation
+
+freq_items <- bind_rows(
+  pct_oui(res_um1, "um1", "Se rend dans l'Aire protégée"),
+  # Parmi ceux qui y vont
+  pct_oui(res_um1 |> filter(um1 == 1), "um1c", "Considère vital / nécessaire d'y aller")
+)
+
+# Connaissance du lieu (um1a) — distribution parmi usagers
+conn_all <- res_um1 |>
+  filter(um1 == 1, !is.na(um1a)) |>
+  mutate(Conn = case_when(
+    um1a == 1 ~ "Très peu",
+    um1a == 2 ~ "Plus ou moins",
+    um1a == 3 ~ "Très bien"
+  ))
+
+conn_by_obs <- conn_all |>
+  count(Observatory, Conn) |>
+  mutate(pct = round(n / sum(n) * 100, 0), .by = Observatory) |>
+  select(-n) |>
+  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0)
+
+conn_total <- conn_all |>
+  count(Conn) |>
+  mutate(Total = round(n / sum(n) * 100, 0)) |>
+  select(Conn, Total)
+
+conn_tbl <- conn_by_obs |>
+  left_join(conn_total, by = "Conn") |>
+  rename(Item = Conn) |>
+  mutate(Item = paste0("  - ", Item))
+
+bind_rows(
+  freq_items,
+  tibble(Item = "Connaissance du lieu (parmi usagers) :",
+         Alaotra = NA_real_, Marovoay = NA_real_, Total = NA_real_),
+  conn_tbl
+) |>
+  gt() |>
+  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay", Total = "Total") |>
+  fmt_number(columns = c(Alaotra, Marovoay, Total), decimals = 0, pattern = "{x} %") |>
+  sub_missing(missing_text = "") |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+### Raisons de non-fréquentation
+
+Pour les ménages qui ne se rendent pas dans l'AP, les raisons invoquées sont les suivantes.
+
+```{r}
+#| fig-cap: "Raisons de ne pas se rendre dans l'Aire protégée (% de Oui parmi ceux qui n'y vont pas)"
+#| fig-width: 9
+#| fig-height: 4
+#| label: fig-non-freq
+
+um1_non <- res_um1 |> filter(um1 == 2)
+
+non_items <- tribble(
+  ~var,      ~label,
+  "um1d_a",  "Interdit par la loi",
+  "um1d_b",  "Fady (interdit coutumier)",
+  "um1d_c",  "Rien d'intéressant",
+  "um1d_d",  "Dangereux",
+  "um1d_e",  "Autre raison"
+)
+
+non_freq <- non_items |>
+  pmap_dfr(\(var, label) pct_oui(um1_non, var, label)) |>
+  pivot_longer(c(Alaotra, Marovoay, Total), names_to = "Groupe", values_to = "pct")
+
+ggplot(non_freq |> filter(Groupe != "Total"),
+       aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = paste0(pct, "%")),
+            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 100)) +
+  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  theme_minimal()
+```
+
+### Usages de l'Aire protégée
+
+Parmi les ménages qui se rendent dans l'AP, la @fig-usages-ap détaille les raisons et la @fig-freq-usages la fréquence des déplacements.
+
+```{r}
+#| fig-cap: "Raisons de se rendre dans l'Aire protégée (% de Oui parmi les usagers)"
+#| fig-width: 10
+#| fig-height: 6
+#| label: fig-usages-ap
+
+um2_labels <- tribble(
+  ~um2_lig, ~Raison,
+  1,  "Cueillette plantes (comestibles)",
+  2,  "Cueillette plantes (médicinales)",
+  3,  "Cultiver",
+  4,  "Chasser / pêcher",
+  5,  "Faire paître (herbe)",
+  6,  "Faire passer les zébus",
+  7,  "Couper du bois",
+  8,  "Produits pour artisanat",
+  9,  "Rituel / cérémonie / funérailles",
+  10, "Accompagner touristes / chercheurs",
+  11, "Promenade / loisir",
+  12, "Autre"
+)
+
+usages <- res_um2 |>
+  filter(um2_lig %in% 1:12, um2_a == 1) |>
+  left_join(um2_labels, by = "um2_lig") |>
+  count(Observatory, Raison) |>
+  left_join(
+    res_um1 |> filter(um1 == 1) |> count(Observatory, name = "n_usagers"),
+    by = "Observatory"
+  ) |>
+  mutate(pct = round(n / n_usagers * 100, 0))
+
+ggplot(usages, aes(x = fct_reorder(Raison, pct, .fun = max), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = paste0(pct, "%")),
+            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 110)) +
+  labs(x = NULL, y = "% des usagers de l'AP", fill = "Observatoire") +
+  theme_minimal()
+```
+
+```{r}
+#| fig-cap: "Fréquence des déplacements dans l'AP selon l'usage (ensemble des deux observatoires)"
+#| fig-width: 10
+#| fig-height: 6
+#| label: fig-freq-usages
+
+freq_labels <- c(
+  "1" = "Quelques fois par an",
+  "2" = "Quelques fois par mois",
+  "3" = "Une fois par semaine",
+  "4" = "Plusieurs fois par semaine"
+)
+
+freq_usage <- res_um2 |>
+  filter(um2_lig %in% 1:12, um2_a == 1, um2_b %in% 1:4) |>
+  left_join(um2_labels, by = "um2_lig") |>
+  mutate(Fréquence = factor(freq_labels[as.character(um2_b)],
+                            levels = rev(freq_labels)))
+
+freq_pct <- freq_usage |>
+  count(Raison, Fréquence) |>
+  mutate(pct = n / sum(n) * 100, .by = Raison)
+
+ggplot(freq_pct, aes(x = fct_reorder(Raison, n, .fun = sum), y = pct, fill = Fréquence)) +
+  geom_col(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_brewer(palette = "YlOrRd", direction = -1) +
+  coord_flip() +
+  labs(x = NULL, y = NULL, fill = "Fréquence") +
+  theme_minimal()
+```
+
+### Saisonnalité de la fréquentation de l'AP
+
+```{r}
+#| fig-cap: "Saisonnalité des usages de l'AP (% d'usagers actifs par mois, principales raisons)"
+#| fig-width: 10
+#| fig-height: 5
+#| label: fig-saison-ap
+
+um2_mois <- paste0("um2_d_", sprintf("%02d", 1:12))
+
+top_raisons <- res_um2 |>
+  filter(um2_lig %in% 1:12, um2_a == 1) |>
+  count(um2_lig, sort = TRUE) |>
+  head(5) |>
+  pull(um2_lig)
+
+ap_saison <- res_um2 |>
+  filter(um2_lig %in% top_raisons, um2_a == 1) |>
+  left_join(um2_labels, by = "um2_lig") |>
+  pivot_longer(cols = all_of(um2_mois), names_to = "mois_var", values_to = "actif") |>
+  mutate(
+    mois_num = as.integer(str_extract(mois_var, "\\d+$")),
+    Mois = factor(mois_labs[mois_num], levels = mois_labs),
+    actif = if_else(actif == 1, 1, 0, missing = 0)
+  ) |>
+  summarise(n_actif = sum(actif), n_total = n(), .by = c(Raison, Mois)) |>
+  mutate(pct = n_actif / n_total * 100)
+
+ggplot(ap_saison, aes(x = Mois, y = pct, color = Raison, group = Raison)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 1.5) +
+  labs(x = NULL, y = "% actifs", color = "Raison") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+## Feux de brousse {#sec-feu}
+
+### Opinions sur les raisons des feux
+
+Les ménages ont été interrogés sur les raisons pour lesquelles les gens font des feux dans la région (question `S16`, réponses multiples).
+
+```{r}
+#| fig-cap: "Raisons perçues de faire des feux (% de Oui)"
+#| fig-width: 10
+#| fig-height: 6
+#| label: fig-raisons-feux
+
+feu_items <- tribble(
+  ~var,      ~label,
+  "s16_01",  "Augmenter surfaces cultivées",
+  "s16_02",  "Augmenter surfaces pâturages",
+  "s16_03",  "Protéger",
+  "s16_04",  "Nettoyer",
+  "s16_05",  "Chasser",
+  "s16_06",  "Marquer son territoire",
+  "s16_07",  "Pratique traditionnelle / rituel",
+  "s16_08",  "Mécontentement (autorités locales)",
+  "s16_09",  "Mécontentement (autorités nationales)",
+  "s16_10",  "Vengeance"
+)
+
+feu_raisons <- feu_items |>
+  pmap_dfr(\(var, label) pct_oui(res_feubrousse, var, label)) |>
+  pivot_longer(c(Alaotra, Marovoay, Total), names_to = "Groupe", values_to = "pct")
+
+ggplot(feu_raisons |> filter(Groupe != "Total"),
+       aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = paste0(pct, "%")),
+            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 100)) +
+  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  theme_minimal()
+```
+
+### Pratique du feu
+
+```{r}
+#| tbl-cap: "Pratique et perception des feux par observatoire"
+#| label: tbl-feux
+
+feu_tbl <- bind_rows(
+  pct_oui(res_feubrousse, "s17",   "Faire des feux est une pratique normale"),
+  pct_oui(res_feubrousse, "s17_a", "Faire des feux est vital / nécessaire"),
+  pct_oui(res_feubrousse, "s18",   "A déjà fait des feux"),
+  pct_oui(res_feubrousse, "s18_b", "Feux au cours des 12 derniers mois")
+)
+
+# Localisation des feux (s18_c) parmi ceux qui ont fait feu récemment
+loc_feux <- res_feubrousse |>
+  filter(s18_b == 1, s18_c %in% 1:3) |>
+  mutate(
+    Lieu = case_when(
+      s18_c == 1 ~ "Près du village",
+      s18_c == 2 ~ "Loin (hors AP)",
+      s18_c == 3 ~ "Dans l'AP"
+    )
+  ) |>
+  count(Observatory, Lieu) |>
+  mutate(pct = round(n / sum(n) * 100, 0), .by = Observatory) |>
+  select(-n) |>
+  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0)
+
+loc_total <- res_feubrousse |>
+  filter(s18_b == 1, s18_c %in% 1:3) |>
+  mutate(Lieu = case_when(
+    s18_c == 1 ~ "Près du village",
+    s18_c == 2 ~ "Loin (hors AP)",
+    s18_c == 3 ~ "Dans l'AP"
+  )) |>
+  count(Lieu) |>
+  mutate(Total = round(n / sum(n) * 100, 0)) |>
+  select(Lieu, Total)
+
+loc_tbl <- loc_feux |>
+  left_join(loc_total, by = "Lieu") |>
+  rename(Item = Lieu) |>
+  mutate(Item = paste0("  - ", Item))
+
+# Maîtrise et échappement
+maitr <- pct_oui(res_feubrousse |> filter(s18 == 1), "s19", "Cherche à maîtriser le feu")
+echap <- pct_oui(res_feubrousse |> filter(s18 == 1), "s20", "Un feu lui a déjà échappé")
+
+bind_rows(
+  feu_tbl,
+  tibble(Item = "Si feux dans l'année, localisation :",
+         Alaotra = NA_real_, Marovoay = NA_real_, Total = NA_real_),
+  loc_tbl,
+  maitr,
+  echap
+) |>
+  gt() |>
+  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay", Total = "Total") |>
+  fmt_number(columns = c(Alaotra, Marovoay, Total), decimals = 0, pattern = "{x} %") |>
+  sub_missing(missing_text = "") |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+### Saisonnalité des feux
+
+```{r}
+#| fig-cap: "Saisonnalité des feux de brousse pratiqués (% de ménages actifs par mois, parmi ceux qui ont fait du feu)"
+#| fig-width: 10
+#| fig-height: 4
+#| label: fig-saison-feux
+
+feu_mois_cols <- paste0("s18_a_", sprintf("%02d", 1:12))
+
+feu_saison <- res_feubrousse |>
+  filter(s18 == 1) |>
+  pivot_longer(cols = any_of(feu_mois_cols), names_to = "mois_var", values_to = "actif") |>
+  mutate(
+    mois_num = as.integer(str_extract(mois_var, "\\d+$")),
+    Mois = factor(mois_labs[mois_num], levels = mois_labs),
+    actif = if_else(actif == 1, 1, 0, missing = 0)
+  ) |>
+  summarise(n_actif = sum(actif), n_total = n(), .by = c(Observatory, Mois)) |>
+  mutate(pct = n_actif / n_total * 100)
+
+ggplot(feu_saison, aes(x = Mois, y = pct, color = Observatory, group = Observatory)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  labs(x = NULL, y = "% des ménages ayant fait du feu", color = "Observatoire") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### Avis sur les feux
+
+```{r}
+#| fig-cap: "Évolution perçue des feux depuis 3 ans, par observatoire"
+#| fig-width: 9
+#| fig-height: 4
+#| label: fig-evol-feux
+
+evol_feux <- res_feubrousse |>
+  filter(s21 %in% 1:3) |>
+  mutate(
+    Évolution = case_when(
+      s21 == 1 ~ "En hausse",
+      s21 == 2 ~ "Stable",
+      s21 == 3 ~ "En diminution"
+    ),
+    Évolution = factor(Évolution, levels = c("En hausse", "Stable", "En diminution"))
+  ) |>
+  count(Observatory, Évolution) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+
+ggplot(evol_feux, aes(x = Évolution, y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = paste0(round(pct, 0), "%")),
+            position = position_dodge(width = 0.9), vjust = -0.3, size = 3) +
+  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  theme_minimal()
+```
+
+```{r}
+#| fig-cap: "Les feux sont-ils un problème dans la région ? (par observatoire)"
+#| fig-width: 9
+#| fig-height: 4
+#| label: fig-probleme-feux
+
+prob_feux <- res_feubrousse |>
+  filter(s22 %in% 1:4) |>
+  mutate(
+    Importance = case_when(
+      s22 == 1 ~ "Très important",
+      s22 == 2 ~ "Important",
+      s22 == 3 ~ "Plutôt pas important",
+      s22 == 4 ~ "Pas du tout"
+    ),
+    Importance = factor(Importance, levels = c("Très important", "Important",
+                                                "Plutôt pas important", "Pas du tout"))
+  ) |>
+  count(Observatory, Importance) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+
+ggplot(prob_feux, aes(x = Importance, y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = paste0(round(pct, 0), "%")),
+            position = position_dodge(width = 0.9), vjust = -0.3, size = 3) +
+  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 15, hjust = 1))
+```
+
+```{r}
+#| fig-cap: "La pratique du feu devrait être… (par observatoire)"
+#| fig-width: 8
+#| fig-height: 4
+#| label: fig-reglementation-feux
+
+regl_feux <- res_feubrousse |>
+  filter(s23 %in% 1:3) |>
+  mutate(
+    Avis = case_when(
+      s23 == 1 ~ "Interdite",
+      s23 == 2 ~ "Limitée",
+      s23 == 3 ~ "Libre"
+    ),
+    Avis = factor(Avis, levels = c("Interdite", "Limitée", "Libre"))
+  ) |>
+  count(Observatory, Avis) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+
+ggplot(regl_feux, aes(x = Avis, y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = paste0(round(pct, 0), "%")),
+            position = position_dodge(width = 0.9), vjust = -0.3, size = 3) +
+  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  theme_minimal()
+```
+
+
+## Protection de l'Aire protégée {#sec-protection}
+
+### Connaissance de l'Aire protégée
+
+```{r}
+#| tbl-cap: "Connaissance de l'Aire protégée et demande de protection"
+#| label: tbl-connaissance-ap
+
+ap_items <- bind_rows(
+  pct_oui(res_ap, "ap1", "A entendu parler de l'AP"),
+  pct_oui(res_ap, "ap4", "Nécessaire de protéger l'environnement"),
+  pct_oui(res_ap, "ap5", "Nécessaire de protéger cette AP"),
+  pct_oui(res_ap, "ap6", "Perte de biodiversité à Madagascar"),
+  pct_oui(res_ap, "ap7", "Les AP ont des résultats positifs")
+)
+
+ap_items |>
+  gt() |>
+  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay", Total = "Total") |>
+  fmt_number(columns = c(Alaotra, Marovoay, Total), decimals = 0, pattern = "{x} %") |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+### Impact perçu des actions de l'AP
+
+Les ménages qui ont entendu parler de l'AP jugent l'impact de ses actions sur trois dimensions : économique, sociale et environnementale.
+
+```{r}
+#| fig-cap: "Jugement des actions de l'AP sur la situation économique, sociale et environnementale"
+#| fig-width: 10
+#| fig-height: 5
+#| label: fig-jugement-ap
+
+ap3_labels <- c(
+  "1" = "Très positif",
+  "2" = "Plutôt positif",
+  "3" = "Plutôt négatif",
+  "4" = "Très négatif",
+  "9" = "Ne connaît pas"
+)
+
+ap3_data <- res_ap |>
+  filter(ap1 == 1) |>
+  select(j5, Observatory, ap3_a, ap3_b, ap3_c) |>
+  pivot_longer(c(ap3_a, ap3_b, ap3_c), names_to = "Dimension", values_to = "Valeur") |>
+  filter(!is.na(Valeur)) |>
+  mutate(
+    Dimension = case_when(
+      Dimension == "ap3_a" ~ "Économique",
+      Dimension == "ap3_b" ~ "Sociale",
+      Dimension == "ap3_c" ~ "Environnementale"
+    ),
+    Jugement = factor(ap3_labels[as.character(Valeur)], levels = ap3_labels)
+  ) |>
+  count(Observatory, Dimension, Jugement) |>
+  mutate(pct = n / sum(n) * 100, .by = c(Observatory, Dimension))
+
+ggplot(ap3_data, aes(x = Dimension, y = pct, fill = Jugement)) +
+  geom_col(position = "fill") +
+  scale_y_continuous(labels = scales::percent) +
+  scale_fill_manual(values = c(
+    "Très positif" = "#2ca02c", "Plutôt positif" = "#98df8a",
+    "Plutôt négatif" = "#ff9896", "Très négatif" = "#d62728",
+    "Ne connaît pas" = "#cccccc"
+  )) +
+  facet_wrap(~Observatory) +
+  labs(x = NULL, y = NULL, fill = "Jugement") +
+  theme_minimal()
+```
+
+### Gestionnaire souhaité
+
+```{r}
+#| fig-cap: "Qui devrait gérer l'AP ? (parmi ceux favorables à la protection)"
+#| fig-width: 9
+#| fig-height: 4
+#| label: fig-gestionnaire
+
+gest_labels <- c(
+  "1" = "Communautés locales",
+  "2" = "Riverains tompontany",
+  "3" = "État (Fanjakana)",
+  "4" = "ONG malgache",
+  "5" = "ONG étrangère",
+  "6" = "Partenariat mixte",
+  "7" = "COBA"
+)
+
+gest <- res_ap |>
+  filter(ap5 == 1, ap5a %in% 1:7) |>
+  mutate(Gestionnaire = factor(gest_labels[as.character(ap5a)], levels = gest_labels)) |>
+  count(Observatory, Gestionnaire) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+
+ggplot(gest, aes(x = fct_reorder(Gestionnaire, pct, .fun = max), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = paste0(round(pct, 0), "%")),
+            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 80)) +
+  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  theme_minimal()
+```
+
+### Mesures de protection souhaitées
+
+```{r}
+#| fig-cap: "Mesures souhaitées pour protéger l'AP (% de Oui, parmi ceux favorables)"
+#| fig-width: 10
+#| fig-height: 7
+#| label: fig-mesures-protection
+
+ap5b_items <- tribble(
+  ~var,       ~label,
+  "ap5b_g1",  "Interdire tous les feux",
+  "ap5b_g2",  "Limiter les feux",
+  "ap5b_l",   "Savoirs et pratiques traditionnels",
+  "ap5b_k",   "Développer les AGR",
+  "ap5b_b",   "Restreindre l'accès des hommes",
+  "ap5b_f",   "Limiter prélèvements (chasse, cueillette…)",
+  "ap5b_h",   "Restreindre le tourisme",
+  "ap5b_j",   "Restreindre les recherches scientifiques",
+  "ap5b_d",   "Restreindre l'accès des bêtes (pâturage)",
+  "ap5b_e",   "Interdire les prélèvements",
+  "ap5b_c",   "Interdire l'accès des bêtes",
+  "ap5b_a",   "Interdire l'accès des hommes",
+  "ap5b_i",   "Encourager le tourisme"
+)
+
+ap_favorable <- res_ap |> filter(ap5 == 1)
+
+mesures <- ap5b_items |>
+  pmap_dfr(\(var, label) pct_oui(ap_favorable, var, label)) |>
+  pivot_longer(c(Alaotra, Marovoay, Total), names_to = "Groupe", values_to = "pct")
+
+ggplot(mesures |> filter(Groupe != "Total"),
+       aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = paste0(pct, "%")),
+            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 100)) +
+  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  theme_minimal()
+```
+
+### Pauvreté vs. environnement : quelle priorité ?
+
+```{r}
+#| fig-cap: "Pauvreté vs. protection de l'environnement : quelle priorité ? (par observatoire)"
+#| fig-width: 10
+#| fig-height: 5
+#| label: fig-priorite
+
+ap8_labels <- c(
+  "1" = "Priorité pauvreté/développement",
+  "2" = "Priorité environnement",
+  "3" = "Les deux en même temps",
+  "4" = "Uniquement pauvreté",
+  "5" = "Uniquement environnement",
+  "6" = "Ni l'une ni l'autre"
+)
+
+priorite <- res_ap |>
+  filter(ap8 %in% 1:6) |>
+  mutate(Priorité = factor(ap8_labels[as.character(ap8)], levels = ap8_labels)) |>
+  count(Observatory, Priorité) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+
+ggplot(priorite, aes(x = fct_reorder(Priorité, pct, .fun = max), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = paste0(round(pct, 0), "%")),
+            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 60)) +
+  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  theme_minimal()
+```
+
+### Connaissance des actions de protection
+
+La @fig-actions-ap présente le degré d'information, de consultation et de bénéfice des ménages vis-à-vis des différents types d'actions menées autour de l'AP.
+
+```{r}
+#| fig-cap: "Information, consultation et bénéfice des actions de l'AP (% de Oui, ensemble)"
+#| fig-width: 10
+#| fig-height: 7
+#| label: fig-actions-ap
+
+ap2_labels <- tribble(
+  ~ap2_lig, ~Action,
+  1, "Sensibilisation",
+  2, "Élaboration plans",
+  3, "Dons / aides",
+  4, "Achat de produits",
+  5, "Tourisme",
+  6, "AGR (élevage…)",
+  7, "Reboisement / pépinière",
+  8, "Appui technique",
+  9, "Autre"
+)
+
+ap2_data <- res_ap2 |>
+  filter(ap2_lig %in% 1:9) |>
+  left_join(ap2_labels, by = "ap2_lig") |>
+  summarise(
+    `Informé`   = round(sum(ap2_a == 1, na.rm = TRUE) / sum(!is.na(ap2_a)) * 100, 0),
+    `Consulté`  = round(sum(ap2_b == 1, na.rm = TRUE) / sum(!is.na(ap2_b)) * 100, 0),
+    `Bénéficié` = round(sum(ap2_c == 1, na.rm = TRUE) / sum(!is.na(ap2_c)) * 100, 0),
+    .by = Action
+  ) |>
+  pivot_longer(c(`Informé`, `Consulté`, `Bénéficié`), names_to = "Indicateur", values_to = "pct") |>
+  mutate(Indicateur = factor(Indicateur, levels = c("Informé", "Consulté", "Bénéficié")))
+
+ggplot(ap2_data, aes(x = fct_reorder(Action, pct, .fun = max), y = pct, fill = Indicateur)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = paste0(pct, "%")),
+            position = position_dodge(width = 0.9), hjust = -0.1, size = 2.5) +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 80)) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(x = NULL, y = "% de ménages", fill = NULL) +
+  theme_minimal()
+```
+ 

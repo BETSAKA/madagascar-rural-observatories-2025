@@ -17,6 +17,7 @@ library(tmap)
 library(sf)
 library(lubridate)
 library(scales)
+library(readxl)
 library(wdpar)
 ```
 
@@ -262,6 +263,78 @@ gt(tab) |>
     locations = cells_body(rows = Observatory == "Ensemble")
   ) |>
   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+### Dénombrement et taux de sondage
+
+Le dénombrement préalable à l'enquête a recensé l'ensemble des ménages résidant dans les hameaux échantillonnés. Le @tbl-denombrement confronte le nombre de ménages dénombrés au nombre de ménages effectivement enquêtés. Le taux de sondage global est de l'ordre de 18 %.
+
+```{r}
+#| tbl-cap: "Dénombrement et taux de sondage par observatoire"
+#| tbl-cap-location: top
+#| label: tbl-denombrement
+
+# --- Lecture et nettoyage du fichier de dénombrement ---
+al_raw <- read_excel("data/Synthèse Dénombrement OR 2025.xlsx", sheet = "ALAOTRA ")
+mr_raw <- read_excel("data/Synthèse Dénombrement OR 2025.xlsx", sheet = "MAROVOAY ")
+
+clean_enum <- function(df, obs_name) {
+  df |>
+    mutate(`Nbr Mén E` = as.character(`Nbr Mén E`)) |>
+    filter(!(Fokontany %in% "TOTAL") | is.na(Fokontany)) |>
+    fill(Fokontany, .direction = "down") |>
+    filter(!is.na(`Nbr toit D`)) |>
+    mutate(Observatory = obs_name)
+}
+
+enum_all <- bind_rows(
+  clean_enum(al_raw, "Alaotra"),
+  clean_enum(mr_raw, "Marovoay")
+)
+
+enum_obs <- enum_all |>
+  summarise(
+    Toits = sum(`Nbr toit D`, na.rm = TRUE),
+    Ménages_dénombrés = sum(`Nbr ménage D`, na.rm = TRUE),
+    .by = Observatory
+  ) |>
+  left_join(
+    res_deb |> count(Observatory, name = "Ménages_enquêtés"),
+    by = "Observatory"
+  ) |>
+  mutate(`Taux de sondage (%)` = round(Ménages_enquêtés / Ménages_dénombrés * 100, 1))
+
+enum_total <- enum_obs |>
+  summarise(
+    across(c(Toits, Ménages_dénombrés, Ménages_enquêtés), sum)
+  ) |>
+  mutate(
+    Observatory = "Ensemble",
+    `Taux de sondage (%)` = round(Ménages_enquêtés / Ménages_dénombrés * 100, 1)
+  )
+
+bind_rows(enum_obs, enum_total) |>
+  gt() |>
+  fmt_number(columns = c(Toits, Ménages_dénombrés, Ménages_enquêtés),
+             sep_mark = " ", decimals = 0) |>
+  fmt_number(columns = `Taux de sondage (%)`, decimals = 1) |>
+  cols_label(
+    Observatory = "Observatoire",
+    Toits = "Toits dénombrés",
+    Ménages_dénombrés = "Ménages dénombrés",
+    Ménages_enquêtés = "Ménages enquêtés"
+  ) |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
+    locations = cells_body(rows = Observatory == "Ensemble")
+  ) |>
+  tab_source_note(
+    source_note = md("**Source : Synthèse Dénombrement OR 2025 & Enquête auprès des OR 2025**")
+  )
 ```
 
 ### Répartition par hameau
