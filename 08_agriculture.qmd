@@ -4,98 +4,1069 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Agriculture
+# Agriculture, élevage et pêche
 
-Nous allons charger les données de l'Agriculture relative aux ménages des OR Alaotra et Marovoay.
+Ce chapitre analyse les activités agricoles, d'élevage, de chasse et de pêche des ménages des deux observatoires. Le chapitre sur les revenus présente déjà les contributions de ces activités au revenu total ; ici nous nous intéressons aux pratiques, aux facteurs de production et aux performances.
 
-```{r}
+```{r setup_agro}
+#| include: false
 library(tidyverse)
 library(haven)
-library(dplyr)
-library (gt) # Easily create presentation - ready display tables
+library(labelled)
+library(gt)
+library(scales)
 
-# Loading observatories data
-res_deb <- read_dta("data/res_deb.dta")
-# Loading household data
-res_m_a <- read_dta("data/res_m_a.dta")
+# --- Données de base ---
+res_deb <- read_dta("data/res_deb.dta") |>
+  mutate(
+    j5 = as.character(j5),
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  )
+
+# Fonction utilitaire : ajout observatoire
+add_obs <- function(df) {
+  df |>
+    mutate(j5 = as.character(j5)) |>
+    left_join(res_deb |> select(j5, Observatory), by = "j5")
+}
+
+# Nombre total de ménages
+n_men <- nrow(res_deb)
+
+# --- Riziculture ---
+res_r    <- read_dta("data/res_r.dta")    |> add_obs()
+res_r1   <- read_dta("data/res_r1.dta")   |> add_obs()
+res_dc1  <- read_dta("data/res_dc1.dta")  |> add_obs()
+res_dc20 <- read_dta("data/res_dc20.dta") |> add_obs()
+res_dc21 <- read_dta("data/res_dc21.dta") |> add_obs()
+
+# --- Autres cultures ---
+res_c  <- read_dta("data/res_c.dta")  |> add_obs()
+res_c0 <- read_dta("data/res_c0.dta") |> add_obs()
+
+# --- Jardins potagers / cueillette ---
+res_jp       <- read_dta("data/res_jp.dta")       |> add_obs()
+res_jpchphef <- read_dta("data/res_jpchphef.dta") |> add_obs()
+
+# --- Élevage ---
+res_el2 <- read_dta("data/res_el2.dta") |> add_obs()
+res_ele <- read_dta("data/res_ele.dta") |> add_obs()
+res_pe  <- read_dta("data/res_pe.dta")  |> add_obs()
+
+# --- Chasse / Pêche ---
+res_chph <- read_dta("data/res_chph.dta") |> add_obs()
+
+# --- Main d'oeuvre ---
+res_mor <- read_dta("data/res_mor.dta") |> add_obs()
+res_mp  <- read_dta("data/res_mp.dta")  |> add_obs()
+res_mp0 <- read_dta("data/res_mp0.dta") |> add_obs()
+
+# Fonction : % de Oui (code 1) par observatoire + total
+pct_oui <- function(df, var, label) {
+  var_sym <- sym(var)
+  df |>
+    summarise(
+      pct = round(sum(!!var_sym == 1, na.rm = TRUE) / sum(!is.na(!!var_sym)) * 100, 0),
+      .by = Observatory
+    ) |>
+    pivot_wider(names_from = Observatory, values_from = pct) |>
+    mutate(
+      Total = df |>
+        summarise(p = round(sum(!!var_sym == 1, na.rm = TRUE) /
+                            sum(!is.na(!!var_sym)) * 100, 0)) |>
+        pull(p),
+      Item = label
+    ) |>
+    select(Item, Alaotra, Marovoay, Total)
+}
+
+# Wrapper sûr pour to_character (encode UTF-8)
+safe_to_char <- function(x) {
+  out <- labelled::to_character(x)
+  out <- as.character(out)
+  # Tenter de corriger les encodages non-UTF-8 (Latin-1 des .dta)
+  Encoding(out[!is.na(out)]) <- "latin1"
+  iconv(out, from = "latin1", to = "UTF-8", sub = "?")
+}
+
+# Labels mois
+mois_labs <- c("Jan", "Fév", "Mar", "Avr", "Mai", "Jun",
+               "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc")
 ```
 
-## Agriculture, Elevage et Pêche
 
-### Agriculture
+## Agriculture {#sec-agriculture}
 
-#### Riziculture
+### Riziculture {#sec-riziculture}
+
+La riziculture est l'activité agricole dominante dans les deux observatoires.
 
 ```{r}
-# Loading rice farming data
-res_r <- read_dta("data/res_r.dta") # Year, j5
-res_r1 <- read_dta("data/res_r1.dta") # Year, j5
-res_dc1 <- read_dta("data/res_dc1.dta") # Year, j5
-res_dc20 <- read_dta("data/res_dc20.dta") # Year, j5
-res_dc21 <- read_dta("data/res_dc21.dta") # Year, j5
+#| label: tbl-pratique-riz
+#| tbl-cap: "Pratique de la riziculture par observatoire (% des ménages)"
+
+res_r1 |>
+  summarise(
+    `Nb ménages` = n(),
+    `Pratiquent (nb)` = sum(r1a == 1, na.rm = TRUE),
+    `Pratiquent (%)` = round(sum(r1a == 1, na.rm = TRUE) / n() * 100, 1),
+    .by = Observatory
+  ) |>
+  bind_rows(
+    res_r1 |>
+      summarise(
+        Observatory = "Total",
+        `Nb ménages` = n(),
+        `Pratiquent (nb)` = sum(r1a == 1, na.rm = TRUE),
+        `Pratiquent (%)` = round(sum(r1a == 1, na.rm = TRUE) / n() * 100, 1)
+      )
+  ) |>
+  gt() |>
+  tab_header(title = "Pratique de la riziculture")
 ```
 
-##### Mode de faire valoir et accès à l’eau
-
-##### Rendements
-
-#### Autres cultures
-
-A voir dans les données si on met dans "autres cultures" les données sur les jardins potagers, ou on les met dans exploitation forestière et usage de l'AP.
+#### Mode de faire valoir et accès à l'eau
 
 ```{r}
-# Loading other culture data
-res_c <- read_dta("data/res_c.dta") # Year, j5
-res_c0 <- read_dta("data/res_c0.dta") # Year, j5
-# Loading vegetable garden data
-res_jp <- read_dta("data/res_jp.dta") # Year, j5
-res_jpchphef <- read_dta("data/res_jpchphef.dta") # Year, j5
+#| label: fig-tenure-riz
+#| fig-cap: "Mode de faire valoir des parcelles rizicoles par observatoire"
+#| fig-width: 9
+#| fig-height: 5
+
+tenure_labs <- c(
+  "0" = "Autre",
+  "1" = "Direct",
+  "2" = "Prise location",
+  "3" = "Prise métayage",
+  "4" = "Prêt gratuit",
+  "5" = "Mise location",
+  "6" = "Mise métayage",
+  "7" = "Mise prêt gratuit",
+  "8" = "Mise en gage",
+  "9" = "Mise gage (exploitée)"
+)
+
+res_r |>
+  filter(!is.na(r4)) |>
+  mutate(Tenure = factor(as.character(r4), levels = names(tenure_labs), labels = tenure_labs)) |>
+  count(Observatory, Tenure) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Tenure, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
 ```
 
-##### Diversification et type de culture
-
-##### Quantités et usages
-
-##### Satisfaction à l’égard des rendements
-
-### Elevage
+La gestion de l'eau est un enjeu central de la riziculture.
 
 ```{r}
-# Loading livestock data
-res_el2 <- read_dta("data/res_el2.dta") # Year, j5
-res_ele <- read_dta("data/res_ele.dta") # Year, j5
-# Loading livestock products data
-res_pe <- read_dta("data/res_pe.dta") # Year, j5
+#| label: fig-eau-riz
+#| fig-cap: "Problèmes de maîtrise de l'eau sur les parcelles rizicoles"
+#| fig-width: 9
+#| fig-height: 5
+
+eau_labs <- c(
+  "1" = "Aucun problème",
+  "2" = "Inondation",
+  "3" = "Manque d'eau",
+  "4" = "Problème drainage",
+  "6" = "Ensablement",
+  "9" = "Autre"
+)
+
+res_r |>
+  filter(!is.na(r11b)) |>
+  mutate(Probleme = factor(as.character(r11b), levels = names(eau_labs), labels = eau_labs)) |>
+  count(Observatory, Probleme) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Probleme, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
 ```
 
-#### Pratiques et raisons de l’élevage
-
-##### Pratique
-
-##### Raisons
-
-#### Produits de l’élevage
-
-##### Vente des produits de l’élevage
-
-##### Perte
-
-### Chasse et Pêche
+#### Techniques culturales et intrants
 
 ```{r}
-# Loading hunting and fishing data
-res_chph <- read_dta("data/res_chph.dta") # Year, j5
+#| label: fig-technique-riz
+#| fig-cap: "Technique de culture rizicole par observatoire"
+#| fig-width: 9
+#| fig-height: 5
+
+tech_labs <- c(
+  "1" = "Repiquage traditionnel",
+  "2" = "SRA",
+  "3" = "SRI",
+  "4" = "Semis direct poquet",
+  "5" = "Repiquage en ligne",
+  "6" = "Semis à la volée",
+  "7" = "Semis direct amélioré",
+  "8" = "Zéro labour"
+)
+
+res_r |>
+  filter(!is.na(r13)) |>
+  mutate(Technique = factor(as.character(r13), levels = names(tech_labs), labels = tech_labs)) |>
+  count(Observatory, Technique) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Technique, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
 ```
-
-A voir si on garde la partie "chasse et pêche" ou si on la met dans "exploitation forestière".
-
-## Main d'oeuvre
 
 ```{r}
-# Loading labor data
-res_mor <- read_dta("data/res_mor.dta") # Year, j5
-res_mp <- read_dta("data/res_mp.dta") # Year, j5
-res_mp0 <- read_dta("data/res_mp0.dta") # Year, j5
+#| label: fig-engrais-riz
+#| fig-cap: "Utilisation d'engrais sur les parcelles rizicoles"
+#| fig-width: 10
+#| fig-height: 5
+
+fert_labs <- c(
+  "1" = "Pas d'engrais",
+  "2" = "Fumure/compost seul",
+  "3" = "Engrais chimique seul",
+  "4" = "Fumure + chimique",
+  "5" = "En pâture",
+  "6" = "Arrière-effet",
+  "7" = "Chimique pépinière",
+  "8" = "Compost amélioré/guano",
+  "9" = "Autre"
+)
+
+res_r |>
+  filter(!is.na(r40)) |>
+  mutate(Engrais = factor(as.character(r40), levels = names(fert_labs), labels = fert_labs)) |>
+  count(Observatory, Engrais) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Engrais, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
 ```
 
-**Remarque :** Main d'oeuvre non-agricole?
+```{r}
+#| label: tbl-semences-labour
+#| tbl-cap: "Type de semences et mode de travail du sol (% des parcelles)"
+
+sem <- res_r |>
+  filter(!is.na(r24)) |>
+  mutate(Modalite = if_else(r24 == 1, "Amélioré", "Traditionnel")) |>
+  count(Observatory, Modalite) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  select(-n) |>
+  pivot_wider(names_from = Observatory, values_from = pct) |>
+  mutate(Indicateur = "Semences", .before = 1)
+
+labour_labs <- c(
+  "1" = "Angady",
+  "2" = "Charrue",
+  "3" = "Nettoyage (mikaoka)",
+  "4" = "Tracteur/motoculteur",
+  "5" = "Pas de labour",
+  "6" = "Piétinage",
+  "9" = "Autre"
+)
+
+labour <- res_r |>
+  filter(!is.na(r14)) |>
+  mutate(Modalite = factor(as.character(r14), levels = names(labour_labs), labels = labour_labs)) |>
+  count(Observatory, Modalite) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  select(-n) |>
+  pivot_wider(names_from = Observatory, values_from = pct) |>
+  mutate(Indicateur = "Travail du sol", .before = 1)
+
+bind_rows(sem, labour) |>
+  gt() |>
+  tab_header(title = "Semences et travail du sol sur les parcelles rizicoles")
+```
+
+#### Rendements et production
+
+```{r}
+#| label: tbl-rendement-riz
+#| tbl-cap: "Perception des rendements rizicoles par observatoire"
+
+res_r1 |>
+  filter(r1a == 1, !is.na(dc23c6)) |>
+  mutate(Perception = safe_to_char(dc23c6)) |>
+  count(Observatory, Perception) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  select(-n) |>
+  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0) |>
+  gt() |>
+  tab_header(title = "Comment jugez-vous le rendement de cette campagne ? (% des riziculteurs)")
+```
+
+```{r}
+#| label: fig-rendement-riz-tha
+#| fig-cap: "Distribution des rendements rizicoles (t/ha) par observatoire"
+#| fig-width: 9
+#| fig-height: 5
+
+res_r |>
+  filter(!is.na(r23), r23 > 0, !is.na(r1d), r1d > 0) |>
+  mutate(rendement_tha = (r23 / r1d) * 100 / 1000) |>
+  filter(rendement_tha < quantile(rendement_tha, 0.95, na.rm = TRUE)) |>
+  ggplot(aes(x = Observatory, y = rendement_tha, fill = Observatory)) +
+  geom_boxplot(alpha = 0.7) +
+  labs(x = NULL, y = "Rendement (t/ha)", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "none")
+```
+
+```{r}
+#| label: fig-production-riz
+#| fig-cap: "Distribution de la production de paddy par parcelle (kg)"
+#| fig-width: 8
+#| fig-height: 5
+
+res_r |>
+  filter(!is.na(r23), r23 > 0) |>
+  ggplot(aes(x = r23, fill = Observatory)) +
+  geom_histogram(position = "identity", alpha = 0.6, bins = 40) +
+  scale_x_continuous(
+    labels = label_comma(),
+    limits = c(0, quantile(res_r[["r23"]][res_r[["r23"]] > 0], 0.95, na.rm = TRUE))
+  ) +
+  labs(x = "Production de paddy (kg)", y = "Nombre de parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12)
+```
+
+#### Topographie et saison de culture
+
+```{r}
+#| label: fig-topographie-riz
+#| fig-cap: "Topographie des parcelles rizicoles"
+#| fig-width: 10
+#| fig-height: 5
+
+topo_labs <- c(
+  "1" = "Bas-fond", "2" = "Plaine", "3" = "Plaine + inondation",
+  "4" = "Tanety", "5" = "Tavy", "6" = "Baiboho", "7" = "Autre"
+)
+
+res_r |>
+  filter(!is.na(r10x)) |>
+  mutate(Topographie = factor(as.character(r10x), levels = names(topo_labs), labels = topo_labs)) |>
+  count(Observatory, Topographie) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Topographie, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r}
+#| label: fig-saison-riz
+#| fig-cap: "Saison de culture rizicole"
+#| fig-width: 8
+#| fig-height: 4
+
+saison_labs <- c(
+  "1" = "Saison principale", "2" = "Contre saison", "3" = "Saison intermédiaire"
+)
+
+res_r |>
+  filter(!is.na(r42)) |>
+  mutate(Saison = factor(as.character(r42), levels = names(saison_labs), labels = saison_labs)) |>
+  count(Observatory, Saison) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = Saison, y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r}
+#| label: fig-origine-semence
+#| fig-cap: "Origine des semences de riz"
+#| fig-width: 10
+#| fig-height: 5
+
+res_r |>
+  filter(!is.na(r30)) |>
+  mutate(Origine = safe_to_char(r30)) |>
+  count(Observatory, Origine) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Origine, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+#### Ventes de riz
+
+```{r}
+#| label: tbl-ventes-riz-taux
+#| tbl-cap: "Taux de vente de riz par observatoire"
+
+res_dc20 |>
+  summarise(
+    `Nb ménages` = n(),
+    `Ont vendu (nb)` = sum(dcva == 1, na.rm = TRUE),
+    `Ont vendu (%)` = round(sum(dcva == 1, na.rm = TRUE) / n() * 100, 1),
+    .by = Observatory
+  ) |>
+  bind_rows(
+    res_dc20 |>
+      summarise(
+        Observatory = "Total",
+        `Nb ménages` = n(),
+        `Ont vendu (nb)` = sum(dcva == 1, na.rm = TRUE),
+        `Ont vendu (%)` = round(sum(dcva == 1, na.rm = TRUE) / n() * 100, 1)
+      )
+  ) |>
+  gt() |>
+  tab_header(title = "Vente de riz (paddy ou blanc)")
+```
+
+```{r}
+#| label: fig-ventes-riz-mois
+#| fig-cap: "Répartition mensuelle des ventes de riz"
+#| fig-width: 9
+#| fig-height: 5
+
+res_dc21 |>
+  filter(!is.na(dc21), dc21 >= 1, dc21 <= 12) |>
+  count(Observatory, Mois = dc21) |>
+  mutate(
+    Mois_lab = factor(Mois, levels = 1:12, labels = mois_labs),
+    pct = n / sum(n) * 100,
+    .by = Observatory
+  ) |>
+  ggplot(aes(x = Mois_lab, y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  labs(x = NULL, y = "% des transactions", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r}
+#| label: fig-prix-paddy
+#| fig-cap: "Distribution du prix de vente du paddy (Ar/kg)"
+#| fig-width: 8
+#| fig-height: 5
+
+res_dc21 |>
+  filter(!is.na(dc24), dc24 > 0, dc24 < quantile(dc24, 0.98, na.rm = TRUE)) |>
+  ggplot(aes(x = dc24, fill = Observatory)) +
+  geom_histogram(position = "identity", alpha = 0.6, bins = 30) +
+  labs(x = "Prix du paddy (Ar/kg)", y = "Nombre de transactions", fill = "Observatoire") +
+  theme_minimal(base_size = 12)
+```
+
+#### Bilan rizicole du ménage
+
+Le bilan rizicole reconstitue les flux de paddy au niveau du ménage : stock initial, production, transactions (achat, vente, rente, dons), autoconsommation alimentaire, utilisation en semences, et stock final.
+
+```{r}
+#| label: tbl-bilan-riz
+#| tbl-cap: "Bilan rizicole moyen par ménage (kg de paddy)"
+
+bilan_vars <- c(
+  dc01 = "Stock début campagne",
+  dc02b = "Production totale",
+  dc03b = "Rente perçue en nature",
+  dc04 = "Achat de paddy",
+  dc05 = "Paddy reçu (dons, héritage…)",
+  dc06 = "Vente de paddy",
+  dc07 = "Rente versée en nature",
+  dc08 = "Paddy donné / cédé",
+  dc09 = "Alimentation du ménage",
+  dc10 = "Paiement MO en nature",
+  dc11 = "Semences utilisées",
+  dc17 = "Stock fin campagne"
+)
+
+# Only keep variables that exist in the data
+bilan_vars <- bilan_vars[names(bilan_vars) %in% names(res_dc1)]
+
+res_dc1 |>
+  summarise(
+    across(all_of(names(bilan_vars)), \(x) round(mean(x, na.rm = TRUE))),
+    .by = Observatory
+  ) |>
+  pivot_longer(-Observatory, names_to = "Variable", values_to = "Moyenne") |>
+  mutate(Poste = bilan_vars[Variable]) |>
+  select(-Variable) |>
+  pivot_wider(names_from = Observatory, values_from = Moyenne) |>
+  gt() |>
+  tab_header(title = "Bilan rizicole moyen par ménage (kg de paddy)") |>
+  fmt_number(columns = c(Alaotra, Marovoay), use_seps = TRUE, decimals = 0)
+```
+
+### Autres cultures {#sec-autres-cultures}
+
+```{r}
+#| label: tbl-pratique-autres
+#| tbl-cap: "Pratique des cultures non rizicoles"
+
+res_c0 |>
+  summarise(
+    `Nb ménages` = n(),
+    `Pratiquent (nb)` = sum(c1a == 1, na.rm = TRUE),
+    `Pratiquent (%)` = round(sum(c1a == 1, na.rm = TRUE) / n() * 100, 1),
+    .by = Observatory
+  ) |>
+  bind_rows(
+    res_c0 |>
+      summarise(
+        Observatory = "Total",
+        `Nb ménages` = n(),
+        `Pratiquent (nb)` = sum(c1a == 1, na.rm = TRUE),
+        `Pratiquent (%)` = round(sum(c1a == 1, na.rm = TRUE) / n() * 100, 1)
+      )
+  ) |>
+  gt() |>
+  tab_header(title = "Pratique des cultures non rizicoles")
+```
+
+#### Diversification et principales cultures
+
+```{r}
+#| label: fig-diversification
+#| fig-cap: "Nombre de cultures non rizicoles par ménage"
+#| fig-width: 8
+#| fig-height: 5
+
+res_c |>
+  filter(c0 != "", !is.na(c0)) |>
+  distinct(j5, Observatory, c0) |>
+  count(j5, Observatory, name = "nb_cultures") |>
+  ggplot(aes(x = nb_cultures, fill = Observatory)) +
+  geom_histogram(position = "dodge", binwidth = 1) +
+  labs(x = "Nombre de cultures pratiquées", y = "Nombre de ménages", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r}
+#| label: fig-top-cultures
+#| fig-cap: "Cultures non rizicoles les plus fréquentes (nb de ménages pratiquant)"
+#| fig-width: 10
+#| fig-height: 6
+
+top_cult <- res_c |>
+  filter(c0 != "", !is.na(c0)) |>
+  distinct(j5, Observatory, c0) |>
+  mutate(Culture = str_to_title(c0)) |>
+  count(Observatory, Culture) |>
+  group_by(Culture) |>
+  mutate(total = sum(n)) |>
+  ungroup() |>
+  filter(dense_rank(-total) <= 15)
+
+top_cult |>
+  ggplot(aes(x = reorder(Culture, total), y = n, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "Nombre de ménages", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+#### Fertilisation et production des autres cultures
+
+```{r}
+#| label: fig-engrais-autres
+#| fig-cap: "Utilisation d'engrais sur les parcelles de cultures non rizicoles"
+#| fig-width: 10
+#| fig-height: 5
+
+fert_c_labs <- c(
+  "1" = "Pas d'engrais",
+  "2" = "Fumure/compost seul",
+  "3" = "Engrais chimique seul",
+  "4" = "Fumure + chimique",
+  "5" = "En pâture",
+  "6" = "Arrière-effet",
+  "7" = "Autre"
+)
+
+res_c |>
+  filter(c0 != "", !is.na(c0), !is.na(c36)) |>
+  mutate(Engrais = factor(as.character(c36), levels = names(fert_c_labs), labels = fert_c_labs)) |>
+  count(Observatory, Engrais) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Engrais, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r}
+#| label: tbl-production-autres
+#| tbl-cap: "Production et ventes des principales cultures non rizicoles"
+
+res_c |>
+  filter(c0 != "", !is.na(c0), !is.na(c2), c2 > 0) |>
+  mutate(Culture = str_to_title(c0)) |>
+  summarise(
+    `Nb parcelles` = n(),
+    `Production moy. (kg)` = round(mean(c2, na.rm = TRUE)),
+    `% vendu (moy.)` = round(mean(c4a, na.rm = TRUE), 1),
+    `Montant vente moy. (Ar)` = round(mean(c6b[c6b > 0], na.rm = TRUE)),
+    .by = c(Observatory, Culture)
+  ) |>
+  filter(`Nb parcelles` >= 5) |>
+  arrange(Observatory, desc(`Nb parcelles`)) |>
+  gt() |>
+  tab_header(title = "Production et ventes des principales cultures non rizicoles") |>
+  fmt_number(columns = c(`Production moy. (kg)`, `Montant vente moy. (Ar)`),
+             use_seps = TRUE, decimals = 0)
+```
+
+#### Perception des rendements
+
+```{r}
+#| label: tbl-rendement-autres
+#| tbl-cap: "Perception des rendements des cultures non rizicoles"
+
+perc <- res_c0 |>
+  filter(c1a == 1, !is.na(c20)) |>
+  mutate(Perception = safe_to_char(c20)) |>
+  count(Observatory, Perception) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  select(-n) |>
+  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0) |>
+  mutate(Indicateur = "Rendement cette campagne", .before = 1) |>
+  rename(Modalite = Perception)
+
+evol <- res_c0 |>
+  filter(c1a == 1, !is.na(c21)) |>
+  mutate(Evolution = safe_to_char(c21)) |>
+  count(Observatory, Evolution) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  select(-n) |>
+  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0) |>
+  mutate(Indicateur = "Par rapport a l'an dernier", .before = 1) |>
+  rename(Modalite = Evolution)
+
+bind_rows(perc, evol) |>
+  gt() |>
+  tab_header(title = "Perception des rendements des cultures non rizicoles (% des pratiquants)")
+```
+
+### Jardins potagers et cueillette {#sec-jardins}
+
+```{r}
+#| label: tbl-jardin-pratique
+#| tbl-cap: "Pratique du jardin potager et de la cueillette"
+
+pct_oui(res_jpchphef, "jpa", "Jardin potager") |>
+  bind_rows(pct_oui(res_jpchphef, "efa", "Exploitation forestière")) |>
+  gt() |>
+  tab_header(title = "Taux de pratique (% des ménages)") |>
+  cols_label(Item = "Activité")
+```
+
+```{r}
+#| label: fig-top-jardin
+#| fig-cap: "Produits de jardin / cueillette les plus fréquents"
+#| fig-width: 10
+#| fig-height: 6
+
+top_jp <- res_jp |>
+  filter(jp_lig != "", !is.na(jp_lig)) |>
+  distinct(j5, Observatory, jp_lig) |>
+  mutate(Produit = str_to_title(jp_lig)) |>
+  count(Observatory, Produit) |>
+  group_by(Produit) |>
+  mutate(total = sum(n)) |>
+  ungroup() |>
+  filter(dense_rank(-total) <= 15)
+
+top_jp |>
+  ggplot(aes(x = reorder(Produit, total), y = n, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "Nombre de ménages", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+### Exploitation forestière {#sec-foret}
+
+```{r}
+#| label: fig-produits-foret
+#| fig-cap: "Principaux produits de l'exploitation forestière"
+#| fig-width: 9
+#| fig-height: 5
+
+res_ef <- read_dta("data/res_ef.dta") |> add_obs()
+
+res_ef |>
+  filter(ef_lib != "", !is.na(ef_lib)) |>
+  mutate(Produit = str_to_title(ef_lib)) |>
+  distinct(j5, Observatory, Produit) |>
+  count(Observatory, Produit) |>
+  group_by(Produit) |>
+  mutate(total = sum(n)) |>
+  ungroup() |>
+  ggplot(aes(x = reorder(Produit, total), y = n, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "Nombre de ménages", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+## Élevage {#sec-elevage}
+
+### Pratique de l'élevage
+
+```{r}
+#| label: tbl-elevage-pratique
+#| tbl-cap: "Taux de pratique de l'élevage"
+
+res_el2 |>
+  summarise(
+    `Nb ménages` = n(),
+    `Pratiquent (nb)` = sum(el2 == 1, na.rm = TRUE),
+    `Pratiquent (%)` = round(sum(el2 == 1, na.rm = TRUE) / n() * 100, 1),
+    .by = Observatory
+  ) |>
+  bind_rows(
+    res_el2 |>
+      summarise(
+        Observatory = "Total",
+        `Nb ménages` = n(),
+        `Pratiquent (nb)` = sum(el2 == 1, na.rm = TRUE),
+        `Pratiquent (%)` = round(sum(el2 == 1, na.rm = TRUE) / n() * 100, 1)
+      )
+  ) |>
+  gt() |>
+  tab_header(title = "Pratique de l'élevage")
+```
+
+### Espèces élevées
+
+```{r}
+#| label: fig-especes-elevage
+#| fig-cap: "Espèces élevées (nombre de ménages pratiquant)"
+#| fig-width: 10
+#| fig-height: 6
+
+res_ele |>
+  filter(ele_lig0 != "", !is.na(ele_lig0)) |>
+  mutate(Espece = str_to_title(ele_lig0)) |>
+  distinct(j5, Observatory, Espece) |>
+  count(Observatory, Espece) |>
+  group_by(Espece) |>
+  mutate(total = sum(n)) |>
+  ungroup() |>
+  ggplot(aes(x = reorder(Espece, total), y = n, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "Nombre de ménages", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+### Objectifs de l'élevage
+
+```{r}
+#| label: fig-objectifs-elevage
+#| fig-cap: "Objectifs de l'élevage par espèce (% des ménages éleveurs)"
+#| fig-width: 10
+#| fig-height: 6
+
+obj_labs <- c(ele5a = "Épargne / assurance", ele5b = "Autoconsommation", ele5c = "Vente")
+
+res_ele |>
+  filter(ele_lig0 != "", !is.na(ele_lig0)) |>
+  mutate(Espece = str_to_title(ele_lig0)) |>
+  pivot_longer(cols = c(ele5a, ele5b, ele5c), names_to = "Objectif_code", values_to = "val") |>
+  filter(val == 1) |>
+  mutate(Objectif = obj_labs[Objectif_code]) |>
+  count(Espece, Objectif) |>
+  ggplot(aes(x = reorder(Espece, n), y = n, fill = Objectif)) +
+  geom_col(position = "fill") +
+  coord_flip() +
+  scale_y_continuous(labels = percent) +
+  labs(x = NULL, y = "Répartition des objectifs", fill = "Objectif") +
+  theme_minimal(base_size = 12)
+```
+
+### Ventes et pertes d'animaux
+
+```{r}
+#| label: tbl-ventes-elevage
+#| tbl-cap: "Ventes d'animaux par observatoire"
+
+res_ele |>
+  filter(!is.na(ele_i1), ele_i1 > 0, ele_lig0 != "", !is.na(ele_lig0)) |>
+  mutate(Espece = str_to_title(ele_lig0)) |>
+  summarise(
+    `Nb transactions` = n(),
+    `Nb animaux vendus` = sum(ele_i1, na.rm = TRUE),
+    `Valeur totale (Ar)` = sum(ele_i2, na.rm = TRUE),
+    .by = c(Observatory, Espece)
+  ) |>
+  arrange(Observatory, desc(`Valeur totale (Ar)`)) |>
+  gt() |>
+  tab_header(title = "Ventes d'animaux par espèce et observatoire") |>
+  fmt_number(columns = c(`Nb animaux vendus`, `Valeur totale (Ar)`),
+             use_seps = TRUE, decimals = 0)
+```
+
+```{r}
+#| label: fig-pertes-elevage
+#| fig-cap: "Ménages ayant subi des pertes de bétail"
+#| fig-width: 9
+#| fig-height: 5
+
+res_ele |>
+  filter(ele_p1 == 1, ele_lig0 != "", !is.na(ele_lig0)) |>
+  mutate(Espece = str_to_title(ele_lig0)) |>
+  distinct(j5, Observatory, Espece) |>
+  count(Observatory, Espece) |>
+  group_by(Espece) |>
+  mutate(total = sum(n)) |>
+  ungroup() |>
+  ggplot(aes(x = reorder(Espece, total), y = n, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "Nb ménages ayant subi des pertes", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+### Produits de l'élevage
+
+```{r}
+#| label: tbl-produits-elevage
+#| tbl-cap: "Produits de l'élevage : nombre de ménages producteurs"
+
+res_pe |>
+  filter(pe_1 != "", !is.na(pe_1)) |>
+  mutate(Produit = str_to_title(pe_1)) |>
+  distinct(j5, Observatory, Produit) |>
+  count(Observatory, Produit) |>
+  pivot_wider(names_from = Observatory, values_from = n, values_fill = 0) |>
+  mutate(Total = Alaotra + Marovoay) |>
+  arrange(desc(Total)) |>
+  gt() |>
+  tab_header(title = "Produits de l'élevage déclarés par les ménages")
+```
+
+## Chasse et pêche {#sec-chasse-peche}
+
+```{r}
+#| label: tbl-chasse-peche-pratique
+#| tbl-cap: "Taux de pratique de la chasse et de la pêche"
+
+pct_oui(res_jpchphef, "chapha", "Chasse / Pêche") |>
+  gt() |>
+  tab_header(title = "Pratique de la chasse et de la pêche (% des ménages)") |>
+  cols_label(Item = "Activité")
+```
+
+```{r}
+#| label: fig-chasse-especes
+#| fig-cap: "Principales espèces chassées/pêchées"
+#| fig-width: 10
+#| fig-height: 6
+
+res_chph |>
+  filter(chph_lib != "", !is.na(chph_lib)) |>
+  mutate(Espece = str_to_title(chph_lib)) |>
+  count(Observatory, Espece) |>
+  group_by(Espece) |>
+  mutate(total = sum(n)) |>
+  ungroup() |>
+  filter(dense_rank(-total) <= 15) |>
+  ggplot(aes(x = reorder(Espece, total), y = n, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "Nombre de mentions", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r}
+#| label: fig-chasse-raison
+#| fig-cap: "Raisons de la chasse/pêche par observatoire"
+#| fig-width: 8
+#| fig-height: 5
+
+res_chph |>
+  filter(!is.na(chph5)) |>
+  mutate(Raison = safe_to_char(chph5)) |>
+  count(Observatory, Raison) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Raison, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des mentions", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+### Fréquence et saisonnalité
+
+```{r}
+#| label: fig-frequence-peche
+#| fig-cap: "Fréquence de la chasse/pêche"
+#| fig-width: 9
+#| fig-height: 5
+
+res_chph |>
+  filter(!is.na(chph3)) |>
+  mutate(Frequence = safe_to_char(chph3)) |>
+  count(Observatory, Frequence) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Frequence, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des mentions", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r}
+#| label: fig-saisonnalite-peche
+#| fig-cap: "Saisonnalité de la chasse/pêche (% de mentions par mois)"
+#| fig-width: 10
+#| fig-height: 5
+
+chph6_cols <- paste0("chph6_", sprintf("%02d", 1:12))
+chph6_cols <- chph6_cols[chph6_cols %in% names(res_chph)]
+
+if (length(chph6_cols) > 0) {
+  res_chph |>
+    filter(chph_lib != "", !is.na(chph_lib)) |>
+    select(j5, Observatory, all_of(chph6_cols)) |>
+    pivot_longer(all_of(chph6_cols), names_to = "mois_code", values_to = "val") |>
+    filter(val == 1) |>
+    mutate(Mois = factor(
+      as.integer(str_extract(mois_code, "\\d+$")),
+      levels = 1:12, labels = mois_labs
+    )) |>
+    count(Observatory, Mois) |>
+    ggplot(aes(x = Mois, y = n, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    labs(x = NULL, y = "Nombre de mentions", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}
+```
+
+## Main d'oeuvre agricole {#sec-main-oeuvre}
+
+### Emploi de main d'oeuvre
+
+```{r}
+#| label: tbl-main-oeuvre-pratique
+#| tbl-cap: "Recours à la main d'oeuvre agricole"
+
+mo_np <- pct_oui(res_mp0, "mora", "Main d'oeuvre non permanente")
+
+mp0_col <- intersect(c("mp0", "mp0a"), names(res_mp0))[1]
+
+if (!is.na(mp0_col)) {
+  mo_p <- pct_oui(res_mp0, mp0_col, "Main d'oeuvre permanente")
+  bind_rows(mo_np, mo_p) |>
+    gt() |>
+    tab_header(title = "Recours à la main d'oeuvre agricole (% des ménages)") |>
+    cols_label(Item = "Type")
+} else {
+  mo_np |>
+    gt() |>
+    tab_header(title = "Recours à la main d'oeuvre non permanente (% des ménages)") |>
+    cols_label(Item = "Type")
+}
+```
+
+### Opérations nécessitant de la main d'oeuvre salariée
+
+```{r}
+#| label: tbl-operations-mo
+#| tbl-cap: "Main d'œuvre salariée et entraide par opération agricole"
+
+op_names <- c("Asa tany" = "Travail du sol", "Mijinja" = "Sarclage", "Manetsa" = "Moisson")
+
+tbl_mo <- res_mor |>
+  filter(mo1_lib != "", !is.na(mo1_lib)) |>
+  mutate(
+    Operation = if_else(mo1_lib %in% names(op_names), op_names[mo1_lib], mo1_lib)
+  ) |>
+  summarise(
+    Salariee_pct = round(sum(mor1 == 1, na.rm = TRUE) / sum(!is.na(mor1)) * 100, 1),
+    Entraide_pct = round(sum(mor2 == 1, na.rm = TRUE) / sum(!is.na(mor2)) * 100, 1),
+    Salaire_moy = round(mean(mor12[mor1 == 1], na.rm = TRUE)),
+    .by = c(Observatory, Operation)
+  ) |>
+  arrange(Operation, Observatory)
+
+tbl_mo |>
+  gt() |>
+  cols_label(
+    Salariee_pct = "Salariee (%)",
+    Entraide_pct = "Entraide (%)",
+    Salaire_moy = "Salaire moyen (Ar)"
+  ) |>
+  fmt_number(columns = Salaire_moy, use_seps = TRUE, decimals = 0)
+```
+
+### Main d'oeuvre permanente
+
+```{r}
+#| label: tbl-main-oeuvre-perm
+#| tbl-cap: "Caractéristiques de la main d'oeuvre permanente"
+
+act_labs <- c(
+  mp3a = "Riziculture", mp3b = "Autres cultures",
+  mp3c = "Élevage", mp3d = "Autres activités", mp3e = "Aide ménagère"
+)
+
+res_mp |>
+  filter(!is.na(mp41) | !is.na(mp42)) |>
+  mutate(Sexe = safe_to_char(mp7)) |>
+  pivot_longer(cols = c(mp3a, mp3b, mp3c, mp3d, mp3e),
+               names_to = "act_code", values_to = "val") |>
+  filter(val == 1) |>
+  mutate(Activite = act_labs[act_code]) |>
+  summarise(
+    `Nb employés` = n_distinct(j5, mp_lig),
+    `Salaire moyen argent (Ar)` = round(mean(mp41, na.rm = TRUE)),
+    `Salaire moyen nature (Ar)` = round(mean(mp42, na.rm = TRUE)),
+    .by = c(Observatory, Activite)
+  ) |>
+  arrange(Observatory, desc(`Nb employés`)) |>
+  gt() |>
+  tab_header(title = "Main d'œuvre permanente par type d'activité") |>
+  fmt_number(columns = c(`Salaire moyen argent (Ar)`, `Salaire moyen nature (Ar)`),
+             use_seps = TRUE, decimals = 0)
+```
+
+## Pistes d'analyse complémentaires {#sec-pistes-agro}
+
+Les données collectées offrent des possibilités d'analyse supplémentaires qui n'ont pas été développées dans ce chapitre, faute de certitude sur leur pertinence ou par manque de recul sur la qualité des variables concernées. On peut notamment mentionner :
+
+- **Détail des ventes de riz** (`res_dc20`) : les variables `vs1` à `vs3` semblent décomposent les usages du riz vendu (semence, consommation, paiement de main d'œuvre), mais leur codage est un peu complexe/à préciser.
+- **Forme des produits vendus** (cultures non rizicoles, `c37`) : la variable indique si le produit est vendu brut, transformé ou autre — potentiellement utile pour un tableau croisé avec les types de culture.
+- **Coûts détaillés de la main d'œuvre par opération rizicole** (`res_mor`, `mor12`) : le salaire total par opération (Asa tany, Mijinja, Manetsa) pourrait être présenté sous forme de tableau comparatif, mais les valeurs présentent une forte dispersion.
+- **Pratiques de nourriture de la main d'oeuvre** (`res_mor`, `mor3`) : la variable indique si les salariés ou l'entraide sont nourris pendant le travail.
+- **Effectifs et variations du cheptel** (`res_ele`) : les variables `ele1` (effectif début), `ele2` (naissances), `ele3` (achats), `ele_i1` (ventes), `ele_p3` (pertes) permettraient de reconstituer un bilan démographique du cheptel par espèce (difficile à exploiter à première vue).
