@@ -16,6 +16,10 @@ library(labelled)
 library(gt)
 library(scales)
 
+source("utils/helpers_report.R")
+source("utils/sites.R")
+source("utils/downloadable_output.R")
+
 # --- Données de base ---
 res_deb <- read_dta("data/res_deb.dta") |>
   mutate(
@@ -28,10 +32,12 @@ res_deb <- read_dta("data/res_deb.dta") |>
     )
   )
 
+res_deb <- assign_site(res_deb)
+
 add_obs <- function(df) {
   df |>
     mutate(j5 = as.character(j5)) |>
-    left_join(res_deb |> select(j5, Observatory), by = "j5")
+    left_join(res_deb |> select(j5, Observatory, Site), by = "j5")
 }
 
 n_men <- nrow(res_deb)
@@ -103,6 +109,19 @@ res_respg0 |>
   tab_header(title = "Ménages ayant au moins un membre dans une organisation")
 ```
 
+```{r dl_tbl_adhesion}
+#| include: false
+dl_tbl_variants("tbl_adhesion", "12", function(d) {
+  d |>
+    summarise(
+      `Nb ménages` = n(),
+      `Membres (nb)` = sum(respga == 1),
+      `Membres (%)` = round(sum(respga == 1) / n() * 100, 1),
+      .by = Observatory
+    )
+}, res_respg0)
+```
+
 ### Nombre d'organisations par ménage
 
 Parmi les ménages membres, la plupart n'adhèrent qu'à une seule organisation, mais certains cumulent jusqu'à quatre affiliations.
@@ -122,6 +141,21 @@ res_respg |>
   labs(x = "Nombre d'organisations", y = "Nombre de ménages", fill = "Observatoire") +
   theme_minimal(base_size = 12) +
   theme(legend.position = "top")
+```
+
+```{r dl_fig_nb_org}
+#| include: false
+dl_fig_variants("fig_nb_org", "12", function(d) {
+  d |>
+    filter(!is.na(respgc)) |>
+    count(j5, Observatory, name = "nb_org") |>
+    count(Observatory, nb_org, name = "n_men") |>
+    ggplot(aes(x = factor(nb_org), y = n_men, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    labs(x = "Nombre d'organisations", y = "Nombre de ménages", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, res_respg, width = 8, height = 5)
 ```
 
 ### Type d'organisation
@@ -155,6 +189,25 @@ res_respg |>
   theme(legend.position = "top")
 ```
 
+```{r dl_fig_type_org}
+#| include: false
+dl_fig_variants("fig_type_org", "12", function(d) {
+  d |>
+    filter(!is.na(respgc)) |>
+    mutate(
+      respgc_chr = as.character(respgc),
+      Type = if_else(respgc_chr %in% names(org_labs), org_labs[respgc_chr], paste0("Code ", respgc_chr))
+    ) |>
+    count(Observatory, Type) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    filter(pct >= 1) |>
+    ggplot(aes(x = reorder(Type, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") + coord_flip() +
+    labs(x = NULL, y = "% des adhésions", fill = "Observatoire") +
+    theme_minimal(base_size = 12) + theme(legend.position = "top")
+}, res_respg, width = 11, height = 7)
+```
+
 ### Qui dans le ménage est membre
 
 Le chef de ménage et le ou la conjoint(e) sont les membres les plus fréquemment affiliés, de façon quasi-égale.
@@ -186,6 +239,29 @@ res_respg |>
   theme(legend.position = "top")
 ```
 
+```{r dl_fig_qui_membre}
+#| include: false
+dl_fig_variants("fig_qui_membre", "12", function(d) {
+  d |>
+    filter(!is.na(respgc)) |>
+    mutate(Membre = case_when(
+      respgb == 1 ~ "Chef de ménage",
+      respgb == 2 ~ "Conjoint(e)",
+      respgb %in% 3:23 ~ "Autre membre",
+      respgb == 91 ~ "Chef et conjoint",
+      respgb == 92 ~ "Tout le ménage",
+      respgb == 93 ~ "Tous les enfants",
+      TRUE ~ "Autre"
+    )) |>
+    count(Observatory, Membre) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = reorder(Membre, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") + coord_flip() +
+    labs(x = NULL, y = "% des adhésions", fill = "Observatoire") +
+    theme_minimal(base_size = 12) + theme(legend.position = "top")
+}, res_respg, width = 9, height = 5)
+```
+
 ### Niveau de responsabilité
 
 La grande majorité des membres se déclarent *membres occasionnels*, et seule une minorité occupe un poste de responsable.
@@ -206,6 +282,21 @@ res_respg |>
   labs(x = NULL, y = "% des adhésions", fill = "Observatoire") +
   theme_minimal(base_size = 12) +
   theme(legend.position = "top")
+```
+
+```{r dl_fig_responsabilite}
+#| include: false
+dl_fig_variants("fig_responsabilite", "12", function(d) {
+  d |>
+    filter(!is.na(respgd), respgd %in% c(1, 2, 3)) |>
+    mutate(Role = factor(as.character(respgd), levels = names(role_labs), labels = role_labs)) |>
+    count(Observatory, Role) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = Role, y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    labs(x = NULL, y = "% des adhésions", fill = "Observatoire") +
+    theme_minimal(base_size = 12) + theme(legend.position = "top")
+}, res_respg, width = 9, height = 5)
 ```
 
 
@@ -232,6 +323,20 @@ res_respg0 |>
   gt() |>
   tab_header(title = "Le ménage a-t-il bénéficié d'un projet ou d'une formation ?") |>
   cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
+```
+
+```{r dl_tbl_pro1}
+#| include: false
+dl_tbl_variants("tbl_pro1", "12", function(d) {
+  d |>
+    mutate(Beneficiaire = case_when(
+      pro1 == 1 ~ "Oui", pro1 == 2 ~ "Non", pro1 == 3 ~ "Ne sait pas"
+    )) |>
+    count(Observatory, Beneficiaire) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    select(-n) |>
+    pivot_wider(names_from = Observatory, values_from = pct)
+}, res_respg0)
 ```
 
 ### Taux de bénéficiaires par type de projet
@@ -275,6 +380,19 @@ pro_clean |>
   theme(legend.position = "top")
 ```
 
+```{r dl_fig_benef_type}
+#| include: false
+dl_fig_variants("fig_benef_type", "12", function(d) {
+  d |>
+    filter(!is.na(pro2), pro2 %in% c(1, 2)) |>
+    summarise(pct = round(mean(pro2 == 1) * 100, 1), .by = c(Observatory, pro_lib_clean)) |>
+    ggplot(aes(x = reorder(pro_lib_clean, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") + coord_flip() +
+    labs(x = NULL, y = "% de ménages bénéficiaires", fill = "Observatoire") +
+    theme_minimal(base_size = 12) + theme(legend.position = "top")
+}, pro_clean, width = 10, height = 6)
+```
+
 ```{r}
 #| label: tbl-benef-type
 #| tbl-cap: "Taux de bénéficiaires par type de projet et observatoire"
@@ -291,6 +409,20 @@ pro_clean |>
   gt() |>
   tab_header(title = "% de ménages bénéficiaires par type de projet") |>
   cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
+```
+
+```{r dl_tbl_benef_type}
+#| include: false
+dl_tbl_variants("tbl_benef_type", "12", function(d) {
+  d |>
+    filter(!is.na(pro2), pro2 %in% c(1, 2)) |>
+    summarise(
+      `% bénéficiaires` = round(mean(pro2 == 1) * 100, 1),
+      .by = c(Observatory, pro_lib_clean)
+    ) |>
+    rename(`Type de projet` = pro_lib_clean) |>
+    arrange(Observatory, desc(`% bénéficiaires`))
+}, pro_clean)
 ```
 
 ### Source des projets
@@ -331,6 +463,26 @@ pro_source |>
   theme(legend.position = "top")
 ```
 
+```{r dl_fig_source_projet}
+#| include: false
+dl_fig_variants("fig_source_projet", "12", function(d) {
+  ps <- d |>
+    summarise(
+      n = n(),
+      Etat = sum(pro3 == 1, na.rm = TRUE),
+      `ONG / Projet` = sum(!is.na(pro4) & pro4 != 0, na.rm = TRUE),
+      Eglise = sum(pro5 == 1, na.rm = TRUE),
+      .by = c(Observatory, pro_lib_clean)
+    ) |>
+    pivot_longer(cols = c(Etat, `ONG / Projet`, Eglise), names_to = "Source", values_to = "nb") |>
+    mutate(pct = round(nb / n * 100, 1))
+  ggplot(ps, aes(x = reorder(pro_lib_clean, pct), y = pct, fill = Source)) +
+    geom_col(position = "dodge") + coord_flip() + facet_wrap(~Observatory) +
+    labs(x = NULL, y = "% des bénéficiaires", fill = "Source") +
+    theme_minimal(base_size = 11) + theme(legend.position = "top")
+}, pro_benef, width = 10, height = 6)
+```
+
 ```{r}
 #| label: tbl-source-global
 #| tbl-cap: "Source des projets (tous types confondus)"
@@ -347,6 +499,22 @@ pro_benef |>
   ) |>
   gt() |>
   tab_header(title = "Source des projets pour les ménages bénéficiaires")
+```
+
+```{r dl_tbl_source_global}
+#| include: false
+dl_tbl_variants("tbl_source_global", "12", function(d) {
+  d |>
+    summarise(
+      `Total bénéficiaires` = n(),
+      `État (nb)` = sum(pro3 == 1, na.rm = TRUE),
+      `État (%)` = round(sum(pro3 == 1, na.rm = TRUE) / n() * 100, 1),
+      `ONG/Projet (nb)` = sum(!is.na(pro4) & pro4 != 0, na.rm = TRUE),
+      `ONG/Projet (%)` = round(sum(!is.na(pro4) & pro4 != 0, na.rm = TRUE) / n() * 100, 1),
+      `Église (nb)` = sum(pro5 == 1, na.rm = TRUE),
+      .by = Observatory
+    )
+}, pro_benef)
 ```
 
 
@@ -378,6 +546,23 @@ res_respg0 |>
     pct_benef_Membre = "Bénéf. (%) membres",
     `pct_benef_Non membre` = "Bénéf. (%) non membres"
   )
+```
+
+```{r dl_tbl_croisement}
+#| include: false
+dl_tbl_variants("tbl_croisement", "12", function(d) {
+  d |>
+    filter(pro1 %in% c(1, 2)) |>
+    mutate(
+      Membre = if_else(respga == 1, "Membre", "Non membre"),
+      Beneficiaire = pro1 == 1
+    ) |>
+    summarise(
+      n = n(),
+      `% bénéficiaires` = round(mean(Beneficiaire) * 100, 1),
+      .by = c(Observatory, Membre)
+    )
+}, res_respg0)
 ```
 
 

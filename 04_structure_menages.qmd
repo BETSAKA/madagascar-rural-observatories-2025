@@ -15,6 +15,8 @@ library(gt)
 library(labelled)
 
 source("utils/helpers_report.R")
+source("utils/sites.R")
+source("utils/downloadable_output.R")
 
 res_deb <- read_dta("data/res_deb.dta")
 res_m_a <- read_dta("data/res_m_a.dta")
@@ -22,32 +24,9 @@ res_m_a <- read_dta("data/res_m_a.dta")
 # Merged dataset: all household members with observatory labels
 members <- res_deb |>
   left_join(res_m_a, by = "j5") |>
-  add_obs()
+  add_obs() |>
+  assign_site()
 ```
-
-## Vérification
-
-Afin de vérifier que les positions dans l'identifiant des ménages correspondent bien à la structure formée par le code observatoire, le code commune et le code des hameaux.
-
-```{r verification}
-source("utils/01_apurement_j5_j0_j4a_j41.R")
-result <- length_analysis(res_deb)
-
-result$grouped_table |>
-  gt() |>
-  tab_header(title = "Occurrences by Obs, hh_ID, village, commune lengths") |>
-  cols_label(j0 = "Obs", j0_length = "Obs_length",
-             j5_length = "hh_ID_length", j4_a_length = "Village_length",
-             j41_length = "Commune_length", n = "Count")
-
-bind_cols(result$min_table, result$max_table) |>
-  pivot_longer(cols = everything(), names_to = c(" ", ".value"),
-               names_pattern = "(.*)_(min|max)") |>
-  gt() |>
-  tab_header(title = "Character Count Summary")
-```
-
-j5 (7 positions) est composée de : code observatoire (positions 1-3), code commune (position 4), code village (position 5), code ménage (positions 6-7).
 
 ## Description des ménages
 
@@ -64,6 +43,17 @@ gt(hh_size_obs) |>
   fmt_number(columns = mean_hh_size, decimals = 2) |>
   cols_label(mean_hh_size = "Taille moyenne", Observatory = "Observatoire") |>
   style_table()
+```
+
+```{r dl_tbl_men_obs}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_men_obs", "04", function(d) {
+  d |>
+    summarise(taille = n(), .by = c(Observatory, j5)) |>
+    summarise(`Taille moyenne` = round(mean(taille), 2), .by = Observatory) |>
+    rename(Site = Observatory)
+}, members)
 ```
 
 ### Taille des ménages par hameau et par observatoire
@@ -104,16 +94,48 @@ gt(hh_age, groupname_col = "Observatory") |>
   style_table()
 ```
 
+```{r dl_tbl_age_obs}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_age_obs", "04", function(d) {
+  d |>
+    mutate(AgeGroup = classify_age_group(m5)) |>
+    filter(!is.na(AgeGroup)) |>
+    count(Observatory, AgeGroup, name = "Effectif") |>
+    mutate(`%` = round(Effectif / sum(Effectif) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, `Tranche d'âge` = AgeGroup)
+}, members)
+```
+
 ```{r fig_age_obs}
 #| fig-cap: "Répartition des membres des ménages par tranche d'âge selon les observatoires"
 
-ggplot(hh_age, aes(x = AgeGroup, y = n, fill = AgeGroup)) +
+ggplot(hh_age, aes(x = AgeGroup, y = Percent, fill = AgeGroup)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~Observatory) +
-  labs(x = "Tranche d'âge", y = "Effectif") +
+  labs(x = "Tranche d'âge", y = "%") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         strip.text = element_text(face = "bold"))
+```
+
+```{r dl_fig_age_obs}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_age_obs", "04", function(d) {
+  agg <- d |>
+    mutate(AgeGroup = classify_age_group(m5)) |>
+    filter(!is.na(AgeGroup)) |>
+    count(Observatory, AgeGroup, name = "n") |>
+    mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory)
+  ggplot(agg, aes(x = AgeGroup, y = Percent, fill = AgeGroup)) +
+    geom_col(show.legend = FALSE) +
+    facet_wrap(~Observatory) +
+    labs(x = "Tranche d'âge", y = "%") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          strip.text = element_text(face = "bold"))
+}, members)
 ```
 
 ```{r fig_pyramide}
@@ -138,36 +160,27 @@ ggplot(hh_age_sex, aes(x = AgeGroup, y = Percent, fill = Sexe)) +
   theme_minimal()
 ```
 
-#### Au niveau des hameaux
-
-```{r age_hameau}
-hh_age_village <- members |>
-  mutate(
-    AgeGroup = classify_age_group(m5),
-    j4bis = fix_hameau(j4),
-    Obs_Hameau = paste(Observatory, j4bis, sep = " - ")
-  ) |>
-  filter(!is.na(AgeGroup)) |>
-  count(Obs_Hameau, AgeGroup, name = "n") |>
-  mutate(Percent = round(n / sum(n) * 100, 1), .by = Obs_Hameau)
-
-gt(hh_age_village, groupname_col = "Obs_Hameau") |>
-  tab_header(title = "Répartition des membres des ménages par tranche d'âge selon les hameaux") |>
-  cols_label(AgeGroup = "Tranche d'âge", n = "Effectif", Percent = "%") |>
-  fmt_number(columns = Percent, decimals = 1) |>
-  style_table()
-```
-
-```{r fig_age_hameau}
-#| fig-cap: "Répartition des ménages par tranche d'âge selon les hameaux"
-
-ggplot(hh_age_village, aes(x = AgeGroup, y = n, fill = AgeGroup)) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~Obs_Hameau) +
-  labs(x = "Tranche d'âge", y = "Effectif") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        strip.text = element_text(face = "bold"))
+```{r dl_fig_pyramide}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_pyramide", "04", function(d) {
+  agg <- d |>
+    mutate(AgeGroup = classify_age_group(m5), Sexe = classify_sex(m4)) |>
+    filter(!is.na(Sexe), !is.na(AgeGroup)) |>
+    count(Observatory, AgeGroup, Sexe, name = "n") |>
+    mutate(
+      Percent = round(n / sum(n) * 100, 1),
+      Percent = if_else(Sexe == "Homme", -Percent, Percent),
+      .by = c(Observatory, Sexe)
+    )
+  ggplot(agg, aes(x = AgeGroup, y = Percent, fill = Sexe)) +
+    geom_col() +
+    coord_flip() +
+    facet_wrap(~Observatory) +
+    labs(x = "Tranche d'âge", y = "Pourcentage (%)") +
+    scale_y_continuous(labels = abs) +
+    theme_minimal()
+}, members)
 ```
 
 ### Origine des CM et conjoints
@@ -179,9 +192,33 @@ make_origin_table(members, m3, classify_origin, "Origine",
                   "Origine des chefs de ménage et conjoints par observatoire")
 ```
 
+```{r dl_tbl_origine}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_origine", "04", function(d) {
+  d |>
+    filter(m6 %in% c(1, 2)) |>
+    mutate(Type = if_else(m6 == 1, "CM", "Conjoint"),
+           Origine = classify_origin(m3)) |>
+    filter(!is.na(Origine)) |>
+    count(Observatory, Type, Origine) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Type)) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
 ```{r fig_origine}
 make_origin_histogram(members, m3, classify_origin, "Origine",
                       "Distribution de l'origine des CM et conjoints")
+```
+
+```{r dl_fig_origine}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_origine", "04", function(d) {
+  make_origin_histogram(d, m3, classify_origin, "Origine",
+                        "Distribution de l'origine des CM et conjoints")
+}, members)
 ```
 
 ### Région d'origine
@@ -216,6 +253,20 @@ gt(homeland_tbl, groupname_col = "Observatory") |>
   style_table()
 ```
 
+```{r dl_tbl_homeland}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_homeland", "04", function(d) {
+  d |>
+    filter(m6 %in% c(1, 2), !is.na(m3a)) |>
+    mutate(Type = if_else(m6 == 1, "CM", "Conjoint"),
+           Région = iconv(as.character(labelled::to_factor(m3a)), from = "latin1", to = "UTF-8")) |>
+    count(Observatory, Type, Région) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Type)) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
 ```{r fig_homeland}
 homeland_labels |>
   mutate(Member_Type = if_else(m6 == 1, "Chef de ménage", "Conjoint")) |>
@@ -231,6 +282,27 @@ homeland_labels |>
   theme(plot.title = element_text(hjust = 0.5, face = "bold"))
 ```
 
+```{r dl_fig_homeland}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_homeland", "04", function(d) {
+  d |>
+    filter(m6 %in% c(1, 2), !is.na(m3a)) |>
+    mutate(Member_Type = if_else(m6 == 1, "Chef de ménage", "Conjoint"),
+           Homeland = iconv(as.character(labelled::to_factor(m3a)), from = "latin1", to = "UTF-8")) |>
+    count(Observatory, Member_Type, Homeland) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Member_Type)) |>
+    ggplot(aes(x = reorder(Homeland, pct), y = pct, fill = Member_Type)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    facet_wrap(~Observatory) +
+    labs(title = "Région d'origine des CM et conjoints",
+         x = "Région", y = "%", fill = NULL) +
+    theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+}, members)
+```
+
 ### Raison d'installation
 
 ```{r raison}
@@ -238,9 +310,33 @@ make_origin_table(members, mg4a, classify_reason, "Raison",
                   "Raison d'implantation des CM et conjoints par observatoire")
 ```
 
+```{r dl_tbl_raison}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_raison", "04", function(d) {
+  d |>
+    filter(m6 %in% c(1, 2)) |>
+    mutate(Type = if_else(m6 == 1, "CM", "Conjoint"),
+           Raison = classify_reason(mg4a)) |>
+    filter(!is.na(Raison)) |>
+    count(Observatory, Type, Raison) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Type)) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
 ```{r fig_raison}
 make_origin_histogram(members, mg4a, classify_reason, "Raison",
                       "Distribution des raisons d'implantation des CM et conjoints")
+```
+
+```{r dl_fig_raison}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_raison", "04", function(d) {
+  make_origin_histogram(d, mg4a, classify_reason, "Raison",
+                        "Distribution des raisons d'implantation des CM et conjoints")
+}, members)
 ```
 
 ## Caractéristiques des chefs de ménages
@@ -305,6 +401,35 @@ gt(hh_combined, groupname_col = "Caractéristique") |>
   style_table()
 ```
 
+```{r dl_tbl_cm_chars}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cm_chars", "04", function(d) {
+  cm <- d |> filter(m6 == 1)
+  sexe <- cm |>
+    mutate(Catégorie = classify_sex(m4)) |>
+    count(Observatory, Catégorie) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    mutate(Variable = "Sexe") |>
+    rename(Site = Observatory, Effectif = n)
+  age <- cm |>
+    summarise(Médiane = median(m5, na.rm = TRUE),
+              Moyenne = round(mean(m5, na.rm = TRUE), 1),
+              .by = Observatory) |>
+    pivot_longer(-Observatory, names_to = "Catégorie", values_to = "Effectif") |>
+    mutate(Variable = "Âge", `%` = NA_real_) |>
+    rename(Site = Observatory)
+  statut <- cm |>
+    mutate(Catégorie = classify_marital(m7)) |>
+    count(Observatory, Catégorie) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    mutate(Variable = "Statut matrimonial") |>
+    rename(Site = Observatory, Effectif = n)
+  bind_rows(sexe, age, statut) |>
+    select(Site, Variable, Catégorie, Effectif, `%`)
+}, members)
+```
+
 ### Niveau d'éducation
 
 #### Niveau d'éducation du Chef de ménage
@@ -322,6 +447,18 @@ gt(cm_educ) |>
   tab_header(title = "Répartition des chefs de ménage selon leur niveau d'éducation") |>
   cols_label(Niv_education = "Niveau d'éducation") |>
   style_table()
+```
+
+```{r dl_tbl_cm_educ}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cm_educ", "04", function(d) {
+  d |> filter(m6 == 1) |>
+    mutate(Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+    count(Observatory, Niv_education) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
 ```
 
 #### Niveau d'éducation des chefs de ménages par sexe
@@ -351,6 +488,19 @@ gt(cm_educ_sex) |>
     locations = cells_title(groups = "title")
   ) |>
   style_table()
+```
+
+```{r dl_tbl_cm_educ_sex}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cm_educ_sex", "04", function(d) {
+  d |> filter(m6 == 1) |>
+    mutate(Sexe = classify_sex(m4),
+           Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+    count(Observatory, Sexe, Niv_education) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
 ```
 
 ### Alphabétisation des chefs de ménage
@@ -420,9 +570,32 @@ cm_rw <- cm |> filter(s1a == 1, s1b == 1)
 literacy_table_obs(cm_rw, "CM sachant lire et écrire")
 ```
 
+```{r dl_tbl_cm_rw}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cm_rw", "04", function(d) {
+  d |> filter(m6 == 1, s1a == 1, s1b == 1) |>
+    count(Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
 ```{r cm_rw_sex}
 #| results: asis
 literacy_by_sex(cm_rw, "CM sachant lire et écrire selon le sexe")
+```
+
+```{r dl_tbl_cm_rw_sex}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cm_rw_sex", "04", function(d) {
+  d |> filter(m6 == 1, s1a == 1, s1b == 1) |>
+    mutate(Sexe = classify_sex(m4)) |>
+    filter(!is.na(Sexe)) |>
+    count(Observatory, Sexe) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
 ```
 
 #### Savoir lire
@@ -432,9 +605,32 @@ cm_read <- cm |> filter(s1a == 1)
 literacy_table_obs(cm_read, "CM sachant lire")
 ```
 
+```{r dl_tbl_cm_r}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cm_r", "04", function(d) {
+  d |> filter(m6 == 1, s1a == 1) |>
+    count(Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
 ```{r cm_r_sex}
 #| results: asis
 literacy_by_sex(cm_read, "CM sachant lire selon le sexe")
+```
+
+```{r dl_tbl_cm_r_sex}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cm_r_sex", "04", function(d) {
+  d |> filter(m6 == 1, s1a == 1) |>
+    mutate(Sexe = classify_sex(m4)) |>
+    filter(!is.na(Sexe)) |>
+    count(Observatory, Sexe) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
 ```
 
 #### Savoir écrire
@@ -444,9 +640,32 @@ cm_write <- cm |> filter(s1b == 1)
 literacy_table_obs(cm_write, "CM sachant écrire")
 ```
 
+```{r dl_tbl_cm_w}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cm_w", "04", function(d) {
+  d |> filter(m6 == 1, s1b == 1) |>
+    count(Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
 ```{r cm_w_sex}
 #| results: asis
 literacy_by_sex(cm_write, "CM sachant écrire selon le sexe")
+```
+
+```{r dl_tbl_cm_w_sex}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cm_w_sex", "04", function(d) {
+  d |> filter(m6 == 1, s1b == 1) |>
+    mutate(Sexe = classify_sex(m4)) |>
+    filter(!is.na(Sexe)) |>
+    count(Observatory, Sexe) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
 ```
 
 ### Activités principales des Chefs de ménage
@@ -467,6 +686,19 @@ gt(cm_all_act, groupname_col = "Observatory") |>
   cols_label(Activite = "Activité", n = "Effectif", Percent = "%") |>
   fmt_number(columns = Percent, decimals = 1) |>
   style_table()
+```
+
+```{r dl_tbl_cm_act_all}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cm_act_all", "04", function(d) {
+  d |> filter(m6 == 1) |>
+    mutate(Activite = iconv(as.character(labelled::to_factor(a1)),
+                            from = "latin1", to = "UTF-8")) |>
+    count(Observatory, Activite) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
 ```
 
 Les cultivateurs exploitants, les ouvriers agricoles et les commerçants sont les activités les plus fréquentes dans les deux observatoires.
@@ -506,6 +738,45 @@ ggplot(cm_act, aes(x = "", y = Percent, fill = Act_principal)) +
   theme_void() +
   theme(plot.title = element_text(face = "bold", hjust = 0.5),
         strip.text = element_text(face = "bold"))
+```
+
+```{r dl_tbl_cm_act}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cm_act", "04", function(d) {
+  d |> filter(m6 == 1) |>
+    mutate(Act_principal = case_when(
+      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
+      a1 == 45 ~ "Commerçant", a1 == 96 ~ "Éleveur", TRUE ~ "Autres")) |>
+    count(Observatory, Act_principal) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
+```{r dl_fig_cm_act}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_cm_act", "04", function(d) {
+  act <- d |> filter(m6 == 1) |>
+    mutate(Act_principal = case_when(
+      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
+      a1 == 45 ~ "Commerçant", a1 == 96 ~ "Éleveur", TRUE ~ "Autres")) |>
+    count(Observatory, Act_principal, name = "n") |>
+    mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory)
+  ggplot(act, aes(x = "", y = Percent, fill = Act_principal)) +
+    geom_col(width = 1, color = "white") +
+    coord_polar(theta = "y") +
+    facet_wrap(~Observatory) +
+    geom_text(aes(label = paste0(Percent, "%")),
+              position = position_stack(vjust = 0.5),
+              color = "white", fontface = "bold", size = 4) +
+    labs(title = "Répartition des activités principales des CM (%)",
+         fill = "Activité") +
+    theme_void() +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5),
+          strip.text = element_text(face = "bold"))
+}, members)
 ```
 
 #### Activités principales des CM par sexe
@@ -555,6 +826,49 @@ ggplot(cm_act_sex, aes(x = "", y = Percent, fill = Act_principal)) +
   theme_void() +
   theme(plot.title = element_text(face = "bold", hjust = 0.5),
         strip.text = element_text(face = "bold"))
+```
+
+```{r dl_tbl_cm_act_sex}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cm_act_sex", "04", function(d) {
+  d |> filter(m6 == 1) |>
+    mutate(Act_principal = case_when(
+      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
+      a1 == 45 ~ "Commerçant", a1 == 96 ~ "Éleveur", TRUE ~ "Autres"),
+      Sexe = classify_sex(m4)) |>
+    filter(!is.na(Sexe)) |>
+    count(Observatory, Sexe, Act_principal) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
+```{r dl_fig_cm_act_sex}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_cm_act_sex", "04", function(d) {
+  act <- d |> filter(m6 == 1) |>
+    mutate(Act_principal = case_when(
+      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
+      a1 == 45 ~ "Commerçant", a1 == 96 ~ "Éleveur", TRUE ~ "Autres"),
+      Sexe = classify_sex(m4)) |>
+    filter(!is.na(Sexe)) |>
+    count(Observatory, Sexe, Act_principal, name = "n") |>
+    mutate(Percent = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe))
+  ggplot(act, aes(x = "", y = Percent, fill = Act_principal)) +
+    geom_col(width = 1, color = "white") +
+    coord_polar(theta = "y") +
+    facet_grid(Observatory ~ Sexe) +
+    geom_text(aes(label = paste0(Percent, "%")),
+              position = position_stack(vjust = 0.5),
+              color = "white", fontface = "bold", size = 3) +
+    labs(title = "Activités principales des CM par observatoire et sexe (%)",
+         fill = "Activité") +
+    theme_void() +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5),
+          strip.text = element_text(face = "bold"))
+}, members)
 ```
 
 ## Caractéristiques des autres membres de ménages
@@ -620,6 +934,36 @@ gt(hh_combined2, groupname_col = "Caractéristique") |>
   style_table()
 ```
 
+```{r dl_tbl_other_chars}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_other_chars", "04", function(d) {
+  oth <- d |> filter(m6 != 1)
+  sexe <- oth |>
+    mutate(Catégorie = classify_sex(m4)) |>
+    count(Observatory, Catégorie) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    mutate(Variable = "Sexe") |>
+    rename(Site = Observatory, Effectif = n)
+  age <- oth |>
+    summarise(Médiane = median(m5, na.rm = TRUE),
+              Moyenne = round(mean(m5, na.rm = TRUE), 1),
+              .by = Observatory) |>
+    pivot_longer(-Observatory, names_to = "Catégorie", values_to = "Effectif") |>
+    mutate(Variable = "Âge", `%` = NA_real_) |>
+    rename(Site = Observatory)
+  statut <- oth |>
+    mutate(Catégorie = classify_marital(m7)) |>
+    filter(!is.na(Catégorie)) |>
+    count(Observatory, Catégorie) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    mutate(Variable = "Statut matrimonial") |>
+    rename(Site = Observatory, Effectif = n)
+  bind_rows(sexe, age, statut) |>
+    select(Site, Variable, Catégorie, Effectif, `%`)
+}, members)
+```
+
 ### Éducation et scolarisation
 
 #### Niveau d'éducation des autres membres
@@ -637,6 +981,18 @@ gt(other_educ) |>
   tab_header(title = "Niveau d'éducation des autres membres de ménage") |>
   cols_label(Niv_education = "Niveau d'éducation") |>
   style_table()
+```
+
+```{r dl_tbl_other_educ}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_other_educ", "04", function(d) {
+  d |> filter(m6 != 1) |>
+    mutate(Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+    count(Observatory, Niv_education) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
 ```
 
 #### Niveau d'éducation des autres membres par sexe
@@ -665,6 +1021,19 @@ gt(other_educ_sex) |>
   style_table()
 ```
 
+```{r dl_tbl_other_educ_sex}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_other_educ_sex", "04", function(d) {
+  d |> filter(m6 != 1) |>
+    mutate(Sexe = classify_sex(m4),
+           Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+    count(Observatory, Sexe, Niv_education) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
 #### Alphabétisation des autres membres
 
 ##### Savoir lire et écrire
@@ -674,9 +1043,32 @@ other_rw <- others |> filter(s1a == 1, s1b == 1)
 literacy_table_obs(other_rw, "Autres membres sachant lire et écrire")
 ```
 
+```{r dl_tbl_other_rw}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_other_rw", "04", function(d) {
+  d |> filter(m6 != 1, s1a == 1, s1b == 1) |>
+    count(Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
 ```{r other_rw_sex}
 #| results: asis
 literacy_by_sex(other_rw, "Autres membres sachant lire et écrire selon le sexe")
+```
+
+```{r dl_tbl_other_rw_sex}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_other_rw_sex", "04", function(d) {
+  d |> filter(m6 != 1, s1a == 1, s1b == 1) |>
+    mutate(Sexe = classify_sex(m4)) |>
+    filter(!is.na(Sexe)) |>
+    count(Observatory, Sexe) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
 ```
 
 ##### Savoir lire
@@ -686,9 +1078,32 @@ other_read <- others |> filter(s1a == 1)
 literacy_table_obs(other_read, "Autres membres sachant lire")
 ```
 
+```{r dl_tbl_other_r}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_other_r", "04", function(d) {
+  d |> filter(m6 != 1, s1a == 1) |>
+    count(Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
 ```{r other_r_sex}
 #| results: asis
 literacy_by_sex(other_read, "Autres membres sachant lire selon le sexe")
+```
+
+```{r dl_tbl_other_r_sex}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_other_r_sex", "04", function(d) {
+  d |> filter(m6 != 1, s1a == 1) |>
+    mutate(Sexe = classify_sex(m4)) |>
+    filter(!is.na(Sexe)) |>
+    count(Observatory, Sexe) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
 ```
 
 ##### Savoir écrire
@@ -698,9 +1113,32 @@ other_write <- others |> filter(s1b == 1)
 literacy_table_obs(other_write, "Autres membres sachant écrire")
 ```
 
+```{r dl_tbl_other_w}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_other_w", "04", function(d) {
+  d |> filter(m6 != 1, s1b == 1) |>
+    count(Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
 ```{r other_w_sex}
 #| results: asis
 literacy_by_sex(other_write, "Autres membres sachant écrire selon le sexe")
+```
+
+```{r dl_tbl_other_w_sex}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_other_w_sex", "04", function(d) {
+  d |> filter(m6 != 1, s1b == 1) |>
+    mutate(Sexe = classify_sex(m4)) |>
+    filter(!is.na(Sexe)) |>
+    count(Observatory, Sexe) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
 ```
 
 ### Scolarisation
@@ -723,6 +1161,19 @@ gt(school_rate) |>
              Non_n = "Non scolarisés (N)", Non_pct = "Non scolarisés (%)") |>
   fmt_number(columns = c(Oui_pct, Non_pct), decimals = 1) |>
   style_table()
+```
+
+```{r dl_tbl_schooling}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_schooling", "04", function(d) {
+  d |>
+    filter(m5 >= 6, m5 <= 14, s2 %in% c(1, 2)) |>
+    mutate(Scolarisé = if_else(s2 == 1, "Oui", "Non")) |>
+    count(Observatory, Scolarisé) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
 ```
 
 #### Classe suivie 2024-2025
@@ -752,6 +1203,22 @@ gt(class_wide, groupname_col = "Observatory") |>
   tab_header(title = "Classe suivie en 2024-2025 par catégorie d'âge") |>
   cols_label(Cat_age = "Catégorie d'âge") |>
   style_table()
+```
+
+```{r dl_tbl_class}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_class", "04", function(d) {
+  d |>
+    filter(m5 >= 3, m5 <= 25, s2 == 1, !is.na(s3a)) |>
+    mutate(Cat_age = case_when(
+      m5 <= 5  ~ "3-5 ans", m5 <= 10 ~ "6-10 ans",
+      m5 <= 14 ~ "11-14 ans", m5 <= 17 ~ "15-17 ans", TRUE ~ "18-25 ans"),
+      Niv_educ = classify_education(s3a) |> replace_na("Inconnu")) |>
+    count(Observatory, Cat_age, Niv_educ) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Cat_age)) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
 ```
 
 #### Raisons de non fréquentation de l'école pour les 6 à 15 ans
@@ -803,6 +1270,25 @@ non_scol |>
   theme(legend.position = "top")
 ```
 
+```{r dl_fig_raisons_non_scol}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_raisons_non_scol", "04", function(d) {
+  ns <- d |>
+    filter(m5 >= 6, m5 <= 15, m6 != 1, s2 == 2, !is.na(s5)) |>
+    mutate(Raison = if_else(
+      as.character(as.integer(s5)) %in% names(raisons_labs),
+      raisons_labs[as.character(as.integer(s5))], "Autre")) |>
+    count(Observatory, Raison) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+  ns |> filter(pct >= 2) |>
+    ggplot(aes(x = reorder(Raison, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") + coord_flip() +
+    labs(x = NULL, y = "% des enfants non scolarisés", fill = "Site") +
+    theme_minimal(base_size = 12) + theme(legend.position = "top")
+}, members)
+```
+
 ```{r tbl-raisons-non-scol}
 #| tbl-cap: "Raisons de non-scolarisation des 6-15 ans par observatoire"
 
@@ -813,6 +1299,21 @@ non_scol |>
   gt() |>
   tab_header(title = "Raisons de non-fréquentation de l'école (6-15 ans)") |>
   cols_label(Raison = "Raison", Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
+```
+
+```{r dl_tbl_raisons_non_scol}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_raisons_non_scol", "04", function(d) {
+  d |>
+    filter(m5 >= 6, m5 <= 15, m6 != 1, s2 == 2, !is.na(s5)) |>
+    mutate(Raison = if_else(
+      as.character(as.integer(s5)) %in% names(raisons_labs),
+      raisons_labs[as.character(as.integer(s5))], "Autre")) |>
+    count(Observatory, Raison) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
 ```
 
 ### Activités principales des autres membres de ménages
@@ -832,6 +1333,19 @@ gt(other_all_act, groupname_col = "Observatory") |>
   cols_label(Activite = "Activité", n = "Effectif", Percent = "%") |>
   fmt_number(columns = Percent, decimals = 1) |>
   style_table()
+```
+
+```{r dl_tbl_other_act_all}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_other_act_all", "04", function(d) {
+  d |> filter(m6 != 1) |>
+    mutate(Activite = iconv(as.character(labelled::to_factor(a1)),
+                            from = "latin1", to = "UTF-8")) |>
+    count(Observatory, Activite) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
 ```
 
 ```{r other_act}
@@ -871,6 +1385,49 @@ ggplot(other_act, aes(x = "", y = Percent, fill = Act_principal)) +
   theme_void() +
   theme(plot.title = element_text(face = "bold", hjust = 0.5),
         strip.text = element_text(face = "bold"))
+```
+
+```{r dl_tbl_other_act}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_other_act", "04", function(d) {
+  d |> filter(m6 != 1) |>
+    mutate(Act_principal = case_when(
+      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
+      a1 == 45 ~ "Commerçant", a1 == 14 ~ "Étudiant",
+      a1 == 0 ~ "Chômeur", a1 == 96 ~ "Éleveur",
+      a1 == 99 ~ "Pêcheur exploitant", TRUE ~ "Autres")) |>
+    count(Observatory, Act_principal) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
+```{r dl_fig_other_act}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_other_act", "04", function(d) {
+  act <- d |> filter(m6 != 1) |>
+    mutate(Act_principal = case_when(
+      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
+      a1 == 45 ~ "Commerçant", a1 == 14 ~ "Étudiant",
+      a1 == 0 ~ "Chômeur", a1 == 96 ~ "Éleveur",
+      a1 == 99 ~ "Pêcheur exploitant", TRUE ~ "Autres")) |>
+    count(Observatory, Act_principal, name = "n") |>
+    mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory)
+  ggplot(act, aes(x = "", y = Percent, fill = Act_principal)) +
+    geom_col(width = 1, color = "white") +
+    coord_polar(theta = "y") +
+    facet_wrap(~Observatory) +
+    geom_text(aes(label = paste0(Percent, "%")),
+              position = position_stack(vjust = 0.5),
+              color = "white", fontface = "bold", size = 4) +
+    labs(title = "Répartition des activités des autres membres (%)",
+         fill = "Activité") +
+    theme_void() +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5),
+          strip.text = element_text(face = "bold"))
+}, members)
 ```
 
 #### Activités principales des autres membres par sexe
@@ -923,6 +1480,53 @@ ggplot(other_act_sex, aes(x = "", y = Percent, fill = Act_principal)) +
   theme_void() +
   theme(plot.title = element_text(face = "bold", hjust = 0.5),
         strip.text = element_text(face = "bold"))
+```
+
+```{r dl_tbl_other_act_sex}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_other_act_sex", "04", function(d) {
+  d |> filter(m6 != 1) |>
+    mutate(Act_principal = case_when(
+      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
+      a1 == 45 ~ "Commerçant", a1 == 14 ~ "Étudiant",
+      a1 == 0 ~ "Chômeur", a1 == 96 ~ "Éleveur",
+      a1 == 99 ~ "Pêcheur exploitant", TRUE ~ "Autres"),
+      Sexe = classify_sex(m4)) |>
+    filter(!is.na(Sexe)) |>
+    count(Observatory, Sexe, Act_principal) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
+```{r dl_fig_other_act_sex}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_other_act_sex", "04", function(d) {
+  act <- d |> filter(m6 != 1) |>
+    mutate(Act_principal = case_when(
+      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
+      a1 == 45 ~ "Commerçant", a1 == 14 ~ "Étudiant",
+      a1 == 0 ~ "Chômeur", a1 == 96 ~ "Éleveur",
+      a1 == 99 ~ "Pêcheur exploitant", TRUE ~ "Autres"),
+      Sexe = classify_sex(m4)) |>
+    filter(!is.na(Sexe)) |>
+    count(Observatory, Sexe, Act_principal, name = "n") |>
+    mutate(Percent = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe))
+  ggplot(act, aes(x = "", y = Percent, fill = Act_principal)) +
+    geom_col(width = 1, color = "white") +
+    coord_polar(theta = "y") +
+    facet_grid(Observatory ~ Sexe) +
+    geom_text(aes(label = paste0(Percent, "%")),
+              position = position_stack(vjust = 0.5),
+              color = "white", fontface = "bold", size = 3) +
+    labs(title = "Activités des autres membres par observatoire et sexe (%)",
+         fill = "Activité") +
+    theme_void() +
+    theme(plot.title = element_text(face = "bold", hjust = 0.5),
+          strip.text = element_text(face = "bold"))
+}, members)
 ```
 
 ## Évolution des indicateurs démographiques (1996-2025) {#sec-demog-multiyear}

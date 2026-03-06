@@ -18,6 +18,10 @@ library(tidyverse)
 library(haven)
 library(labelled)
 library(gt)
+
+source("utils/helpers_report.R")
+source("utils/sites.R")
+source("utils/downloadable_output.R")
 ```
 
 ```{r data_qualite}
@@ -35,8 +39,10 @@ res_deb <- res_deb |>
     )
   )
 
+res_deb <- assign_site(res_deb)
+
 res_remq <- res_remq |>
-  left_join(res_deb |> select(j5, Observatory), by = "j5")
+  left_join(res_deb |> select(j5, Observatory, Site), by = "j5")
 ```
 
 ## Qualité de l'enquête (évaluation par l'enquêteur, page de couverture)
@@ -72,6 +78,23 @@ ggplot(qual, aes(x = Qualité, y = n, fill = Observatory)) +
   theme_minimal()
 ```
 
+```{r dl_fig_qualite}
+#| include: false
+dl_fig_variants("fig_qualite", "13", function(d) {
+  q <- d |>
+    mutate(
+      Qualite = case_when(j11 == 1 ~ "Bonne", j11 == 2 ~ "Moyenne", j11 == 3 ~ "Mauvaise", TRUE ~ as.character(j11)),
+      Qualite = factor(Qualite, levels = c("Bonne", "Moyenne", "Mauvaise"))
+    ) |>
+    count(Observatory, Qualite)
+  ggplot(q, aes(x = Qualite, y = n, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    geom_text(aes(label = n), position = position_dodge(width = 0.9), vjust = -0.3, size = 3) +
+    labs(x = NULL, y = "Nombre d'entretiens", fill = "Observatoire") +
+    theme_minimal()
+}, res_deb, width = 8, height = 4)
+```
+
 ## Répondant
 
 Dans la plupart des cas, le répondant est le chef de ménage lui-même ou son conjoint. Quelques entretiens ont été réalisés avec un autre membre du ménage (@tbl-repondant).
@@ -98,6 +121,19 @@ res_deb |>
     locations = cells_column_labels(columns = everything())
   ) |>
   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+```{r dl_tbl_repondant}
+#| include: false
+dl_tbl_variants("tbl_repondant", "13", function(d) {
+  d |>
+    mutate(Repondant = case_when(
+      j10 == 1 ~ "Chef de menage", j10 == 2 ~ "Conjoint(e)",
+      j10 == 3 ~ "Autre membre", j10 == 91 ~ "Autre",
+      TRUE ~ paste0("Code ", j10)
+    )) |>
+    count(Observatory, Repondant)
+}, res_deb)
 ```
 
 ## Qualité de la réponse (évaluation par l'enquêteur, fin de questionnaire)
@@ -132,6 +168,24 @@ ggplot(qual_rep, aes(x = Qualité, y = n, fill = Observatory)) +
   theme_minimal()
 ```
 
+```{r dl_fig_qual_reponse}
+#| include: false
+dl_fig_variants("fig_qual_reponse", "13", function(d) {
+  qr <- d |>
+    filter(!is.na(qual1aa), qual1aa %in% c(1, 2)) |>
+    mutate(
+      Qualite = case_when(qual1aa == 1 ~ "Bonne", qual1aa == 2 ~ "Mauvaise"),
+      Qualite = factor(Qualite, levels = c("Bonne", "Mauvaise"))
+    ) |>
+    count(Observatory, Qualite)
+  ggplot(qr, aes(x = Qualite, y = n, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    geom_text(aes(label = n), position = position_dodge(width = 0.9), vjust = -0.3, size = 3) +
+    labs(x = NULL, y = "Nombre de menages", fill = "Observatoire") +
+    theme_minimal()
+}, res_remq, width = 8, height = 4)
+```
+
 ## Réaction du répondant (évaluation par l'enquêteur, fin de questionnaire)
 
 La variable `qual2aa` — *« Réaction du répondant »* — est renseignée par l'enquêteur dans le même module. Les modalités prévues sont : **1 = ouvert (à l'aise), 2 = neutre, 3 = méfiant**. La @fig-reaction présente la répartition (les codes aberrants sont exclus).
@@ -163,6 +217,24 @@ ggplot(reaction, aes(x = Réaction, y = n, fill = Observatory)) +
   ) +
   labs(x = NULL, y = "Nombre de ménages", fill = "Observatoire") +
   theme_minimal()
+```
+
+```{r dl_fig_reaction}
+#| include: false
+dl_fig_variants("fig_reaction", "13", function(d) {
+  r <- d |>
+    filter(!is.na(qual2aa), qual2aa %in% c(1, 2, 3)) |>
+    mutate(
+      Reaction = case_when(qual2aa == 1 ~ "Ouvert", qual2aa == 2 ~ "Neutre", qual2aa == 3 ~ "Mefiant"),
+      Reaction = factor(Reaction, levels = c("Ouvert", "Neutre", "Mefiant"))
+    ) |>
+    count(Observatory, Reaction)
+  ggplot(r, aes(x = Reaction, y = n, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    geom_text(aes(label = n), position = position_dodge(width = 0.9), vjust = -0.3, size = 3) +
+    labs(x = NULL, y = "Nombre de menages", fill = "Observatoire") +
+    theme_minimal()
+}, res_remq, width = 8, height = 4)
 ```
 
 ## Codes aberrants à signaler pour l'apurement {#sec-codes-aberrants}
@@ -220,6 +292,26 @@ res_remq |>
   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025 — à corriger lors de l'apurement**"))
 ```
 
+```{r dl_tbl_codes_aberrants}
+#| include: false
+dl_tbl_variants("tbl_codes_aberrants", "13", function(d) {
+  d |>
+    left_join(res_deb |> select(j5, j1, j4, j11), by = "j5") |>
+    filter(
+      (!qual1aa %in% c(1, 2) & !is.na(qual1aa)) |
+      (!qual2aa %in% c(1, 2, 3) & !is.na(qual2aa)) |
+      is.na(qual1aa) | is.na(qual2aa)
+    ) |>
+    mutate(
+      Enqueteur = paste0("E", sprintf("%02d", j1)),
+      j11_lbl = case_when(j11 == 1 ~ "Bonne", j11 == 2 ~ "Moyenne", j11 == 3 ~ "Mauvaise"),
+      qual1aa = as.numeric(qual1aa),
+      qual2aa = as.numeric(qual2aa)
+    ) |>
+    select(j5, Observatory, Enqueteur, Hameau = j4, j11 = j11_lbl, qual1aa, qual2aa)
+}, res_remq)
+```
+
 ## Synthèse croisée
 
 Le @tbl-synthese-qualite croise les deux indicateurs d'évaluation de fin de questionnaire (`qual1aa` et `qual2aa`) par observatoire, en ne retenant que les codes valides.
@@ -246,6 +338,19 @@ res_remq |>
     locations = cells_column_labels(columns = everything())
   ) |>
   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+```{r dl_tbl_synthese_qualite}
+#| include: false
+dl_tbl_variants("tbl_synthese_qualite", "13", function(d) {
+  d |>
+    filter(qual1aa %in% c(1, 2), qual2aa %in% c(1, 2, 3)) |>
+    mutate(
+      `Qualite reponse` = case_when(qual1aa == 1 ~ "Bonne", qual1aa == 2 ~ "Mauvaise"),
+      `Reaction repondant` = case_when(qual2aa == 1 ~ "Ouvert", qual2aa == 2 ~ "Neutre", qual2aa == 3 ~ "Mefiant")
+    ) |>
+    count(Observatory, `Qualite reponse`, `Reaction repondant`)
+}, res_remq)
 ```
 
 ## Remarques générales
