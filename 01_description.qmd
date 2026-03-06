@@ -385,6 +385,149 @@ gt(tab_ham, groupname_col = "Observatory") |>
 ```
 
 
+## Catalogue des données multi-années
+
+Cette section présente l'inventaire complet des variables disponibles dans les fichiers `.dta` pour l'ensemble des campagnes des observatoires ruraux (1995–2015 et 2025). Pour chaque variable, le catalogue indique le fichier d'appartenance, le label descriptif et les années pour lesquelles la variable est présente, ce qui permet d'évaluer la couverture temporelle des indicateurs.
+
+```{r catalogue_multi_annees}
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(haven)
+library(labelled)
+library(readxl)
+library(DT)
+
+# --- Paramètres ---
+base_path <- "data/ROS_MDG_microdata"
+years <- list.dirs(base_path, full.names = FALSE, recursive = FALSE) |>
+  str_subset("^\\d{4}$") |>
+  as.integer() |>
+  sort()
+
+# --- Fonction d'extraction des métadonnées pour un fichier/année ---
+extract_variable_info <- function(year, file_path) {
+  file_name <- basename(file_path)
+  tryCatch({
+    df <- read_dta(file_path, n_max = 0)
+    labs <- var_label(df) |> unlist()
+    tibble(
+      year      = year,
+      file_name = str_remove(file_name, "\\.dta$"),
+      variable_name  = names(df),
+      variable_label = if (length(labs) > 0) {
+        labs[names(df)]
+      } else {
+        rep(NA_character_, ncol(df))
+      }
+    )
+  }, error = function(e) {
+    tibble(
+      year = integer(), file_name = character(),
+      variable_name = character(), variable_label = character()
+    )
+  })
+}
+
+# --- Itération sur toutes les années et fichiers ---
+catalogue_raw <- map_dfr(years, function(yr) {
+  dta_files <- list.files(
+    file.path(base_path, yr),
+    pattern = "\\.dta$", full.names = TRUE, ignore.case = TRUE
+  )
+  map_dfr(dta_files, ~ extract_variable_info(yr, .x))
+})
+
+# --- Résumé : années de présence par variable × fichier ---
+catalogue <- catalogue_raw |>
+  group_by(file_name, variable_name) |>
+  summarise(
+    variable_label = first(na.omit(variable_label)),
+    n_years       = n_distinct(year),
+    first_year    = min(year),
+    last_year     = max(year),
+    years_present = paste(sort(unique(year)), collapse = ", "),
+    .groups = "drop"
+  ) |>
+  arrange(file_name, first_year, variable_name)
+
+# --- Enrichir avec les labels de fichiers (si File_labels.xlsx existe) ---
+file_labels_path <- "documentation/File_labels.xlsx"
+if (file.exists(file_labels_path)) {
+  file_labels <- read_excel(file_labels_path) |>
+    rename(file_name = 1, file_label = 2)
+  catalogue <- catalogue |>
+    left_join(file_labels, by = "file_name") |>
+    relocate(file_label, .after = file_name)
+}
+
+# --- Export Excel ---
+output_xlsx <- "output/ROS_Variable_Dictionary_MultiYear.xlsx"
+if (requireNamespace("writexl", quietly = TRUE)) {
+  writexl::write_xlsx(catalogue, output_xlsx)
+}
+```
+
+Le catalogue contient **`r format(nrow(catalogue), big.mark = " ")` variables** issues de **`r n_distinct(catalogue$file_name)` fichiers** couvrant **`r length(years)` campagnes** (`r paste(range(years), collapse = "–")`).
+
+```{r}
+#| label: tbl-catalogue-resume
+#| tbl-cap: "Résumé du catalogue par fichier de données"
+
+catalogue |>
+  group_by(file_name) |>
+  summarise(
+    `Nb variables`  = n(),
+    `Première année` = min(first_year),
+    `Dernière année` = max(last_year),
+    `Nb campagnes`   = max(n_years),
+    .groups = "drop"
+  ) |>
+  arrange(file_name) |>
+  gt() |>
+  cols_label(file_name = "Fichier") |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_source_note(
+    source_note = md("**Source : Fichiers .dta, campagnes 1995–2025**")
+  )
+```
+
+Le tableau interactif ci-dessous permet de rechercher une variable par nom, label ou fichier, et de filtrer par année de présence.
+
+```{r}
+#| label: fig-catalogue-interactif
+
+catalogue |>
+  select(
+    Fichier   = file_name,
+    Variable  = variable_name,
+    Label     = variable_label,
+    `Nb campagnes` = n_years,
+    `Première`     = first_year,
+    `Dernière`     = last_year,
+    `Années`       = years_present
+  ) |>
+  datatable(
+    filter   = "top",
+    rownames = FALSE,
+    options  = list(
+      pageLength = 20,
+      autoWidth  = TRUE,
+      language   = list(
+        search   = "Rechercher :",
+        lengthMenu = "Afficher _MENU_ entrées",
+        info     = "Entrées _START_ à _END_ sur _TOTAL_",
+        paginate = list(`previous` = "Précédent", `next` = "Suivant")
+      )
+    ),
+    caption = "Catalogue multi-années des variables OR (1995–2025)"
+  )
+```
+
 ## Déroulement de l'enquête
 
 ### Période de collecte
