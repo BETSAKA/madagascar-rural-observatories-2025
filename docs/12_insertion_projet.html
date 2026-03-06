@@ -287,17 +287,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Membres (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">sum</span>(respga <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Observatory</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    res_respg0 <span class="sc">|&gt;</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">Observatory =</span> <span class="st">"Total"</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">Nb ménages</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">Membres (nb)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(respga <span class="sc">==</span> <span class="dv">1</span>),</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">`</span><span class="at">Membres (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">sum</span>(respga <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Ménages ayant au moins un membre dans une organisation"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Ménages ayant au moins un membre dans une organisation"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="tbl-adhesion" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -306,23 +297,23 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
 </figcaption>
 <div aria-describedby="tbl-adhesion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="bbfijdxhdi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#bbfijdxhdi table {
+<div id="obhjxawolm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#obhjxawolm table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#bbfijdxhdi thead, #bbfijdxhdi tbody, #bbfijdxhdi tfoot, #bbfijdxhdi tr, #bbfijdxhdi td, #bbfijdxhdi th {
+#obhjxawolm thead, #obhjxawolm tbody, #obhjxawolm tfoot, #obhjxawolm tr, #obhjxawolm td, #obhjxawolm th {
   border-style: none;
 }
 
-#bbfijdxhdi p {
+#obhjxawolm p {
   margin: 0;
   padding: 0;
 }
 
-#bbfijdxhdi .gt_table {
+#obhjxawolm .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -348,12 +339,12 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   border-left-color: #D3D3D3;
 }
 
-#bbfijdxhdi .gt_caption {
+#obhjxawolm .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#bbfijdxhdi .gt_title {
+#obhjxawolm .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -365,7 +356,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   border-bottom-width: 0;
 }
 
-#bbfijdxhdi .gt_subtitle {
+#obhjxawolm .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -377,7 +368,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   border-top-width: 0;
 }
 
-#bbfijdxhdi .gt_heading {
+#obhjxawolm .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -389,13 +380,13 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   border-right-color: #D3D3D3;
 }
 
-#bbfijdxhdi .gt_bottom_border {
+#obhjxawolm .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#bbfijdxhdi .gt_col_headings {
+#obhjxawolm .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -410,7 +401,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   border-right-color: #D3D3D3;
 }
 
-#bbfijdxhdi .gt_col_heading {
+#obhjxawolm .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -430,7 +421,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   overflow-x: hidden;
 }
 
-#bbfijdxhdi .gt_column_spanner_outer {
+#obhjxawolm .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -442,15 +433,15 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   padding-right: 4px;
 }
 
-#bbfijdxhdi .gt_column_spanner_outer:first-child {
+#obhjxawolm .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#bbfijdxhdi .gt_column_spanner_outer:last-child {
+#obhjxawolm .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#bbfijdxhdi .gt_column_spanner {
+#obhjxawolm .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -462,11 +453,11 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   width: 100%;
 }
 
-#bbfijdxhdi .gt_spanner_row {
+#obhjxawolm .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#bbfijdxhdi .gt_group_heading {
+#obhjxawolm .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -492,7 +483,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   text-align: left;
 }
 
-#bbfijdxhdi .gt_empty_group_heading {
+#obhjxawolm .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -507,15 +498,15 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   vertical-align: middle;
 }
 
-#bbfijdxhdi .gt_from_md > :first-child {
+#obhjxawolm .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#bbfijdxhdi .gt_from_md > :last-child {
+#obhjxawolm .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#bbfijdxhdi .gt_row {
+#obhjxawolm .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -534,7 +525,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   overflow-x: hidden;
 }
 
-#bbfijdxhdi .gt_stub {
+#obhjxawolm .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -547,7 +538,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   padding-right: 5px;
 }
 
-#bbfijdxhdi .gt_stub_row_group {
+#obhjxawolm .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -561,15 +552,15 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   vertical-align: top;
 }
 
-#bbfijdxhdi .gt_row_group_first td {
+#obhjxawolm .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#bbfijdxhdi .gt_row_group_first th {
+#obhjxawolm .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#bbfijdxhdi .gt_summary_row {
+#obhjxawolm .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -579,16 +570,16 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   padding-right: 5px;
 }
 
-#bbfijdxhdi .gt_first_summary_row {
+#obhjxawolm .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#bbfijdxhdi .gt_first_summary_row.thick {
+#obhjxawolm .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#bbfijdxhdi .gt_last_summary_row {
+#obhjxawolm .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -598,7 +589,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   border-bottom-color: #D3D3D3;
 }
 
-#bbfijdxhdi .gt_grand_summary_row {
+#obhjxawolm .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -608,7 +599,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   padding-right: 5px;
 }
 
-#bbfijdxhdi .gt_first_grand_summary_row {
+#obhjxawolm .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -618,7 +609,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   border-top-color: #D3D3D3;
 }
 
-#bbfijdxhdi .gt_last_grand_summary_row_top {
+#obhjxawolm .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -628,11 +619,11 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   border-bottom-color: #D3D3D3;
 }
 
-#bbfijdxhdi .gt_striped {
+#obhjxawolm .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#bbfijdxhdi .gt_table_body {
+#obhjxawolm .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -641,7 +632,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   border-bottom-color: #D3D3D3;
 }
 
-#bbfijdxhdi .gt_footnotes {
+#obhjxawolm .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -655,7 +646,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   border-right-color: #D3D3D3;
 }
 
-#bbfijdxhdi .gt_footnote {
+#obhjxawolm .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -664,7 +655,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   padding-right: 5px;
 }
 
-#bbfijdxhdi .gt_sourcenotes {
+#obhjxawolm .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -678,7 +669,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   border-right-color: #D3D3D3;
 }
 
-#bbfijdxhdi .gt_sourcenote {
+#obhjxawolm .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -686,72 +677,72 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
   padding-right: 5px;
 }
 
-#bbfijdxhdi .gt_left {
+#obhjxawolm .gt_left {
   text-align: left;
 }
 
-#bbfijdxhdi .gt_center {
+#obhjxawolm .gt_center {
   text-align: center;
 }
 
-#bbfijdxhdi .gt_right {
+#obhjxawolm .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#bbfijdxhdi .gt_font_normal {
+#obhjxawolm .gt_font_normal {
   font-weight: normal;
 }
 
-#bbfijdxhdi .gt_font_bold {
+#obhjxawolm .gt_font_bold {
   font-weight: bold;
 }
 
-#bbfijdxhdi .gt_font_italic {
+#obhjxawolm .gt_font_italic {
   font-style: italic;
 }
 
-#bbfijdxhdi .gt_super {
+#obhjxawolm .gt_super {
   font-size: 65%;
 }
 
-#bbfijdxhdi .gt_footnote_marks {
+#obhjxawolm .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#bbfijdxhdi .gt_asterisk {
+#obhjxawolm .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#bbfijdxhdi .gt_indent_1 {
+#obhjxawolm .gt_indent_1 {
   text-indent: 5px;
 }
 
-#bbfijdxhdi .gt_indent_2 {
+#obhjxawolm .gt_indent_2 {
   text-indent: 10px;
 }
 
-#bbfijdxhdi .gt_indent_3 {
+#obhjxawolm .gt_indent_3 {
   text-indent: 15px;
 }
 
-#bbfijdxhdi .gt_indent_4 {
+#obhjxawolm .gt_indent_4 {
   text-indent: 20px;
 }
 
-#bbfijdxhdi .gt_indent_5 {
+#obhjxawolm .gt_indent_5 {
   text-indent: 25px;
 }
 
-#bbfijdxhdi .katex-display {
+#obhjxawolm .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#bbfijdxhdi div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#obhjxawolm div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -780,12 +771,6 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
 <td class="gt_row gt_right" headers="Nb ménages">519</td>
 <td class="gt_row gt_right" headers="Membres (nb)">287</td>
 <td class="gt_row gt_right" headers="Membres (%)">55.3</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="Observatory">Total</td>
-<td class="gt_row gt_right" headers="Nb ménages">1026</td>
-<td class="gt_row gt_right" headers="Membres (nb)">450</td>
-<td class="gt_row gt_right" headers="Membres (%)">43.9</td>
 </tr>
 </tbody>
 </table>
@@ -968,23 +953,23 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
 </figcaption>
 <div aria-describedby="tbl-pro1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="mzvcaztrbn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#mzvcaztrbn table {
+<div id="xuofvhzxjw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#xuofvhzxjw table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#mzvcaztrbn thead, #mzvcaztrbn tbody, #mzvcaztrbn tfoot, #mzvcaztrbn tr, #mzvcaztrbn td, #mzvcaztrbn th {
+#xuofvhzxjw thead, #xuofvhzxjw tbody, #xuofvhzxjw tfoot, #xuofvhzxjw tr, #xuofvhzxjw td, #xuofvhzxjw th {
   border-style: none;
 }
 
-#mzvcaztrbn p {
+#xuofvhzxjw p {
   margin: 0;
   padding: 0;
 }
 
-#mzvcaztrbn .gt_table {
+#xuofvhzxjw .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1010,12 +995,12 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   border-left-color: #D3D3D3;
 }
 
-#mzvcaztrbn .gt_caption {
+#xuofvhzxjw .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#mzvcaztrbn .gt_title {
+#xuofvhzxjw .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1027,7 +1012,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   border-bottom-width: 0;
 }
 
-#mzvcaztrbn .gt_subtitle {
+#xuofvhzxjw .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1039,7 +1024,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   border-top-width: 0;
 }
 
-#mzvcaztrbn .gt_heading {
+#xuofvhzxjw .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1051,13 +1036,13 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   border-right-color: #D3D3D3;
 }
 
-#mzvcaztrbn .gt_bottom_border {
+#xuofvhzxjw .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#mzvcaztrbn .gt_col_headings {
+#xuofvhzxjw .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1072,7 +1057,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   border-right-color: #D3D3D3;
 }
 
-#mzvcaztrbn .gt_col_heading {
+#xuofvhzxjw .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1092,7 +1077,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   overflow-x: hidden;
 }
 
-#mzvcaztrbn .gt_column_spanner_outer {
+#xuofvhzxjw .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1104,15 +1089,15 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   padding-right: 4px;
 }
 
-#mzvcaztrbn .gt_column_spanner_outer:first-child {
+#xuofvhzxjw .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#mzvcaztrbn .gt_column_spanner_outer:last-child {
+#xuofvhzxjw .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#mzvcaztrbn .gt_column_spanner {
+#xuofvhzxjw .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1124,11 +1109,11 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   width: 100%;
 }
 
-#mzvcaztrbn .gt_spanner_row {
+#xuofvhzxjw .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#mzvcaztrbn .gt_group_heading {
+#xuofvhzxjw .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1154,7 +1139,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   text-align: left;
 }
 
-#mzvcaztrbn .gt_empty_group_heading {
+#xuofvhzxjw .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1169,15 +1154,15 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   vertical-align: middle;
 }
 
-#mzvcaztrbn .gt_from_md > :first-child {
+#xuofvhzxjw .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#mzvcaztrbn .gt_from_md > :last-child {
+#xuofvhzxjw .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#mzvcaztrbn .gt_row {
+#xuofvhzxjw .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1196,7 +1181,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   overflow-x: hidden;
 }
 
-#mzvcaztrbn .gt_stub {
+#xuofvhzxjw .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1209,7 +1194,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   padding-right: 5px;
 }
 
-#mzvcaztrbn .gt_stub_row_group {
+#xuofvhzxjw .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1223,15 +1208,15 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   vertical-align: top;
 }
 
-#mzvcaztrbn .gt_row_group_first td {
+#xuofvhzxjw .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#mzvcaztrbn .gt_row_group_first th {
+#xuofvhzxjw .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#mzvcaztrbn .gt_summary_row {
+#xuofvhzxjw .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1241,16 +1226,16 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   padding-right: 5px;
 }
 
-#mzvcaztrbn .gt_first_summary_row {
+#xuofvhzxjw .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#mzvcaztrbn .gt_first_summary_row.thick {
+#xuofvhzxjw .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#mzvcaztrbn .gt_last_summary_row {
+#xuofvhzxjw .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1260,7 +1245,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   border-bottom-color: #D3D3D3;
 }
 
-#mzvcaztrbn .gt_grand_summary_row {
+#xuofvhzxjw .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1270,7 +1255,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   padding-right: 5px;
 }
 
-#mzvcaztrbn .gt_first_grand_summary_row {
+#xuofvhzxjw .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1280,7 +1265,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   border-top-color: #D3D3D3;
 }
 
-#mzvcaztrbn .gt_last_grand_summary_row_top {
+#xuofvhzxjw .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1290,11 +1275,11 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   border-bottom-color: #D3D3D3;
 }
 
-#mzvcaztrbn .gt_striped {
+#xuofvhzxjw .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#mzvcaztrbn .gt_table_body {
+#xuofvhzxjw .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1303,7 +1288,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   border-bottom-color: #D3D3D3;
 }
 
-#mzvcaztrbn .gt_footnotes {
+#xuofvhzxjw .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1317,7 +1302,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   border-right-color: #D3D3D3;
 }
 
-#mzvcaztrbn .gt_footnote {
+#xuofvhzxjw .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1326,7 +1311,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   padding-right: 5px;
 }
 
-#mzvcaztrbn .gt_sourcenotes {
+#xuofvhzxjw .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1340,7 +1325,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   border-right-color: #D3D3D3;
 }
 
-#mzvcaztrbn .gt_sourcenote {
+#xuofvhzxjw .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1348,72 +1333,72 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
   padding-right: 5px;
 }
 
-#mzvcaztrbn .gt_left {
+#xuofvhzxjw .gt_left {
   text-align: left;
 }
 
-#mzvcaztrbn .gt_center {
+#xuofvhzxjw .gt_center {
   text-align: center;
 }
 
-#mzvcaztrbn .gt_right {
+#xuofvhzxjw .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#mzvcaztrbn .gt_font_normal {
+#xuofvhzxjw .gt_font_normal {
   font-weight: normal;
 }
 
-#mzvcaztrbn .gt_font_bold {
+#xuofvhzxjw .gt_font_bold {
   font-weight: bold;
 }
 
-#mzvcaztrbn .gt_font_italic {
+#xuofvhzxjw .gt_font_italic {
   font-style: italic;
 }
 
-#mzvcaztrbn .gt_super {
+#xuofvhzxjw .gt_super {
   font-size: 65%;
 }
 
-#mzvcaztrbn .gt_footnote_marks {
+#xuofvhzxjw .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#mzvcaztrbn .gt_asterisk {
+#xuofvhzxjw .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#mzvcaztrbn .gt_indent_1 {
+#xuofvhzxjw .gt_indent_1 {
   text-indent: 5px;
 }
 
-#mzvcaztrbn .gt_indent_2 {
+#xuofvhzxjw .gt_indent_2 {
   text-indent: 10px;
 }
 
-#mzvcaztrbn .gt_indent_3 {
+#xuofvhzxjw .gt_indent_3 {
   text-indent: 15px;
 }
 
-#mzvcaztrbn .gt_indent_4 {
+#xuofvhzxjw .gt_indent_4 {
   text-indent: 20px;
 }
 
-#mzvcaztrbn .gt_indent_5 {
+#xuofvhzxjw .gt_indent_5 {
   text-indent: 25px;
 }
 
-#mzvcaztrbn .katex-display {
+#xuofvhzxjw .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#mzvcaztrbn div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#xuofvhzxjw div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1527,23 +1512,23 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
 </figcaption>
 <div aria-describedby="tbl-benef-type-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="mankczxshe" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#mankczxshe table {
+<div id="wniisndroq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#wniisndroq table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#mankczxshe thead, #mankczxshe tbody, #mankczxshe tfoot, #mankczxshe tr, #mankczxshe td, #mankczxshe th {
+#wniisndroq thead, #wniisndroq tbody, #wniisndroq tfoot, #wniisndroq tr, #wniisndroq td, #wniisndroq th {
   border-style: none;
 }
 
-#mankczxshe p {
+#wniisndroq p {
   margin: 0;
   padding: 0;
 }
 
-#mankczxshe .gt_table {
+#wniisndroq .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1569,12 +1554,12 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   border-left-color: #D3D3D3;
 }
 
-#mankczxshe .gt_caption {
+#wniisndroq .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#mankczxshe .gt_title {
+#wniisndroq .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1586,7 +1571,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   border-bottom-width: 0;
 }
 
-#mankczxshe .gt_subtitle {
+#wniisndroq .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1598,7 +1583,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   border-top-width: 0;
 }
 
-#mankczxshe .gt_heading {
+#wniisndroq .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1610,13 +1595,13 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   border-right-color: #D3D3D3;
 }
 
-#mankczxshe .gt_bottom_border {
+#wniisndroq .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#mankczxshe .gt_col_headings {
+#wniisndroq .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1631,7 +1616,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   border-right-color: #D3D3D3;
 }
 
-#mankczxshe .gt_col_heading {
+#wniisndroq .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1651,7 +1636,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   overflow-x: hidden;
 }
 
-#mankczxshe .gt_column_spanner_outer {
+#wniisndroq .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1663,15 +1648,15 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   padding-right: 4px;
 }
 
-#mankczxshe .gt_column_spanner_outer:first-child {
+#wniisndroq .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#mankczxshe .gt_column_spanner_outer:last-child {
+#wniisndroq .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#mankczxshe .gt_column_spanner {
+#wniisndroq .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1683,11 +1668,11 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   width: 100%;
 }
 
-#mankczxshe .gt_spanner_row {
+#wniisndroq .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#mankczxshe .gt_group_heading {
+#wniisndroq .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1713,7 +1698,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   text-align: left;
 }
 
-#mankczxshe .gt_empty_group_heading {
+#wniisndroq .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1728,15 +1713,15 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   vertical-align: middle;
 }
 
-#mankczxshe .gt_from_md > :first-child {
+#wniisndroq .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#mankczxshe .gt_from_md > :last-child {
+#wniisndroq .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#mankczxshe .gt_row {
+#wniisndroq .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1755,7 +1740,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   overflow-x: hidden;
 }
 
-#mankczxshe .gt_stub {
+#wniisndroq .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1768,7 +1753,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   padding-right: 5px;
 }
 
-#mankczxshe .gt_stub_row_group {
+#wniisndroq .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1782,15 +1767,15 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   vertical-align: top;
 }
 
-#mankczxshe .gt_row_group_first td {
+#wniisndroq .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#mankczxshe .gt_row_group_first th {
+#wniisndroq .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#mankczxshe .gt_summary_row {
+#wniisndroq .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1800,16 +1785,16 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   padding-right: 5px;
 }
 
-#mankczxshe .gt_first_summary_row {
+#wniisndroq .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#mankczxshe .gt_first_summary_row.thick {
+#wniisndroq .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#mankczxshe .gt_last_summary_row {
+#wniisndroq .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1819,7 +1804,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   border-bottom-color: #D3D3D3;
 }
 
-#mankczxshe .gt_grand_summary_row {
+#wniisndroq .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1829,7 +1814,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   padding-right: 5px;
 }
 
-#mankczxshe .gt_first_grand_summary_row {
+#wniisndroq .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1839,7 +1824,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   border-top-color: #D3D3D3;
 }
 
-#mankczxshe .gt_last_grand_summary_row_top {
+#wniisndroq .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1849,11 +1834,11 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   border-bottom-color: #D3D3D3;
 }
 
-#mankczxshe .gt_striped {
+#wniisndroq .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#mankczxshe .gt_table_body {
+#wniisndroq .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1862,7 +1847,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   border-bottom-color: #D3D3D3;
 }
 
-#mankczxshe .gt_footnotes {
+#wniisndroq .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1876,7 +1861,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   border-right-color: #D3D3D3;
 }
 
-#mankczxshe .gt_footnote {
+#wniisndroq .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1885,7 +1870,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   padding-right: 5px;
 }
 
-#mankczxshe .gt_sourcenotes {
+#wniisndroq .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1899,7 +1884,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   border-right-color: #D3D3D3;
 }
 
-#mankczxshe .gt_sourcenote {
+#wniisndroq .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1907,72 +1892,72 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
   padding-right: 5px;
 }
 
-#mankczxshe .gt_left {
+#wniisndroq .gt_left {
   text-align: left;
 }
 
-#mankczxshe .gt_center {
+#wniisndroq .gt_center {
   text-align: center;
 }
 
-#mankczxshe .gt_right {
+#wniisndroq .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#mankczxshe .gt_font_normal {
+#wniisndroq .gt_font_normal {
   font-weight: normal;
 }
 
-#mankczxshe .gt_font_bold {
+#wniisndroq .gt_font_bold {
   font-weight: bold;
 }
 
-#mankczxshe .gt_font_italic {
+#wniisndroq .gt_font_italic {
   font-style: italic;
 }
 
-#mankczxshe .gt_super {
+#wniisndroq .gt_super {
   font-size: 65%;
 }
 
-#mankczxshe .gt_footnote_marks {
+#wniisndroq .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#mankczxshe .gt_asterisk {
+#wniisndroq .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#mankczxshe .gt_indent_1 {
+#wniisndroq .gt_indent_1 {
   text-indent: 5px;
 }
 
-#mankczxshe .gt_indent_2 {
+#wniisndroq .gt_indent_2 {
   text-indent: 10px;
 }
 
-#mankczxshe .gt_indent_3 {
+#wniisndroq .gt_indent_3 {
   text-indent: 15px;
 }
 
-#mankczxshe .gt_indent_4 {
+#wniisndroq .gt_indent_4 {
   text-indent: 20px;
 }
 
-#mankczxshe .gt_indent_5 {
+#wniisndroq .gt_indent_5 {
   text-indent: 25px;
 }
 
-#mankczxshe .katex-display {
+#wniisndroq .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#mankczxshe div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#wniisndroq div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -2108,23 +2093,23 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
 </figcaption>
 <div aria-describedby="tbl-source-global-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="wuedmvrmic" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#wuedmvrmic table {
+<div id="xxhdddviev" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#xxhdddviev table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#wuedmvrmic thead, #wuedmvrmic tbody, #wuedmvrmic tfoot, #wuedmvrmic tr, #wuedmvrmic td, #wuedmvrmic th {
+#xxhdddviev thead, #xxhdddviev tbody, #xxhdddviev tfoot, #xxhdddviev tr, #xxhdddviev td, #xxhdddviev th {
   border-style: none;
 }
 
-#wuedmvrmic p {
+#xxhdddviev p {
   margin: 0;
   padding: 0;
 }
 
-#wuedmvrmic .gt_table {
+#xxhdddviev .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -2150,12 +2135,12 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   border-left-color: #D3D3D3;
 }
 
-#wuedmvrmic .gt_caption {
+#xxhdddviev .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#wuedmvrmic .gt_title {
+#xxhdddviev .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2167,7 +2152,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   border-bottom-width: 0;
 }
 
-#wuedmvrmic .gt_subtitle {
+#xxhdddviev .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2179,7 +2164,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   border-top-width: 0;
 }
 
-#wuedmvrmic .gt_heading {
+#xxhdddviev .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2191,13 +2176,13 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   border-right-color: #D3D3D3;
 }
 
-#wuedmvrmic .gt_bottom_border {
+#xxhdddviev .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#wuedmvrmic .gt_col_headings {
+#xxhdddviev .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2212,7 +2197,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   border-right-color: #D3D3D3;
 }
 
-#wuedmvrmic .gt_col_heading {
+#xxhdddviev .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2232,7 +2217,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   overflow-x: hidden;
 }
 
-#wuedmvrmic .gt_column_spanner_outer {
+#xxhdddviev .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2244,15 +2229,15 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   padding-right: 4px;
 }
 
-#wuedmvrmic .gt_column_spanner_outer:first-child {
+#xxhdddviev .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#wuedmvrmic .gt_column_spanner_outer:last-child {
+#xxhdddviev .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#wuedmvrmic .gt_column_spanner {
+#xxhdddviev .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2264,11 +2249,11 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   width: 100%;
 }
 
-#wuedmvrmic .gt_spanner_row {
+#xxhdddviev .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#wuedmvrmic .gt_group_heading {
+#xxhdddviev .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2294,7 +2279,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   text-align: left;
 }
 
-#wuedmvrmic .gt_empty_group_heading {
+#xxhdddviev .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2309,15 +2294,15 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   vertical-align: middle;
 }
 
-#wuedmvrmic .gt_from_md > :first-child {
+#xxhdddviev .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#wuedmvrmic .gt_from_md > :last-child {
+#xxhdddviev .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#wuedmvrmic .gt_row {
+#xxhdddviev .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2336,7 +2321,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   overflow-x: hidden;
 }
 
-#wuedmvrmic .gt_stub {
+#xxhdddviev .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2349,7 +2334,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   padding-right: 5px;
 }
 
-#wuedmvrmic .gt_stub_row_group {
+#xxhdddviev .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2363,15 +2348,15 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   vertical-align: top;
 }
 
-#wuedmvrmic .gt_row_group_first td {
+#xxhdddviev .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#wuedmvrmic .gt_row_group_first th {
+#xxhdddviev .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#wuedmvrmic .gt_summary_row {
+#xxhdddviev .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2381,16 +2366,16 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   padding-right: 5px;
 }
 
-#wuedmvrmic .gt_first_summary_row {
+#xxhdddviev .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#wuedmvrmic .gt_first_summary_row.thick {
+#xxhdddviev .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#wuedmvrmic .gt_last_summary_row {
+#xxhdddviev .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2400,7 +2385,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   border-bottom-color: #D3D3D3;
 }
 
-#wuedmvrmic .gt_grand_summary_row {
+#xxhdddviev .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2410,7 +2395,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   padding-right: 5px;
 }
 
-#wuedmvrmic .gt_first_grand_summary_row {
+#xxhdddviev .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2420,7 +2405,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   border-top-color: #D3D3D3;
 }
 
-#wuedmvrmic .gt_last_grand_summary_row_top {
+#xxhdddviev .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2430,11 +2415,11 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   border-bottom-color: #D3D3D3;
 }
 
-#wuedmvrmic .gt_striped {
+#xxhdddviev .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#wuedmvrmic .gt_table_body {
+#xxhdddviev .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2443,7 +2428,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   border-bottom-color: #D3D3D3;
 }
 
-#wuedmvrmic .gt_footnotes {
+#xxhdddviev .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2457,7 +2442,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   border-right-color: #D3D3D3;
 }
 
-#wuedmvrmic .gt_footnote {
+#xxhdddviev .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -2466,7 +2451,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   padding-right: 5px;
 }
 
-#wuedmvrmic .gt_sourcenotes {
+#xxhdddviev .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2480,7 +2465,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   border-right-color: #D3D3D3;
 }
 
-#wuedmvrmic .gt_sourcenote {
+#xxhdddviev .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2488,72 +2473,72 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
   padding-right: 5px;
 }
 
-#wuedmvrmic .gt_left {
+#xxhdddviev .gt_left {
   text-align: left;
 }
 
-#wuedmvrmic .gt_center {
+#xxhdddviev .gt_center {
   text-align: center;
 }
 
-#wuedmvrmic .gt_right {
+#xxhdddviev .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#wuedmvrmic .gt_font_normal {
+#xxhdddviev .gt_font_normal {
   font-weight: normal;
 }
 
-#wuedmvrmic .gt_font_bold {
+#xxhdddviev .gt_font_bold {
   font-weight: bold;
 }
 
-#wuedmvrmic .gt_font_italic {
+#xxhdddviev .gt_font_italic {
   font-style: italic;
 }
 
-#wuedmvrmic .gt_super {
+#xxhdddviev .gt_super {
   font-size: 65%;
 }
 
-#wuedmvrmic .gt_footnote_marks {
+#xxhdddviev .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#wuedmvrmic .gt_asterisk {
+#xxhdddviev .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#wuedmvrmic .gt_indent_1 {
+#xxhdddviev .gt_indent_1 {
   text-indent: 5px;
 }
 
-#wuedmvrmic .gt_indent_2 {
+#xxhdddviev .gt_indent_2 {
   text-indent: 10px;
 }
 
-#wuedmvrmic .gt_indent_3 {
+#xxhdddviev .gt_indent_3 {
   text-indent: 15px;
 }
 
-#wuedmvrmic .gt_indent_4 {
+#xxhdddviev .gt_indent_4 {
   text-indent: 20px;
 }
 
-#wuedmvrmic .gt_indent_5 {
+#xxhdddviev .gt_indent_5 {
   text-indent: 25px;
 }
 
-#wuedmvrmic .katex-display {
+#xxhdddviev .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#wuedmvrmic div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#xxhdddviev div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -2637,23 +2622,23 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
 </figcaption>
 <div aria-describedby="tbl-croisement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="eienlmxyin" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#eienlmxyin table {
+<div id="nnvhwmbalu" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#nnvhwmbalu table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#eienlmxyin thead, #eienlmxyin tbody, #eienlmxyin tfoot, #eienlmxyin tr, #eienlmxyin td, #eienlmxyin th {
+#nnvhwmbalu thead, #nnvhwmbalu tbody, #nnvhwmbalu tfoot, #nnvhwmbalu tr, #nnvhwmbalu td, #nnvhwmbalu th {
   border-style: none;
 }
 
-#eienlmxyin p {
+#nnvhwmbalu p {
   margin: 0;
   padding: 0;
 }
 
-#eienlmxyin .gt_table {
+#nnvhwmbalu .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -2679,12 +2664,12 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   border-left-color: #D3D3D3;
 }
 
-#eienlmxyin .gt_caption {
+#nnvhwmbalu .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#eienlmxyin .gt_title {
+#nnvhwmbalu .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2696,7 +2681,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   border-bottom-width: 0;
 }
 
-#eienlmxyin .gt_subtitle {
+#nnvhwmbalu .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2708,7 +2693,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   border-top-width: 0;
 }
 
-#eienlmxyin .gt_heading {
+#nnvhwmbalu .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2720,13 +2705,13 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   border-right-color: #D3D3D3;
 }
 
-#eienlmxyin .gt_bottom_border {
+#nnvhwmbalu .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#eienlmxyin .gt_col_headings {
+#nnvhwmbalu .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2741,7 +2726,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   border-right-color: #D3D3D3;
 }
 
-#eienlmxyin .gt_col_heading {
+#nnvhwmbalu .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2761,7 +2746,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   overflow-x: hidden;
 }
 
-#eienlmxyin .gt_column_spanner_outer {
+#nnvhwmbalu .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2773,15 +2758,15 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   padding-right: 4px;
 }
 
-#eienlmxyin .gt_column_spanner_outer:first-child {
+#nnvhwmbalu .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#eienlmxyin .gt_column_spanner_outer:last-child {
+#nnvhwmbalu .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#eienlmxyin .gt_column_spanner {
+#nnvhwmbalu .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2793,11 +2778,11 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   width: 100%;
 }
 
-#eienlmxyin .gt_spanner_row {
+#nnvhwmbalu .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#eienlmxyin .gt_group_heading {
+#nnvhwmbalu .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2823,7 +2808,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   text-align: left;
 }
 
-#eienlmxyin .gt_empty_group_heading {
+#nnvhwmbalu .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2838,15 +2823,15 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   vertical-align: middle;
 }
 
-#eienlmxyin .gt_from_md > :first-child {
+#nnvhwmbalu .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#eienlmxyin .gt_from_md > :last-child {
+#nnvhwmbalu .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#eienlmxyin .gt_row {
+#nnvhwmbalu .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2865,7 +2850,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   overflow-x: hidden;
 }
 
-#eienlmxyin .gt_stub {
+#nnvhwmbalu .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2878,7 +2863,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   padding-right: 5px;
 }
 
-#eienlmxyin .gt_stub_row_group {
+#nnvhwmbalu .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2892,15 +2877,15 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   vertical-align: top;
 }
 
-#eienlmxyin .gt_row_group_first td {
+#nnvhwmbalu .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#eienlmxyin .gt_row_group_first th {
+#nnvhwmbalu .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#eienlmxyin .gt_summary_row {
+#nnvhwmbalu .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2910,16 +2895,16 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   padding-right: 5px;
 }
 
-#eienlmxyin .gt_first_summary_row {
+#nnvhwmbalu .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#eienlmxyin .gt_first_summary_row.thick {
+#nnvhwmbalu .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#eienlmxyin .gt_last_summary_row {
+#nnvhwmbalu .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2929,7 +2914,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   border-bottom-color: #D3D3D3;
 }
 
-#eienlmxyin .gt_grand_summary_row {
+#nnvhwmbalu .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2939,7 +2924,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   padding-right: 5px;
 }
 
-#eienlmxyin .gt_first_grand_summary_row {
+#nnvhwmbalu .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2949,7 +2934,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   border-top-color: #D3D3D3;
 }
 
-#eienlmxyin .gt_last_grand_summary_row_top {
+#nnvhwmbalu .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2959,11 +2944,11 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   border-bottom-color: #D3D3D3;
 }
 
-#eienlmxyin .gt_striped {
+#nnvhwmbalu .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#eienlmxyin .gt_table_body {
+#nnvhwmbalu .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2972,7 +2957,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   border-bottom-color: #D3D3D3;
 }
 
-#eienlmxyin .gt_footnotes {
+#nnvhwmbalu .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2986,7 +2971,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   border-right-color: #D3D3D3;
 }
 
-#eienlmxyin .gt_footnote {
+#nnvhwmbalu .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -2995,7 +2980,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   padding-right: 5px;
 }
 
-#eienlmxyin .gt_sourcenotes {
+#nnvhwmbalu .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3009,7 +2994,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   border-right-color: #D3D3D3;
 }
 
-#eienlmxyin .gt_sourcenote {
+#nnvhwmbalu .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -3017,72 +3002,72 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
   padding-right: 5px;
 }
 
-#eienlmxyin .gt_left {
+#nnvhwmbalu .gt_left {
   text-align: left;
 }
 
-#eienlmxyin .gt_center {
+#nnvhwmbalu .gt_center {
   text-align: center;
 }
 
-#eienlmxyin .gt_right {
+#nnvhwmbalu .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#eienlmxyin .gt_font_normal {
+#nnvhwmbalu .gt_font_normal {
   font-weight: normal;
 }
 
-#eienlmxyin .gt_font_bold {
+#nnvhwmbalu .gt_font_bold {
   font-weight: bold;
 }
 
-#eienlmxyin .gt_font_italic {
+#nnvhwmbalu .gt_font_italic {
   font-style: italic;
 }
 
-#eienlmxyin .gt_super {
+#nnvhwmbalu .gt_super {
   font-size: 65%;
 }
 
-#eienlmxyin .gt_footnote_marks {
+#nnvhwmbalu .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#eienlmxyin .gt_asterisk {
+#nnvhwmbalu .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#eienlmxyin .gt_indent_1 {
+#nnvhwmbalu .gt_indent_1 {
   text-indent: 5px;
 }
 
-#eienlmxyin .gt_indent_2 {
+#nnvhwmbalu .gt_indent_2 {
   text-indent: 10px;
 }
 
-#eienlmxyin .gt_indent_3 {
+#nnvhwmbalu .gt_indent_3 {
   text-indent: 15px;
 }
 
-#eienlmxyin .gt_indent_4 {
+#nnvhwmbalu .gt_indent_4 {
   text-indent: 20px;
 }
 
-#eienlmxyin .gt_indent_5 {
+#nnvhwmbalu .gt_indent_5 {
   text-indent: 25px;
 }
 
-#eienlmxyin .katex-display {
+#nnvhwmbalu .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#eienlmxyin div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#nnvhwmbalu div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
