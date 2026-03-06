@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -21,9 +21,8 @@ ul.task-list li input[type="checkbox"] {
   vertical-align: middle;
 }
 /* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -34,7 +33,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -67,17 +66,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="quarto:offset" content="./">
 <link href="./08_agriculture.html" rel="next">
 <link href="./05_habitat_niveau_de_vie.html" rel="prev">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-70a47bd5681a7291082a5b9f83d58762.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -109,7 +106,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </head>
 
-<body class="nav-sidebar floating quarto-light">
+<body class="nav-sidebar floating">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -131,9 +128,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
-      <a href="./index.html" class="sidebar-logo-link">
-      </a>
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Campagne 2025 des Observatoires ruraux d’Alaotra et Marovoay</a> 
         <div class="sidebar-tools-main">
@@ -278,13 +273,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30a)) <span class="sc">|&gt;</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> fr30a, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">binwidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Nombre de parcelles possédées"</span>, <span class="at">y =</span> <span class="st">"Nombre de ménages"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-nb-parcelles" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -302,7 +297,7 @@ Figure&nbsp;4.1: Distribution du nombre de parcelles possédées par ménage
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="ot">&lt;-</span> res_fr30 <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30c))</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="ot">&lt;-</span> res_fr30 <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30c))</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  fr30_data <span class="sc">|&gt;</span></span>
@@ -339,7 +334,7 @@ Figure&nbsp;4.1: Distribution du nombre de parcelles possédées par ménage
 <span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Indicateur =</span> <span class="st">"Superficie totale / ménage (ares)"</span>, <span class="at">.before =</span> <span class="dv">1</span>)</span>
 <span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
 <span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Patrimoine foncier des ménages propriétaires"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Patrimoine foncier des ménages propriétaires"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div id="tbl-parcelles-stats" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -348,23 +343,23 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
 </figcaption>
 <div aria-describedby="tbl-parcelles-stats-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="rekwsrmycc" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#rekwsrmycc table {
+<div id="rhrzidxnqx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#rhrzidxnqx table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#rekwsrmycc thead, #rekwsrmycc tbody, #rekwsrmycc tfoot, #rekwsrmycc tr, #rekwsrmycc td, #rekwsrmycc th {
+#rhrzidxnqx thead, #rhrzidxnqx tbody, #rhrzidxnqx tfoot, #rhrzidxnqx tr, #rhrzidxnqx td, #rhrzidxnqx th {
   border-style: none;
 }
 
-#rekwsrmycc p {
+#rhrzidxnqx p {
   margin: 0;
   padding: 0;
 }
 
-#rekwsrmycc .gt_table {
+#rhrzidxnqx .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -390,12 +385,12 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   border-left-color: #D3D3D3;
 }
 
-#rekwsrmycc .gt_caption {
+#rhrzidxnqx .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#rekwsrmycc .gt_title {
+#rhrzidxnqx .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -407,7 +402,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   border-bottom-width: 0;
 }
 
-#rekwsrmycc .gt_subtitle {
+#rhrzidxnqx .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -419,7 +414,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   border-top-width: 0;
 }
 
-#rekwsrmycc .gt_heading {
+#rhrzidxnqx .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -431,13 +426,13 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   border-right-color: #D3D3D3;
 }
 
-#rekwsrmycc .gt_bottom_border {
+#rhrzidxnqx .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#rekwsrmycc .gt_col_headings {
+#rhrzidxnqx .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -452,7 +447,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   border-right-color: #D3D3D3;
 }
 
-#rekwsrmycc .gt_col_heading {
+#rhrzidxnqx .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -472,7 +467,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   overflow-x: hidden;
 }
 
-#rekwsrmycc .gt_column_spanner_outer {
+#rhrzidxnqx .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -484,15 +479,15 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   padding-right: 4px;
 }
 
-#rekwsrmycc .gt_column_spanner_outer:first-child {
+#rhrzidxnqx .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#rekwsrmycc .gt_column_spanner_outer:last-child {
+#rhrzidxnqx .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#rekwsrmycc .gt_column_spanner {
+#rhrzidxnqx .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -504,11 +499,11 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   width: 100%;
 }
 
-#rekwsrmycc .gt_spanner_row {
+#rhrzidxnqx .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#rekwsrmycc .gt_group_heading {
+#rhrzidxnqx .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -534,7 +529,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   text-align: left;
 }
 
-#rekwsrmycc .gt_empty_group_heading {
+#rhrzidxnqx .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -549,15 +544,15 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   vertical-align: middle;
 }
 
-#rekwsrmycc .gt_from_md > :first-child {
+#rhrzidxnqx .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#rekwsrmycc .gt_from_md > :last-child {
+#rhrzidxnqx .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#rekwsrmycc .gt_row {
+#rhrzidxnqx .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -576,7 +571,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   overflow-x: hidden;
 }
 
-#rekwsrmycc .gt_stub {
+#rhrzidxnqx .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -589,7 +584,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   padding-right: 5px;
 }
 
-#rekwsrmycc .gt_stub_row_group {
+#rhrzidxnqx .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -603,15 +598,15 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   vertical-align: top;
 }
 
-#rekwsrmycc .gt_row_group_first td {
+#rhrzidxnqx .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#rekwsrmycc .gt_row_group_first th {
+#rhrzidxnqx .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#rekwsrmycc .gt_summary_row {
+#rhrzidxnqx .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -621,16 +616,16 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   padding-right: 5px;
 }
 
-#rekwsrmycc .gt_first_summary_row {
+#rhrzidxnqx .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#rekwsrmycc .gt_first_summary_row.thick {
+#rhrzidxnqx .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#rekwsrmycc .gt_last_summary_row {
+#rhrzidxnqx .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -640,7 +635,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   border-bottom-color: #D3D3D3;
 }
 
-#rekwsrmycc .gt_grand_summary_row {
+#rhrzidxnqx .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -650,7 +645,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   padding-right: 5px;
 }
 
-#rekwsrmycc .gt_first_grand_summary_row {
+#rhrzidxnqx .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -660,7 +655,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   border-top-color: #D3D3D3;
 }
 
-#rekwsrmycc .gt_last_grand_summary_row_top {
+#rhrzidxnqx .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -670,11 +665,11 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   border-bottom-color: #D3D3D3;
 }
 
-#rekwsrmycc .gt_striped {
+#rhrzidxnqx .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#rekwsrmycc .gt_table_body {
+#rhrzidxnqx .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -683,7 +678,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   border-bottom-color: #D3D3D3;
 }
 
-#rekwsrmycc .gt_footnotes {
+#rhrzidxnqx .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -697,7 +692,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   border-right-color: #D3D3D3;
 }
 
-#rekwsrmycc .gt_footnote {
+#rhrzidxnqx .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -706,7 +701,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   padding-right: 5px;
 }
 
-#rekwsrmycc .gt_sourcenotes {
+#rhrzidxnqx .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -720,7 +715,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   border-right-color: #D3D3D3;
 }
 
-#rekwsrmycc .gt_sourcenote {
+#rhrzidxnqx .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -728,82 +723,82 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
   padding-right: 5px;
 }
 
-#rekwsrmycc .gt_left {
+#rhrzidxnqx .gt_left {
   text-align: left;
 }
 
-#rekwsrmycc .gt_center {
+#rhrzidxnqx .gt_center {
   text-align: center;
 }
 
-#rekwsrmycc .gt_right {
+#rhrzidxnqx .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#rekwsrmycc .gt_font_normal {
+#rhrzidxnqx .gt_font_normal {
   font-weight: normal;
 }
 
-#rekwsrmycc .gt_font_bold {
+#rhrzidxnqx .gt_font_bold {
   font-weight: bold;
 }
 
-#rekwsrmycc .gt_font_italic {
+#rhrzidxnqx .gt_font_italic {
   font-style: italic;
 }
 
-#rekwsrmycc .gt_super {
+#rhrzidxnqx .gt_super {
   font-size: 65%;
 }
 
-#rekwsrmycc .gt_footnote_marks {
+#rhrzidxnqx .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#rekwsrmycc .gt_asterisk {
+#rhrzidxnqx .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#rekwsrmycc .gt_indent_1 {
+#rhrzidxnqx .gt_indent_1 {
   text-indent: 5px;
 }
 
-#rekwsrmycc .gt_indent_2 {
+#rhrzidxnqx .gt_indent_2 {
   text-indent: 10px;
 }
 
-#rekwsrmycc .gt_indent_3 {
+#rhrzidxnqx .gt_indent_3 {
   text-indent: 15px;
 }
 
-#rekwsrmycc .gt_indent_4 {
+#rhrzidxnqx .gt_indent_4 {
   text-indent: 20px;
 }
 
-#rekwsrmycc .gt_indent_5 {
+#rhrzidxnqx .gt_indent_5 {
   text-indent: 25px;
 }
 
-#rekwsrmycc .katex-display {
+#rhrzidxnqx .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#rekwsrmycc div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#rhrzidxnqx div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
 
-<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
-<tr class="gt_heading header">
-<td colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">Patrimoine foncier des ménages propriétaires</td>
+<tr class="header gt_heading">
+<th colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">Patrimoine foncier des ménages propriétaires</th>
 </tr>
-<tr class="gt_col_headings even">
+<tr class="odd gt_col_headings">
 <th id="Indicateur" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Indicateur</th>
 <th id="Stat" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Stat</th>
 <th id="Alaotra" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Alaotra</th>
@@ -862,7 +857,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="sc">|&gt;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30c), <span class="at">levels =</span> <span class="fu">names</span>(type_labs), <span class="at">labels =</span> type_labs)) <span class="sc">|&gt;</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Type) <span class="sc">|&gt;</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
@@ -871,7 +866,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-type-parcelle" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -889,7 +884,7 @@ Figure&nbsp;4.2: Type des parcelles possédées
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="sc">|&gt;</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30e)) <span class="sc">|&gt;</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Localisation =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30e), <span class="at">levels =</span> <span class="fu">names</span>(loc_labs), <span class="at">labels =</span> loc_labs)) <span class="sc">|&gt;</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Localisation) <span class="sc">|&gt;</span></span>
@@ -899,7 +894,7 @@ Figure&nbsp;4.2: Type des parcelles possédées
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-localisation-parcelle" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -920,7 +915,7 @@ Figure&nbsp;4.3: Localisation des parcelles possédées
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="sc">|&gt;</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30f)) <span class="sc">|&gt;</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Irrigation =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30f), <span class="at">levels =</span> <span class="fu">names</span>(irrig_labs), <span class="at">labels =</span> irrig_labs)) <span class="sc">|&gt;</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Irrigation) <span class="sc">|&gt;</span></span>
@@ -930,7 +925,7 @@ Figure&nbsp;4.3: Localisation des parcelles possédées
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-irrigation-possedee" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -951,7 +946,7 @@ Figure&nbsp;4.4: Mode d’irrigation des parcelles possédées
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>acq_labs <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>acq_labs <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"11"</span> <span class="ot">=</span> <span class="st">"Achat"</span>, <span class="st">"13"</span> <span class="ot">=</span> <span class="st">"Don"</span>, <span class="st">"15"</span> <span class="ot">=</span> <span class="st">"Mise en valeur"</span>,</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"21"</span> <span class="ot">=</span> <span class="st">"Héritage (partage définitif)"</span>, <span class="st">"22"</span> <span class="ot">=</span> <span class="st">"Héritage (partage non définitif)"</span>,</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"23"</span> <span class="ot">=</span> <span class="st">"Héritage tournant"</span></span>
@@ -967,7 +962,7 @@ Figure&nbsp;4.4: Mode d’irrigation des parcelles possédées
 <span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-acquisition" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -985,7 +980,7 @@ Figure&nbsp;4.5: Mode d’acquisition des parcelles possédées
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>anc_labs <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>anc_labs <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"Avant 1970"</span>, <span class="st">"2"</span> <span class="ot">=</span> <span class="st">"Années 1970"</span>, <span class="st">"3"</span> <span class="ot">=</span> <span class="st">"Années 1980"</span>,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"4"</span> <span class="ot">=</span> <span class="st">"Années 1990"</span>, <span class="st">"5"</span> <span class="ot">=</span> <span class="st">"Années 2000"</span>, <span class="st">"6"</span> <span class="ot">=</span> <span class="st">"Années 2010"</span>,</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"8"</span> <span class="ot">=</span> <span class="st">"Ne se rappelle pas"</span></span>
@@ -1000,7 +995,7 @@ Figure&nbsp;4.5: Mode d’acquisition des parcelles possédées
 <span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
 <span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">30</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">30</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-anciennete" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1021,7 +1016,7 @@ Figure&nbsp;4.6: Ancienneté de possession des parcelles
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>prop_labs <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>prop_labs <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"0"</span> <span class="ot">=</span> <span class="st">"Tous les membres"</span>, <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"Chef de ménage"</span>, <span class="st">"2"</span> <span class="ot">=</span> <span class="st">"Conjoint"</span>,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"3"</span> <span class="ot">=</span> <span class="st">"Chef et conjoint"</span>, <span class="st">"41"</span> <span class="ot">=</span> <span class="st">"Parents du chef"</span>, <span class="st">"42"</span> <span class="ot">=</span> <span class="st">"Parents du conjoint"</span>,</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"81"</span> <span class="ot">=</span> <span class="st">"Indivision (chef)"</span>, <span class="st">"82"</span> <span class="ot">=</span> <span class="st">"Indivision (conjoint)"</span>, <span class="st">"99"</span> <span class="ot">=</span> <span class="st">"Autre"</span></span>
@@ -1045,7 +1040,7 @@ Figure&nbsp;4.6: Ancienneté de possession des parcelles
 <span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-proprietaire" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1068,7 +1063,7 @@ Figure&nbsp;4.7: Qui dans le ménage est propriétaire de la parcelle
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sec_data <span class="ot">&lt;-</span> fr30_data <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sec_data <span class="ot">&lt;-</span> fr30_data <span class="sc">|&gt;</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Titre =</span> <span class="fu">if_else</span>(fr30j <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Oui"</span>, <span class="st">"Non"</span>),</span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Certificat =</span> <span class="fu">if_else</span>(fr30l <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Oui"</span>, <span class="st">"Non"</span>)</span>
@@ -1095,7 +1090,7 @@ Figure&nbsp;4.7: Qui dans le ménage est propriétaire de la parcelle
 <span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(titre_pct, cert_pct) <span class="sc">|&gt;</span></span>
 <span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
 <span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"% des parcelles disposant d'un document de sécurisation"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(<span class="at">Alaotra =</span> <span class="st">"Alaotra (%)"</span>, <span class="at">Marovoay =</span> <span class="st">"Marovoay (%)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(<span class="at">Alaotra =</span> <span class="st">"Alaotra (%)"</span>, <span class="at">Marovoay =</span> <span class="st">"Marovoay (%)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div id="tbl-securisation" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -1104,23 +1099,23 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
 </figcaption>
 <div aria-describedby="tbl-securisation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="afuriujcby" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#afuriujcby table {
+<div id="nshbzgrvei" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#nshbzgrvei table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#afuriujcby thead, #afuriujcby tbody, #afuriujcby tfoot, #afuriujcby tr, #afuriujcby td, #afuriujcby th {
+#nshbzgrvei thead, #nshbzgrvei tbody, #nshbzgrvei tfoot, #nshbzgrvei tr, #nshbzgrvei td, #nshbzgrvei th {
   border-style: none;
 }
 
-#afuriujcby p {
+#nshbzgrvei p {
   margin: 0;
   padding: 0;
 }
 
-#afuriujcby .gt_table {
+#nshbzgrvei .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1146,12 +1141,12 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   border-left-color: #D3D3D3;
 }
 
-#afuriujcby .gt_caption {
+#nshbzgrvei .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#afuriujcby .gt_title {
+#nshbzgrvei .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1163,7 +1158,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   border-bottom-width: 0;
 }
 
-#afuriujcby .gt_subtitle {
+#nshbzgrvei .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1175,7 +1170,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   border-top-width: 0;
 }
 
-#afuriujcby .gt_heading {
+#nshbzgrvei .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1187,13 +1182,13 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   border-right-color: #D3D3D3;
 }
 
-#afuriujcby .gt_bottom_border {
+#nshbzgrvei .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#afuriujcby .gt_col_headings {
+#nshbzgrvei .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1208,7 +1203,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   border-right-color: #D3D3D3;
 }
 
-#afuriujcby .gt_col_heading {
+#nshbzgrvei .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1228,7 +1223,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   overflow-x: hidden;
 }
 
-#afuriujcby .gt_column_spanner_outer {
+#nshbzgrvei .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1240,15 +1235,15 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   padding-right: 4px;
 }
 
-#afuriujcby .gt_column_spanner_outer:first-child {
+#nshbzgrvei .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#afuriujcby .gt_column_spanner_outer:last-child {
+#nshbzgrvei .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#afuriujcby .gt_column_spanner {
+#nshbzgrvei .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1260,11 +1255,11 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   width: 100%;
 }
 
-#afuriujcby .gt_spanner_row {
+#nshbzgrvei .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#afuriujcby .gt_group_heading {
+#nshbzgrvei .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1290,7 +1285,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   text-align: left;
 }
 
-#afuriujcby .gt_empty_group_heading {
+#nshbzgrvei .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1305,15 +1300,15 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   vertical-align: middle;
 }
 
-#afuriujcby .gt_from_md > :first-child {
+#nshbzgrvei .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#afuriujcby .gt_from_md > :last-child {
+#nshbzgrvei .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#afuriujcby .gt_row {
+#nshbzgrvei .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1332,7 +1327,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   overflow-x: hidden;
 }
 
-#afuriujcby .gt_stub {
+#nshbzgrvei .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1345,7 +1340,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   padding-right: 5px;
 }
 
-#afuriujcby .gt_stub_row_group {
+#nshbzgrvei .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1359,15 +1354,15 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   vertical-align: top;
 }
 
-#afuriujcby .gt_row_group_first td {
+#nshbzgrvei .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#afuriujcby .gt_row_group_first th {
+#nshbzgrvei .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#afuriujcby .gt_summary_row {
+#nshbzgrvei .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1377,16 +1372,16 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   padding-right: 5px;
 }
 
-#afuriujcby .gt_first_summary_row {
+#nshbzgrvei .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#afuriujcby .gt_first_summary_row.thick {
+#nshbzgrvei .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#afuriujcby .gt_last_summary_row {
+#nshbzgrvei .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1396,7 +1391,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   border-bottom-color: #D3D3D3;
 }
 
-#afuriujcby .gt_grand_summary_row {
+#nshbzgrvei .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1406,7 +1401,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   padding-right: 5px;
 }
 
-#afuriujcby .gt_first_grand_summary_row {
+#nshbzgrvei .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1416,7 +1411,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   border-top-color: #D3D3D3;
 }
 
-#afuriujcby .gt_last_grand_summary_row_top {
+#nshbzgrvei .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1426,11 +1421,11 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   border-bottom-color: #D3D3D3;
 }
 
-#afuriujcby .gt_striped {
+#nshbzgrvei .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#afuriujcby .gt_table_body {
+#nshbzgrvei .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1439,7 +1434,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   border-bottom-color: #D3D3D3;
 }
 
-#afuriujcby .gt_footnotes {
+#nshbzgrvei .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1453,7 +1448,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   border-right-color: #D3D3D3;
 }
 
-#afuriujcby .gt_footnote {
+#nshbzgrvei .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1462,7 +1457,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   padding-right: 5px;
 }
 
-#afuriujcby .gt_sourcenotes {
+#nshbzgrvei .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1476,7 +1471,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   border-right-color: #D3D3D3;
 }
 
-#afuriujcby .gt_sourcenote {
+#nshbzgrvei .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1484,82 +1479,82 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
   padding-right: 5px;
 }
 
-#afuriujcby .gt_left {
+#nshbzgrvei .gt_left {
   text-align: left;
 }
 
-#afuriujcby .gt_center {
+#nshbzgrvei .gt_center {
   text-align: center;
 }
 
-#afuriujcby .gt_right {
+#nshbzgrvei .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#afuriujcby .gt_font_normal {
+#nshbzgrvei .gt_font_normal {
   font-weight: normal;
 }
 
-#afuriujcby .gt_font_bold {
+#nshbzgrvei .gt_font_bold {
   font-weight: bold;
 }
 
-#afuriujcby .gt_font_italic {
+#nshbzgrvei .gt_font_italic {
   font-style: italic;
 }
 
-#afuriujcby .gt_super {
+#nshbzgrvei .gt_super {
   font-size: 65%;
 }
 
-#afuriujcby .gt_footnote_marks {
+#nshbzgrvei .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#afuriujcby .gt_asterisk {
+#nshbzgrvei .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#afuriujcby .gt_indent_1 {
+#nshbzgrvei .gt_indent_1 {
   text-indent: 5px;
 }
 
-#afuriujcby .gt_indent_2 {
+#nshbzgrvei .gt_indent_2 {
   text-indent: 10px;
 }
 
-#afuriujcby .gt_indent_3 {
+#nshbzgrvei .gt_indent_3 {
   text-indent: 15px;
 }
 
-#afuriujcby .gt_indent_4 {
+#nshbzgrvei .gt_indent_4 {
   text-indent: 20px;
 }
 
-#afuriujcby .gt_indent_5 {
+#nshbzgrvei .gt_indent_5 {
   text-indent: 25px;
 }
 
-#afuriujcby .katex-display {
+#nshbzgrvei .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#afuriujcby div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#nshbzgrvei div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
 
-<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
-<tr class="gt_heading header">
-<td colspan="3" class="gt_heading gt_title gt_font_normal gt_bottom_border">% des parcelles disposant d'un document de sécurisation</td>
+<tr class="header gt_heading">
+<th colspan="3" class="gt_heading gt_title gt_font_normal gt_bottom_border">% des parcelles disposant d'un document de sécurisation</th>
 </tr>
-<tr class="gt_col_headings even">
+<tr class="odd gt_col_headings">
 <th id="Document" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Document</th>
 <th id="Alaotra" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Alaotra (%)</th>
 <th id="Marovoay" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Marovoay (%)</th>
@@ -1588,7 +1583,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>papier_labs <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>papier_labs <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"Aucun document"</span>, <span class="st">"2"</span> <span class="ot">=</span> <span class="st">"Taratasy non visé"</span>,</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"3"</span> <span class="ot">=</span> <span class="st">"Bokimpianakaviana"</span>, <span class="st">"4"</span> <span class="ot">=</span> <span class="st">"Taratasy visa Fokontany"</span>,</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"5"</span> <span class="ot">=</span> <span class="st">"Visa Mairie"</span>, <span class="st">"6"</span> <span class="ot">=</span> <span class="st">"Visa Arrondissement"</span>, <span class="st">"9"</span> <span class="ot">=</span> <span class="st">"Autre"</span></span>
@@ -1604,7 +1599,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-papiers" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1626,7 +1621,7 @@ Figure&nbsp;4.8: Autres documents prouvant la possession
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr33a)) <span class="sc">|&gt;</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Nb ménages</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
@@ -1645,7 +1640,7 @@ Figure&nbsp;4.8: Autres documents prouvant la possession
 <span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>      )</span>
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Ménages cédant des parcelles à des tiers"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Ménages cédant des parcelles à des tiers"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div id="tbl-cession-pratique" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -1654,23 +1649,23 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
 </figcaption>
 <div aria-describedby="tbl-cession-pratique-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="kkdhnqyryu" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#kkdhnqyryu table {
+<div id="qgvjacdaby" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#qgvjacdaby table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#kkdhnqyryu thead, #kkdhnqyryu tbody, #kkdhnqyryu tfoot, #kkdhnqyryu tr, #kkdhnqyryu td, #kkdhnqyryu th {
+#qgvjacdaby thead, #qgvjacdaby tbody, #qgvjacdaby tfoot, #qgvjacdaby tr, #qgvjacdaby td, #qgvjacdaby th {
   border-style: none;
 }
 
-#kkdhnqyryu p {
+#qgvjacdaby p {
   margin: 0;
   padding: 0;
 }
 
-#kkdhnqyryu .gt_table {
+#qgvjacdaby .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1696,12 +1691,12 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   border-left-color: #D3D3D3;
 }
 
-#kkdhnqyryu .gt_caption {
+#qgvjacdaby .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#kkdhnqyryu .gt_title {
+#qgvjacdaby .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1713,7 +1708,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   border-bottom-width: 0;
 }
 
-#kkdhnqyryu .gt_subtitle {
+#qgvjacdaby .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1725,7 +1720,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   border-top-width: 0;
 }
 
-#kkdhnqyryu .gt_heading {
+#qgvjacdaby .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1737,13 +1732,13 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   border-right-color: #D3D3D3;
 }
 
-#kkdhnqyryu .gt_bottom_border {
+#qgvjacdaby .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#kkdhnqyryu .gt_col_headings {
+#qgvjacdaby .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1758,7 +1753,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   border-right-color: #D3D3D3;
 }
 
-#kkdhnqyryu .gt_col_heading {
+#qgvjacdaby .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1778,7 +1773,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   overflow-x: hidden;
 }
 
-#kkdhnqyryu .gt_column_spanner_outer {
+#qgvjacdaby .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1790,15 +1785,15 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   padding-right: 4px;
 }
 
-#kkdhnqyryu .gt_column_spanner_outer:first-child {
+#qgvjacdaby .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#kkdhnqyryu .gt_column_spanner_outer:last-child {
+#qgvjacdaby .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#kkdhnqyryu .gt_column_spanner {
+#qgvjacdaby .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1810,11 +1805,11 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   width: 100%;
 }
 
-#kkdhnqyryu .gt_spanner_row {
+#qgvjacdaby .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#kkdhnqyryu .gt_group_heading {
+#qgvjacdaby .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1840,7 +1835,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   text-align: left;
 }
 
-#kkdhnqyryu .gt_empty_group_heading {
+#qgvjacdaby .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1855,15 +1850,15 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   vertical-align: middle;
 }
 
-#kkdhnqyryu .gt_from_md > :first-child {
+#qgvjacdaby .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#kkdhnqyryu .gt_from_md > :last-child {
+#qgvjacdaby .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#kkdhnqyryu .gt_row {
+#qgvjacdaby .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1882,7 +1877,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   overflow-x: hidden;
 }
 
-#kkdhnqyryu .gt_stub {
+#qgvjacdaby .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1895,7 +1890,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   padding-right: 5px;
 }
 
-#kkdhnqyryu .gt_stub_row_group {
+#qgvjacdaby .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1909,15 +1904,15 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   vertical-align: top;
 }
 
-#kkdhnqyryu .gt_row_group_first td {
+#qgvjacdaby .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#kkdhnqyryu .gt_row_group_first th {
+#qgvjacdaby .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#kkdhnqyryu .gt_summary_row {
+#qgvjacdaby .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1927,16 +1922,16 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   padding-right: 5px;
 }
 
-#kkdhnqyryu .gt_first_summary_row {
+#qgvjacdaby .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#kkdhnqyryu .gt_first_summary_row.thick {
+#qgvjacdaby .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#kkdhnqyryu .gt_last_summary_row {
+#qgvjacdaby .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1946,7 +1941,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   border-bottom-color: #D3D3D3;
 }
 
-#kkdhnqyryu .gt_grand_summary_row {
+#qgvjacdaby .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1956,7 +1951,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   padding-right: 5px;
 }
 
-#kkdhnqyryu .gt_first_grand_summary_row {
+#qgvjacdaby .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1966,7 +1961,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   border-top-color: #D3D3D3;
 }
 
-#kkdhnqyryu .gt_last_grand_summary_row_top {
+#qgvjacdaby .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1976,11 +1971,11 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   border-bottom-color: #D3D3D3;
 }
 
-#kkdhnqyryu .gt_striped {
+#qgvjacdaby .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#kkdhnqyryu .gt_table_body {
+#qgvjacdaby .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1989,7 +1984,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   border-bottom-color: #D3D3D3;
 }
 
-#kkdhnqyryu .gt_footnotes {
+#qgvjacdaby .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2003,7 +1998,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   border-right-color: #D3D3D3;
 }
 
-#kkdhnqyryu .gt_footnote {
+#qgvjacdaby .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -2012,7 +2007,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   padding-right: 5px;
 }
 
-#kkdhnqyryu .gt_sourcenotes {
+#qgvjacdaby .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2026,7 +2021,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   border-right-color: #D3D3D3;
 }
 
-#kkdhnqyryu .gt_sourcenote {
+#qgvjacdaby .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2034,82 +2029,82 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
   padding-right: 5px;
 }
 
-#kkdhnqyryu .gt_left {
+#qgvjacdaby .gt_left {
   text-align: left;
 }
 
-#kkdhnqyryu .gt_center {
+#qgvjacdaby .gt_center {
   text-align: center;
 }
 
-#kkdhnqyryu .gt_right {
+#qgvjacdaby .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#kkdhnqyryu .gt_font_normal {
+#qgvjacdaby .gt_font_normal {
   font-weight: normal;
 }
 
-#kkdhnqyryu .gt_font_bold {
+#qgvjacdaby .gt_font_bold {
   font-weight: bold;
 }
 
-#kkdhnqyryu .gt_font_italic {
+#qgvjacdaby .gt_font_italic {
   font-style: italic;
 }
 
-#kkdhnqyryu .gt_super {
+#qgvjacdaby .gt_super {
   font-size: 65%;
 }
 
-#kkdhnqyryu .gt_footnote_marks {
+#qgvjacdaby .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#kkdhnqyryu .gt_asterisk {
+#qgvjacdaby .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#kkdhnqyryu .gt_indent_1 {
+#qgvjacdaby .gt_indent_1 {
   text-indent: 5px;
 }
 
-#kkdhnqyryu .gt_indent_2 {
+#qgvjacdaby .gt_indent_2 {
   text-indent: 10px;
 }
 
-#kkdhnqyryu .gt_indent_3 {
+#qgvjacdaby .gt_indent_3 {
   text-indent: 15px;
 }
 
-#kkdhnqyryu .gt_indent_4 {
+#qgvjacdaby .gt_indent_4 {
   text-indent: 20px;
 }
 
-#kkdhnqyryu .gt_indent_5 {
+#qgvjacdaby .gt_indent_5 {
   text-indent: 25px;
 }
 
-#kkdhnqyryu .katex-display {
+#qgvjacdaby .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#kkdhnqyryu div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#qgvjacdaby div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
 
-<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
-<tr class="gt_heading header">
-<td colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">Ménages cédant des parcelles à des tiers</td>
+<tr class="header gt_heading">
+<th colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">Ménages cédant des parcelles à des tiers</th>
 </tr>
-<tr class="gt_col_headings even">
+<tr class="odd gt_col_headings">
 <th id="Observatory" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Observatory</th>
 <th id="Nb-ménages" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Nb ménages</th>
 <th id="Cèdent-(nb)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Cèdent (nb)</th>
@@ -2147,7 +2142,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fr33_data <span class="ot">&lt;-</span> res_fr33 <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr33gc))</span>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fr33_data <span class="ot">&lt;-</span> res_fr33 <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr33gc))</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>fr33_data <span class="sc">|&gt;</span></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr33gc), <span class="at">levels =</span> <span class="fu">names</span>(fv_labs), <span class="at">labels =</span> fv_labs)) <span class="sc">|&gt;</span></span>
@@ -2158,7 +2153,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles cédées"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-mode-cession" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2176,7 +2171,7 @@ Figure&nbsp;4.9: Mode de faire-valoir des parcelles cédées
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fr33_data <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fr33_data <span class="sc">|&gt;</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr33h)) <span class="sc">|&gt;</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Motif =</span> <span class="fu">safe_to_char</span>(fr33h)) <span class="sc">|&gt;</span></span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Motif =</span> <span class="fu">str_trunc</span>(Motif, <span class="dv">45</span>)) <span class="sc">|&gt;</span></span>
@@ -2187,7 +2182,7 @@ Figure&nbsp;4.9: Mode de faire-valoir des parcelles cédées
 <span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles cédées"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-motif-cession" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2205,7 +2200,7 @@ Figure&nbsp;4.10: Motif de la cession de parcelles
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>fr33_data <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>fr33_data <span class="sc">|&gt;</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr33k)) <span class="sc">|&gt;</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Destinataire =</span> <span class="fu">safe_to_char</span>(fr33k)) <span class="sc">|&gt;</span></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Destinataire =</span> <span class="fu">str_trunc</span>(Destinataire, <span class="dv">40</span>)) <span class="sc">|&gt;</span></span>
@@ -2216,7 +2211,7 @@ Figure&nbsp;4.10: Motif de la cession de parcelles
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles cédées"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-cedee-a-qui" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2238,7 +2233,7 @@ Figure&nbsp;4.11: À qui la parcelle est-elle cédée
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34a)) <span class="sc">|&gt;</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Nb ménages</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
@@ -2257,7 +2252,7 @@ Figure&nbsp;4.11: À qui la parcelle est-elle cédée
 <span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>      )</span>
 <span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Ménages exploitant des parcelles d'autrui"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Ménages exploitant des parcelles d'autrui"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div id="tbl-exploitation-autres" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -2266,23 +2261,23 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
 </figcaption>
 <div aria-describedby="tbl-exploitation-autres-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="fwpmwauorz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#fwpmwauorz table {
+<div id="lymtuywrsj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#lymtuywrsj table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#fwpmwauorz thead, #fwpmwauorz tbody, #fwpmwauorz tfoot, #fwpmwauorz tr, #fwpmwauorz td, #fwpmwauorz th {
+#lymtuywrsj thead, #lymtuywrsj tbody, #lymtuywrsj tfoot, #lymtuywrsj tr, #lymtuywrsj td, #lymtuywrsj th {
   border-style: none;
 }
 
-#fwpmwauorz p {
+#lymtuywrsj p {
   margin: 0;
   padding: 0;
 }
 
-#fwpmwauorz .gt_table {
+#lymtuywrsj .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -2308,12 +2303,12 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   border-left-color: #D3D3D3;
 }
 
-#fwpmwauorz .gt_caption {
+#lymtuywrsj .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#fwpmwauorz .gt_title {
+#lymtuywrsj .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2325,7 +2320,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   border-bottom-width: 0;
 }
 
-#fwpmwauorz .gt_subtitle {
+#lymtuywrsj .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2337,7 +2332,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   border-top-width: 0;
 }
 
-#fwpmwauorz .gt_heading {
+#lymtuywrsj .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2349,13 +2344,13 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   border-right-color: #D3D3D3;
 }
 
-#fwpmwauorz .gt_bottom_border {
+#lymtuywrsj .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#fwpmwauorz .gt_col_headings {
+#lymtuywrsj .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2370,7 +2365,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   border-right-color: #D3D3D3;
 }
 
-#fwpmwauorz .gt_col_heading {
+#lymtuywrsj .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2390,7 +2385,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   overflow-x: hidden;
 }
 
-#fwpmwauorz .gt_column_spanner_outer {
+#lymtuywrsj .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2402,15 +2397,15 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   padding-right: 4px;
 }
 
-#fwpmwauorz .gt_column_spanner_outer:first-child {
+#lymtuywrsj .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#fwpmwauorz .gt_column_spanner_outer:last-child {
+#lymtuywrsj .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#fwpmwauorz .gt_column_spanner {
+#lymtuywrsj .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2422,11 +2417,11 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   width: 100%;
 }
 
-#fwpmwauorz .gt_spanner_row {
+#lymtuywrsj .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#fwpmwauorz .gt_group_heading {
+#lymtuywrsj .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2452,7 +2447,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   text-align: left;
 }
 
-#fwpmwauorz .gt_empty_group_heading {
+#lymtuywrsj .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2467,15 +2462,15 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   vertical-align: middle;
 }
 
-#fwpmwauorz .gt_from_md > :first-child {
+#lymtuywrsj .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#fwpmwauorz .gt_from_md > :last-child {
+#lymtuywrsj .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#fwpmwauorz .gt_row {
+#lymtuywrsj .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2494,7 +2489,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   overflow-x: hidden;
 }
 
-#fwpmwauorz .gt_stub {
+#lymtuywrsj .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2507,7 +2502,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   padding-right: 5px;
 }
 
-#fwpmwauorz .gt_stub_row_group {
+#lymtuywrsj .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2521,15 +2516,15 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   vertical-align: top;
 }
 
-#fwpmwauorz .gt_row_group_first td {
+#lymtuywrsj .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#fwpmwauorz .gt_row_group_first th {
+#lymtuywrsj .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#fwpmwauorz .gt_summary_row {
+#lymtuywrsj .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2539,16 +2534,16 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   padding-right: 5px;
 }
 
-#fwpmwauorz .gt_first_summary_row {
+#lymtuywrsj .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#fwpmwauorz .gt_first_summary_row.thick {
+#lymtuywrsj .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#fwpmwauorz .gt_last_summary_row {
+#lymtuywrsj .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2558,7 +2553,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   border-bottom-color: #D3D3D3;
 }
 
-#fwpmwauorz .gt_grand_summary_row {
+#lymtuywrsj .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2568,7 +2563,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   padding-right: 5px;
 }
 
-#fwpmwauorz .gt_first_grand_summary_row {
+#lymtuywrsj .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2578,7 +2573,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   border-top-color: #D3D3D3;
 }
 
-#fwpmwauorz .gt_last_grand_summary_row_top {
+#lymtuywrsj .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2588,11 +2583,11 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   border-bottom-color: #D3D3D3;
 }
 
-#fwpmwauorz .gt_striped {
+#lymtuywrsj .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#fwpmwauorz .gt_table_body {
+#lymtuywrsj .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2601,7 +2596,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   border-bottom-color: #D3D3D3;
 }
 
-#fwpmwauorz .gt_footnotes {
+#lymtuywrsj .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2615,7 +2610,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   border-right-color: #D3D3D3;
 }
 
-#fwpmwauorz .gt_footnote {
+#lymtuywrsj .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -2624,7 +2619,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   padding-right: 5px;
 }
 
-#fwpmwauorz .gt_sourcenotes {
+#lymtuywrsj .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2638,7 +2633,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   border-right-color: #D3D3D3;
 }
 
-#fwpmwauorz .gt_sourcenote {
+#lymtuywrsj .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2646,82 +2641,82 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
   padding-right: 5px;
 }
 
-#fwpmwauorz .gt_left {
+#lymtuywrsj .gt_left {
   text-align: left;
 }
 
-#fwpmwauorz .gt_center {
+#lymtuywrsj .gt_center {
   text-align: center;
 }
 
-#fwpmwauorz .gt_right {
+#lymtuywrsj .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#fwpmwauorz .gt_font_normal {
+#lymtuywrsj .gt_font_normal {
   font-weight: normal;
 }
 
-#fwpmwauorz .gt_font_bold {
+#lymtuywrsj .gt_font_bold {
   font-weight: bold;
 }
 
-#fwpmwauorz .gt_font_italic {
+#lymtuywrsj .gt_font_italic {
   font-style: italic;
 }
 
-#fwpmwauorz .gt_super {
+#lymtuywrsj .gt_super {
   font-size: 65%;
 }
 
-#fwpmwauorz .gt_footnote_marks {
+#lymtuywrsj .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#fwpmwauorz .gt_asterisk {
+#lymtuywrsj .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#fwpmwauorz .gt_indent_1 {
+#lymtuywrsj .gt_indent_1 {
   text-indent: 5px;
 }
 
-#fwpmwauorz .gt_indent_2 {
+#lymtuywrsj .gt_indent_2 {
   text-indent: 10px;
 }
 
-#fwpmwauorz .gt_indent_3 {
+#lymtuywrsj .gt_indent_3 {
   text-indent: 15px;
 }
 
-#fwpmwauorz .gt_indent_4 {
+#lymtuywrsj .gt_indent_4 {
   text-indent: 20px;
 }
 
-#fwpmwauorz .gt_indent_5 {
+#lymtuywrsj .gt_indent_5 {
   text-indent: 25px;
 }
 
-#fwpmwauorz .katex-display {
+#lymtuywrsj .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#fwpmwauorz div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#lymtuywrsj div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
 
-<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
-<tr class="gt_heading header">
-<td colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">Ménages exploitant des parcelles d'autrui</td>
+<tr class="header gt_heading">
+<th colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">Ménages exploitant des parcelles d'autrui</th>
 </tr>
-<tr class="gt_col_headings even">
+<tr class="odd gt_col_headings">
 <th id="Observatory" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Observatory</th>
 <th id="Nb-ménages" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Nb ménages</th>
 <th id="Exploitent-(nb)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Exploitent (nb)</th>
@@ -2759,7 +2754,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="ot">&lt;-</span> res_fr34 <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30c1))</span>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="ot">&lt;-</span> res_fr34 <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30c1))</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30c1), <span class="at">levels =</span> <span class="fu">names</span>(type_labs), <span class="at">labels =</span> type_labs)) <span class="sc">|&gt;</span></span>
@@ -2770,7 +2765,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
 <span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-type-exploitee" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2788,7 +2783,7 @@ Figure&nbsp;4.12: Type des parcelles exploitées (non possédées)
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34g)) <span class="sc">|&gt;</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34g), <span class="at">levels =</span> <span class="fu">names</span>(fv_labs), <span class="at">labels =</span> fv_labs)) <span class="sc">|&gt;</span></span>
 <span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Mode) <span class="sc">|&gt;</span></span>
@@ -2798,7 +2793,7 @@ Figure&nbsp;4.12: Type des parcelles exploitées (non possédées)
 <span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles exploitées"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-fv-exploitee" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2816,7 +2811,7 @@ Figure&nbsp;4.13: Mode de faire-valoir des parcelles exploitées
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34k)) <span class="sc">|&gt;</span></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Proprietaire =</span> <span class="fu">safe_to_char</span>(fr34k)) <span class="sc">|&gt;</span></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Proprietaire =</span> <span class="fu">str_trunc</span>(Proprietaire, <span class="dv">40</span>)) <span class="sc">|&gt;</span></span>
@@ -2827,7 +2822,7 @@ Figure&nbsp;4.13: Mode de faire-valoir des parcelles exploitées
 <span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles exploitées"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-proprietaire-exploitee" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2845,7 +2840,7 @@ Figure&nbsp;4.14: Propriétaire des parcelles exploitées
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34f)) <span class="sc">|&gt;</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Irrigation =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34f), <span class="at">levels =</span> <span class="fu">names</span>(irrig_labs), <span class="at">labels =</span> irrig_labs)) <span class="sc">|&gt;</span></span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Irrigation) <span class="sc">|&gt;</span></span>
@@ -2855,7 +2850,7 @@ Figure&nbsp;4.14: Propriétaire des parcelles exploitées
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles exploitées"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-irrigation-exploitee" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2873,7 +2868,7 @@ Figure&nbsp;4.15: Mode d’irrigation des parcelles exploitées
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34g)) <span class="sc">|&gt;</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34g), <span class="at">levels =</span> <span class="fu">names</span>(fv_labs), <span class="at">labels =</span> fv_labs)) <span class="sc">|&gt;</span></span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
@@ -2887,7 +2882,7 @@ Figure&nbsp;4.15: Mode d’irrigation des parcelles exploitées
 <span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
 <span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Conditions des parcelles exploitées par mode de faire-valoir"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">Rente argent moy. (Ar)</span><span class="st">`</span>, <span class="st">`</span><span class="at">Rente produit moy. (kg)</span><span class="st">`</span>),</span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">use_seps =</span> <span class="cn">TRUE</span>, <span class="at">decimals =</span> <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">use_seps =</span> <span class="cn">TRUE</span>, <span class="at">decimals =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div id="tbl-rente-exploitee" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -2896,23 +2891,23 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
 </figcaption>
 <div aria-describedby="tbl-rente-exploitee-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="rdpqinjfcb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#rdpqinjfcb table {
+<div id="opwkvexast" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#opwkvexast table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#rdpqinjfcb thead, #rdpqinjfcb tbody, #rdpqinjfcb tfoot, #rdpqinjfcb tr, #rdpqinjfcb td, #rdpqinjfcb th {
+#opwkvexast thead, #opwkvexast tbody, #opwkvexast tfoot, #opwkvexast tr, #opwkvexast td, #opwkvexast th {
   border-style: none;
 }
 
-#rdpqinjfcb p {
+#opwkvexast p {
   margin: 0;
   padding: 0;
 }
 
-#rdpqinjfcb .gt_table {
+#opwkvexast .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -2938,12 +2933,12 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   border-left-color: #D3D3D3;
 }
 
-#rdpqinjfcb .gt_caption {
+#opwkvexast .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#rdpqinjfcb .gt_title {
+#opwkvexast .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2955,7 +2950,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   border-bottom-width: 0;
 }
 
-#rdpqinjfcb .gt_subtitle {
+#opwkvexast .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2967,7 +2962,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   border-top-width: 0;
 }
 
-#rdpqinjfcb .gt_heading {
+#opwkvexast .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2979,13 +2974,13 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   border-right-color: #D3D3D3;
 }
 
-#rdpqinjfcb .gt_bottom_border {
+#opwkvexast .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#rdpqinjfcb .gt_col_headings {
+#opwkvexast .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3000,7 +2995,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   border-right-color: #D3D3D3;
 }
 
-#rdpqinjfcb .gt_col_heading {
+#opwkvexast .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3020,7 +3015,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   overflow-x: hidden;
 }
 
-#rdpqinjfcb .gt_column_spanner_outer {
+#opwkvexast .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3032,15 +3027,15 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   padding-right: 4px;
 }
 
-#rdpqinjfcb .gt_column_spanner_outer:first-child {
+#opwkvexast .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#rdpqinjfcb .gt_column_spanner_outer:last-child {
+#opwkvexast .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#rdpqinjfcb .gt_column_spanner {
+#opwkvexast .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3052,11 +3047,11 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   width: 100%;
 }
 
-#rdpqinjfcb .gt_spanner_row {
+#opwkvexast .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#rdpqinjfcb .gt_group_heading {
+#opwkvexast .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3082,7 +3077,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   text-align: left;
 }
 
-#rdpqinjfcb .gt_empty_group_heading {
+#opwkvexast .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3097,15 +3092,15 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   vertical-align: middle;
 }
 
-#rdpqinjfcb .gt_from_md > :first-child {
+#opwkvexast .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#rdpqinjfcb .gt_from_md > :last-child {
+#opwkvexast .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#rdpqinjfcb .gt_row {
+#opwkvexast .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3124,7 +3119,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   overflow-x: hidden;
 }
 
-#rdpqinjfcb .gt_stub {
+#opwkvexast .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3137,7 +3132,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   padding-right: 5px;
 }
 
-#rdpqinjfcb .gt_stub_row_group {
+#opwkvexast .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3151,15 +3146,15 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   vertical-align: top;
 }
 
-#rdpqinjfcb .gt_row_group_first td {
+#opwkvexast .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#rdpqinjfcb .gt_row_group_first th {
+#opwkvexast .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#rdpqinjfcb .gt_summary_row {
+#opwkvexast .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3169,16 +3164,16 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   padding-right: 5px;
 }
 
-#rdpqinjfcb .gt_first_summary_row {
+#opwkvexast .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#rdpqinjfcb .gt_first_summary_row.thick {
+#opwkvexast .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#rdpqinjfcb .gt_last_summary_row {
+#opwkvexast .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3188,7 +3183,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   border-bottom-color: #D3D3D3;
 }
 
-#rdpqinjfcb .gt_grand_summary_row {
+#opwkvexast .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3198,7 +3193,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   padding-right: 5px;
 }
 
-#rdpqinjfcb .gt_first_grand_summary_row {
+#opwkvexast .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3208,7 +3203,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   border-top-color: #D3D3D3;
 }
 
-#rdpqinjfcb .gt_last_grand_summary_row_top {
+#opwkvexast .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3218,11 +3213,11 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   border-bottom-color: #D3D3D3;
 }
 
-#rdpqinjfcb .gt_striped {
+#opwkvexast .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#rdpqinjfcb .gt_table_body {
+#opwkvexast .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3231,7 +3226,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   border-bottom-color: #D3D3D3;
 }
 
-#rdpqinjfcb .gt_footnotes {
+#opwkvexast .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3245,7 +3240,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   border-right-color: #D3D3D3;
 }
 
-#rdpqinjfcb .gt_footnote {
+#opwkvexast .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -3254,7 +3249,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   padding-right: 5px;
 }
 
-#rdpqinjfcb .gt_sourcenotes {
+#opwkvexast .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3268,7 +3263,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   border-right-color: #D3D3D3;
 }
 
-#rdpqinjfcb .gt_sourcenote {
+#opwkvexast .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -3276,82 +3271,82 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
   padding-right: 5px;
 }
 
-#rdpqinjfcb .gt_left {
+#opwkvexast .gt_left {
   text-align: left;
 }
 
-#rdpqinjfcb .gt_center {
+#opwkvexast .gt_center {
   text-align: center;
 }
 
-#rdpqinjfcb .gt_right {
+#opwkvexast .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#rdpqinjfcb .gt_font_normal {
+#opwkvexast .gt_font_normal {
   font-weight: normal;
 }
 
-#rdpqinjfcb .gt_font_bold {
+#opwkvexast .gt_font_bold {
   font-weight: bold;
 }
 
-#rdpqinjfcb .gt_font_italic {
+#opwkvexast .gt_font_italic {
   font-style: italic;
 }
 
-#rdpqinjfcb .gt_super {
+#opwkvexast .gt_super {
   font-size: 65%;
 }
 
-#rdpqinjfcb .gt_footnote_marks {
+#opwkvexast .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#rdpqinjfcb .gt_asterisk {
+#opwkvexast .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#rdpqinjfcb .gt_indent_1 {
+#opwkvexast .gt_indent_1 {
   text-indent: 5px;
 }
 
-#rdpqinjfcb .gt_indent_2 {
+#opwkvexast .gt_indent_2 {
   text-indent: 10px;
 }
 
-#rdpqinjfcb .gt_indent_3 {
+#opwkvexast .gt_indent_3 {
   text-indent: 15px;
 }
 
-#rdpqinjfcb .gt_indent_4 {
+#opwkvexast .gt_indent_4 {
   text-indent: 20px;
 }
 
-#rdpqinjfcb .gt_indent_5 {
+#opwkvexast .gt_indent_5 {
   text-indent: 25px;
 }
 
-#rdpqinjfcb .katex-display {
+#opwkvexast .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#rdpqinjfcb div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#opwkvexast div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
 
-<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
-<tr class="gt_heading header">
-<td colspan="6" class="gt_heading gt_title gt_font_normal gt_bottom_border">Conditions des parcelles exploitées par mode de faire-valoir</td>
+<tr class="header gt_heading">
+<th colspan="6" class="gt_heading gt_title gt_font_normal gt_bottom_border">Conditions des parcelles exploitées par mode de faire-valoir</th>
 </tr>
-<tr class="gt_col_headings even">
+<tr class="odd gt_col_headings">
 <th id="Observatory" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Observatory</th>
 <th id="Mode" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Mode</th>
 <th id="Nb-parcelles" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Nb parcelles</th>
@@ -3448,7 +3443,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30p)) <span class="sc">|&gt;</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
 <span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Nb ménages</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
@@ -3467,7 +3462,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
 <span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>      )</span>
 <span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Abandon de la culture d'une ou plusieurs parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Abandon de la culture d'une ou plusieurs parcelles"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div id="tbl-abandon" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -3476,23 +3471,23 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
 </figcaption>
 <div aria-describedby="tbl-abandon-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="qvowrixayp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#qvowrixayp table {
+<div id="duahwbrdmk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#duahwbrdmk table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#qvowrixayp thead, #qvowrixayp tbody, #qvowrixayp tfoot, #qvowrixayp tr, #qvowrixayp td, #qvowrixayp th {
+#duahwbrdmk thead, #duahwbrdmk tbody, #duahwbrdmk tfoot, #duahwbrdmk tr, #duahwbrdmk td, #duahwbrdmk th {
   border-style: none;
 }
 
-#qvowrixayp p {
+#duahwbrdmk p {
   margin: 0;
   padding: 0;
 }
 
-#qvowrixayp .gt_table {
+#duahwbrdmk .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -3518,12 +3513,12 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   border-left-color: #D3D3D3;
 }
 
-#qvowrixayp .gt_caption {
+#duahwbrdmk .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#qvowrixayp .gt_title {
+#duahwbrdmk .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3535,7 +3530,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   border-bottom-width: 0;
 }
 
-#qvowrixayp .gt_subtitle {
+#duahwbrdmk .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3547,7 +3542,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   border-top-width: 0;
 }
 
-#qvowrixayp .gt_heading {
+#duahwbrdmk .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3559,13 +3554,13 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   border-right-color: #D3D3D3;
 }
 
-#qvowrixayp .gt_bottom_border {
+#duahwbrdmk .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#qvowrixayp .gt_col_headings {
+#duahwbrdmk .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3580,7 +3575,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   border-right-color: #D3D3D3;
 }
 
-#qvowrixayp .gt_col_heading {
+#duahwbrdmk .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3600,7 +3595,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   overflow-x: hidden;
 }
 
-#qvowrixayp .gt_column_spanner_outer {
+#duahwbrdmk .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3612,15 +3607,15 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   padding-right: 4px;
 }
 
-#qvowrixayp .gt_column_spanner_outer:first-child {
+#duahwbrdmk .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#qvowrixayp .gt_column_spanner_outer:last-child {
+#duahwbrdmk .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#qvowrixayp .gt_column_spanner {
+#duahwbrdmk .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3632,11 +3627,11 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   width: 100%;
 }
 
-#qvowrixayp .gt_spanner_row {
+#duahwbrdmk .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#qvowrixayp .gt_group_heading {
+#duahwbrdmk .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3662,7 +3657,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   text-align: left;
 }
 
-#qvowrixayp .gt_empty_group_heading {
+#duahwbrdmk .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3677,15 +3672,15 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   vertical-align: middle;
 }
 
-#qvowrixayp .gt_from_md > :first-child {
+#duahwbrdmk .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#qvowrixayp .gt_from_md > :last-child {
+#duahwbrdmk .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#qvowrixayp .gt_row {
+#duahwbrdmk .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3704,7 +3699,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   overflow-x: hidden;
 }
 
-#qvowrixayp .gt_stub {
+#duahwbrdmk .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3717,7 +3712,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   padding-right: 5px;
 }
 
-#qvowrixayp .gt_stub_row_group {
+#duahwbrdmk .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3731,15 +3726,15 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   vertical-align: top;
 }
 
-#qvowrixayp .gt_row_group_first td {
+#duahwbrdmk .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#qvowrixayp .gt_row_group_first th {
+#duahwbrdmk .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#qvowrixayp .gt_summary_row {
+#duahwbrdmk .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3749,16 +3744,16 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   padding-right: 5px;
 }
 
-#qvowrixayp .gt_first_summary_row {
+#duahwbrdmk .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#qvowrixayp .gt_first_summary_row.thick {
+#duahwbrdmk .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#qvowrixayp .gt_last_summary_row {
+#duahwbrdmk .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3768,7 +3763,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   border-bottom-color: #D3D3D3;
 }
 
-#qvowrixayp .gt_grand_summary_row {
+#duahwbrdmk .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3778,7 +3773,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   padding-right: 5px;
 }
 
-#qvowrixayp .gt_first_grand_summary_row {
+#duahwbrdmk .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3788,7 +3783,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   border-top-color: #D3D3D3;
 }
 
-#qvowrixayp .gt_last_grand_summary_row_top {
+#duahwbrdmk .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3798,11 +3793,11 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   border-bottom-color: #D3D3D3;
 }
 
-#qvowrixayp .gt_striped {
+#duahwbrdmk .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#qvowrixayp .gt_table_body {
+#duahwbrdmk .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3811,7 +3806,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   border-bottom-color: #D3D3D3;
 }
 
-#qvowrixayp .gt_footnotes {
+#duahwbrdmk .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3825,7 +3820,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   border-right-color: #D3D3D3;
 }
 
-#qvowrixayp .gt_footnote {
+#duahwbrdmk .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -3834,7 +3829,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   padding-right: 5px;
 }
 
-#qvowrixayp .gt_sourcenotes {
+#duahwbrdmk .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3848,7 +3843,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   border-right-color: #D3D3D3;
 }
 
-#qvowrixayp .gt_sourcenote {
+#duahwbrdmk .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -3856,82 +3851,82 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
   padding-right: 5px;
 }
 
-#qvowrixayp .gt_left {
+#duahwbrdmk .gt_left {
   text-align: left;
 }
 
-#qvowrixayp .gt_center {
+#duahwbrdmk .gt_center {
   text-align: center;
 }
 
-#qvowrixayp .gt_right {
+#duahwbrdmk .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#qvowrixayp .gt_font_normal {
+#duahwbrdmk .gt_font_normal {
   font-weight: normal;
 }
 
-#qvowrixayp .gt_font_bold {
+#duahwbrdmk .gt_font_bold {
   font-weight: bold;
 }
 
-#qvowrixayp .gt_font_italic {
+#duahwbrdmk .gt_font_italic {
   font-style: italic;
 }
 
-#qvowrixayp .gt_super {
+#duahwbrdmk .gt_super {
   font-size: 65%;
 }
 
-#qvowrixayp .gt_footnote_marks {
+#duahwbrdmk .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#qvowrixayp .gt_asterisk {
+#duahwbrdmk .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#qvowrixayp .gt_indent_1 {
+#duahwbrdmk .gt_indent_1 {
   text-indent: 5px;
 }
 
-#qvowrixayp .gt_indent_2 {
+#duahwbrdmk .gt_indent_2 {
   text-indent: 10px;
 }
 
-#qvowrixayp .gt_indent_3 {
+#duahwbrdmk .gt_indent_3 {
   text-indent: 15px;
 }
 
-#qvowrixayp .gt_indent_4 {
+#duahwbrdmk .gt_indent_4 {
   text-indent: 20px;
 }
 
-#qvowrixayp .gt_indent_5 {
+#duahwbrdmk .gt_indent_5 {
   text-indent: 25px;
 }
 
-#qvowrixayp .katex-display {
+#duahwbrdmk .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#qvowrixayp div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#duahwbrdmk div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
 
-<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
-<tr class="gt_heading header">
-<td colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">Abandon de la culture d'une ou plusieurs parcelles</td>
+<tr class="header gt_heading">
+<th colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">Abandon de la culture d'une ou plusieurs parcelles</th>
 </tr>
-<tr class="gt_col_headings even">
+<tr class="odd gt_col_headings">
 <th id="Observatory" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Observatory</th>
 <th id="Nb-ménages" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Nb ménages</th>
 <th id="Ont-abandonné-(nb)" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Ont abandonné (nb)</th>
@@ -3972,7 +3967,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>satis_labs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"1"</span> <span class="ot">=</span> <span class="st">"Très insuffisante"</span>, <span class="st">"2"</span> <span class="ot">=</span> <span class="st">"Insuffisante"</span>, <span class="st">"3"</span> <span class="ot">=</span> <span class="st">"Suffisante"</span>)</span>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>satis_labs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"1"</span> <span class="ot">=</span> <span class="st">"Très insuffisante"</span>, <span class="st">"2"</span> <span class="ot">=</span> <span class="st">"Insuffisante"</span>, <span class="st">"3"</span> <span class="ot">=</span> <span class="st">"Suffisante"</span>)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30o)) <span class="sc">|&gt;</span></span>
@@ -3983,7 +3978,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
 <span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
 <span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des ménages"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-satisfaction" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -4015,243 +4010,239 @@ Figure&nbsp;4.16: Satisfaction des ménages par rapport à leur surface foncièr
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
-  window.document.addEventListener("DOMContentLoaded", function (event) {
-    const icon = "";
-    const anchorJS = new window.AnchorJS();
-    anchorJS.options = {
-      placement: 'right',
-      icon: icon
-    };
-    anchorJS.add('.anchored');
-    const isCodeAnnotation = (el) => {
-      for (const clz of el.classList) {
-        if (clz.startsWith('code-annotation-')) {                     
-          return true;
-        }
-      }
-      return false;
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
     }
-    const onCopySuccess = function(e) {
-      // button target
-      const button = e.trigger;
-      // don't keep focus
-      button.blur();
-      // flash "checked"
-      button.classList.add('code-copy-button-checked');
-      var currentTitle = button.getAttribute("title");
-      button.setAttribute("title", "Copied!");
-      let tooltip;
-      if (window.bootstrap) {
-        button.setAttribute("data-bs-toggle", "tooltip");
-        button.setAttribute("data-bs-placement", "left");
-        button.setAttribute("data-bs-title", "Copied!");
-        tooltip = new bootstrap.Tooltip(button, 
-          { trigger: "manual", 
-            customClass: "code-copy-button-tooltip",
-            offset: [0, -8]});
-        tooltip.show();    
-      }
-      setTimeout(function() {
-        if (tooltip) {
-          tooltip.hide();
-          button.removeAttribute("data-bs-title");
-          button.removeAttribute("data-bs-toggle");
-          button.removeAttribute("data-bs-placement");
-        }
-        button.setAttribute("title", currentTitle);
-        button.classList.remove('code-copy-button-checked');
-      }, 1000);
-      // clear code selection
-      e.clearSelection();
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
     }
-    const getTextToCopy = function(trigger) {
-      const outerScaffold = trigger.parentElement.cloneNode(true);
-      const codeEl = outerScaffold.querySelector('code');
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
       for (const childEl of codeEl.children) {
         if (isCodeAnnotation(childEl)) {
           childEl.remove();
         }
       }
       return codeEl.innerText;
-    }
-    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-      text: getTextToCopy
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
     });
-    clipboard.on('success', onCopySuccess);
-    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-        text: getTextToCopy,
-        container: window.document.getElementById('quarto-embedded-source-code-modal')
-      });
-      clipboardModal.on('success', onCopySuccess);
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/github\.com\/BETSAKA\/madagascar-rural-observatories-2025");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
-      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp("https:\/\/github\.com\/BETSAKA\/madagascar-rural-observatories-2025");
-      var isInternal = (href) => {
-          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-      }
-      // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-      for (var i=0; i<links.length; i++) {
-        const link = links[i];
-        if (!isInternal(link.href)) {
-          // undo the damage that might have been done by quarto-nav.js in the case of
-          // links that we want to consider external
-          if (link.dataset.originalHref !== undefined) {
-            link.href = link.dataset.originalHref;
-          }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
         }
       }
-    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-      const config = {
-        allowHTML: true,
-        maxWidth: 500,
-        delay: 100,
-        arrow: false,
-        appendTo: function(el) {
-            return el.parentElement;
-        },
-        interactive: true,
-        interactiveBorder: 10,
-        theme: 'quarto',
-        placement: 'bottom-start',
-      };
-      if (contentFn) {
-        config.content = contentFn;
-      }
-      if (onTriggerFn) {
-        config.onTrigger = onTriggerFn;
-      }
-      if (onUntriggerFn) {
-        config.onUntrigger = onUntriggerFn;
-      }
-      window.tippy(el, config); 
     }
-    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-    for (var i=0; i<noterefs.length; i++) {
-      const ref = noterefs[i];
-      tippyHover(ref, function() {
-        // use id or data attribute instead here
-        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-        try { href = new URL(href).hash; } catch {}
-        const id = href.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note) {
-          return note.innerHTML;
-        } else {
-          return "";
-        }
-      });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
     }
-    const xrefs = window.document.querySelectorAll('a.quarto-xref');
-    const processXRef = (id, note) => {
-      // Strip column container classes
-      const stripColumnClz = (el) => {
-        el.classList.remove("page-full", "page-columns");
-        if (el.children) {
-          for (const child of el.children) {
-            stripColumnClz(child);
-          }
-        }
-      }
-      stripColumnClz(note)
-      if (id === null || id.startsWith('sec-')) {
-        // Special case sections, only their first couple elements
-        const container = document.createElement("div");
-        if (note.children && note.children.length > 2) {
-          container.appendChild(note.children[0].cloneNode(true));
-          for (let i = 1; i < note.children.length; i++) {
-            const child = note.children[i];
-            if (child.tagName === "P" && child.innerText === "") {
-              continue;
-            } else {
-              container.appendChild(child.cloneNode(true));
-              break;
-            }
-          }
-          if (window.Quarto?.typesetMath) {
-            window.Quarto.typesetMath(container);
-          }
-          return container.innerHTML
-        } else {
-          if (window.Quarto?.typesetMath) {
-            window.Quarto.typesetMath(note);
-          }
-          return note.innerHTML;
-        }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
       } else {
-        // Remove any anchor links if they are present
-        const anchorLink = note.querySelector('a.anchorjs-link');
-        if (anchorLink) {
-          anchorLink.remove();
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
         }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
         if (window.Quarto?.typesetMath) {
           window.Quarto.typesetMath(note);
         }
-        if (note.classList.contains("callout")) {
-          return note.outerHTML;
-        } else {
-          return note.innerHTML;
-        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
       }
     }
-    for (var i=0; i<xrefs.length; i++) {
-      const xref = xrefs[i];
-      tippyHover(xref, undefined, function(instance) {
-        instance.disable();
-        let url = xref.getAttribute('href');
-        let hash = undefined; 
-        if (url.startsWith('#')) {
-          hash = url;
-        } else {
-          try { hash = new URL(url).hash; } catch {}
-        }
-        if (hash) {
-          const id = hash.replace(/^#\/?/, "");
-          const note = window.document.getElementById(id);
-          if (note !== null) {
-            try {
-              const html = processXRef(id, note.cloneNode(true));
-              instance.setContent(html);
-            } finally {
-              instance.enable();
-              instance.show();
-            }
-          } else {
-            // See if we can fetch this
-            fetch(url.split('#')[0])
-            .then(res => res.text())
-            .then(html => {
-              const parser = new DOMParser();
-              const htmlDoc = parser.parseFromString(html, "text/html");
-              const note = htmlDoc.getElementById(id);
-              if (note !== null) {
-                const html = processXRef(id, note);
-                instance.setContent(html);
-              } 
-            }).finally(() => {
-              instance.enable();
-              instance.show();
-            });
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
           }
         } else {
-          // See if we can fetch a full url (with no hash to target)
-          // This is a special case and we should probably do some content thinning / targeting
-          fetch(url)
+          // See if we can fetch this
+          fetch(url.split('#')[0])
           .then(res => res.text())
           .then(html => {
             const parser = new DOMParser();
             const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.querySelector('main.content');
+            const note = htmlDoc.getElementById(id);
             if (note !== null) {
-              // This should only happen for chapter cross references
-              // (since there is no id in the URL)
-              // remove the first header
-              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-                note.children[0].remove();
-              }
-              const html = processXRef(null, note);
+              const html = processXRef(id, note);
               instance.setContent(html);
             } 
           }).finally(() => {
@@ -4259,161 +4250,185 @@ Figure&nbsp;4.16: Satisfaction des ménages par rapport à leur surface foncièr
             instance.show();
           });
         }
-      }, function(instance) {
-      });
-    }
-        let selectedAnnoteEl;
-        const selectorForAnnotation = ( cell, annotation) => {
-          let cellAttr = 'data-code-cell="' + cell + '"';
-          let lineAttr = 'data-code-annotation="' +  annotation + '"';
-          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-          return selector;
-        }
-        const selectCodeLines = (annoteEl) => {
-          const doc = window.document;
-          const targetCell = annoteEl.getAttribute("data-target-cell");
-          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-          const lineIds = lines.map((line) => {
-            return targetCell + "-" + line;
-          })
-          let top = null;
-          let height = null;
-          let parent = null;
-          if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
-            }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
-            }
-            selectedAnnoteEl = annoteEl;
-          }
-        };
-        const unselectCodeLines = () => {
-          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-          elementsIds.forEach((elId) => {
-            const div = window.document.getElementById(elId);
-            if (div) {
-              div.remove();
-            }
-          });
-          selectedAnnoteEl = undefined;
-        };
-          // Handle positioning of the toggle
-      window.addEventListener(
-        "resize",
-        throttle(() => {
-          elRect = undefined;
-          if (selectedAnnoteEl) {
-            selectCodeLines(selectedAnnoteEl);
-          }
-        }, 10)
-      );
-      function throttle(fn, ms) {
-      let throttle = false;
-      let timer;
-        return (...args) => {
-          if(!throttle) { // first call gets through
-              fn.apply(this, args);
-              throttle = true;
-          } else { // all the others get throttled
-              if(timer) clearTimeout(timer); // cancel #2
-              timer = setTimeout(() => {
-                fn.apply(this, args);
-                timer = throttle = false;
-              }, ms);
-          }
-        };
-      }
-        // Attach click handler to the DT
-        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-        for (const annoteDlNode of annoteDls) {
-          annoteDlNode.addEventListener('click', (event) => {
-            const clickedEl = event.target;
-            if (clickedEl !== selectedAnnoteEl) {
-              unselectCodeLines();
-              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-              if (activeEl) {
-                activeEl.classList.remove('code-annotation-active');
-              }
-              selectCodeLines(clickedEl);
-              clickedEl.classList.add('code-annotation-active');
-            } else {
-              // Unselect the line
-              unselectCodeLines();
-              clickedEl.classList.remove('code-annotation-active');
-            }
-          });
-        }
-    const findCites = (el) => {
-      const parentEl = el.parentElement;
-      if (parentEl) {
-        const cites = parentEl.dataset.cites;
-        if (cites) {
-          return {
-            el,
-            cites: cites.split(' ')
-          };
-        } else {
-          return findCites(el.parentElement)
-        }
       } else {
-        return undefined;
-      }
-    };
-    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-    for (var i=0; i<bibliorefs.length; i++) {
-      const ref = bibliorefs[i];
-      const citeInfo = findCites(ref);
-      if (citeInfo) {
-        tippyHover(citeInfo.el, function() {
-          var popup = window.document.createElement('div');
-          citeInfo.cites.forEach(function(cite) {
-            var citeDiv = window.document.createElement('div');
-            citeDiv.classList.add('hanging-indent');
-            citeDiv.classList.add('csl-entry');
-            var biblioDiv = window.document.getElementById('ref-' + cite);
-            if (biblioDiv) {
-              citeDiv.innerHTML = biblioDiv.innerHTML;
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
             }
-            popup.appendChild(citeDiv);
-          });
-          return popup.innerHTML;
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
         });
       }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
     }
-  });
-  </script>
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./05_habitat_niveau_de_vie.html" class="pagination-link" aria-label="Habitat et niveau de vie">

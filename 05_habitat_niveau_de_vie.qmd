@@ -470,7 +470,7 @@ ggplot(light_source_plot, aes(x = Type, y = Percentage, fill = Observatory)) +
 
 
 ### Source d'énérgie utilisée pour la cuisson
-```{r}
+```{r energie_cuisson}
 ## Mode de cuisson
 #| label: setup
 #| include: false
@@ -576,6 +576,7 @@ Les équipements agricoles sont dans "res_v.dta" avec "e0" uniquement comme vari
 ## Biens de confort
 #| label: setup
 #| include: false
+
 
 # Extraction des labels pour v
 lables_v <- tibble(
@@ -864,6 +865,7 @@ equip_keep <- c(
 # Construction des données
 # -----------------------------
 hh_assets <- res_v %>% 
+  mutate(j5 = as.character(j5)) %>%
   select(j5, all_of(vars_to_keep)) %>% 
   pivot_longer(
     cols = starts_with("v"),
@@ -927,13 +929,12 @@ ggplot(hh_assets_plot, aes(x = Type, y = Percentage, fill = Observatory)) +
 
 
 #### Accès à la communication audiovisuelle et à la télécommunication par observatoire
-```{r}
-
+```{r carte_sim}
+## Possession de carte SIM
+## sim_card 
 
 ```
 
-
-#### Accès à la communication audiovisuelle et à la télécommunication par observatoire et selon les caractéristiques des chefs de ménages
 
 
 
