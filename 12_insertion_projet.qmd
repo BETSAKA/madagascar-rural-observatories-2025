@@ -99,15 +99,6 @@ res_respg0 |>
     `Membres (%)` = round(sum(respga == 1) / n() * 100, 1),
     .by = Observatory
   ) |>
-  bind_rows(
-    res_respg0 |>
-      summarise(
-        Observatory = "Total",
-        `Nb ménages` = n(),
-        `Membres (nb)` = sum(respga == 1),
-        `Membres (%)` = round(sum(respga == 1) / n() * 100, 1)
-      )
-  ) |>
   gt() |>
   tab_header(title = "Ménages ayant au moins un membre dans une organisation")
 ```

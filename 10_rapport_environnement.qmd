@@ -54,7 +54,7 @@ res_ap2        <- add_obs(res_ap2)
 
 n_men <- nrow(res_deb)
 
-# Fonction utilitaire : % de Oui (code 1) par observatoire + total
+# Fonction utilitaire : % de Oui (code 1) par observatoire
 pct_oui <- function(df, var, label) {
   var_sym <- sym(var)
   df |>
@@ -63,13 +63,8 @@ pct_oui <- function(df, var, label) {
       .by = Observatory
     ) |>
     pivot_wider(names_from = Observatory, values_from = pct) |>
-    mutate(
-      Total = df |>
-        summarise(p = round(sum(!!var_sym == 1, na.rm = TRUE) / sum(!is.na(!!var_sym)) * 100, 0)) |>
-        pull(p),
-      Item = label
-    ) |>
-    select(Item, Alaotra, Marovoay, Total)
+    mutate(Item = label) |>
+    select(Item, Alaotra, Marovoay)
 }
 
 # Labels mois
@@ -188,9 +183,9 @@ appart <- rm3_items |>
   pmap_dfr(\(var, label) {
     pct_oui(res_op_env, var, label)
   }) |>
-  pivot_longer(c(Alaotra, Marovoay, Total), names_to = "Groupe", values_to = "pct")
+  pivot_longer(c(Alaotra, Marovoay), names_to = "Groupe", values_to = "pct")
 
-ggplot(appart |> filter(Groupe != "Total"),
+ggplot(appart,
        aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
   geom_col(position = "dodge") +
   geom_text(aes(label = paste0(pct, "%")),
@@ -247,10 +242,10 @@ bind_rows(
   menaces |> mutate(Section = "Principales menaces (parmi ceux qui déclarent menacé)"),
   resps |> mutate(Section = "Principaux responsables")
 ) |>
-  select(Section, Item, Alaotra, Marovoay, Total) |>
+  select(Section, Item, Alaotra, Marovoay) |>
   gt(groupname_col = "Section") |>
-  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay", Total = "Total") |>
-  fmt_number(columns = c(Alaotra, Marovoay, Total), decimals = 0, pattern = "{x} %") |>
+  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
+  fmt_number(columns = c(Alaotra, Marovoay), decimals = 0, pattern = "{x} %") |>
   tab_style(
     style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
     locations = cells_column_labels(columns = everything())
@@ -290,9 +285,9 @@ rm5_items <- tribble(
 
 repr <- rm5_items |>
   pmap_dfr(\(var, label) pct_oui(res_op_env, var, label)) |>
-  pivot_longer(c(Alaotra, Marovoay, Total), names_to = "Groupe", values_to = "pct")
+  pivot_longer(c(Alaotra, Marovoay), names_to = "Groupe", values_to = "pct")
 
-ggplot(repr |> filter(Groupe != "Total"),
+ggplot(repr,
        aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
   geom_col(position = "dodge") +
   geom_text(aes(label = paste0(pct, "%")),
@@ -465,25 +460,19 @@ conn_by_obs <- conn_all |>
   select(-n) |>
   pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0)
 
-conn_total <- conn_all |>
-  count(Conn) |>
-  mutate(Total = round(n / sum(n) * 100, 0)) |>
-  select(Conn, Total)
-
 conn_tbl <- conn_by_obs |>
-  left_join(conn_total, by = "Conn") |>
   rename(Item = Conn) |>
   mutate(Item = paste0("  - ", Item))
 
 bind_rows(
   freq_items,
   tibble(Item = "Connaissance du lieu (parmi usagers) :",
-         Alaotra = NA_real_, Marovoay = NA_real_, Total = NA_real_),
+         Alaotra = NA_real_, Marovoay = NA_real_),
   conn_tbl
 ) |>
   gt() |>
-  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay", Total = "Total") |>
-  fmt_number(columns = c(Alaotra, Marovoay, Total), decimals = 0, pattern = "{x} %") |>
+  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
+  fmt_number(columns = c(Alaotra, Marovoay), decimals = 0, pattern = "{x} %") |>
   sub_missing(missing_text = "") |>
   tab_style(
     style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
@@ -515,9 +504,9 @@ non_items <- tribble(
 
 non_freq <- non_items |>
   pmap_dfr(\(var, label) pct_oui(um1_non, var, label)) |>
-  pivot_longer(c(Alaotra, Marovoay, Total), names_to = "Groupe", values_to = "pct")
+  pivot_longer(c(Alaotra, Marovoay), names_to = "Groupe", values_to = "pct")
 
-ggplot(non_freq |> filter(Groupe != "Total"),
+ggplot(non_freq,
        aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
   geom_col(position = "dodge") +
   geom_text(aes(label = paste0(pct, "%")),
@@ -671,9 +660,9 @@ feu_items <- tribble(
 
 feu_raisons <- feu_items |>
   pmap_dfr(\(var, label) pct_oui(res_feubrousse, var, label)) |>
-  pivot_longer(c(Alaotra, Marovoay, Total), names_to = "Groupe", values_to = "pct")
+  pivot_longer(c(Alaotra, Marovoay), names_to = "Groupe", values_to = "pct")
 
-ggplot(feu_raisons |> filter(Groupe != "Total"),
+ggplot(feu_raisons,
        aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
   geom_col(position = "dodge") +
   geom_text(aes(label = paste0(pct, "%")),
@@ -712,19 +701,7 @@ loc_feux <- res_feubrousse |>
   select(-n) |>
   pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0)
 
-loc_total <- res_feubrousse |>
-  filter(s18_b == 1, s18_c %in% 1:3) |>
-  mutate(Lieu = case_when(
-    s18_c == 1 ~ "Près du village",
-    s18_c == 2 ~ "Loin (hors AP)",
-    s18_c == 3 ~ "Dans l'AP"
-  )) |>
-  count(Lieu) |>
-  mutate(Total = round(n / sum(n) * 100, 0)) |>
-  select(Lieu, Total)
-
 loc_tbl <- loc_feux |>
-  left_join(loc_total, by = "Lieu") |>
   rename(Item = Lieu) |>
   mutate(Item = paste0("  - ", Item))
 
@@ -735,14 +712,14 @@ echap <- pct_oui(res_feubrousse |> filter(s18 == 1), "s20", "Un feu lui a déjà
 bind_rows(
   feu_tbl,
   tibble(Item = "Si feux dans l'année, localisation :",
-         Alaotra = NA_real_, Marovoay = NA_real_, Total = NA_real_),
+         Alaotra = NA_real_, Marovoay = NA_real_),
   loc_tbl,
   maitr,
   echap
 ) |>
   gt() |>
-  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay", Total = "Total") |>
-  fmt_number(columns = c(Alaotra, Marovoay, Total), decimals = 0, pattern = "{x} %") |>
+  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
+  fmt_number(columns = c(Alaotra, Marovoay), decimals = 0, pattern = "{x} %") |>
   sub_missing(missing_text = "") |>
   tab_style(
     style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
@@ -885,8 +862,8 @@ ap_items <- bind_rows(
 
 ap_items |>
   gt() |>
-  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay", Total = "Total") |>
-  fmt_number(columns = c(Alaotra, Marovoay, Total), decimals = 0, pattern = "{x} %") |>
+  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
+  fmt_number(columns = c(Alaotra, Marovoay), decimals = 0, pattern = "{x} %") |>
   tab_style(
     style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
     locations = cells_column_labels(columns = everything())
@@ -1004,9 +981,9 @@ ap_favorable <- res_ap |> filter(ap5 == 1)
 
 mesures <- ap5b_items |>
   pmap_dfr(\(var, label) pct_oui(ap_favorable, var, label)) |>
-  pivot_longer(c(Alaotra, Marovoay, Total), names_to = "Groupe", values_to = "pct")
+  pivot_longer(c(Alaotra, Marovoay), names_to = "Groupe", values_to = "pct")
 
-ggplot(mesures |> filter(Groupe != "Total"),
+ggplot(mesures,
        aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
   geom_col(position = "dodge") +
   geom_text(aes(label = paste0(pct, "%")),

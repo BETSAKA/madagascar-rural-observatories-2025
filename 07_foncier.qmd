@@ -365,16 +365,6 @@ res_fr30a |>
     `Cèdent (%)` = round(sum(fr33a == 1, na.rm = TRUE) / n() * 100, 1),
     .by = Observatory
   ) |>
-  bind_rows(
-    res_fr30a |>
-      filter(!is.na(fr33a)) |>
-      summarise(
-        Observatory = "Total",
-        `Nb ménages` = n(),
-        `Cèdent (nb)` = sum(fr33a == 1, na.rm = TRUE),
-        `Cèdent (%)` = round(sum(fr33a == 1, na.rm = TRUE) / n() * 100, 1)
-      )
-  ) |>
   gt() |>
   tab_header(title = "Ménages cédant des parcelles à des tiers")
 ```
@@ -455,16 +445,6 @@ res_fr30a |>
     `Exploitent (nb)` = sum(fr34a == 1, na.rm = TRUE),
     `Exploitent (%)` = round(sum(fr34a == 1, na.rm = TRUE) / n() * 100, 1),
     .by = Observatory
-  ) |>
-  bind_rows(
-    res_fr30a |>
-      filter(!is.na(fr34a)) |>
-      summarise(
-        Observatory = "Total",
-        `Nb ménages` = n(),
-        `Exploitent (nb)` = sum(fr34a == 1, na.rm = TRUE),
-        `Exploitent (%)` = round(sum(fr34a == 1, na.rm = TRUE) / n() * 100, 1)
-      )
   ) |>
   gt() |>
   tab_header(title = "Ménages exploitant des parcelles d'autrui")
@@ -583,16 +563,6 @@ res_fr30a |>
     `Ont abandonné (nb)` = sum(fr30p == 1, na.rm = TRUE),
     `Ont abandonné (%)` = round(sum(fr30p == 1, na.rm = TRUE) / n() * 100, 1),
     .by = Observatory
-  ) |>
-  bind_rows(
-    res_fr30a |>
-      filter(!is.na(fr30p)) |>
-      summarise(
-        Observatory = "Total",
-        `Nb ménages` = n(),
-        `Ont abandonné (nb)` = sum(fr30p == 1, na.rm = TRUE),
-        `Ont abandonné (%)` = round(sum(fr30p == 1, na.rm = TRUE) / n() * 100, 1)
-      )
   ) |>
   gt() |>
   tab_header(title = "Abandon de la culture d'une ou plusieurs parcelles")

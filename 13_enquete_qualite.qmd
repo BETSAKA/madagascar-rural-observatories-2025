@@ -182,7 +182,7 @@ ggplot(reaction, aes(x = Réaction, y = n, fill = Observatory)) +
 #| label: tbl-codes-aberrants
 
 res_remq |>
-  left_join(res_deb |> select(j5, Observatory, j1, j4, j11), by = "j5") |>
+  left_join(res_deb |> select(j5, j1, j4, j11), by = "j5") |>
   filter(
     (!qual1aa %in% c(1, 2) & !is.na(qual1aa)) |
     (!qual2aa %in% c(1, 2, 3) & !is.na(qual2aa)) |

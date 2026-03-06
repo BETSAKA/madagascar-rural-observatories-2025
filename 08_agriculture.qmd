@@ -116,15 +116,6 @@ res_r1 |>
     `Pratiquent (%)` = round(sum(r1a == 1, na.rm = TRUE) / n() * 100, 1),
     .by = Observatory
   ) |>
-  bind_rows(
-    res_r1 |>
-      summarise(
-        Observatory = "Total",
-        `Nb ménages` = n(),
-        `Pratiquent (nb)` = sum(r1a == 1, na.rm = TRUE),
-        `Pratiquent (%)` = round(sum(r1a == 1, na.rm = TRUE) / n() * 100, 1)
-      )
-  ) |>
   gt() |>
   tab_header(title = "Pratique de la riziculture")
 ```
@@ -425,15 +416,6 @@ res_dc20 |>
     `Ont vendu (%)` = round(sum(dcva == 1, na.rm = TRUE) / n() * 100, 1),
     .by = Observatory
   ) |>
-  bind_rows(
-    res_dc20 |>
-      summarise(
-        Observatory = "Total",
-        `Nb ménages` = n(),
-        `Ont vendu (nb)` = sum(dcva == 1, na.rm = TRUE),
-        `Ont vendu (%)` = round(sum(dcva == 1, na.rm = TRUE) / n() * 100, 1)
-      )
-  ) |>
   gt() |>
   tab_header(title = "Vente de riz (paddy ou blanc)")
 ```
@@ -525,15 +507,6 @@ res_c0 |>
     `Pratiquent (nb)` = sum(c1a == 1, na.rm = TRUE),
     `Pratiquent (%)` = round(sum(c1a == 1, na.rm = TRUE) / n() * 100, 1),
     .by = Observatory
-  ) |>
-  bind_rows(
-    res_c0 |>
-      summarise(
-        Observatory = "Total",
-        `Nb ménages` = n(),
-        `Pratiquent (nb)` = sum(c1a == 1, na.rm = TRUE),
-        `Pratiquent (%)` = round(sum(c1a == 1, na.rm = TRUE) / n() * 100, 1)
-      )
   ) |>
   gt() |>
   tab_header(title = "Pratique des cultures non rizicoles")
@@ -745,15 +718,6 @@ res_el2 |>
     `Pratiquent (nb)` = sum(el2 == 1, na.rm = TRUE),
     `Pratiquent (%)` = round(sum(el2 == 1, na.rm = TRUE) / n() * 100, 1),
     .by = Observatory
-  ) |>
-  bind_rows(
-    res_el2 |>
-      summarise(
-        Observatory = "Total",
-        `Nb ménages` = n(),
-        `Pratiquent (nb)` = sum(el2 == 1, na.rm = TRUE),
-        `Pratiquent (%)` = round(sum(el2 == 1, na.rm = TRUE) / n() * 100, 1)
-      )
   ) |>
   gt() |>
   tab_header(title = "Pratique de l'élevage")
@@ -1103,6 +1067,7 @@ crop_family <- function(code) {
 cult_quint <- res_c |>
   filter(!is.na(c1)) |>
   mutate(j5 = as.character(j5), Famille = crop_family(c1)) |>
+  select(-Observatory) |>
   left_join(quintiles, by = "j5") |>
   filter(!is.na(Quintile)) |>
   count(Observatory, Quintile, Famille) |>
@@ -1170,24 +1135,29 @@ if (file.exists(agro_file)) {
     if (file.exists(f_r)) {
       r <- read_dta(f_r) |> mutate(j5 = as.character(j5))
       r_obs <- r |>
+        select(-any_of("year")) |>
         inner_join(deb |> select(j5, Observatory), by = "j5")
       
+      has_r6 <- "r6" %in% names(r_obs)
+      
       # Total production per HH
-      prod_hh <- r_obs |>
-        filter(!is.na(r6), r6 >= 0) |>
-        summarise(prod_kg = sum(r6, na.rm = TRUE), .by = c(j5, Observatory)) |>
-        summarise(prod_moy = round(mean(prod_kg)), .by = Observatory)
+      prod_hh <- if (has_r6) {
+        r_obs |>
+          filter(!is.na(r6), r6 >= 0) |>
+          summarise(prod_kg = sum(r6, na.rm = TRUE), .by = c(j5, Observatory)) |>
+          summarise(prod_moy = round(mean(prod_kg)), .by = Observatory)
+      } else tibble()
       
       # Yield (kg/are) if r23 available
-      has_r23 <- "r23" %in% names(r)
-      rdt <- if (has_r23) {
+      has_r23 <- "r23" %in% names(r_obs)
+      rdt <- if (has_r6 && has_r23) {
         r_obs |>
           filter(!is.na(r6), r6 > 0, !is.na(r23), r23 > 0) |>
           mutate(rdt = r6 / r23) |>
           summarise(rdt_moy = round(mean(rdt, na.rm = TRUE), 1), .by = Observatory)
       } else tibble()
       
-      out <- out |> left_join(prod_hh, by = "Observatory")
+      out <- if (nrow(prod_hh) > 0) out |> left_join(prod_hh, by = "Observatory") else out
       if (nrow(rdt) > 0) out <- out |> left_join(rdt, by = "Observatory")
     }
     
@@ -1196,6 +1166,7 @@ if (file.exists(agro_file)) {
       el2 <- read_dta(f_el2) |> mutate(j5 = as.character(j5))
       # el2 variable = 1 means "oui, pratique élevage"
       el_obs <- el2 |>
+        select(-any_of("year")) |>
         inner_join(deb |> select(j5, Observatory), by = "j5")
       
       if ("el2" %in% names(el_obs)) {

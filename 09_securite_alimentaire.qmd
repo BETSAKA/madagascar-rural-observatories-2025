@@ -823,8 +823,11 @@ if (file.exists(sa_file)) {
     
     if (!"sal2d" %in% names(sa)) return(tibble())
     
-    d <- sa |> inner_join(deb |> select(j5, Observatory, year), by = "j5")
-    
+    d <- sa |>
+      inner_join(deb |> select(j5, Observatory), by = "j5") |>
+      select(-any_of("year")) |>
+      mutate(year = yr)
+
     d |>
       filter(!is.na(sal2d), sal2d >= 0, sal2d <= 12) |>
       summarise(
