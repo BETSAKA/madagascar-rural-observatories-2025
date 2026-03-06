@@ -3508,38 +3508,70 @@ Alaotra	15-17 ans	2.6%	68.4%	28.9%" => Leurs sommes ne font pas 100%.
 
 #### Raisons de non fréquentation de l’école pour les 6 à 15 ans
 
-```{r}
-# Raisons de non fréquentation de l’école pour les 6 à 15 ans
-# Préparation des données
+La variable `s5` recense le motif principal de non-scolarisation ou d’arrêt des études. Les frais de scolarité, le besoin de main-d’œuvre familiale et la perception d’un « niveau suffisant » dominent.
 
-# class_attended_2425 <- res_deb %>%
-#   left_join(res_m_a, by = "j5") %>%
-#   arrange(j5) %>% 
-#   filter(m5 >= 6 & m5 <= 15 & m6 != 1 & s2 == 2 ) %>%
-#   mutate(
-#     j0 = as.character(j0),
-#     Observatory = case_when(
-#       j0 == "3"  ~ "Marovoay",
-#       j0 == "21" ~ "Alaotra",
-#       TRUE       ~ j0
-#     ),
-#     m4 = as.character(m4),
-#     Observatory = case_when(
-#       m4 == "1"  ~ "Fille",
-#       m4 == "2" ~ "Garçon",
-#       TRUE       ~ m4
-#     ),
-#     # Extraire les labels des activités et corriger l'encodage
-#     Activite = iconv(as.character(labelled::to_factor(a1)), from = "latin1", to = "UTF-8"),
-#     Activite = gsub("&#39;", "'", Activite, fixed = TRUE)
-#   ) %>%
-#   group_by(Observatory, Activite) %>% 
-#   summarise(n = n(), .groups = "drop") %>% 
-#   mutate( 
-#     Percent = round(n / sum(n) * 100, 1) 
-#   ) %>% 
-#   arrange(Observatory, desc(n), desc(Percent))
+```{r}
+#| label: fig-raisons-non-scol
+#| fig-cap: "Principales raisons de non-scolarisation ou d’arrêt des études (6–15 ans)"
+#| fig-width: 10
+#| fig-height: 6
+
+# Labels des raisons (s5)
+raisons_labs <- c(
+ "1"  = "Niveau suffisant",
+ "2"  = "Main-d’oeuvre exploitation",
+ "3"  = "Besoin revenu",
+ "4"  = "Frais scolarité trop élevés",
+ "5"  = "Sans intérêt (famille)",
+ "6"  = "Échec scolaire",
+ "7"  = "Grossesse / mariage",
+ "8"  = "Handicap / maladie",
+ "9"  = "École en mauvais état",
+ "10" = "Instituteur absent",
+ "11" = "École trop éloignée",
+ "12" = "Trop jeune",
+ "16" = "Autre raison",
+ "17" = "Famine",
+ "19" = "Paresse"
+)
+
+non_scol <- res_deb %>%
+ left_join(res_m_a, by = "j5") %>%
+ filter(m5 >= 6, m5 <= 15, m6 != 1, s2 == 2, !is.na(s5)) %>%
+ mutate(
+   Observatory = add_obs(j0),
+   Raison = if_else(
+     as.character(as.integer(s5)) %in% names(raisons_labs),
+     raisons_labs[as.character(as.integer(s5))],
+     "Autre"
+   )
+ ) %>%
+ count(Observatory, Raison) %>%
+ mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+
+non_scol %>%
+ filter(pct >= 2) %>%
+ ggplot(aes(x = reorder(Raison, pct), y = pct, fill = Observatory)) +
+ geom_col(position = "dodge") +
+ coord_flip() +
+ labs(x = NULL, y = "% des enfants non scolarisés", fill = "Observatoire") +
+ theme_minimal(base_size = 12) +
+ theme(legend.position = "top")
 ```
+
+```{r}
+#| label: tbl-raisons-non-scol
+#| tbl-cap: "Raisons de non-scolarisation des 6–15 ans par observatoire"
+
+non_scol %>%
+ select(Observatory, Raison, pct) %>%
+ pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0) %>%
+ arrange(desc(Alaotra)) %>%
+ gt() %>%
+ tab_header(title = "Raisons de non-fréquentation de l’école (6–15 ans)") %>%
+ cols_label(Raison = "Raison", Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
+```
+
 
 ### Activités principales des autres membres de ménages
 
@@ -3888,3 +3920,143 @@ REMARQUES :
 - A corriger dans tableaux, les "n_autres" et "percent_autres" dans la ligne des colonnes,  
 - Activités des autres membres du ménage selon l'âge : Pour vérifier si les NA correspondent avec les moins de 15 ans.  
 - Est-ce pertinent de voir les activités agricoles et non-agricoles?? (aa2, aa3, aa4, aa5) avec les SAC
+## Évolution des indicateurs démographiques (1996–2025) {#sec-demog-multiyear}
+
+Les observatoires d'Alaotra et de Marovoay disposent de données démographiques depuis 1996. Cette section retrace l'évolution de quatre indicateurs clés : la taille moyenne des ménages, la proportion de chefs de ménage femmes, le taux de scolarisation des 6–14 ans et l'âge moyen du chef de ménage.
+
+```{r demog_trends_compute}
+#| include: false
+
+# Cache file for demographic trends
+demog_file <- "output/demog_trends_obs.rds"
+
+if (file.exists(demog_file)) {
+  demog_trends <- readRDS(demog_file)
+} else {
+  years_dir <- "data/ROS_MDG_microdata"
+  all_years <- c(1996:2015, 2025)
+  
+  demog_trends <- map_dfr(all_years, function(yr) {
+    f_deb <- file.path(years_dir, yr, "res_deb.dta")
+    f_ma  <- file.path(years_dir, yr, "res_m_a.dta")
+    if (!file.exists(f_deb) || !file.exists(f_ma)) return(tibble())
+    
+    deb <- read_dta(f_deb) |> mutate(j5 = as.character(j5), year = yr)
+    ma  <- read_dta(f_ma) |> mutate(j5 = as.character(j5))
+    
+    # Filter Alaotra (j0=21) and Marovoay (j0=3) only
+    deb <- deb |> filter(j0 %in% c(3, 21)) |>
+      mutate(Observatory = if_else(j0 == 3, "Marovoay", "Alaotra"))
+    
+    d <- ma |> inner_join(deb |> select(j5, Observatory, year), by = "j5")
+    
+    # HH size (count members per j5)
+    hh_size <- d |>
+      count(j5, Observatory, year, name = "taille") |>
+      summarise(taille_moy = mean(taille), .by = c(year, Observatory))
+    
+    # % female HH heads (m6==1 and m4==1)
+    has_m4 <- "m4" %in% names(d) && "m6" %in% names(d)
+    fem_heads <- if (has_m4) {
+      d |>
+        filter(m6 == 1) |>
+        summarise(pct_fem_cm = round(mean(m4 == 1, na.rm = TRUE) * 100, 1),
+                  .by = c(year, Observatory))
+    } else tibble()
+    
+    # Age of HH head
+    has_m5 <- "m5" %in% names(d) && "m6" %in% names(d)
+    age_cm <- if (has_m5) {
+      d |>
+        filter(m6 == 1) |>
+        summarise(age_cm_moy = round(mean(m5, na.rm = TRUE), 1),
+                  .by = c(year, Observatory))
+    } else tibble()
+    
+    # Schooling rate 6-14 (s2==1 among m5 6-14)
+    has_s2 <- "s2" %in% names(d)
+    scol <- if (has_s2 && has_m5) {
+      d |>
+        filter(m5 >= 6, m5 <= 14, s2 %in% c(1, 2)) |>
+        summarise(taux_scol = round(mean(s2 == 1, na.rm = TRUE) * 100, 1),
+                  .by = c(year, Observatory))
+    } else tibble()
+    
+    # Combine
+    out <- hh_size
+    if (nrow(fem_heads) > 0) out <- out |> left_join(fem_heads, by = c("year", "Observatory"))
+    if (nrow(age_cm) > 0) out <- out |> left_join(age_cm, by = c("year", "Observatory"))
+    if (nrow(scol) > 0) out <- out |> left_join(scol, by = c("year", "Observatory"))
+    out
+  })
+  
+  saveRDS(demog_trends, demog_file)
+}
+
+# Solid lines and gap segments
+demog_solid <- demog_trends |> filter(year <= 2015)
+demog_gap   <- demog_trends |> filter(year %in% c(2015, 2025))
+```
+
+```{r fig_demog_taille}
+#| fig-cap: "Évolution de la taille moyenne des ménages (1996–2025)"
+#| fig-width: 9
+#| fig-height: 5
+
+ggplot(mapping = aes(x = year, y = taille_moy, colour = Observatory)) +
+  geom_line(data = demog_solid, linewidth = 0.8) +
+  geom_line(data = demog_gap, linewidth = 0.8, linetype = "31") +
+  geom_point(data = demog_trends, size = 2) +
+  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+  labs(x = NULL, y = "Taille moyenne du ménage", colour = "Observatoire", linetype = NULL) +
+  theme_minimal()
+```
+
+```{r fig_demog_fem_cm}
+#| fig-cap: "Évolution du pourcentage de chefs de ménage femmes (1996–2025)"
+#| fig-width: 9
+#| fig-height: 5
+
+if ("pct_fem_cm" %in% names(demog_trends)) {
+  ggplot(mapping = aes(x = year, y = pct_fem_cm, colour = Observatory)) +
+    geom_line(data = demog_solid |> filter(!is.na(pct_fem_cm)), linewidth = 0.8) +
+    geom_line(data = demog_gap |> filter(!is.na(pct_fem_cm)), linewidth = 0.8, linetype = "31") +
+    geom_point(data = demog_trends |> filter(!is.na(pct_fem_cm)), size = 2) +
+    scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+    labs(x = NULL, y = "% de chefs de ménage femmes", colour = "Observatoire") +
+    theme_minimal()
+}
+```
+
+```{r fig_demog_scol}
+#| fig-cap: "Évolution du taux de scolarisation des 6–14 ans (1996–2025)"
+#| fig-width: 9
+#| fig-height: 5
+
+if ("taux_scol" %in% names(demog_trends)) {
+  ggplot(mapping = aes(x = year, y = taux_scol, colour = Observatory)) +
+    geom_line(data = demog_solid |> filter(!is.na(taux_scol)), linewidth = 0.8) +
+    geom_line(data = demog_gap |> filter(!is.na(taux_scol)), linewidth = 0.8, linetype = "31") +
+    geom_point(data = demog_trends |> filter(!is.na(taux_scol)), size = 2) +
+    scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+    scale_y_continuous(limits = c(0, 100)) +
+    labs(x = NULL, y = "Taux de scolarisation 6–14 ans (%)", colour = "Observatoire") +
+    theme_minimal()
+}
+```
+
+```{r fig_demog_age_cm}
+#| fig-cap: "Évolution de l'âge moyen du chef de ménage (1996–2025)"
+#| fig-width: 9
+#| fig-height: 5
+
+if ("age_cm_moy" %in% names(demog_trends)) {
+  ggplot(mapping = aes(x = year, y = age_cm_moy, colour = Observatory)) +
+    geom_line(data = demog_solid |> filter(!is.na(age_cm_moy)), linewidth = 0.8) +
+    geom_line(data = demog_gap |> filter(!is.na(age_cm_moy)), linewidth = 0.8, linetype = "31") +
+    geom_point(data = demog_trends |> filter(!is.na(age_cm_moy)), size = 2) +
+    scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+    labs(x = NULL, y = "Âge moyen du chef de ménage", colour = "Observatoire") +
+    theme_minimal()
+}
+```

@@ -776,3 +776,85 @@ ggplot(champs_vs_stocks_plot, aes(x = Culture, y = pct, fill = Type)) +
 ```
 
 Les dégâts sur les champs (cultures en cours) sont systématiquement plus fréquents que les pertes de stocks. Toutefois, les pertes de stocks, même si elles concernent moins de ménages, ont un impact direct sur les réserves alimentaires disponibles.
+
+## Évolution de la prévalence des catastrophes (2003–2025) {#sec-cata-multiyear}
+
+Le module « catastrophes » (`res_cc`) est disponible depuis 2003. On retrace ici la proportion de ménages ayant déclaré au moins un aléa climatique ou biologique au cours de la campagne.
+
+```{r cata_trends_compute}
+#| include: false
+
+cata_file <- "output/cata_trends_obs.rds"
+
+if (file.exists(cata_file)) {
+  cata_trends <- readRDS(cata_file)
+} else {
+  years_dir <- "data/ROS_MDG_microdata"
+  all_years <- c(2003:2015, 2025)
+  
+  cata_trends <- map_dfr(all_years, function(yr) {
+    f_deb <- file.path(years_dir, yr, "res_deb.dta")
+    f_cc  <- file.path(years_dir, yr, "res_cc.dta")
+    if (!file.exists(f_deb) || !file.exists(f_cc)) return(tibble())
+    
+    deb <- read_dta(f_deb) |>
+      mutate(j5 = as.character(j5), year = yr) |>
+      filter(j0 %in% c(3, 21)) |>
+      mutate(Observatory = if_else(j0 == 3, "Marovoay", "Alaotra"))
+    
+    cc <- read_dta(f_cc) |> mutate(j5 = as.character(j5))
+    
+    # Two formats:
+    # 2003: one row per HH, cc1_1..cc1_7 = yes/no per catastrophe type
+    # 2008+: multiple rows per HH, cc11 = yes/no per catastrophe type row
+    
+    has_cc11 <- "cc11" %in% names(cc)
+    cc1_vars <- grep("^cc1_[0-9]", names(cc), value = TRUE)
+    
+    if (has_cc11) {
+      # Multi-row format: HH has catastrophe if any row has cc11==1
+      cc_hh <- cc |>
+        inner_join(deb |> select(j5, Observatory), by = "j5") |>
+        summarise(any_cata = any(cc11 == 1, na.rm = TRUE), .by = c(j5, Observatory))
+    } else if (length(cc1_vars) > 0) {
+      # Single-row format: HH has catastrophe if any cc1_x==1
+      cc_hh <- cc |>
+        inner_join(deb |> select(j5, Observatory), by = "j5") |>
+        rowwise() |>
+        mutate(any_cata = any(c_across(all_of(cc1_vars)) == 1, na.rm = TRUE)) |>
+        ungroup() |>
+        select(j5, Observatory, any_cata)
+    } else {
+      return(tibble())
+    }
+    
+    cc_hh |>
+      summarise(
+        n = n(),
+        pct_cata = round(mean(any_cata, na.rm = TRUE) * 100, 1),
+        .by = Observatory
+      ) |>
+      mutate(year = yr)
+  })
+  
+  saveRDS(cata_trends, cata_file)
+}
+
+cata_solid <- cata_trends |> filter(year <= 2015)
+cata_gap   <- cata_trends |> filter(year %in% c(2015, 2025))
+```
+
+```{r fig_cata_prevalence}
+#| fig-cap: "Évolution du pourcentage de ménages ayant subi au moins une catastrophe (2003–2025)"
+#| fig-width: 9
+#| fig-height: 5
+
+ggplot(mapping = aes(x = year, y = pct_cata, colour = Observatory)) +
+  geom_line(data = cata_solid, linewidth = 0.8) +
+  geom_line(data = cata_gap, linewidth = 0.8, linetype = "31") +
+  geom_point(data = cata_trends, size = 2) +
+  scale_x_continuous(breaks = seq(2003, 2025, 2)) +
+  scale_y_continuous(limits = c(0, 100)) +
+  labs(x = NULL, y = "% de ménages touchés", colour = "Observatoire") +
+  theme_minimal()
+```

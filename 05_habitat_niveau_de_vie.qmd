@@ -955,6 +955,113 @@ res_t1 <- read_dta("data/res_t1.dta") # year, j5
 res_t2 <- read_dta("data/res_t2.dta") # year, j5 
 ```
 
+#### Transferts sortants
+
+Le fichier `res_t2` recense les transferts envoyés par les ménages à des personnes extérieures au foyer. Chaque ligne correspond à un destinataire. Les variables clés sont le type de transfert (`t21a`), le lieu de résidence du destinataire (`t41`), le poids de riz envoyé (`t42`, en kg) et la valeur totale (`t21d`, en Ar).
+
+```{r}
+#| label: fig-transferts-sortants
+#| fig-cap: "Valeur moyenne des transferts sortants par observatoire et type"
+#| fig-width: 10
+#| fig-height: 6
+
+# Préparer les labels
+type_transf_labs <- c(
+  "1" = "Argent",
+  "2" = "Riz",
+  "3" = "Autres produits",
+  "99" = "Autre"
+)
+
+res_t2_obs <- res_t2 |>
+  mutate(j5 = as.character(j5)) |>
+  left_join(res_deb |> select(j5, Observatory), by = "j5") |>
+  mutate(
+    Type = if_else(
+      as.character(as.integer(t21a)) %in% names(type_transf_labs),
+      type_transf_labs[as.character(as.integer(t21a))],
+      "Non précisé"
+    )
+  )
+
+# % de ménages qui envoient des transferts
+n_t2 <- res_t2_obs |>
+  summarise(
+    n_envoyeurs = n_distinct(j5),
+    .by = Observatory
+  ) |>
+  left_join(
+    res_deb |> count(Observatory, name = "n_total"),
+    by = "Observatory"
+  ) |>
+  mutate(pct = round(n_envoyeurs / n_total * 100, 1))
+
+# Valeur moyenne par type
+val_par_type <- res_t2_obs |>
+  filter(!is.na(t21d), t21d > 0) |>
+  summarise(
+    n = n(),
+    val_moy = round(mean(t21d, na.rm = TRUE)),
+    val_med = round(median(t21d, na.rm = TRUE)),
+    .by = c(Observatory, Type)
+  ) |>
+  filter(n >= 3)
+
+val_par_type |>
+  ggplot(aes(x = reorder(Type, val_moy), y = val_moy / 1000, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "Valeur moyenne (milliers Ar)", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r}
+#| label: tbl-transferts-sortants
+#| tbl-cap: "Transferts sortants : résumé par observatoire"
+
+n_t2 |>
+  gt() |>
+  tab_header(title = "Ménages envoyant des transferts") |>
+  cols_label(
+    n_envoyeurs = "Nb envoyeurs",
+    n_total = "Nb ménages total",
+    pct = "% envoyeurs"
+  )
+```
+
+```{r}
+#| label: fig-destination-transferts
+#| fig-cap: "Lieu de résidence des destinataires de transferts"
+#| fig-width: 9
+#| fig-height: 5
+
+dest_labs <- c(
+  "1" = "Même commune",
+  "2" = "Autre commune, même région",
+  "3" = "Autre région",
+  "4" = "Étranger"
+)
+
+res_t2_obs |>
+  filter(!is.na(t41)) |>
+  mutate(
+    Destination = if_else(
+      as.character(as.integer(t41)) %in% names(dest_labs),
+      dest_labs[as.character(as.integer(t41))],
+      "Non précisé"
+    )
+  ) |>
+  count(Observatory, Destination) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  ggplot(aes(x = reorder(Destination, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des transferts", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
 ### Revenu
 
 Les revenus présentés ici sont des revenus annuels par ménage, calculés sur la période de référence (PR) de la campagne 2025. Le revenu total (`revtot`) se décompose en revenu courant (`revcou`) et revenu exceptionnel (`revexcept`).
@@ -1547,4 +1654,97 @@ ggplot(mapping = aes(x = year, y = revcou_paddy, colour = Observatory)) +
     colour = "Observatoire", linetype = NULL
   ) +
   theme_minimal()
+```
+
+### Évolution des conditions d'habitat (1997–2025) {#sec-habitat-multiyear}
+
+Les données sur l'habitat permettent de suivre l'évolution de la source d'éclairage (accès à l'électricité) et de la source d'eau principale sur la période couverte.
+
+```{r habitat_trends_compute}
+#| include: false
+
+habitat_file <- "output/habitat_trends_obs.rds"
+
+if (file.exists(habitat_file)) {
+  habitat_trends <- readRDS(habitat_file)
+} else {
+  years_dir <- "data/ROS_MDG_microdata"
+  all_years <- c(1995, 1997:2015, 2025)
+  
+  habitat_trends <- map_dfr(all_years, function(yr) {
+    f_deb <- file.path(years_dir, yr, "res_deb.dta")
+    f_h   <- file.path(years_dir, yr, "res_h.dta")
+    if (!file.exists(f_deb) || !file.exists(f_h)) return(tibble())
+    
+    deb <- read_dta(f_deb) |>
+      mutate(j5 = as.character(j5), year = yr) |>
+      filter(j0 %in% c(3, 21)) |>
+      mutate(Observatory = if_else(j0 == 3, "Marovoay", "Alaotra"))
+    
+    h <- read_dta(f_h) |> mutate(j5 = as.character(j5))
+    d <- h |> inner_join(deb |> select(j5, Observatory, year), by = "j5")
+    
+    # Electricity: h7==1 (Électricité) in years with h7, or h7a==1 in 2025
+    has_h7  <- "h7" %in% names(d)
+    has_h7a <- "h7a" %in% names(d)
+    pct_elec <- if (has_h7) {
+      d |> summarise(pct_elec = round(mean(h7 == 1, na.rm = TRUE) * 100, 1),
+                     .by = c(year, Observatory))
+    } else if (has_h7a) {
+      d |> summarise(pct_elec = round(mean(h7a == 1, na.rm = TRUE) * 100, 1),
+                     .by = c(year, Observatory))
+    } else tibble()
+    
+    # Water source: h4 — % with improved water (codes 1-4: citerne, eau courante, borne fontaine, puits margelle)
+    has_h4 <- "h4" %in% names(d)
+    pct_water <- if (has_h4) {
+      d |> summarise(pct_eau_amelioree = round(mean(h4 %in% c(1, 2, 3, 4), na.rm = TRUE) * 100, 1),
+                     .by = c(year, Observatory))
+    } else tibble()
+    
+    out <- tibble(year = yr, Observatory = unique(deb$Observatory))
+    if (nrow(pct_elec) > 0) out <- out |> left_join(pct_elec, by = c("year", "Observatory"))
+    if (nrow(pct_water) > 0) out <- out |> left_join(pct_water, by = c("year", "Observatory"))
+    out
+  })
+  
+  saveRDS(habitat_trends, habitat_file)
+}
+
+hab_solid <- habitat_trends |> filter(year <= 2015)
+hab_gap   <- habitat_trends |> filter(year %in% c(2015, 2025))
+```
+
+```{r fig_habitat_elec}
+#| fig-cap: "Évolution de l'accès à l'électricité (1997–2025)"
+#| fig-width: 9
+#| fig-height: 5
+
+if ("pct_elec" %in% names(habitat_trends)) {
+  ggplot(mapping = aes(x = year, y = pct_elec, colour = Observatory)) +
+    geom_line(data = hab_solid |> filter(!is.na(pct_elec)), linewidth = 0.8) +
+    geom_line(data = hab_gap |> filter(!is.na(pct_elec)), linewidth = 0.8, linetype = "31") +
+    geom_point(data = habitat_trends |> filter(!is.na(pct_elec)), size = 2) +
+    scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+    scale_y_continuous(limits = c(0, NA)) +
+    labs(x = NULL, y = "% de ménages avec électricité", colour = "Observatoire") +
+    theme_minimal()
+}
+```
+
+```{r fig_habitat_water}
+#| fig-cap: "Évolution de l'accès à une source d'eau améliorée (1997–2025)"
+#| fig-width: 9
+#| fig-height: 5
+
+if ("pct_eau_amelioree" %in% names(habitat_trends)) {
+  ggplot(mapping = aes(x = year, y = pct_eau_amelioree, colour = Observatory)) +
+    geom_line(data = hab_solid |> filter(!is.na(pct_eau_amelioree)), linewidth = 0.8) +
+    geom_line(data = hab_gap |> filter(!is.na(pct_eau_amelioree)), linewidth = 0.8, linetype = "31") +
+    geom_point(data = habitat_trends |> filter(!is.na(pct_eau_amelioree)), size = 2) +
+    scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+    scale_y_continuous(limits = c(0, 100)) +
+    labs(x = NULL, y = "% de ménages avec eau améliorée", colour = "Observatoire") +
+    theme_minimal()
+}
 ```

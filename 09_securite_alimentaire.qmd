@@ -793,3 +793,81 @@ ggplot(csi, aes(x = Observatory, y = csi_score, fill = Observatory)) +
   theme_minimal() +
   theme(plot.title = element_text(face = "bold", size = 12))
 ```
+
+## Évolution de la sécurité alimentaire (1995–2025) {#sec-sa-multiyear}
+
+La durée de la période de soudure (`sal2d`, en mois) est disponible pour un nombre significatif de campagnes. On retrace ici son évolution pour les deux observatoires.
+
+```{r sa_trends_compute}
+#| include: false
+
+sa_file <- "output/sa_trends_obs.rds"
+
+if (file.exists(sa_file)) {
+  sa_trends <- readRDS(sa_file)
+} else {
+  years_dir <- "data/ROS_MDG_microdata"
+  all_years <- c(1995:2015, 2025)
+  
+  sa_trends <- map_dfr(all_years, function(yr) {
+    f_deb <- file.path(years_dir, yr, "res_deb.dta")
+    f_sa  <- file.path(years_dir, yr, "res_sa.dta")
+    if (!file.exists(f_deb) || !file.exists(f_sa)) return(tibble())
+    
+    deb <- read_dta(f_deb) |>
+      mutate(j5 = as.character(j5), year = yr) |>
+      filter(j0 %in% c(3, 21)) |>
+      mutate(Observatory = if_else(j0 == 3, "Marovoay", "Alaotra"))
+    
+    sa <- read_dta(f_sa) |> mutate(j5 = as.character(j5))
+    
+    if (!"sal2d" %in% names(sa)) return(tibble())
+    
+    d <- sa |> inner_join(deb |> select(j5, Observatory, year), by = "j5")
+    
+    d |>
+      filter(!is.na(sal2d), sal2d >= 0, sal2d <= 12) |>
+      summarise(
+        n = n(),
+        soudure_moy = round(mean(sal2d, na.rm = TRUE), 1),
+        pct_soudure = round(mean(sal2d > 0, na.rm = TRUE) * 100, 1),
+        .by = c(year, Observatory)
+      )
+  })
+  
+  saveRDS(sa_trends, sa_file)
+}
+
+sa_solid <- sa_trends |> filter(year <= 2015)
+sa_gap   <- sa_trends |> filter(year %in% c(2015, 2025))
+```
+
+```{r fig_sa_soudure_duration}
+#| fig-cap: "Évolution de la durée moyenne de soudure (mois/ménage)"
+#| fig-width: 9
+#| fig-height: 5
+
+ggplot(mapping = aes(x = year, y = soudure_moy, colour = Observatory)) +
+  geom_line(data = sa_solid, linewidth = 0.8) +
+  geom_line(data = sa_gap, linewidth = 0.8, linetype = "31") +
+  geom_point(data = sa_trends, size = 2) +
+  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+  scale_y_continuous(limits = c(0, NA)) +
+  labs(x = NULL, y = "Durée moyenne de soudure (mois)", colour = "Observatoire") +
+  theme_minimal()
+```
+
+```{r fig_sa_pct_soudure}
+#| fig-cap: "Évolution du pourcentage de ménages en soudure"
+#| fig-width: 9
+#| fig-height: 5
+
+ggplot(mapping = aes(x = year, y = pct_soudure, colour = Observatory)) +
+  geom_line(data = sa_solid, linewidth = 0.8) +
+  geom_line(data = sa_gap, linewidth = 0.8, linetype = "31") +
+  geom_point(data = sa_trends, size = 2) +
+  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+  scale_y_continuous(limits = c(0, 100)) +
+  labs(x = NULL, y = "% de ménages ayant connu une soudure", colour = "Observatoire") +
+  theme_minimal()
+```
