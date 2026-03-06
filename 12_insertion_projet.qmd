@@ -4,37 +4,395 @@ editor_options:
   chunk_output_type: console
 ---
 
-# Insertion sociale et accès des ménages aux projets 
+# Insertion sociale et accès des ménages aux projets
 
-Nous allons charger les données concernant l'insertion sociale des ménages par l'appartenance à un groupement et l'accès des ménages aux projets dans les OR Alaotra et Marovoay.
+Ce chapitre analyse l'insertion sociale des ménages à travers leur appartenance à des organisations et associations, ainsi que leur accès aux projets de développement dans les observatoires d'Alaotra et de Marovoay.
 
-```{r}
+```{r setup_insertion}
+#| include: false
 library(tidyverse)
 library(haven)
-library(dplyr)
-library (gt) # Easily create presentation - ready display tables
- 
-# Loading observatories data
-res_deb <- read_dta("data/res_deb.dta")
-# Loading household data
-res_m_a <- read_dta("data/res_m_a.dta")
+library(labelled)
+library(gt)
+library(scales)
+
+# --- Données de base ---
+res_deb <- read_dta("data/res_deb.dta") |>
+  mutate(
+    j5 = as.character(j5),
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  )
+
+add_obs <- function(df) {
+  df |>
+    mutate(j5 = as.character(j5)) |>
+    left_join(res_deb |> select(j5, Observatory), by = "j5")
+}
+
+n_men <- nrow(res_deb)
+
+safe_to_char <- function(x) {
+  out <- labelled::to_character(x)
+  out <- as.character(out)
+  Encoding(out[!is.na(out)]) <- "latin1"
+  iconv(out, from = "latin1", to = "UTF-8", sub = "?")
+}
+
+# --- Données insertion sociale ---
+res_respg  <- read_dta("data/res_respg.dta")  |> add_obs()
+res_respg0 <- read_dta("data/res_respg0.dta") |> add_obs()
+
+# --- Données projets ---
+res_pro <- read_dta("data/res_pro.dta") |> add_obs()
+
+# Labels types d'organisation
+org_labs <- c(
+  "1"  = "Organisation de producteurs",
+  "2"  = "Organisation d'autres filières",
+  "3"  = "Association de parents d'élèves",
+  "4"  = "Association religieuse",
+  "5"  = "Parti ou groupement politique",
+  "6"  = "Association sportive ou de loisir",
+  "7"  = "Mutuelle de microfinance",
+  "8"  = "Grenier communautaire villageois",
+  "9"  = "Assoc. villageoise d'épargne et de crédit",
+  "10" = "ONG",
+  "11" = "Autorités locales (Fokontany)",
+  "12" = "Autorités traditionnelles",
+  "13" = "Association de protection de la nature",
+  "14" = "Association de guide touristique",
+  "15" = "Association de protection de l'environnement",
+  "16" = "COBA (Communauté de base GELOSE)",
+  "17" = "Association de femmes",
+  "18" = "Association d'hommes",
+  "19" = "Association de jeunes",
+  "99" = "Autre organisation"
+)
+
+role_labs <- c(
+  "1" = "Responsable",
+  "2" = "Membre actif",
+  "3" = "Membre occasionnel"
+)
 ```
 
-## Insertion sociale
+
+## Insertion sociale {#sec-insertion}
+
+### Appartenance à une organisation
+
+Sur les `r n_men` ménages enquêtés, `r sum(res_respg0$respga == 1)` (`r round(sum(res_respg0$respga == 1) / n_men * 100, 1)` %) déclarent qu'au moins un de leurs membres appartient à une organisation ou association. La participation est nettement plus élevée à Marovoay qu'à Alaotra.
 
 ```{r}
-# Loading social organization data
-res_respg <- read_dta("data/res_respg.dta") # year, j5
-res_respg0 <- read_dta("data/res_respg0.dta") # year, j5
+#| label: tbl-adhesion
+#| tbl-cap: "Appartenance à une organisation ou association"
+
+res_respg0 |>
+  summarise(
+    `Nb ménages` = n(),
+    `Membres (nb)` = sum(respga == 1),
+    `Membres (%)` = round(sum(respga == 1) / n() * 100, 1),
+    .by = Observatory
+  ) |>
+  bind_rows(
+    res_respg0 |>
+      summarise(
+        Observatory = "Total",
+        `Nb ménages` = n(),
+        `Membres (nb)` = sum(respga == 1),
+        `Membres (%)` = round(sum(respga == 1) / n() * 100, 1)
+      )
+  ) |>
+  gt() |>
+  tab_header(title = "Ménages ayant au moins un membre dans une organisation")
 ```
 
-## Accès des ménages aux projets
+### Nombre d'organisations par ménage
+
+Parmi les ménages membres, la plupart n'adhèrent qu'à une seule organisation, mais certains cumulent jusqu'à quatre affiliations.
 
 ```{r}
-# Loading household project acces data
-res_pro <- read_dta("data/res_pro.dta") # year, j5
+#| label: fig-nb-org
+#| fig-cap: "Nombre d'organisations par ménage membre"
+#| fig-width: 8
+#| fig-height: 5
+
+res_respg |>
+  filter(!is.na(respgc)) |>
+  count(j5, Observatory, name = "nb_org") |>
+  count(Observatory, nb_org, name = "n_men") |>
+  ggplot(aes(x = factor(nb_org), y = n_men, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  labs(x = "Nombre d'organisations", y = "Nombre de ménages", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
 ```
 
-La variable "pro1" dans "respg0.dta";
+### Type d'organisation
 
-On va assembler d'abord repg0\$pro1 avec res_pro
+Les associations villageoises d'épargne et de crédit (tontines, *voamamy*) dominent à Marovoay, tandis que les associations religieuses prédominent à Alaotra. Les associations de femmes (liées au 8 mars) et les organisations de producteurs figurent également parmi les types les plus courants.
+
+```{r}
+#| label: fig-type-org
+#| fig-cap: "Type d'organisation (toutes adhésions)"
+#| fig-width: 11
+#| fig-height: 7
+
+res_respg |>
+  filter(!is.na(respgc)) |>
+  mutate(
+    respgc_chr = as.character(respgc),
+    Type = if_else(
+      respgc_chr %in% names(org_labs),
+      org_labs[respgc_chr],
+      paste0("Code ", respgc_chr)
+    )
+  ) |>
+  count(Observatory, Type) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  filter(pct >= 1) |>
+  ggplot(aes(x = reorder(Type, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des adhésions", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+### Qui dans le ménage est membre
+
+Le chef de ménage et le ou la conjoint(e) sont les membres les plus fréquemment affiliés, de façon quasi-égale.
+
+```{r}
+#| label: fig-qui-membre
+#| fig-cap: "Membre du ménage affilié à l'organisation"
+#| fig-width: 9
+#| fig-height: 5
+
+res_respg |>
+  filter(!is.na(respgc)) |>
+  mutate(Membre = case_when(
+    respgb == 1 ~ "Chef de ménage",
+    respgb == 2 ~ "Conjoint(e)",
+    respgb %in% 3:23 ~ "Autre membre",
+    respgb == 91 ~ "Chef et conjoint",
+    respgb == 92 ~ "Tout le ménage",
+    respgb == 93 ~ "Tous les enfants",
+    TRUE ~ "Autre"
+  )) |>
+  count(Observatory, Membre) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Membre, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des adhésions", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+### Niveau de responsabilité
+
+La grande majorité des membres se déclarent *membres occasionnels*, et seule une minorité occupe un poste de responsable.
+
+```{r}
+#| label: fig-responsabilite
+#| fig-cap: "Niveau de responsabilité dans l'organisation"
+#| fig-width: 9
+#| fig-height: 5
+
+res_respg |>
+  filter(!is.na(respgd), respgd %in% c(1, 2, 3)) |>
+  mutate(Role = factor(as.character(respgd), levels = names(role_labs), labels = role_labs)) |>
+  count(Observatory, Role) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = Role, y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  labs(x = NULL, y = "% des adhésions", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+
+## Accès des ménages aux projets {#sec-projets}
+
+Le questionnaire demande aux ménages s'ils ont bénéficié de projets ou de formations dans huit domaines. La variable `pro1` (dans `res_respg0`) indique si au moins un membre du ménage a bénéficié d'un projet, tandis que `res_pro` détaille les bénéficiaires par type de projet et leur source de financement.
+
+### Bénéficiaires de projets
+
+```{r}
+#| label: tbl-pro1
+#| tbl-cap: "Ménages bénéficiaires de projets ou formations"
+
+res_respg0 |>
+  mutate(Beneficiaire = case_when(
+    pro1 == 1 ~ "Oui",
+    pro1 == 2 ~ "Non",
+    pro1 == 3 ~ "Ne sait pas"
+  )) |>
+  count(Observatory, Beneficiaire) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  select(-n) |>
+  pivot_wider(names_from = Observatory, values_from = pct) |>
+  gt() |>
+  tab_header(title = "Le ménage a-t-il bénéficié d'un projet ou d'une formation ?") |>
+  cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
+```
+
+### Taux de bénéficiaires par type de projet
+
+L'éducation et la santé, la nutrition et l'agriculture sont les domaines pour lesquels les ménages bénéficient le plus de projets. Le tourisme reste totalement absent des deux observatoires.
+
+```{r}
+#| label: fig-benef-type
+#| fig-cap: "Taux de ménages bénéficiaires par type de projet"
+#| fig-width: 10
+#| fig-height: 6
+
+pro_clean <- res_pro |>
+  mutate(
+    pro_lib_txt = safe_to_char(pro_lib),
+    pro_lib_clean = case_when(
+      pro_lib_txt %in% c("Fizahan-tany", "Fizahantany") ~ "Tourisme",
+      str_detect(pro_lib_txt, "^Hafa") ~ "Autre (ex. HIMO)",
+      pro_lib_txt == "Fambolena" ~ "Agriculture",
+      pro_lib_txt == "Fampianarana &  Faha" ~ "Éducation & santé",
+      pro_lib_txt == "Fanjariantsakafo" ~ "Nutrition",
+      pro_lib_txt == "Fiompiana/jono" ~ "Élevage / pêche",
+      pro_lib_txt == "Asam-pamokarana hafa" ~ "Autres productions",
+      pro_lib_txt == "Tontolo iainana" ~ "Environnement",
+      TRUE ~ pro_lib_txt
+    )
+  ) |>
+  filter(pro_lib_clean != "")
+
+pro_clean |>
+  filter(!is.na(pro2), pro2 %in% c(1, 2)) |>
+  summarise(
+    pct = round(mean(pro2 == 1) * 100, 1),
+    .by = c(Observatory, pro_lib_clean)
+  ) |>
+  ggplot(aes(x = reorder(pro_lib_clean, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% de ménages bénéficiaires", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r}
+#| label: tbl-benef-type
+#| tbl-cap: "Taux de bénéficiaires par type de projet et observatoire"
+
+pro_clean |>
+  filter(!is.na(pro2), pro2 %in% c(1, 2)) |>
+  summarise(
+    pct = round(mean(pro2 == 1) * 100, 1),
+    .by = c(Observatory, pro_lib_clean)
+  ) |>
+  pivot_wider(names_from = Observatory, values_from = pct) |>
+  arrange(desc(Alaotra)) |>
+  rename(`Type de projet` = pro_lib_clean) |>
+  gt() |>
+  tab_header(title = "% de ménages bénéficiaires par type de projet") |>
+  cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
+```
+
+### Source des projets
+
+Pour les ménages bénéficiaires, le financement provient principalement de l'État et des ONG/projets. L'Église et les autres sources restent marginales.
+
+```{r}
+#| label: fig-source-projet
+#| fig-cap: "Source des projets pour les ménages bénéficiaires"
+#| fig-width: 10
+#| fig-height: 6
+
+pro_benef <- pro_clean |>
+  filter(pro2 == 1)
+
+pro_source <- pro_benef |>
+  summarise(
+    n = n(),
+    Etat = sum(pro3 == 1, na.rm = TRUE),
+    `ONG / Projet` = sum(!is.na(pro4) & pro4 != 0, na.rm = TRUE),
+    Eglise = sum(pro5 == 1, na.rm = TRUE),
+    .by = c(Observatory, pro_lib_clean)
+  ) |>
+  pivot_longer(
+    cols = c(Etat, `ONG / Projet`, Eglise),
+    names_to = "Source",
+    values_to = "nb"
+  ) |>
+  mutate(pct = round(nb / n * 100, 1))
+
+pro_source |>
+  ggplot(aes(x = reorder(pro_lib_clean, pct), y = pct, fill = Source)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  facet_wrap(~Observatory) +
+  labs(x = NULL, y = "% des bénéficiaires", fill = "Source") +
+  theme_minimal(base_size = 11) +
+  theme(legend.position = "top")
+```
+
+```{r}
+#| label: tbl-source-global
+#| tbl-cap: "Source des projets (tous types confondus)"
+
+pro_benef |>
+  summarise(
+    `Total bénéficiaires` = n(),
+    `État (nb)` = sum(pro3 == 1, na.rm = TRUE),
+    `État (%)` = round(sum(pro3 == 1, na.rm = TRUE) / n() * 100, 1),
+    `ONG/Projet (nb)` = sum(!is.na(pro4) & pro4 != 0, na.rm = TRUE),
+    `ONG/Projet (%)` = round(sum(!is.na(pro4) & pro4 != 0, na.rm = TRUE) / n() * 100, 1),
+    `Église (nb)` = sum(pro5 == 1, na.rm = TRUE),
+    .by = Observatory
+  ) |>
+  gt() |>
+  tab_header(title = "Source des projets pour les ménages bénéficiaires")
+```
+
+
+## Croisement insertion sociale et accès aux projets {#sec-croisement}
+
+Les ménages membres d'une organisation sont-ils davantage bénéficiaires de projets ?
+
+```{r}
+#| label: tbl-croisement
+#| tbl-cap: "Accès aux projets selon l'appartenance à une organisation"
+
+res_respg0 |>
+  filter(pro1 %in% c(1, 2)) |>
+  mutate(
+    Membre = if_else(respga == 1, "Membre", "Non membre"),
+    Beneficiaire = pro1 == 1
+  ) |>
+  summarise(
+    n = n(),
+    pct_benef = round(mean(Beneficiaire) * 100, 1),
+    .by = c(Observatory, Membre)
+  ) |>
+  pivot_wider(names_from = Membre, values_from = c(n, pct_benef)) |>
+  gt() |>
+  tab_header(title = "% de ménages bénéficiaires de projets selon l'appartenance à une organisation") |>
+  cols_label(
+    n_Membre = "N (membres)",
+    `n_Non membre` = "N (non membres)",
+    pct_benef_Membre = "Bénéf. (%) membres",
+    `pct_benef_Non membre` = "Bénéf. (%) non membres"
+  )
+```
+
+
+## Pistes d'analyse complémentaires {#sec-pistes-insertion}
+
+- **Lien organisation–type de projet** : les ménages membres d'organisations de producteurs bénéficient-ils davantage de projets agricoles ?
+- **Codes ONG/Projet** (`pro4`) : les valeurs numériques (10–15, 24, etc.) semblent correspondre à des identifiants de projets spécifiques dont la correspondance avec des noms de projets reste à documenter.
+- **Multi-adhésion et capital social** : croiser le nombre d'organisations par ménage avec les indicateurs de bien-être (habitat, sécurité alimentaire) pour tester l'effet du capital social.
+- **Analyse genrée** : les associations de femmes (code 17, liées au 8 mars) sont très présentes à Marovoay ; une analyse genrée de l'insertion sociale serait pertinente.
