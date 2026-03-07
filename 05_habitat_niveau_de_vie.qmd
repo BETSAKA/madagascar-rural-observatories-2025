@@ -5,1046 +5,606 @@ editor_options:
 ---
 
 # Habitat et niveau de vie
-On s'intéresse ici aux conditions d'habitat, aux actifs du ménage et à son accès aux services essentiels.
-Nous allons charger les données de l'habitat et niveau de vies.
 
-```{r}
+Cette section decrit les conditions d'habitat, les equipements des menages, leurs transferts et revenus.
+
+```{r setup_habitat}
+#| include: false
 library(tidyverse)
 library(haven)
-library(dplyr)
-library (gt) # Easily create presentation - ready display tables
-library(ggplot2)
-library(forcats)
-library(stringr)
 library(labelled)
+library(gt)
+library(scales)
 
-# Loading observatories data
-res_deb <- read_dta("data/res_deb.dta")
-# Loading household data
-res_m_a <- read_dta("data/res_m_a.dta")
-# Loading habitat data including kitchen (h)
-res_h <- read_dta("data/res_h.dta") # year, j5 
-# Loading indicateur de confort (v), equipement , communication (tm1, ut1, snw), equipement agricole (e0) data
-res_v <- read_dta("data/res_v.dta") # year, j5 
-res_e <- read_dta("data/res_E.dta") # year, j5 # Equipement module next part
+source("utils/helpers_report.R")
+source("utils/sites.R")
+source("utils/downloadable_output.R")
+
+res_deb <- read_dta("data/res_deb.dta") |>
+  mutate(j5 = as.character(j5)) |>
+  add_obs() |>
+  assign_site()
+
+res_h <- read_dta("data/res_h.dta") |> mutate(j5 = as.character(j5))
+res_v <- read_dta("data/res_v.dta") |> mutate(j5 = as.character(j5))
+res_e <- read_dta("data/res_E.dta") |> mutate(j5 = as.character(j5))
+
+obs <- res_deb |> select(j5, Observatory, Site)
 ```
 
 ## Habitat
 
-### Accès au logement d'habitation
+### Statut d'occupation du logement
 
-```{r}
-# Statut d'occupation du logement par observatoire
-house_status <- res_h %>% 
-  left_join(res_deb, by = "j5") %>% 
-  group_by(j0, h0) %>% 
-  summarise(n = n(), .groups = "drop") %>% 
-  mutate(
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    ),
-    # Extraire les labels des activités et corriger l'encodage
-    statut = iconv(as.character(labelled::to_factor(h0)), from = "latin1", to = "UTF-8"),
-    statut = gsub("&#39;", "'", statut, fixed = TRUE)
-  ) %>%
-  group_by(Observatory) %>% 
-  mutate(
-    Total = sum(n),
-    Percentage = round(100 * n / Total, 1)
-  ) %>% 
-  select(Observatory, statut, n, Percentage) %>% 
-  ungroup()
+```{r house_status}
+house <- res_h |>
+  left_join(obs, by = "j5") |>
+  mutate(Statut = decode_labelled(h0)) |>
+  count(Observatory, Statut) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
-# Ajouter les lignes "Total" par observatoire
-house_status <- bind_rows(
-  house_status,
-  house_status %>% 
-    group_by(Observatory) %>% 
-    summarise(
-      statut = "Total",
-      n = sum(n),
-      Percentage = 100,
-      .groups = "drop"
-    )
-) %>% 
-  arrange(Observatory, desc(statut == "Total"))
+house |>
+  gt(groupname_col = "Observatory") |>
+  tab_header(title = "Statut d'occupation du logement par observatoire") |>
+  cols_label(Statut = "Statut", n = "N", pct = "%") |>
+  fmt_number(columns = n, decimals = 0) |>
+  fmt_number(columns = pct, decimals = 1) |>
+  style_table()
 
-# Ajouter une ligne "Total global"
-house_status <- bind_rows(
-  house_status,
-  house_status %>% 
-    summarise(
-      Observatory = "Total global",
-      statut = "Total",
-      n = sum(n),
-      Percentage = 100,
-      .groups = "drop"
-    )
-)
-
-# Créer un tableau formaté avec gt
-house_status %>% 
-  gt(rowname_col = "statut") %>% 
-  tab_header(
-    title = "Statut d'occupation du logement par observatoire"
-  ) %>% 
-  fmt_number(
-    columns = c(n),
-    sep_mark = " ",
-    decimals = 0
-  ) %>% 
-  fmt_number(
-    columns = c(Percentage),
-    decimals = 1
-  ) %>% 
-  cols_label(
-    n = "Nombre",
-    Percentage = "%"
-  )
-
-# Camembert display 
-
-house_status %>% 
-  filter(Observatory %in% c("Marovoay", "Alaotra"), statut != "Total") %>% 
-  ggplot(aes(x = "", y = Percentage, fill = statut)) +
-  geom_bar(width = 1, stat = "identity") +
-  coord_polar("y") +
-  geom_text(aes(label = paste0(Percentage, "%")),
-            position = position_stack(vjust = 0.5)) +
-  facet_wrap(~Observatory) +
-  labs(title = "Répartition (%) des ménages par statut d'occupation selon l'observatoire") +
-  theme_void() +
-  theme(legend.title = element_blank(),
-        plot.title = element_text(hjust = 0.5))
-
+house |> make_bar_obs(x = Statut, title = "Statut d'occupation du logement")
 ```
 
-
-### Nombres de chambres
-
-### mur
-
-### tafo
-
-### gorodona
-
+```{r dl_house_status}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_house_status", "05", function(d) {
+  d |> mutate(Statut = decode_labelled(h0)) |>
+    count(Observatory, Statut) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, res_h |> left_join(obs, by = "j5"))
+dl_fig_variants("fig_house_status", "05", function(d) {
+  d |> mutate(Statut = decode_labelled(h0)) |>
+    count(Observatory, Statut) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    make_bar_obs(x = Statut, title = "Statut d'occupation du logement")
+}, res_h |> left_join(obs, by = "j5"))
+```
 
 ### Type de latrine
 
-```{r}
-# Calcul des types de latrine par observatoire
-latrine_type <- res_h %>% 
-  mutate(
-    h5_factor = haven::as_factor(h5),
-    type = iconv(as.character(h5_factor), from = "latin1", to = "UTF-8"),
-    Type = gsub("&#39;", "'", type, fixed = TRUE)
-  ) %>% 
-  left_join(res_deb, by = "j5") %>% 
-  mutate(
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    )
-  ) %>% 
-  group_by(Observatory, Type) %>% 
-  summarise(n = n(), .groups = "drop") %>% 
-  group_by(Observatory) %>% 
-  mutate(
-    Total = sum(n),
-    Percentage_raw = 100 * n / Total,
-    Percentage = round(Percentage_raw, 1)
-  ) %>% 
-  ungroup()
+```{r latrine}
+latrine <- res_h |>
+  left_join(obs, by = "j5") |>
+  mutate(Type = decode_labelled(h5)) |>
+  count(Observatory, Type) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
-# Ajouter les lignes "Total" par observatoire
-latrine_type <- bind_rows(
-  latrine_type,
-  latrine_type %>% 
-    group_by(Observatory) %>% 
-    summarise(
-      Type = "Total",
-      n = sum(n),
-      Percentage_raw = 100,
-      Percentage = 100,
-      .groups = "drop"
-    )
-) %>% 
-  arrange(Observatory, desc(n))
+latrine |>
+  gt(groupname_col = "Observatory") |>
+  tab_header(title = "Types de latrine par observatoire") |>
+  cols_label(Type = "Type de latrine", n = "N", pct = "%") |>
+  fmt_number(columns = n, decimals = 0) |>
+  fmt_number(columns = pct, decimals = 1) |>
+  style_table()
 
-# Ajouter une ligne "Total global"
-latrine_type <- bind_rows(
-  latrine_type,
-  latrine_type %>% 
-    summarise(
-      Observatory = "Total global",
-      Type = "Total",
-      n = sum(n),
-      Percentage_raw = 100,
-      Percentage = 100,
-      .groups = "drop"
-    )
-)
-
-# Tableau formaté avec gt (sans colonnes Total et Percentage_raw)
-latrine_type %>% 
-  select(Observatory, Type, n, Percentage) %>%   # ⚠️ on garde seulement les colonnes utiles
-  arrange(Observatory, desc(Percentage)) %>% 
-  gt(rowname_col = "Observatory") %>% 
-  tab_header(
-    title = "Types de latrine par observatoire"
-  ) %>% 
-  fmt_number(
-    columns = c(n),
-    sep_mark = " ",
-    decimals = 0
-  ) %>% 
-  fmt_number(
-    columns = c(Percentage),
-    decimals = 1
-  ) %>% 
-  cols_label(
-    Type = "Type de latrine",
-    n = "Nombre",
-    Percentage = "%"
-  ) %>%
-  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
-
-# Camembert par observatoire (parts ordonnées par fréquence décroissante en pourcentage)
-latrine_type %>% 
-  filter(Observatory %in% c("Marovoay", "Alaotra"), Type != "Total") %>% 
-  arrange(Observatory, desc(Percentage)) %>% 
-  ggplot(aes(x = 1, y = Percentage, fill = fct_reorder(Type, -Percentage))) + 
-  geom_bar(width = 1, stat = "identity") +
-  coord_polar("y") +
-  geom_text(aes(label = paste0(Percentage, "%")),
-            position = position_stack(vjust = 0.5)) +
-  facet_wrap(~Observatory) +
-  labs(title = "Types de latrine par observatoire") +
-  scale_fill_brewer(palette = "Set3") +   # palette harmonisée
-  theme_void() +
-  theme(legend.title = element_blank(),
-        plot.title = element_text(hjust = 0.5))
-
+latrine |> make_bar_obs(title = "Types de latrine par observatoire")
 ```
 
-### Accès à l'eau de source améliorée et à l'électricité
-
-#### Mode d'approvisionnement en eau
-```{r}
-# Calcul des modes d'approvisionnement en eau par observatoire
-water_access <- res_h %>% 
-  mutate(
-    h4_factor = haven::as_factor(h4),
-    type = as.character(h4_factor),
-    type_utf8 = iconv(type, from = "latin1", to = "UTF-8", sub = ""),   # conversion robuste en UTF-8
-    Type = gsub("&#39;", "'", type_utf8, fixed = TRUE)                  # remplacement des entités HTML
-  ) %>% 
-  left_join(res_deb, by = "j5") %>% 
-  mutate(
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    )
-  ) %>% 
-  group_by(Observatory, Type) %>% 
-  summarise(n = n(), .groups = "drop") %>% 
-  group_by(Observatory) %>% 
-  mutate(
-    Total = sum(n),
-    Percentage_raw = 100 * n / Total,
-    Percentage = round(Percentage_raw, 1)
-  ) %>% 
-  ungroup()
-
-# Ajouter les lignes "Total" par observatoire
-water_access <- bind_rows(
-  water_access,
-  water_access %>% 
-    group_by(Observatory) %>% 
-    summarise(
-      Type = "Total",
-      n = sum(n),
-      Percentage_raw = 100,
-      Percentage = 100,
-      .groups = "drop"
-    )
-) %>% 
-  arrange(Observatory, desc(n))
-
-# Ajouter une ligne "Total global"
-water_access <- bind_rows(
-  water_access,
-  water_access %>% 
-    summarise(
-      Observatory = "Total global",
-      Type = "Total",
-      n = sum(n),
-      Percentage_raw = 100,
-      Percentage = 100,
-      .groups = "drop"
-    )
-)
-
-# Tableau formaté avec gt (sans colonnes Total et Percentage_raw)
-water_access %>% 
-  select(Observatory, Type, n, Percentage) %>%   # on garde seulement les colonnes utiles
-  arrange(Observatory, desc(Percentage)) %>% 
-  gt(rowname_col = "Observatory") %>% 
-  tab_header(
-    title = "Mode d'approvisionnement en eau des ménages par observatoire"
-  ) %>% 
-  fmt_number(
-    columns = c(n),
-    sep_mark = " ",
-    decimals = 0
-  ) %>% 
-  fmt_number(
-    columns = c(Percentage),
-    decimals = 1
-  ) %>% 
-  cols_label(
-    Type = "Type",
-    n = "Nombre",
-    Percentage = "%"
-  ) %>%
-  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
-
-# Histogramme horizontal en % sans noms d'axes
-water_access %>% 
-  filter(Type != "Total", Observatory != "Total global") %>% 
-  ggplot(aes(x = fct_reorder(Type, Percentage), 
-             y = Percentage, 
-             fill = Observatory)) +
-  geom_col(position = "dodge") +
-  coord_flip() +
-  geom_text(aes(label = paste0(Percentage, "%")), 
-            position = position_dodge(width = 1), 
-            hjust = -0.1, size = 3) +
-  labs(title = "Modes d'approvisionnement en eau des ménages par observatoire",
-       x = NULL,   # pas de label pour l'axe X
-       y = NULL) + # pas de label pour l'axe Y
-  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
-  theme_minimal() +
-  theme(legend.title = element_blank(),
-        plot.title = element_text(hjust = 0.5))
-
+```{r dl_latrine}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_latrine", "05", function(d) {
+  d |> mutate(Type = decode_labelled(h5)) |>
+    count(Observatory, Type) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, res_h |> left_join(obs, by = "j5"))
+dl_fig_variants("fig_latrine", "05", function(d) {
+  d |> mutate(Type = decode_labelled(h5)) |>
+    count(Observatory, Type) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    make_bar_obs(title = "Types de latrine par observatoire")
+}, res_h |> left_join(obs, by = "j5"))
 ```
 
-#### Mode d'éclairage
+### Acces a l'eau
 
-```{r}
-##Mode d' éclairage
-# Extraction des labels propres
-labels_h7 <- tibble(
-  H7_var = names(res_h)[grepl("^h7", names(res_h))],
-  Type = sapply(res_h[grepl("^h7", names(res_h))], function(x) {
-    lab <- iconv(var_label(x), from = "latin1", to = "UTF-8")
-    if (grepl(":", lab)) {
-      lab <- sub(".*?:\\s*", "", lab)
-    }
-    lab
-  })
-)
+```{r water}
+water <- res_h |>
+  left_join(obs, by = "j5") |>
+  mutate(Type = decode_labelled(h4)) |>
+  count(Observatory, Type) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
-#Construction des données
-light_source <- res_h %>% 
-  mutate(across(starts_with("h7"), as.numeric)) %>% 
-  pivot_longer(
-    cols = starts_with("h7"),
-    names_to = "H7_var",
-    values_to = "value"
-  ) %>% 
-  filter(value == 1) %>% 
-  left_join(labels_h7, by = "H7_var") %>% 
-  left_join(res_deb, by = "j5") %>% 
-  mutate(
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    )
-  ) %>% 
-  group_by(Observatory, Type) %>% 
-  summarise(n = n(), .groups = "drop") %>% 
-  group_by(Observatory) %>% 
-  mutate(
-    Percentage = round(100 * n / sum(n), 1)
-  ) %>% 
-  ungroup()
+water |>
+  gt(groupname_col = "Observatory") |>
+  tab_header(title = "Mode d'approvisionnement en eau par observatoire") |>
+  cols_label(Type = "Source", n = "N", pct = "%") |>
+  fmt_number(columns = n, decimals = 0) |>
+  fmt_number(columns = pct, decimals = 1) |>
+  style_table()
 
-# Correction encodage finale
-light_source <- light_source %>%
-  mutate(across(where(is.character),
-                ~ iconv(., from = "UTF-8", to = "UTF-8", sub = "")))
-
-#Totaux par observatoire
-total_by_observatory <- light_source %>%
-  group_by(Observatory) %>%
-  summarise(
-    Type = "Total",
-    n = sum(n),
-    Percentage = 100,
-    .groups = "drop"
-  )
-
-# Total global
-total_global <- light_source %>%
-  summarise(
-    Observatory = "Total global",
-    Type = "Total",
-    n = sum(n),
-    Percentage = 100
-  )
-
-# Fusion des données avec totaux
-light_source_final <- bind_rows(light_source, total_by_observatory, total_global)
-
-# Tableau final
-light_source_final %>% 
-  arrange(Observatory, desc(Percentage)) %>% 
-  gt(groupname_col = "Observatory") %>% 
-  fmt_number(
-    columns = n,
-    decimals = 0
-  ) %>% 
-  fmt_number(
-    columns = Percentage,
-    decimals = 1
-  ) %>% 
-  cols_label(
-    Type = "Type d'éclairage",
-    n = "Nombre",
-    Percentage = "%"
-  ) %>% 
-  tab_header(
-    title = "Modes d'éclairage des ménages par observatoire"
-  ) %>% 
-  tab_source_note(
-    source_note = md("**Source : Enquête auprès des OR 2025**")
-  )
-
-################################################
-## HISTOGRAMME
-###############################################
-
-# Filtrer les types réels (pas les totaux)
-light_source_plot <- light_source_final %>%
-  filter(Type != "Total", Observatory != "Total global") %>%
-  group_by(Observatory, Type) %>%
-  summarise(Percentage = first(Percentage), .groups = "drop")
-
-# Définir l'ordre des observatoires (Alaotra en haut, Marovoay en bas)
-light_source_plot <- light_source_plot %>%
-  mutate(
-    Observatory = factor(Observatory, levels = c("Alaotra", "Marovoay"))
-  )
-
-# Trier les types par pourcentage décroissant dans chaque observatoire
-light_source_plot <- light_source_plot %>%
-  group_by(Observatory) %>%
-  mutate(Type = factor(Type, levels = Type[order(-Percentage)])) %>%
-  ungroup()
-
-# Histogramme horizontal avec facettes et sans noms d'axes
-ggplot(light_source_plot, aes(x = Type, y = Percentage, fill = Observatory)) +
-  geom_col(show.legend = FALSE) +
-  coord_flip() +
-  facet_wrap(~ Observatory, ncol = 1, scales = "free_y") +
-  geom_text(aes(label = paste0(Percentage, "%")), hjust = -0.1, size = 4) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
-  labs(
-    title = "Répartition des modes d'éclairage par observatoire",
-    x = NULL,
-    y = NULL
-  ) +
-  theme_minimal(base_size = 14)
+water |> make_bar_obs(title = "Mode d'approvisionnement en eau")
 ```
 
-
-### Source d'énérgie utilisée pour la cuisson
-```{r energie_cuisson}
-## Mode de cuisson
-#| label: setup
-#| include: false
-
-# Extraction des labels pour h6
-labels_h6 <- tibble(
-  H6_var = names(res_h)[grepl("^h6", names(res_h))],
-  Type = sapply(res_h[grepl("^h6", names(res_h))], function(x) {
-    lab <- iconv(var_label(x), from = "latin1", to = "UTF-8")
-    if (grepl(":", lab)) lab <- sub(".*?:\\s*", "", lab)
-    lab <- str_to_title(lab)
-    str_squish(lab)
-  })
-)
-
-# Construction des données
-cooking_energy_source <- res_h %>% 
-  mutate(across(starts_with("h6"), as.numeric)) %>% 
-  pivot_longer(
-    cols = starts_with("h6"),
-    names_to = "H6_var",
-    values_to = "value"
-  ) %>% 
-  filter(value == 1) %>% 
-  left_join(labels_h6, by = "H6_var") %>% 
-  left_join(res_deb, by = "j5") %>% 
-  mutate(
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    ),
-    # Nettoyer les espaces et remplacer "Autre Préciser"
-    Type = str_squish(Type),
-    Type = str_replace_all(Type, "[\u00A0]", " "),
-    Type = ifelse(Type == "Autre Préciser", "Autre", Type)
-  ) %>% 
-  group_by(Observatory, Type) %>% 
-  summarise(n = n(), .groups = "drop") %>% 
-  group_by(Observatory) %>% 
-  mutate(Percentage = round(100 * n / sum(n), 1)) %>% 
-  ungroup()
-
-# Totaux par observatoire et total global
-# Totaux par observatoire
-totals_observatory <- cooking_energy_source %>%
-  group_by(Observatory) %>%
-  summarise(Type = "Total", n = sum(n), Percentage = 100, .groups = "drop")
-
-# Total global
-total_global <- cooking_energy_source %>%
-  summarise(Observatory = "Total global",
-            Type = "Total",
-            n = sum(n),
-            Percentage = 100)
-
-# Fusionner les données finales
-cooking_energy_source_final <- bind_rows(cooking_energy_source, totals_observatory, total_global)
-
-# Tableau gt
-cooking_energy_source_final %>% 
-  arrange(Observatory, desc(Percentage)) %>% 
-  gt(groupname_col = "Observatory") %>% 
-  fmt_number(columns = n, decimals = 0) %>% 
-  fmt_number(columns = Percentage, decimals = 1) %>% 
-  cols_label(Type = "Type de cuisson", n = "Nombre", Percentage = "%") %>% 
-  tab_header(title = "Modes de cuisson des ménages par observatoire") %>% 
-  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
-
-# Histogramme horizontal
-cooking_energy_source_plot <- cooking_energy_source_final %>%
-  filter(Type != "Total", Observatory != "Total global") %>%
-  group_by(Observatory, Type) %>%
-  summarise(Percentage = first(Percentage), .groups = "drop") %>%
-  mutate(Observatory = factor(Observatory, levels = c("Alaotra", "Marovoay"))) %>%
-  group_by(Observatory) %>%
-  mutate(Type = factor(Type, levels = Type[order(-Percentage)])) %>%
-  ungroup()
-
-ggplot(cooking_energy_source_plot, aes(x = Type, y = Percentage, fill = Observatory)) +
-  geom_col(show.legend = FALSE) +
-  coord_flip() +
-  facet_wrap(~Observatory, ncol = 1, scales = "free_y") +
-  geom_text(aes(label = paste0(Percentage, "%")), hjust = -0.1, size = 4) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
-  labs(title = "Répartition des modes de cuisson par observatoire", x = NULL, y = NULL) +
-  theme_minimal(base_size = 14)
+```{r dl_water}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_water", "05", function(d) {
+  d |> mutate(Type = decode_labelled(h4)) |>
+    count(Observatory, Type) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, res_h |> left_join(obs, by = "j5"))
+dl_fig_variants("fig_water", "05", function(d) {
+  d |> mutate(Type = decode_labelled(h4)) |>
+    count(Observatory, Type) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    make_bar_obs(title = "Mode d'approvisionnement en eau")
+}, res_h |> left_join(obs, by = "j5"))
 ```
 
+### Mode d'eclairage
+
+```{r lighting}
+light <- res_h |>
+  left_join(obs, by = "j5") |>
+  tabulate_binary_set("h7")
+
+light |>
+  gt(groupname_col = "Observatory") |>
+  tab_header(title = "Modes d'eclairage des menages par observatoire") |>
+  cols_label(Type = "Type d'eclairage", n = "N", pct = "%") |>
+  fmt_number(columns = n, decimals = 0) |>
+  fmt_number(columns = pct, decimals = 1) |>
+  style_table()
+
+light |> make_bar_obs(title = "Modes d'eclairage par observatoire")
+```
+
+```{r dl_lighting}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_lighting", "05", function(d) {
+  d |> tabulate_binary_set("h7") |>
+    rename(Site = Observatory, Effectif = n, `%` = pct)
+}, res_h |> left_join(obs, by = "j5"))
+dl_fig_variants("fig_lighting", "05", function(d) {
+  d |> tabulate_binary_set("h7") |>
+    make_bar_obs(title = "Modes d'eclairage par observatoire")
+}, res_h |> left_join(obs, by = "j5"))
+```
+
+### Source d'energie pour la cuisson
+
+```{r cooking}
+cooking <- res_h |>
+  left_join(obs, by = "j5") |>
+  tabulate_binary_set("h6") |>
+  mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type))
+
+cooking |>
+  gt(groupname_col = "Observatory") |>
+  tab_header(title = "Modes de cuisson des menages par observatoire") |>
+  cols_label(Type = "Source d'energie", n = "N", pct = "%") |>
+  fmt_number(columns = n, decimals = 0) |>
+  fmt_number(columns = pct, decimals = 1) |>
+  style_table()
+
+cooking |> make_bar_obs(title = "Modes de cuisson par observatoire")
+```
+
+```{r dl_cooking}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cooking", "05", function(d) {
+  d |> tabulate_binary_set("h6") |>
+    mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type)) |>
+    rename(Site = Observatory, Effectif = n, `%` = pct)
+}, res_h |> left_join(obs, by = "j5"))
+dl_fig_variants("fig_cooking", "05", function(d) {
+  d |> tabulate_binary_set("h6") |>
+    mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type)) |>
+    make_bar_obs(title = "Modes de cuisson par observatoire")
+}, res_h |> left_join(obs, by = "j5"))
+```
 
 ## Niveau de vie
 
+### Biens de confort courant
 
-### Equipement
+```{r comfort_goods}
+comfort <- res_v |>
+  left_join(obs, by = "j5") |>
+  tabulate_binary_set("v") |>
+  mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type))
 
-Les équipements agricoles sont dans "res_v.dta" avec "e0" uniquement comme variable.
+comfort |>
+  gt(groupname_col = "Observatory") |>
+  tab_header(title = "Taux de possession de biens de confort courants") |>
+  cols_label(Type = "Bien", n = "N", pct = "%") |>
+  fmt_number(columns = n, decimals = 0) |>
+  fmt_number(columns = pct, decimals = 1) |>
+  style_table()
 
-
-
-#### Taux de possession des biens de confort courant
-```{r}
-## Biens de confort
-#| label: setup
-#| include: false
-
-
-# Extraction des labels pour v
-lables_v <- tibble(
-  v_var = names(res_v)[grepl("^v", names(res_v))],
-  Type = sapply(res_v[grepl("^v", names(res_v))], function(x) {
-    lab <- iconv(var_label(x), from = "latin1", to = "UTF-8")
-    if (grepl(":", lab)) lab <- sub(".*?:\\s*", "", lab)
-    lab <- str_to_title(lab)
-    str_squish(lab)
-  })
-)
-
-# Construction des données
-hh_assets <- res_v %>% 
-  mutate(across(starts_with("v"), as.numeric)) %>% 
-  pivot_longer(
-    cols = starts_with("v"),
-    names_to = "v_var",
-    values_to = "value"
-  ) %>% 
-  filter(value == 1) %>% 
-  left_join(lables_v, by = "v_var") %>% 
-  left_join(res_deb, by = "j5") %>% 
-  mutate(
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    ),
-    Type = str_squish(Type),
-    Type = str_replace_all(Type, "[\u00A0]", " "),
-    Type = ifelse(Type == "Autre Préciser", "Autre", Type)
-  ) %>% 
-  group_by(Observatory, Type) %>% 
-  summarise(n = n(), .groups = "drop") %>% 
-  group_by(Observatory) %>% 
-  mutate(Percentage = round(100 * n / sum(n), 1)) %>% 
-  ungroup()
-
-# Totaux par observatoire
-totals_observatory <- hh_assets %>%
-  group_by(Observatory) %>%
-  summarise(Type = "Total", n = sum(n), Percentage = 100, .groups = "drop")
-
-# Total global
-total_global <- hh_assets %>%
-  summarise(
-    Observatory = "Total global",
-    Type = "Total",
-    n = sum(n),
-    Percentage = 100
-  )
-
-# Fusion des données finales
-hh_assets_final <- bind_rows(hh_assets, totals_observatory, total_global)
-
-# Tableau gt
-hh_assets_final %>% 
-  arrange(Observatory, desc(Percentage)) %>% 
-  gt(groupname_col = "Observatory") %>% 
-  fmt_number(columns = n, decimals = 0) %>% 
-  fmt_number(columns = Percentage, decimals = 1) %>% 
-  cols_label(Type = "Type", n = "Nombre", Percentage = "%") %>% 
-  tab_header(title = "Taux de possession de biens de confort courants par observatoire") %>% 
-  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
-
-# Histogramme horizontal
-hh_assets_plot <- hh_assets_final %>%
-  filter(Type != "Total", Observatory != "Total global") %>%
-  group_by(Observatory, Type) %>%
-  summarise(Percentage = first(Percentage), .groups = "drop") %>%
-  mutate(Observatory = factor(Observatory, levels = c("Alaotra", "Marovoay"))) %>%
-  group_by(Observatory) %>%
-  mutate(Type = factor(Type, levels = Type[order(-Percentage)])) %>%
-  ungroup()
-
-ggplot(hh_assets_plot, aes(x = Type, y = Percentage, fill = Observatory)) +
-  geom_col(show.legend = FALSE) +
-  coord_flip() +
-  facet_wrap(~Observatory, ncol = 1, scales = "free_y") +
-  geom_text(aes(label = paste0(Percentage, "%")), hjust = -0.1, size = 4) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
-  labs(
-    title = "Taux de possession de biens de confort courants par observatoire",
-    x = NULL,
-    y = NULL
-  ) +
-  theme_minimal(base_size = 14)
+comfort |> make_bar_obs(title = "Biens de confort courants par observatoire")
 ```
 
+```{r dl_comfort}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_comfort", "05", function(d) {
+  d |> tabulate_binary_set("v") |>
+    mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type)) |>
+    rename(Site = Observatory, Effectif = n, `%` = pct)
+}, res_v |> left_join(obs, by = "j5"))
+dl_fig_variants("fig_comfort", "05", function(d) {
+  d |> tabulate_binary_set("v") |>
+    mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type)) |>
+    make_bar_obs(title = "Biens de confort courants par observatoire")
+}, res_v |> left_join(obs, by = "j5"))
+```
 
-#### Equipement agricole des ménages : taux d’équipement et nombre d’outils
+### Equipement agricole
 
-```{r}
-
-## Possession d'équipements agricoles par les ménages
-# -----------------------------
-# Chargement des données
-# -----------------------------
-
-res_e  <- res_e  |> mutate(j5 = as.character(j5))
-res_deb <- res_deb |> mutate(j5 = as.character(j5))
-
-# -----------------------------
-# Base ménage + observatoire
-# -----------------------------
-
-obs <- res_deb |>
-  select(j5, j0) |>
-  mutate(
-    Observatory = case_when(
-      j0 == 3  ~ "Marovoay",
-      j0 == 21 ~ "Alaotra",
-      TRUE ~ as.character(j0)
-    )
-  ) |>
-  distinct(j5, Observatory)   # 1 ménage = 1 ligne
-
-# -----------------------------
-# Totaux ménages par observatoire
-# -----------------------------
-
-total_households <- obs |>
-  group_by(Observatory) |>
-  summarise(
-    total_hh = n(),
-    .groups = "drop"
-  )
-
-# -----------------------------
-# Données équipements
-# -----------------------------
-
+```{r agri_equipment}
 equip_data <- res_e |>
   left_join(obs, by = "j5") |>
-  mutate(
-    equip = labelled::to_factor(e11) |> as.character(),
-    equip = iconv(equip, from = "latin1", to = "UTF-8"),
-    equip = if_else(is.na(equip) | equip == "", "INCONNU", equip)  # CORRECTION : remplacer NA ou vide par INCONNU
-  )
+  mutate(Equipement = decode_labelled(e11))
 
-# -----------------------------
-# Nombre total d’outils
-# -----------------------------
-
-tools <- equip_data |>
-  group_by(Observatory, equip) |>
-  summarise(
-    N_tools = n(),
-    .groups = "drop"
-  )
-
-# -----------------------------
-# Ménages possédant l’équipement
-# -----------------------------
-
+tools <- equip_data |> count(Observatory, Equipement, name = "N_outils")
 households <- equip_data |>
-  distinct(j5, Observatory, equip) |>
-  group_by(Observatory, equip) |>
-  summarise(
-    N_households = n(),
-    .groups = "drop"
-  )
+  distinct(j5, Observatory, Equipement) |>
+  count(Observatory, Equipement, name = "N_menages")
+total_hh <- obs |> count(Observatory, name = "total_hh")
 
-# -----------------------------
-# Fusion des statistiques
-# -----------------------------
+table_equip <- tools |>
+  left_join(households, by = c("Observatory", "Equipement")) |>
+  left_join(total_hh, by = "Observatory") |>
+  mutate(pct_menages = round(N_menages / total_hh * 100, 1)) |>
+  select(Observatory, Equipement, N_menages, pct_menages, N_outils) |>
+  arrange(Observatory, desc(pct_menages))
 
-table_equipment <- tools |>
-  left_join(households, by = c("Observatory","equip")) |>
-  left_join(total_households, by = "Observatory") |>
-  mutate(
-    `Ménages (%)` = 100 * N_households / total_hh
-  ) |>
-  select(
-    Observatory,
-    Equipement = equip,
-    `Ménages (N)` = N_households,
-    `Ménages (%)`,
-    `Nombre d'outils` = N_tools
-  ) |>
-  group_by(Observatory) |>
-  arrange(desc(`Ménages (%)`), .by_group = TRUE) |>
-  ungroup()
-
-# -----------------------------
-# Tableau GT
-# -----------------------------
-
-table_equipment |>
+table_equip |>
   gt(groupname_col = "Observatory") |>
-  tab_header(
-    title = "Taux de possession d'équipements agricoles"
+  tab_header(title = "Taux de possession d'equipements agricoles") |>
+  cols_label(
+    Equipement = "Equipement", N_menages = "Menages (N)",
+    pct_menages = "Menages (%)", N_outils = "Nb outils"
   ) |>
-  fmt_number(
-    columns = c(`Ménages (N)`,`Nombre d'outils`),
-    decimals = 0
-  ) |>
-  fmt_number(
-    columns = c(`Ménages (%)`),
-    decimals = 1
-  ) |>
-  tab_source_note(
-    source_note = md("**Source : Enquête auprès des OR 2025**")
-  )
+  fmt_number(columns = c(N_menages, N_outils), decimals = 0) |>
+  fmt_number(columns = pct_menages, decimals = 1) |>
+  style_table()
 
-# -----------------------------
-# Histogramme
-# -----------------------------
-
-plot_data <- table_equipment |>
-  mutate(
-    Equipement = reorder(Equipement, `Ménages (%)`)
-  )
-
-ggplot(plot_data,
-       aes(x = Equipement,
-           y = `Ménages (%)`,
-           fill = Observatory)) +
-
-  geom_col(show.legend = FALSE) +
-  coord_flip() +
-
-  facet_wrap(
-    ~Observatory,
-    ncol = 1,
-    scales = "free_y"
-  ) +
-
-  geom_text(
-    aes(label = paste0(round(`Ménages (%)`,1),"%")),
-    hjust = -0.1,
-    size = 4
-  ) +
-
-  scale_y_continuous(
-    expand = expansion(mult = c(0,0.1))
-  ) +
-
-  labs(
-    title = "Taux de possession d'équipements agricoles par observatoire",
-    x = NULL,
-    y = NULL
-  ) +
-
-  theme_minimal(base_size = 14)
-
-```
-
-
-### Accès à la communication audiovisuelle et à la télécommunication
-
-
-#### Possession de matériels de communication audiovisuelle et de télécommunication
-
-
-```{r communication}
-
-# -----------------------------
-# Extraction des labels pour v
-# -----------------------------
-lables_v <- tibble(
-  v_var = names(res_v)[grepl("^v", names(res_v))],
-  Type = sapply(res_v[grepl("^v", names(res_v))], function(x) {
-    lab <- iconv(var_label(x), from = "latin1", to = "UTF-8")
-    if (grepl(":", lab)) lab <- sub(".*?:\\s*", "", lab)
-    lab <- str_to_title(lab)
-    str_squish(lab)
-  })
-)
-
-# -----------------------------
-# Variables et valeurs à garder
-# -----------------------------
-vars_to_keep <- c("v5", "v8", "v9", "v20", "v11")
-equip_keep <- c(
-  "Radio/",
-  "Lecteur Vcd / Dvd / Divx",
-  "Antenne Parabolique ( Canal+ Parabole Startimes",
-  "Télévision",
-  "Radio / Radio-K7"
-)
-
-# -----------------------------
-# Construction des données
-# -----------------------------
-hh_assets <- res_v %>% 
-  mutate(j5 = as.character(j5)) %>%
-  select(j5, all_of(vars_to_keep)) %>% 
-  pivot_longer(
-    cols = starts_with("v"),
-    names_to = "v_var",
-    values_to = "value"
-  ) %>% 
-  filter(value == 1) %>% 
-  left_join(lables_v, by = "v_var") %>% 
-  left_join(res_deb, by = "j5") %>% 
-  mutate(
-    j0 = as.character(j0),
-    Observatory = case_when(
-      j0 == "3"  ~ "Marovoay",
-      j0 == "21" ~ "Alaotra",
-      TRUE       ~ j0
-    )
-  ) %>% 
-  filter(Type %in% equip_keep) %>%  # NE GARDER QUE LES ÉQUIPEMENTS DE COMMUNICATION
-  group_by(Observatory, Type) %>% 
-  summarise(n = n(), .groups = "drop") %>% 
-  group_by(Observatory) %>% 
-  mutate(Percentage = round(100 * n / sum(n), 1)) %>% 
-  ungroup()
-
-# -----------------------------
-# Tableau GT
-# -----------------------------
-hh_assets %>% 
-  arrange(Observatory, desc(Percentage)) %>% 
-  gt(groupname_col = "Observatory") %>% 
-  fmt_number(columns = n, decimals = 0) %>% 
-  fmt_number(columns = Percentage, decimals = 1) %>% 
-  cols_label(Type = "Type", n = "Nombre", Percentage = "%") %>% 
-  tab_header(
-    title = "Taux de possession de matériels de communication audiovisuelle et de télécommunication par observatoire"
-  ) %>% 
-  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
-
-# -----------------------------
-# Histogramme horizontal
-# -----------------------------
-hh_assets_plot <- hh_assets %>%
-  group_by(Observatory) %>%
-  mutate(Type = factor(Type, levels = Type[order(-Percentage)])) %>%
-  ungroup()
-
-ggplot(hh_assets_plot, aes(x = Type, y = Percentage, fill = Observatory)) +
+table_equip |>
+  ggplot(aes(x = reorder(Equipement, pct_menages), y = pct_menages, fill = Observatory)) +
   geom_col(show.legend = FALSE) +
   coord_flip() +
   facet_wrap(~Observatory, ncol = 1, scales = "free_y") +
-  geom_text(aes(label = paste0(Percentage, "%")), hjust = -0.1, size = 4) +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
-  labs(
-    title = "Taux de possession de matériels de communication audiovisuelle et de télécommunication par observatoire",
-    x = NULL,
-    y = NULL
-  ) +
-  theme_minimal(base_size = 14)
-
+  geom_text(aes(label = paste0(pct_menages, "%")), hjust = -0.1, size = 3.5) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(title = "Equipements agricoles par observatoire", x = NULL, y = NULL) +
+  theme_minimal(base_size = 13)
 ```
 
-
-#### Accès à la communication audiovisuelle et à la télécommunication par observatoire
-```{r carte_sim}
-## Possession de carte SIM
-## sim_card 
-
+```{r dl_agri_equipment}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_agri_equip", "05", function(d) {
+  d |> mutate(Equipement = decode_labelled(e11)) |>
+    count(Observatory, Equipement) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, res_e |> left_join(obs, by = "j5"))
+dl_fig_variants("fig_agri_equip", "05", function(d) {
+  equip <- d |> mutate(Equipement = decode_labelled(e11)) |>
+    distinct(j5, Observatory, Equipement) |>
+    count(Observatory, Equipement, name = "N_menages") |>
+    left_join(d |> distinct(j5, Observatory) |> count(Observatory, name = "total"),
+              by = "Observatory") |>
+    mutate(pct_menages = round(N_menages / total * 100, 1))
+  ggplot(equip, aes(x = reorder(Equipement, pct_menages), y = pct_menages, fill = Observatory)) +
+    geom_col(show.legend = FALSE) + coord_flip() +
+    facet_wrap(~Observatory, ncol = 1, scales = "free_y") +
+    geom_text(aes(label = paste0(pct_menages, "%")), hjust = -0.1, size = 3.5) +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+    labs(title = "Equipements agricoles par observatoire", x = NULL, y = NULL) +
+    theme_minimal(base_size = 13)
+}, res_e |> left_join(obs, by = "j5"))
 ```
 
+### Materiel de communication audiovisuelle et telecommunication
 
+```{r communication}
+comm_vars <- c("v5", "v8", "v9", "v20", "v11")
+comm_labels <- tibble(
+  v_var = comm_vars,
+  Type = vapply(res_v[comm_vars], function(x) {
+    lab <- iconv(var_label(x), from = "latin1", to = "UTF-8")
+    if (grepl(":", lab)) lab <- sub(".*?:\\s*", "", lab)
+    str_squish(str_to_title(lab))
+  }, character(1))
+)
 
+comm <- res_v |>
+  select(j5, all_of(comm_vars)) |>
+  left_join(obs, by = "j5") |>
+  pivot_longer(all_of(comm_vars), names_to = "v_var", values_to = "value") |>
+  filter(value == 1) |>
+  left_join(comm_labels, by = "v_var") |>
+  count(Observatory, Type) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
-### Epargne et emprunt
+comm |>
+  gt(groupname_col = "Observatory") |>
+  tab_header(title = "Materiels de communication audiovisuelle et telecommunication") |>
+  cols_label(Type = "Equipement", n = "N", pct = "%") |>
+  fmt_number(columns = n, decimals = 0) |>
+  fmt_number(columns = pct, decimals = 1) |>
+  style_table()
 
-```{r}
-# Loading savings and loan data
-res_pp0 <- read_dta("data/res_pp0.dta") # year, j5 
-res_pp <- read_dta("data/res_pp.dta") # year, j5 
+comm |> make_bar_obs(title = "Materiels de communication par observatoire")
 ```
 
-### Transfert
-
-```{r}
-# Loading trasfers data
-res_t <- read_dta("data/res_t.dta") # year, j5 
-res_t1 <- read_dta("data/res_t1.dta") # year, j5 
-res_t2 <- read_dta("data/res_t2.dta") # year, j5 
+```{r dl_communication}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_communication", "05", function(d) {
+  comm_vars <- c("v5", "v8", "v9", "v20", "v11")
+  comm_labels <- tibble(
+    v_var = comm_vars,
+    Type = vapply(d[comm_vars], function(x) {
+      lab <- iconv(var_label(x), from = "latin1", to = "UTF-8")
+      if (grepl(":", lab)) lab <- sub(".*?:\\s*", "", lab)
+      str_squish(str_to_title(lab))
+    }, character(1)))
+  d |> select(j5, Observatory, all_of(comm_vars)) |>
+    pivot_longer(all_of(comm_vars), names_to = "v_var", values_to = "value") |>
+    filter(value == 1) |>
+    left_join(comm_labels, by = "v_var") |>
+    count(Observatory, Type) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    rename(Site = Observatory, Effectif = n)
+}, res_v |> left_join(obs, by = "j5"))
+dl_fig_variants("fig_communication", "05", function(d) {
+  comm_vars <- c("v5", "v8", "v9", "v20", "v11")
+  comm_labels <- tibble(
+    v_var = comm_vars,
+    Type = vapply(d[comm_vars], function(x) {
+      lab <- iconv(var_label(x), from = "latin1", to = "UTF-8")
+      if (grepl(":", lab)) lab <- sub(".*?:\\s*", "", lab)
+      str_squish(str_to_title(lab))
+    }, character(1)))
+  d |> select(j5, Observatory, all_of(comm_vars)) |>
+    pivot_longer(all_of(comm_vars), names_to = "v_var", values_to = "value") |>
+    filter(value == 1) |>
+    left_join(comm_labels, by = "v_var") |>
+    count(Observatory, Type) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    make_bar_obs(title = "Materiels de communication par observatoire")
+}, res_v |> left_join(obs, by = "j5"))
 ```
 
-### Revenu
+## Transferts sortants
 
-Les revenus présentés ici sont des revenus annuels par ménage, calculés sur la période de référence (PR) de la campagne 2025. Le revenu total (`revtot`) se décompose en revenu courant (`revcou`) et revenu exceptionnel (`revexcept`).
+Le fichier `res_t2` recense les transferts envoyes par les menages a des personnes exterieures au foyer. Chaque ligne correspond a un destinataire. Les variables cles sont le type de transfert (`t21a`), le lieu de residence du destinataire (`t41`), le poids de riz envoye (`t42`, en kg) et la valeur totale (`t21d`, en Ar).
 
-Le revenu courant agrège sept composantes :
+```{r transfers_load}
+res_t2 <- read_dta("data/res_t2.dta") |> mutate(j5 = as.character(j5))
 
-- les **salaires agricoles** (`revsec`) : rémunération du travail salarié agricole ;
-- les **salaires non-agricoles** (`revppal`) : rémunération du travail salarié hors agriculture ;
-- les **revenus indépendants** (`rev_indep`) : revenus des activités libérales et artisanales non-agricoles ;
-- le **revenu net rizicole** (`rev_riz`) : valeur de la production de riz moins les charges (main-d'œuvre, intrants, métayage) — il s'agit du résultat d'exploitation du ménage en tant que producteur ;
-- le **revenu net des autres cultures** (`rev_cu`) : même logique pour les cultures non-rizicoles (maraîchage, tubercules, légumineuses, etc.) ;
-- le **revenu de l'élevage** (`revel`) : ventes d'animaux et produits d'élevage ;
-- la **pêche** (`revpeche`).
+type_transf_labs <- c(
+  "1" = "Argent", "2" = "Riz", "3" = "Autres produits", "99" = "Autre"
+)
 
-Le revenu exceptionnel regroupe les rentes foncières, les autres revenus, le travail HIMO, la décapitalisation et les transferts reçus.
+res_t2_obs <- res_t2 |>
+  left_join(obs, by = "j5") |>
+  mutate(
+    Type = if_else(
+      as.character(as.integer(t21a)) %in% names(type_transf_labs),
+      type_transf_labs[as.character(as.integer(t21a))],
+      "Non precise"
+    )
+  )
+```
+
+```{r fig-transferts-sortants}
+#| fig-cap: "Valeur moyenne des transferts sortants par observatoire et type"
+#| fig-width: 10
+#| fig-height: 6
+
+val_par_type <- res_t2_obs |>
+  filter(!is.na(t21d), t21d > 0) |>
+  summarise(
+    n = n(),
+    val_moy = round(mean(t21d, na.rm = TRUE)),
+    val_med = round(median(t21d, na.rm = TRUE)),
+    .by = c(Observatory, Type)
+  ) |>
+  filter(n >= 3)
+
+val_par_type |>
+  ggplot(aes(x = reorder(Type, val_moy), y = val_moy / 1000, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "Valeur moyenne (milliers Ar)", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_transferts}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_transferts", "05", function(d) {
+  val <- d |> filter(!is.na(t21d), t21d > 0) |>
+    mutate(Type = if_else(
+      as.character(as.integer(t21a)) %in% names(type_transf_labs),
+      type_transf_labs[as.character(as.integer(t21a))], "Non precise")) |>
+    summarise(val_moy = round(mean(t21d, na.rm = TRUE)), n = n(),
+              .by = c(Observatory, Type)) |> filter(n >= 3)
+  ggplot(val, aes(x = reorder(Type, val_moy), y = val_moy / 1000, fill = Observatory)) +
+    geom_col(position = "dodge") + coord_flip() +
+    labs(x = NULL, y = "Valeur moyenne (milliers Ar)", fill = "Site") +
+    theme_minimal(base_size = 12) + theme(legend.position = "top")
+}, res_t2 |> left_join(obs, by = "j5"))
+```
+
+```{r tbl-transferts-sortants}
+#| tbl-cap: "Transferts sortants : resume par observatoire"
+
+n_t2 <- res_t2_obs |>
+  summarise(n_envoyeurs = n_distinct(j5), .by = Observatory) |>
+  left_join(res_deb |> count(Observatory, name = "n_total"), by = "Observatory") |>
+  mutate(pct = round(n_envoyeurs / n_total * 100, 1))
+
+n_t2 |>
+  gt() |>
+  tab_header(title = "Menages envoyant des transferts") |>
+  cols_label(n_envoyeurs = "Nb envoyeurs", n_total = "Nb menages total", pct = "% envoyeurs") |>
+  style_table()
+```
+
+```{r dl_tbl_transferts}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_transferts", "05", function(d) {
+  t2_ids <- unique(as.character(res_t2$j5))
+  d |>
+    mutate(envoyeur = j5 %in% t2_ids) |>
+    summarise(Envoyeurs = sum(envoyeur), Total = n(), .by = Observatory) |>
+    mutate(`%` = round(Envoyeurs / Total * 100, 1)) |>
+    rename(Site = Observatory)
+}, res_deb)
+```
+
+```{r fig-destination-transferts}
+#| fig-cap: "Lieu de residence des destinataires de transferts"
+#| fig-width: 9
+#| fig-height: 5
+
+dest_labs <- c(
+  "1" = "Meme commune", "2" = "Autre commune, meme region",
+  "3" = "Autre region", "4" = "Etranger"
+)
+
+res_t2_obs |>
+  filter(!is.na(t41)) |>
+  mutate(
+    Destination = if_else(
+      as.character(as.integer(t41)) %in% names(dest_labs),
+      dest_labs[as.character(as.integer(t41))],
+      "Non precise"
+    )
+  ) |>
+  count(Observatory, Destination) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  ggplot(aes(x = reorder(Destination, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des transferts", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_destination}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_destination", "05", function(d) {
+  dest_labs <- c("1" = "Meme commune", "2" = "Autre commune, meme region",
+                 "3" = "Autre region", "4" = "Etranger")
+  d |> filter(!is.na(t41)) |>
+    mutate(Destination = if_else(
+      as.character(as.integer(t41)) %in% names(dest_labs),
+      dest_labs[as.character(as.integer(t41))], "Non precise")) |>
+    count(Observatory, Destination) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    ggplot(aes(x = reorder(Destination, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") + coord_flip() +
+    labs(x = NULL, y = "% des transferts", fill = "Site") +
+    theme_minimal(base_size = 12) + theme(legend.position = "top")
+}, res_t2 |> left_join(obs, by = "j5"))
+```
+
+## Revenu
+
+Les revenus presentes ici sont des revenus annuels par menage, calcules sur la periode de reference (PR) de la campagne 2025. Le revenu total (`revtot`) se decompose en revenu courant (`revcou`) et revenu exceptionnel (`revexcept`).
+
+Le revenu courant agrege sept composantes :
+
+- les **salaires agricoles** (`revsec`) : remuneration du travail salarie agricole ;
+- les **salaires non-agricoles** (`revppal`) : remuneration du travail salarie hors agriculture ;
+- les **revenus independants** (`rev_indep`) : revenus des activites liberales et artisanales non-agricoles ;
+- le **revenu net rizicole** (`rev_riz`) : valeur de la production de riz moins les charges ;
+- le **revenu net des autres cultures** (`rev_cu`) : meme logique pour les cultures non-rizicoles ;
+- le **revenu de l'elevage** (`revel`) : ventes d'animaux et produits d'elevage ;
+- la **peche** (`revpeche`).
+
+Le revenu exceptionnel regroupe les rentes foncieres, les autres revenus, le travail HIMO, la decapitalisation et les transferts recus.
 
 ```{r income_compute}
 source("utils/calc_incomes_all_years.R")
 
-# Compute incomes for 2025
-inc_2025 <- compute_income_year(2025)
-
-# Join with observatory info
-res_deb <- read_dta("data/res_deb.dta") |>
-  mutate(
-    j5 = as.character(j5),
-    Observatory = case_when(
-      j0 == 3  ~ "Marovoay",
-      j0 == 21 ~ "Alaotra",
-      TRUE     ~ as.character(j0)
-    )
-  )
-
-inc <- inc_2025 |>
-  left_join(res_deb |> select(j5, Observatory), by = "j5")
+inc <- compute_income_year(2025) |>
+  left_join(obs, by = "j5")
 ```
 
-#### Structure du revenu total
+### Structure du revenu total
 
 ```{r t_revtot_obs}
-# Statistiques descriptives du revenu total par observatoire
 inc |>
-  group_by(Observatory) |>
   summarise(
-    `Nb ménages` = n(),
+    `Nb menages` = n(),
     Moyenne = round(mean(revtot, na.rm = TRUE)),
-    Médiane = round(median(revtot, na.rm = TRUE)),
-    `Écart-type` = round(sd(revtot, na.rm = TRUE)),
+    Mediane = round(median(revtot, na.rm = TRUE)),
+    `Ecart-type` = round(sd(revtot, na.rm = TRUE)),
     Minimum = round(min(revtot, na.rm = TRUE)),
     Maximum = round(max(revtot, na.rm = TRUE)),
-    .groups = "drop"
+    .by = Observatory
   ) |>
   gt() |>
   tab_header(
-    title = "Revenu total annuel par ménage et par observatoire (Ar/an)",
+    title = "Revenu total annuel par menage et par observatoire (Ar/an)",
     subtitle = "Campagne 2025"
   ) |>
-  fmt_number(columns = Moyenne:Maximum, use_seps = TRUE, decimals = 0)
+  fmt_number(columns = Moyenne:Maximum, use_seps = TRUE, decimals = 0) |>
+  style_table()
 ```
 
-#### Décomposition du revenu courant
+```{r dl_revtot}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_revtot", "05", function(d) {
+  d |> summarise(`Nb menages` = n(),
+    Moyenne = round(mean(revtot, na.rm = TRUE)),
+    Mediane = round(median(revtot, na.rm = TRUE)),
+    `Ecart-type` = round(sd(revtot, na.rm = TRUE)),
+    .by = Observatory) |>
+    rename(Site = Observatory)
+}, inc)
+```
+
+### Decomposition du revenu courant
 
 ```{r t_revcou_decomp}
-# Décomposition du revenu courant moyen : montants, totaux et pourcentages
 decomp <- inc |>
-  group_by(Observatory) |>
   summarise(
     `Salaires agricoles` = mean(revsec, na.rm = TRUE),
     `Salaires non-agricoles` = mean(revppal, na.rm = TRUE),
-    `Revenus indépendants` = mean(rev_indep, na.rm = TRUE),
+    `Revenus independants` = mean(rev_indep, na.rm = TRUE),
     `Revenu net rizicole` = mean(rev_riz, na.rm = TRUE),
     `Revenu net autres cultures` = mean(rev_cu, na.rm = TRUE),
-    Élevage = mean(revel, na.rm = TRUE),
-    Pêche = mean(revpeche, na.rm = TRUE),
-    .groups = "drop"
+    Elevage = mean(revel, na.rm = TRUE),
+    Peche = mean(revpeche, na.rm = TRUE),
+    .by = Observatory
   ) |>
   pivot_longer(-Observatory, names_to = "Composante", values_to = "Montant") |>
   pivot_wider(names_from = Observatory, values_from = Montant)
 
-# Colonnes numériques (observatoires)
 obs_cols <- setdiff(names(decomp), "Composante")
-
-# Totaux par observatoire
 totaux <- colSums(decomp[obs_cols])
-
-# Pourcentages par composante
 decomp_pct <- decomp |>
   mutate(across(all_of(obs_cols), ~ . / totaux[cur_column()] * 100))
 
-# Ligne Total : montants + 100%
 total_montants <- as.list(totaux)
 total_pct <- as.list(setNames(rep(100, length(obs_cols)), obs_cols))
 
@@ -1052,7 +612,6 @@ decomp_display <- bind_cols(
   decomp,
   decomp_pct |> select(all_of(obs_cols)) |> rename_with(~ paste0(., " (%)"))
 )
-
 total_display <- tibble(
   Composante = "Total revenu courant",
   !!!total_montants,
@@ -1062,7 +621,7 @@ total_display <- tibble(
 bind_rows(decomp_display, total_display) |>
   gt() |>
   tab_header(
-    title = "Décomposition du revenu courant moyen par ménage (Ar/an)",
+    title = "Decomposition du revenu courant moyen par menage (Ar/an)",
     subtitle = "Campagne 2025"
   ) |>
   fmt_number(columns = all_of(obs_cols), use_seps = TRUE, decimals = 0) |>
@@ -1070,10 +629,9 @@ bind_rows(decomp_display, total_display) |>
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_body(rows = Composante == "Total revenu courant")
-  )
+  ) |>
+  style_table()
 ```
-
-#### Structure du revenu courant (graphique)
 
 ```{r fig_revcou_shares}
 #| fig-cap: "Part des composantes dans le revenu courant moyen par observatoire"
@@ -1081,28 +639,61 @@ bind_rows(decomp_display, total_display) |>
 #| fig-height: 5
 
 inc |>
-  group_by(Observatory) |>
   summarise(
     `Salaires agricoles` = mean(revsec, na.rm = TRUE),
     `Salaires non-agricoles` = mean(revppal, na.rm = TRUE),
-    `Revenus indépendants` = mean(rev_indep, na.rm = TRUE),
+    `Revenus independants` = mean(rev_indep, na.rm = TRUE),
     `Revenu net rizicole` = mean(rev_riz, na.rm = TRUE),
     `Revenu net autres cultures` = mean(rev_cu, na.rm = TRUE),
-    Élevage = mean(revel, na.rm = TRUE),
-    .groups = "drop"
+    Elevage = mean(revel, na.rm = TRUE),
+    .by = Observatory
   ) |>
   pivot_longer(-Observatory, names_to = "Composante", values_to = "Montant") |>
   ggplot(aes(x = Observatory, y = Montant, fill = Composante)) +
   geom_col(position = "fill") +
-  scale_y_continuous(labels = scales::percent) +
+  scale_y_continuous(labels = percent) +
   labs(x = NULL, y = "Part du revenu courant", fill = NULL) +
   theme_minimal()
 ```
 
-#### Distribution du revenu total
+```{r dl_income}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_revcou_decomp", "05", function(d) {
+  d |> summarise(
+    `Salaires agricoles` = round(mean(revsec, na.rm = TRUE)),
+    `Salaires non-agricoles` = round(mean(revppal, na.rm = TRUE)),
+    `Revenus independants` = round(mean(rev_indep, na.rm = TRUE)),
+    `Revenu net rizicole` = round(mean(rev_riz, na.rm = TRUE)),
+    `Revenu net autres cultures` = round(mean(rev_cu, na.rm = TRUE)),
+    Elevage = round(mean(revel, na.rm = TRUE)),
+    Peche = round(mean(revpeche, na.rm = TRUE)),
+    .by = Observatory) |>
+    pivot_longer(-Observatory, names_to = "Composante", values_to = "Montant") |>
+    rename(Site = Observatory)
+}, inc)
+dl_fig_variants("fig_revcou_shares", "05", function(d) {
+  d |> summarise(
+    `Salaires agricoles` = mean(revsec, na.rm = TRUE),
+    `Salaires non-agricoles` = mean(revppal, na.rm = TRUE),
+    `Revenus independants` = mean(rev_indep, na.rm = TRUE),
+    `Revenu net rizicole` = mean(rev_riz, na.rm = TRUE),
+    `Revenu net autres cultures` = mean(rev_cu, na.rm = TRUE),
+    Elevage = mean(revel, na.rm = TRUE),
+    .by = Observatory) |>
+    pivot_longer(-Observatory, names_to = "Composante", values_to = "Montant") |>
+    ggplot(aes(x = Observatory, y = Montant, fill = Composante)) +
+    geom_col(position = "fill") +
+    scale_y_continuous(labels = scales::percent) +
+    labs(x = NULL, y = "Part du revenu courant", fill = NULL) +
+    theme_minimal()
+}, inc)
+```
+
+### Distribution du revenu total
 
 ```{r fig_revtot_dist}
-#| fig-cap: "Distribution du revenu total par observatoire (échelle log)"
+#| fig-cap: "Distribution du revenu total par observatoire (echelle log)"
 #| fig-width: 8
 #| fig-height: 5
 
@@ -1110,63 +701,114 @@ inc |>
   filter(revtot > 0) |>
   ggplot(aes(x = revtot, fill = Observatory)) +
   geom_density(alpha = 0.5) +
-  scale_x_log10(labels = scales::label_comma()) +
-  labs(x = "Revenu total annuel par ménage (Ar, échelle log)", y = "Densité", fill = "Observatoire") +
+  scale_x_log10(labels = label_comma()) +
+  labs(x = "Revenu total annuel (Ar, echelle log)", y = "Densite", fill = "Observatoire") +
   theme_minimal()
 ```
 
-#### Revenu courant et revenu exceptionnel
+```{r dl_fig_revtot_dist}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_revtot_dist", "05", function(d) {
+  d |>
+    filter(revtot > 0) |>
+    ggplot(aes(x = revtot, fill = Observatory)) +
+    geom_density(alpha = 0.5) +
+    scale_x_log10(labels = label_comma()) +
+    labs(x = "Revenu total annuel (Ar, echelle log)", y = "Densite",
+         fill = "Observatoire") +
+    theme_minimal()
+}, inc)
+```
+
+### Revenu courant et revenu exceptionnel
 
 ```{r t_revcou_revexcept}
 inc |>
-  group_by(Observatory) |>
   summarise(
     `Revenu courant` = round(mean(revcou, na.rm = TRUE)),
     `Revenu exceptionnel` = round(mean(revexcept, na.rm = TRUE)),
     `Revenu total` = round(mean(revtot, na.rm = TRUE)),
     `Part courant (%)` = round(mean(revcou, na.rm = TRUE) / mean(revtot, na.rm = TRUE) * 100, 1),
-    .groups = "drop"
+    .by = Observatory
   ) |>
   gt() |>
   tab_header(
-    title = "Revenu courant et revenu exceptionnel moyens par ménage (Ar/an)",
+    title = "Revenu courant et revenu exceptionnel moyens par menage (Ar/an)",
     subtitle = "Campagne 2025"
   ) |>
-  fmt_number(columns = c(`Revenu courant`, `Revenu exceptionnel`, `Revenu total`),
-             use_seps = TRUE, decimals = 0)
+  fmt_number(
+    columns = c(`Revenu courant`, `Revenu exceptionnel`, `Revenu total`),
+    use_seps = TRUE, decimals = 0
+  ) |>
+  style_table()
 ```
 
-#### Ménages à revenu négatif ou nul
+```{r dl_t_revcou_revexcept}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_revcou_revexcept", "05", function(d) {
+  d |>
+    summarise(
+      `Revenu courant` = round(mean(revcou, na.rm = TRUE)),
+      `Revenu exceptionnel` = round(mean(revexcept, na.rm = TRUE)),
+      `Revenu total` = round(mean(revtot, na.rm = TRUE)),
+      `Part courant (%)` = round(mean(revcou, na.rm = TRUE) /
+                                   mean(revtot, na.rm = TRUE) * 100, 1),
+      .by = Observatory
+    ) |>
+    rename(Site = Observatory)
+}, inc)
+```
 
-Certains ménages présentent un revenu courant négatif, principalement en raison de charges agricoles supérieures aux produits (mauvaises récoltes, coûts d'intrants élevés).
+### Menages a revenu negatif ou nul
+
+Certains menages presentent un revenu courant negatif, principalement en raison de charges agricoles superieures aux produits (mauvaises recoltes, couts d'intrants eleves).
 
 ```{r t_rev_negatif}
 inc |>
-  group_by(Observatory) |>
   summarise(
-    `Nb ménages` = n(),
-    `Revenu courant ≤ 0` = sum(revcou <= 0, na.rm = TRUE),
-    `% ≤ 0` = round(mean(revcou <= 0, na.rm = TRUE) * 100, 1),
-    `Revenu total ≤ 0` = sum(revtot <= 0, na.rm = TRUE),
-    .groups = "drop"
+    `Nb menages` = n(),
+    `Revenu courant <= 0` = sum(revcou <= 0, na.rm = TRUE),
+    `% <= 0` = round(mean(revcou <= 0, na.rm = TRUE) * 100, 1),
+    `Revenu total <= 0` = sum(revtot <= 0, na.rm = TRUE),
+    .by = Observatory
   ) |>
   gt() |>
-  tab_header(title = "Ménages à revenu courant ou total négatif ou nul")
+  tab_header(title = "Menages a revenu courant ou total negatif ou nul") |>
+  style_table()
 ```
 
-#### Évolution des revenus nominaux depuis 1995
+```{r dl_t_rev_negatif}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_rev_negatif", "05", function(d) {
+  d |>
+    summarise(
+      `Nb menages` = n(),
+      `Revenu courant <= 0` = sum(revcou <= 0, na.rm = TRUE),
+      `% <= 0` = round(mean(revcou <= 0, na.rm = TRUE) * 100, 1),
+      `Revenu total <= 0` = sum(revtot <= 0, na.rm = TRUE),
+      .by = Observatory
+    ) |>
+    rename(Site = Observatory)
+}, inc)
+```
 
-Les observatoires de Marovoay et d'Alaotra disposent de séries longues permettant de suivre l'évolution des revenus sur trois décennies. Les données couvrent 1995–2008 et 2010–2014 pour Marovoay, 1999–2008 et 2010–2014 pour Alaotra, ainsi que la campagne 2025 pour les deux. Les années 2009 et 2015 ne contiennent pas ces observatoires. Le calcul des agrégats est mis en cache dans un fichier intermédiaire (`output/inc_trends_obs.rds`) afin de ne pas retraiter les microdonnées à chaque exécution.
+## Evolution des revenus nominaux depuis 1995 {#sec-income-multiyear}
+
+Les observatoires de Marovoay et d'Alaotra disposent de series longues permettant de suivre l'evolution des revenus sur trois decennies. Les donnees couvrent 1995-2008 et 2010-2014 pour Marovoay, 1999-2008 et 2010-2014 pour Alaotra, ainsi que la campagne 2025 pour les deux. Les annees 2009 et 2015-2024 ne contiennent pas ces observatoires. Le trait pointille materialise l'absence de donnees.
 
 ```{r trends_load}
-# Charger ou recalculer les tendances agrégées par observatoire
+#| include: false
+
 trends_file <- "output/inc_trends_obs.rds"
+
 if (file.exists(trends_file)) {
   trends <- readRDS(trends_file)
 } else {
-  # Recalcul complet (première exécution uniquement)
   all_inc <- compute_income_all_years(c(1995:2015, 2025))
-  
+
   obs_lookup <- map_dfr(c(1995:2015, 2025), function(yr) {
     f <- paste0("data/ROS_MDG_microdata/", yr, "/res_deb.dta")
     if (!file.exists(f)) return(tibble())
@@ -1182,7 +824,6 @@ if (file.exists(trends_file)) {
     mutate(Observatory = if_else(j0 == 3, "Marovoay", "Alaotra"))
 
   trends <- all_obs |>
-    group_by(year, Observatory) |>
     summarise(
       n = n(),
       revcou_mean    = mean(revcou, na.rm = TRUE),
@@ -1197,10 +838,10 @@ if (file.exists(trends_file)) {
       rev_cu_mean    = mean(rev_cu, na.rm = TRUE),
       revel_mean     = mean(revel, na.rm = TRUE),
       revpeche_mean  = mean(revpeche, na.rm = TRUE),
-      .groups = "drop"
+      .by = c(year, Observatory)
     )
 
-  # --- Prix médian du paddy par observatoire ---
+  # Prix median du paddy par observatoire
   paddy_prices <- map_dfr(c(1995:2015, 2025), function(yr) {
     f <- paste0("data/ROS_MDG_microdata/", yr, "/res_dc21.dta")
     if (!file.exists(f)) return(tibble())
@@ -1214,10 +855,9 @@ if (file.exists(trends_file)) {
                 .by = c(year, Observatory))
   })
 
-  trends <- trends |>
-    left_join(paddy_prices, by = c("year", "Observatory"))
+  trends <- trends |> left_join(paddy_prices, by = c("year", "Observatory"))
 
-  # --- IPC Banque Mondiale (base 2010 = 100) ---
+  # IPC Banque Mondiale (base 2010 = 100)
   library(jsonlite)
   wb_raw <- fromJSON(
     "https://api.worldbank.org/v2/country/MDG/indicator/FP.CPI.TOTL?date=1995:2025&format=json&per_page=50"
@@ -1227,14 +867,12 @@ if (file.exists(trends_file)) {
     cpi  = as.numeric(wb_raw[[2]]$value)
   ) |> filter(!is.na(cpi)) |> arrange(year)
 
-  # Extrapolation 2024-2025 (~9 % par an)
   cpi_full <- bind_rows(
     cpi_wb,
     tibble(year = 2024L, cpi = cpi_wb$cpi[cpi_wb$year == 2023] * 1.09),
     tibble(year = 2025L, cpi = cpi_wb$cpi[cpi_wb$year == 2023] * 1.09^2)
   )
 
-  # Déflation par l'IPC
   trends <- trends |>
     left_join(cpi_full, by = "year") |>
     mutate(
@@ -1254,8 +892,7 @@ if (file.exists(trends_file)) {
   saveRDS(trends, trends_file)
 }
 
-# Déflation par le prix du paddy (propre à chaque observatoire)
-# Rebase : paddy 2010 = 1 par observatoire
+# Deflation par le prix du paddy
 paddy_base_2010 <- trends |>
   filter(year == 2010) |>
   select(Observatory, paddy_base = prix_paddy_median)
@@ -1269,112 +906,65 @@ trends <- trends |>
     revexcept_paddy = revexcept_mean / deflator_paddy
   ) |>
   select(-paddy_base)
-
-# Sous-ensembles pour le style des lignes
-trends_solid <- trends |> filter(year <= 2014)
-trends_gap   <- trends |> filter(year >= 2014)
 ```
 
 ```{r fig_trends_revtot}
-#| fig-cap: "Évolution du revenu total moyen par ménage (Ar courants)"
+#| fig-cap: "Evolution du revenu total moyen par menage (Ar courants)"
 #| fig-width: 9
 #| fig-height: 5
 
-ggplot(mapping = aes(x = year, y = revtot_mean, colour = Observatory)) +
-  geom_line(data = trends_solid, linewidth = 0.8) +
-  geom_line(data = trends_gap, linewidth = 0.8, linetype = "31") +
-  geom_point(data = trends, size = 2) +
-  geom_line(data = tibble(year = NA_real_, revtot_mean = NA_real_),
-            aes(linetype = "Sans enquête"), colour = "black", linewidth = 0.8) +
-  scale_linetype_manual(values = c("Sans enquête" = "31")) +
-  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-  scale_y_continuous(labels = scales::label_comma()) +
-  labs(
-    x = NULL, y = "Revenu total moyen (Ar/ménage/an)",
-    colour = "Observatoire", linetype = NULL
-  ) +
-  theme_minimal()
+trends |> make_trend_plot(revtot_mean, "Revenu total moyen (Ar/menage/an)")
 ```
 
 ```{r fig_trends_revcou}
-#| fig-cap: "Évolution du revenu courant moyen par ménage (Ar courants)"
+#| fig-cap: "Evolution du revenu courant moyen par menage (Ar courants)"
 #| fig-width: 9
 #| fig-height: 5
 
-ggplot(mapping = aes(x = year, y = revcou_mean, colour = Observatory)) +
-  geom_line(data = trends_solid, linewidth = 0.8) +
-  geom_line(data = trends_gap, linewidth = 0.8, linetype = "31") +
-  geom_point(data = trends, size = 2) +
-  geom_line(data = tibble(year = NA_real_, revcou_mean = NA_real_),
-            aes(linetype = "Sans enquête"), colour = "black", linewidth = 0.8) +
-  scale_linetype_manual(values = c("Sans enquête" = "31")) +
-  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-  scale_y_continuous(labels = scales::label_comma()) +
-  labs(
-    x = NULL, y = "Revenu courant moyen (Ar/ménage/an)",
-    colour = "Observatoire", linetype = NULL
-  ) +
-  theme_minimal()
+trends |> make_trend_plot(revcou_mean, "Revenu courant moyen (Ar/menage/an)")
 ```
 
 ```{r fig_trends_decomp}
-#| fig-cap: "Évolution des composantes du revenu courant moyen (Ar courants)"
+#| fig-cap: "Evolution des composantes du revenu courant moyen (Ar courants)"
 #| fig-width: 10
 #| fig-height: 6
 
+# Note: certaines composantes (rev_cu en 2002-2004) sont negatives en raison
+# de charges superieures aux recettes. On utilise geom_col qui gere
+# correctement les valeurs negatives (barres sous l'axe zero).
 trends |>
   select(year, Observatory,
          `Salaires agricoles` = revsec_mean,
          `Salaires non-agricoles` = revppal_mean,
-         `Revenus indépendants` = rev_indep_mean,
+         `Revenus independants` = rev_indep_mean,
          `Revenu net rizicole` = rev_riz_mean,
          `Revenu net autres cultures` = rev_cu_mean,
-         Élevage = revel_mean,
-         Pêche = revpeche_mean) |>
+         Elevage = revel_mean,
+         Peche = revpeche_mean) |>
   pivot_longer(-c(year, Observatory), names_to = "Composante", values_to = "Montant") |>
-  ggplot(aes(x = year, y = Montant, fill = Composante)) +
-  geom_area() +
-  geom_rect(data = tibble(xmin = 2015, xmax = 2024, ymin = -Inf, ymax = Inf),
-            aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax,
-                x = NULL, y = NULL, fill = "Sans enquête"),
-            inherit.aes = FALSE, alpha = 0.45) +
-  scale_fill_manual(
-    values = c(
-      "Salaires agricoles" = scales::hue_pal()(7)[1],
-      "Salaires non-agricoles" = scales::hue_pal()(7)[2],
-      "Revenus indépendants" = scales::hue_pal()(7)[3],
-      "Revenu net rizicole" = scales::hue_pal()(7)[4],
-      "Revenu net autres cultures" = scales::hue_pal()(7)[5],
-      "Élevage" = scales::hue_pal()(7)[6],
-      "Pêche" = scales::hue_pal()(7)[7],
-      "Sans enquête" = "white"
-    )
-  ) +
-  facet_wrap(~ Observatory) +
-  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-  scale_y_continuous(labels = scales::label_comma()) +
-  labs(x = NULL, y = "Revenu courant moyen (Ar/ménage/an)", fill = NULL) +
-  guides(fill = guide_legend(override.aes = list(
-    fill = c(scales::hue_pal()(7), "grey70")
-  ))) +
+  ggplot(aes(x = factor(year), y = Montant, fill = Composante)) +
+  geom_col(position = "stack") +
+  facet_wrap(~Observatory) +
+  scale_y_continuous(labels = label_comma()) +
+  labs(x = NULL, y = "Revenu courant moyen (Ar/menage/an)", fill = NULL) +
   theme_minimal() +
-  theme(legend.position = "bottom")
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 7),
+        legend.position = "bottom")
 ```
 
-#### Revenus réels : déflation et indices de prix
+### Deflation et indices de prix
 
-La comparaison des revenus sur longue période nécessite de tenir compte de l'inflation. Nous utilisons ici l'**IPC national** publié par la Banque Mondiale (indicateur `FP.CPI.TOTL`, base 2010 = 100). Cet indice est calculé à partir d'un panier de consommation urbain (principalement Antananarivo et quelques capitales provinciales) ; il ne reflète donc qu'imparfaitement l'évolution des prix en milieu rural. Pour 2024–2025, non encore publiés par la Banque Mondiale, l'IPC est extrapolé à +9 % par an.
+La comparaison des revenus sur longue periode necessite de tenir compte de l'inflation. Nous utilisons ici l'**IPC national** publie par la Banque Mondiale (indicateur `FP.CPI.TOTL`, base 2010 = 100). Cet indice est calcule a partir d'un panier de consommation urbain ; il ne reflete donc qu'imparfaitement l'evolution des prix en milieu rural. Pour 2024-2025, non encore publies par la Banque Mondiale, l'IPC est extrapole a +9 % par an.
 
 ::: {.callout-note}
-Une prochaine version de ce rapport intégrera un IPC régional (Boeny pour Marovoay, Alaotra-Mangoro pour Alaotra), extrait des séries de l'INSTAT ou des enquêtes EPM, afin de mieux capter l'inflation locale.
+Une prochaine version de ce rapport integrera un IPC regional (Boeny pour Marovoay, Alaotra-Mangoro pour Alaotra), extrait des series de l'INSTAT ou des enquetes EPM, afin de mieux capter l'inflation locale.
 :::
 
 ```{r fig_ipc_national}
-#| fig-cap: "Évolution de l'IPC national Madagascar (base 2010 = 100)"
+#| fig-cap: "Evolution de l'IPC national Madagascar (base 2010 = 100)"
 #| fig-width: 9
 #| fig-height: 4
 
-# Reconstituer la série IPC complète à partir des données en cache
 cpi_series <- trends |>
   distinct(year, cpi) |>
   filter(!is.na(cpi)) |>
@@ -1392,29 +982,16 @@ cpi_series |>
   theme_minimal()
 ```
 
-#### Prix médian du paddy et comparaison avec l'IPC
+### Prix median du paddy et comparaison avec l'IPC
 
-Le prix de vente médian du paddy, calculé à partir des ventes déclarées par les ménages (`dc24` dans `res_dc21`), fournit un indicateur complémentaire de l'inflation locale. Le riz étant le bien central de ces économies rurales, son évolution est comparée ci-dessous à l'IPC national (les deux rebassés à 100 en 2010).
+Le prix de vente median du paddy, calcule a partir des ventes declarees par les menages (`dc24` dans `res_dc21`), fournit un indicateur complementaire de l'inflation locale.
 
 ```{r fig_trends_paddy}
-#| fig-cap: "Évolution du prix médian du paddy (Ar/kg)"
+#| fig-cap: "Evolution du prix median du paddy (Ar/kg)"
 #| fig-width: 9
 #| fig-height: 5
 
-ggplot(trends, aes(x = year, y = prix_paddy_median, colour = Observatory)) +
-  geom_line(data = trends_solid, aes(y = prix_paddy_median), linewidth = 0.8) +
-  geom_line(data = trends_gap, aes(y = prix_paddy_median), linewidth = 0.8, linetype = "31") +
-  geom_point(size = 2) +
-  geom_line(data = tibble(year = NA_real_, prix_paddy_median = NA_real_),
-            aes(linetype = "Sans enquête"), colour = "black", linewidth = 0.8) +
-  scale_linetype_manual(values = c("Sans enquête" = "31")) +
-  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-  scale_y_continuous(labels = scales::label_comma()) +
-  labs(
-    x = NULL, y = "Prix médian du paddy (Ar/kg)",
-    colour = "Observatoire", linetype = NULL
-  ) +
-  theme_minimal()
+trends |> make_trend_plot(prix_paddy_median, "Prix median du paddy (Ar/kg)")
 ```
 
 ```{r fig_ipc_vs_paddy}
@@ -1422,7 +999,6 @@ ggplot(trends, aes(x = year, y = prix_paddy_median, colour = Observatory)) +
 #| fig-width: 9
 #| fig-height: 5
 
-# Rebase paddy price to 100 in 2010 per observatory
 paddy_2010 <- trends |>
   filter(year == 2010) |>
   select(Observatory, paddy_base = prix_paddy_median)
@@ -1432,12 +1008,10 @@ index_paddy <- trends |>
   mutate(indice_paddy = prix_paddy_median / paddy_base * 100) |>
   select(year, Observatory, indice_paddy)
 
-# IPC rebased (already base 2010 = 100)
 index_cpi <- cpi_series |>
   mutate(Indicateur = "IPC national") |>
   rename(indice = cpi)
 
-# Combine
 index_all <- index_paddy |>
   mutate(Indicateur = paste0("Prix paddy ", Observatory)) |>
   rename(indice = indice_paddy) |>
@@ -1450,101 +1024,142 @@ index_all |>
   geom_point(size = 1.5) +
   geom_hline(yintercept = 100, linetype = "dashed", colour = "grey50") +
   scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-  labs(
-    x = NULL, y = "Indice (base 100 en 2010)",
-    colour = NULL
-  ) +
+  labs(x = NULL, y = "Indice (base 100 en 2010)", colour = NULL) +
   theme_minimal()
 ```
 
-#### Revenus réels (déflatés par l'IPC national)
+### Revenus reels (deflates par l'IPC national)
 
-Les revenus nominaux sont convertis en Ariary constants (base 2010) en divisant par l'IPC national. Ceci permet d'évaluer l'évolution du pouvoir d'achat, sous réserve des limites du déflateur urbain.
+Les revenus nominaux sont convertis en Ariary constants (base 2010) en divisant par l'IPC national. Ceci permet d'evaluer l'evolution du pouvoir d'achat, sous reserve des limites du deflateur urbain.
 
 ```{r fig_trends_revtot_real}
-#| fig-cap: "Évolution du revenu total réel moyen par ménage (déflaté par l'IPC national, Ar constants 2010)"
+#| fig-cap: "Evolution du revenu total reel moyen par menage (Ar constants 2010, IPC)"
 #| fig-width: 9
 #| fig-height: 5
 
-ggplot(mapping = aes(x = year, y = revtot_real, colour = Observatory)) +
-  geom_line(data = trends_solid, linewidth = 0.8) +
-  geom_line(data = trends_gap, linewidth = 0.8, linetype = "31") +
-  geom_point(data = trends, size = 2) +
-  geom_line(data = tibble(year = NA_real_, revtot_real = NA_real_),
-            aes(linetype = "Sans enquête"), colour = "black", linewidth = 0.8) +
-  scale_linetype_manual(values = c("Sans enquête" = "31")) +
-  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-  scale_y_continuous(labels = scales::label_comma()) +
-  labs(
-    x = NULL, y = "Revenu total réel moyen (Ar constants 2010/ménage/an)",
-    colour = "Observatoire", linetype = NULL
-  ) +
-  theme_minimal()
+trends |> make_trend_plot(revtot_real, "Revenu total reel moyen (Ar constants 2010)")
 ```
 
 ```{r fig_trends_revcou_real}
-#| fig-cap: "Évolution du revenu courant réel moyen par ménage (déflaté par l'IPC national, Ar constants 2010)"
+#| fig-cap: "Evolution du revenu courant reel moyen par menage (Ar constants 2010, IPC)"
 #| fig-width: 9
 #| fig-height: 5
 
-ggplot(mapping = aes(x = year, y = revcou_real, colour = Observatory)) +
-  geom_line(data = trends_solid, linewidth = 0.8) +
-  geom_line(data = trends_gap, linewidth = 0.8, linetype = "31") +
-  geom_point(data = trends, size = 2) +
-  geom_line(data = tibble(year = NA_real_, revcou_real = NA_real_),
-            aes(linetype = "Sans enquête"), colour = "black", linewidth = 0.8) +
-  scale_linetype_manual(values = c("Sans enquête" = "31")) +
-  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-  scale_y_continuous(labels = scales::label_comma()) +
-  labs(
-    x = NULL, y = "Revenu courant réel moyen (Ar constants 2010/ménage/an)",
-    colour = "Observatoire", linetype = NULL
-  ) +
-  theme_minimal()
+trends |> make_trend_plot(revcou_real, "Revenu courant reel moyen (Ar constants 2010)")
 ```
 
-#### Revenus réels (déflatés par le prix du paddy)
+### Revenus reels (deflates par le prix du paddy)
 
-Le prix du paddy, produit central de ces économies rizicoles, offre un déflateur alternatif plus proche de la réalité locale que l'IPC national. Les revenus sont ici exprimés en équivalent-paddy à prix 2010, c'est-à-dire divisés par l'indice du prix médian du paddy de chaque observatoire (base 2010 = 1). Ce déflateur est propre à chaque observatoire, contrairement à l'IPC national appliqué uniformément.
+Le prix du paddy, produit central de ces economies rizicoles, offre un deflateur alternatif plus proche de la realite locale que l'IPC national. Les revenus sont ici exprimes en equivalent-paddy a prix 2010, c'est-a-dire divises par l'indice du prix median du paddy de chaque observatoire (base 2010 = 1). Ce deflateur est propre a chaque observatoire.
 
 ```{r fig_trends_revtot_paddy}
-#| fig-cap: "Évolution du revenu total réel moyen par ménage (déflaté par le prix du paddy, Ar constants 2010)"
+#| fig-cap: "Evolution du revenu total reel moyen par menage (Ar constants paddy 2010)"
 #| fig-width: 9
 #| fig-height: 5
 
-ggplot(mapping = aes(x = year, y = revtot_paddy, colour = Observatory)) +
-  geom_line(data = trends_solid, linewidth = 0.8) +
-  geom_line(data = trends_gap, linewidth = 0.8, linetype = "31") +
-  geom_point(data = trends, size = 2) +
-  geom_line(data = tibble(year = NA_real_, revtot_paddy = NA_real_),
-            aes(linetype = "Sans enquête"), colour = "black", linewidth = 0.8) +
-  scale_linetype_manual(values = c("Sans enquête" = "31")) +
-  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-  scale_y_continuous(labels = scales::label_comma()) +
-  labs(
-    x = NULL, y = "Revenu total réel moyen (Ar constants paddy 2010/ménage/an)",
-    colour = "Observatoire", linetype = NULL
-  ) +
-  theme_minimal()
+trends |> make_trend_plot(revtot_paddy, "Revenu total reel moyen (Ar constants paddy 2010)")
 ```
 
 ```{r fig_trends_revcou_paddy}
-#| fig-cap: "Évolution du revenu courant réel moyen par ménage (déflaté par le prix du paddy, Ar constants 2010)"
+#| fig-cap: "Evolution du revenu courant reel moyen par menage (Ar constants paddy 2010)"
 #| fig-width: 9
 #| fig-height: 5
 
-ggplot(mapping = aes(x = year, y = revcou_paddy, colour = Observatory)) +
-  geom_line(data = trends_solid, linewidth = 0.8) +
-  geom_line(data = trends_gap, linewidth = 0.8, linetype = "31") +
-  geom_point(data = trends, size = 2) +
-  geom_line(data = tibble(year = NA_real_, revcou_paddy = NA_real_),
-            aes(linetype = "Sans enquête"), colour = "black", linewidth = 0.8) +
-  scale_linetype_manual(values = c("Sans enquête" = "31")) +
-  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-  scale_y_continuous(labels = scales::label_comma()) +
-  labs(
-    x = NULL, y = "Revenu courant réel moyen (Ar constants paddy 2010/ménage/an)",
-    colour = "Observatoire", linetype = NULL
-  ) +
-  theme_minimal()
+trends |> make_trend_plot(revcou_paddy, "Revenu courant reel moyen (Ar constants paddy 2010)")
+```
+
+## Evolution des conditions d'habitat (1997-2025) {#sec-habitat-multiyear}
+
+Les donnees sur l'habitat permettent de suivre l'evolution de la source d'eclairage (acces a l'electricite) et de la source d'eau principale sur la periode couverte.
+
+```{r habitat_trends_compute}
+#| include: false
+
+habitat_file <- "output/habitat_trends_obs.rds"
+
+if (file.exists(habitat_file)) {
+  habitat_trends <- readRDS(habitat_file)
+} else {
+  years_dir <- "data/ROS_MDG_microdata"
+  all_years <- c(1995, 1997:2015, 2025)
+
+  habitat_trends <- map_dfr(all_years, function(yr) {
+    f_deb <- file.path(years_dir, yr, "res_deb.dta")
+    f_h   <- file.path(years_dir, yr, "res_h.dta")
+    if (!file.exists(f_deb) || !file.exists(f_h)) return(tibble())
+
+    deb <- read_dta(f_deb) |>
+      mutate(j5 = as.character(j5)) |>
+      filter(j0 %in% c(3, 21)) |>
+      mutate(Observatory = if_else(j0 == 3, "Marovoay", "Alaotra"))
+
+    h <- read_dta(f_h) |> mutate(j5 = as.character(j5))
+    d <- h |>
+      select(-any_of("year")) |>
+      inner_join(deb |> select(j5, Observatory), by = "j5") |>
+      mutate(year = yr)
+
+    has_h7  <- "h7" %in% names(d)
+    has_h7a <- "h7a" %in% names(d)
+    pct_elec <- if (has_h7) {
+      d |> summarise(pct_elec = round(mean(h7 == 1, na.rm = TRUE) * 100, 1),
+                     .by = c(year, Observatory))
+    } else if (has_h7a) {
+      d |> summarise(pct_elec = round(mean(h7a == 1, na.rm = TRUE) * 100, 1),
+                     .by = c(year, Observatory))
+    } else tibble()
+
+    has_h4 <- "h4" %in% names(d)
+    pct_water <- if (has_h4) {
+      d |> summarise(
+        pct_eau_amelioree = round(mean(h4 %in% c(1, 2, 3, 4), na.rm = TRUE) * 100, 1),
+        .by = c(year, Observatory)
+      )
+    } else tibble()
+
+    out <- tibble(year = yr, Observatory = unique(deb$Observatory))
+    if (nrow(pct_elec) > 0)  out <- out |> left_join(pct_elec, by = c("year", "Observatory"))
+    if (nrow(pct_water) > 0) out <- out |> left_join(pct_water, by = c("year", "Observatory"))
+    out
+  })
+
+  saveRDS(habitat_trends, habitat_file)
+}
+
+hab_solid <- habitat_trends |> filter(year <= 2015)
+hab_gap   <- habitat_trends |> filter(year %in% c(2015, 2025))
+```
+
+```{r fig_habitat_elec}
+#| fig-cap: "Evolution de l'acces a l'electricite (1997-2025)"
+#| fig-width: 9
+#| fig-height: 5
+
+if ("pct_elec" %in% names(habitat_trends)) {
+  ggplot(mapping = aes(x = year, y = pct_elec, colour = Observatory)) +
+    geom_line(data = hab_solid |> filter(!is.na(pct_elec)), linewidth = 0.8) +
+    geom_line(data = hab_gap |> filter(!is.na(pct_elec)), linewidth = 0.8, linetype = "31") +
+    geom_point(data = habitat_trends |> filter(!is.na(pct_elec)), size = 2) +
+    scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+    scale_y_continuous(limits = c(0, NA)) +
+    labs(x = NULL, y = "% de menages avec electricite", colour = "Observatoire") +
+    theme_minimal()
+}
+```
+
+```{r fig_habitat_water}
+#| fig-cap: "Evolution de l'acces a une source d'eau amelioree (1997-2025)"
+#| fig-width: 9
+#| fig-height: 5
+
+if ("pct_eau_amelioree" %in% names(habitat_trends)) {
+  ggplot(mapping = aes(x = year, y = pct_eau_amelioree, colour = Observatory)) +
+    geom_line(data = hab_solid |> filter(!is.na(pct_eau_amelioree)), linewidth = 0.8) +
+    geom_line(data = hab_gap |> filter(!is.na(pct_eau_amelioree)), linewidth = 0.8, linetype = "31") +
+    geom_point(data = habitat_trends |> filter(!is.na(pct_eau_amelioree)), size = 2) +
+    scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+    scale_y_continuous(limits = c(0, 100)) +
+    labs(x = NULL, y = "% de menages avec eau amelioree", colour = "Observatoire") +
+    theme_minimal()
+}
 ```

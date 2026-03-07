@@ -304,16 +304,7 @@ enum_obs <- enum_all |>
   ) |>
   mutate(`Taux de sondage (%)` = round(Ménages_enquêtés / Ménages_dénombrés * 100, 1))
 
-enum_total <- enum_obs |>
-  summarise(
-    across(c(Toits, Ménages_dénombrés, Ménages_enquêtés), sum)
-  ) |>
-  mutate(
-    Observatory = "Ensemble",
-    `Taux de sondage (%)` = round(Ménages_enquêtés / Ménages_dénombrés * 100, 1)
-  )
-
-bind_rows(enum_obs, enum_total) |>
+enum_obs |>
   gt() |>
   fmt_number(columns = c(Toits, Ménages_dénombrés, Ménages_enquêtés),
              sep_mark = " ", decimals = 0) |>
@@ -327,10 +318,6 @@ bind_rows(enum_obs, enum_total) |>
   tab_style(
     style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
     locations = cells_column_labels(columns = everything())
-  ) |>
-  tab_style(
-    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
-    locations = cells_body(rows = Observatory == "Ensemble")
   ) |>
   tab_source_note(
     source_note = md("**Source : Synthèse Dénombrement OR 2025 & Enquête auprès des OR 2025**")
@@ -356,15 +343,8 @@ totals <- tab_ham |>
   group_by(Observatory) |>
   summarise(j4bis = "Ensemble", n = sum(n), Percent = 100)
 
-grand_total <- tibble(
-  Observatory = "", j4bis = "Total",
-  n = sum(tab_ham$n), Percent = 100
-)
-
-tab_ham <- bind_rows(tab_ham, totals, grand_total) |>
-  mutate(order_flag = if_else(Observatory == "", 2, 1)) |>
-  arrange(order_flag, Observatory, desc(j4bis != "Ensemble"), desc(n)) |>
-  select(-order_flag)
+tab_ham <- bind_rows(tab_ham, totals) |>
+  arrange(Observatory, desc(j4bis != "Ensemble"), desc(n))
 
 gt(tab_ham, groupname_col = "Observatory") |>
   fmt_number(columns = Percent, decimals = 1) |>
@@ -379,7 +359,7 @@ gt(tab_ham, groupname_col = "Observatory") |>
   ) |>
   tab_style(
     style = list(cell_text(weight = "bold"), cell_fill(color = "#CECECE")),
-    locations = cells_body(rows = j4bis %in% c("Ensemble", "Total"))
+    locations = cells_body(rows = j4bis == "Ensemble")
   ) |>
   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 ```

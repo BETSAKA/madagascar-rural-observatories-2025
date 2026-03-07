@@ -20,6 +20,10 @@ library(tidyverse)
 library(haven)
 library(gt)
 
+source("utils/helpers_report.R")
+source("utils/sites.R")
+source("utils/downloadable_output.R")
+
 # Données observatoires
 res_deb <- read_dta("data/res_deb.dta")
 # Données cataclysmes (ménage × type)
@@ -43,6 +47,8 @@ res_deb <- res_deb %>%
       TRUE ~ j4
     )
   )
+
+res_deb <- assign_site(res_deb)
 
 # Harmoniser les labels des types de cataclysmes (nettoyage des doublons de saisie)
 res_cc <- res_cc %>%
@@ -84,6 +90,26 @@ res_cc <- res_cc %>%
 
 # Filtrer les événements survenus
 events <- res_cc %>% filter(cc11 == 1)
+
+# --- Préparation pour les variantes téléchargeables ---
+n_hh_site <- res_deb %>% count(Observatory, Site, name = "n_hh_site")
+n_hh_obs  <- res_deb %>% count(Observatory, name = "n_hh_obs")
+
+hh_cata <- res_deb %>%
+  select(j5, Observatory, Site, j4bis) %>%
+  left_join(
+    events %>% group_by(j5) %>% summarise(nb_events = n(), .groups = "drop"),
+    by = "j5"
+  ) %>%
+  mutate(nb_events = replace_na(nb_events, 0), touched = nb_events > 0)
+
+events_full <- events %>%
+  left_join(res_deb %>% select(j5, Observatory, Site, j4bis), by = "j5") %>%
+  left_join(n_hh_site, by = c("Observatory", "Site")) %>%
+  left_join(n_hh_obs, by = "Observatory")
+
+cca_full <- res_cca %>%
+  left_join(res_deb %>% select(j5, Observatory, Site), by = "j5")
 ```
 
 ## Prévalence des cataclysmes
@@ -138,6 +164,19 @@ menages_touches_all %>%
   )
 ```
 
+```{r dl_t1_prevalence_globale}
+dl_tbl_variants("tbl_cata_prevalence", "11", function(d) {
+  d %>%
+    group_by(Observatory) %>%
+    summarise(
+      `Ménages touchés` = sum(touched),
+      `Total ménages` = n(),
+      `% touchés` = round(sum(touched) / n() * 100, 1),
+      .groups = "drop"
+    )
+}, hh_cata)
+```
+
 Le taux d'exposition aux cataclysmes est très élevé dans les deux observatoires.
 
 ### Prévalence par type de catastrophe
@@ -190,6 +229,24 @@ prev_type_wide %>%
   )
 ```
 
+```{r dl_t2_prevalence_type}
+dl_tbl_variants("tbl_cata_type", "11", function(d) {
+  d %>%
+    group_by(Observatory, Catastrophe) %>%
+    summarise(
+      n = n_distinct(j5),
+      n_total = if_else(
+        grepl("- Tous$", first(Observatory)),
+        first(n_hh_obs), first(n_hh_site)
+      ),
+      .groups = "drop"
+    ) %>%
+    mutate(`%` = round(n / n_total * 100, 1)) %>%
+    select(Observatory, Catastrophe, n, `%`) %>%
+    arrange(Observatory, desc(n))
+}, events_full)
+```
+
 La sécheresse est de loin le Catastrophe le plus fréquemment cité, suivi des maladies (cultures/élevage), des rats et des facteurs humains (vol, dégradation). Les cyclones et inondations ont touché un nombre plus limité de ménages dans ces deux observatoires pour cette campagne.
 
 ```{r g1_prevalence_type}
@@ -210,6 +267,30 @@ prev_type %>%
     plot.title = element_text(face = "bold", size = 12),
     axis.text.y = element_text(size = 9)
   )
+```
+
+```{r dl_g1_prevalence_type}
+dl_fig_variants("fig_cata_prevalence_type", "11", function(d) {
+  prev <- d %>%
+    group_by(Observatory, Catastrophe) %>%
+    summarise(
+      n = n_distinct(j5),
+      n_total = if_else(
+        grepl("- Tous$", first(Observatory)),
+        first(n_hh_obs), first(n_hh_site)
+      ),
+      .groups = "drop"
+    ) %>%
+    mutate(pct = round(n / n_total * 100, 1))
+  ggplot(prev, aes(x = reorder(Catastrophe, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(x = NULL, y = "% de ménages", fill = "Observatoire",
+         title = "Types de cataclysmes subis par les ménages") +
+    theme_minimal() +
+    theme(plot.title = element_text(face = "bold", size = 12),
+          axis.text.y = element_text(size = 9))
+}, events_full, width = 10, height = 6)
 ```
 
 ### Nombre moyen de catastrophes par ménage
@@ -265,6 +346,18 @@ nb_cata_combined %>%
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
   )
+```
+
+```{r dl_t3_nb_moyen_catastrophes}
+dl_tbl_variants("tbl_cata_nb_moyen", "11", function(d) {
+  d %>%
+    group_by(Observatory) %>%
+    summarise(
+      `Nb ménages` = n(),
+      `Nb moyen de catastrophes` = round(mean(nb_events), 1),
+      .groups = "drop"
+    )
+}, hh_cata)
 ```
 
 ## Sévérité des dégâts
@@ -335,6 +428,21 @@ degats_logement_resume %>%
   )
 ```
 
+```{r dl_t4_degats_logement}
+dl_tbl_variants("tbl_degats_logement", "11", function(d) {
+  d %>%
+    filter(!is.na(cc1a1)) %>%
+    group_by(Observatory, Catastrophe) %>%
+    summarise(
+      `N total` = n(),
+      `N dégâts` = sum(cc1a1 >= 2, na.rm = TRUE),
+      `% dégâts` = round(sum(cc1a1 >= 2, na.rm = TRUE) / n() * 100, 1),
+      .groups = "drop"
+    ) %>%
+    filter(`N total` >= 5)
+}, events_full)
+```
+
 ### Dégâts sur l'élevage
 
 ```{r t5_degats_elevage}
@@ -392,6 +500,21 @@ degats_elevage_display %>%
   tab_options(row_group.font.weight = "bold")
 ```
 
+```{r dl_t5_degats_elevage}
+dl_tbl_variants("tbl_degats_elevage", "11", function(d) {
+  d %>%
+    filter(!is.na(cc1a3)) %>%
+    mutate(Niveau = degats_labels[as.character(cc1a3)]) %>%
+    count(Observatory, Catastrophe, Niveau) %>%
+    group_by(Observatory, Catastrophe) %>%
+    mutate(pct = round(n / sum(n) * 100, 1), total = sum(n)) %>%
+    ungroup() %>%
+    filter(total >= 5) %>%
+    select(-n, -total) %>%
+    pivot_wider(names_from = Niveau, values_from = pct, values_fill = 0)
+}, events_full)
+```
+
 Les dégâts sur l'élevage sont particulièrement importants pour certains aléas : les maladies et la sécheresse peuvent entraîner des pertes significatives (catégorie « Beaucoup » ou « Destruction totale »).
 
 ### Conséquences sur les personnes
@@ -431,6 +554,21 @@ degats_personnes %>%
     locations = cells_column_labels()
   ) %>%
   tab_options(row_group.font.weight = "bold")
+```
+
+```{r dl_t6_degats_personnes}
+dl_tbl_variants("tbl_degats_personnes", "11", function(d) {
+  d %>%
+    filter(!is.na(cc1a4)) %>%
+    mutate(Consequence = personnes_labels[as.character(cc1a4)]) %>%
+    count(Observatory, Catastrophe, Consequence) %>%
+    group_by(Observatory, Catastrophe) %>%
+    mutate(pct = round(n / sum(n) * 100, 1), total = sum(n)) %>%
+    ungroup() %>%
+    filter(total >= 5) %>%
+    select(-n, -total) %>%
+    pivot_wider(names_from = Consequence, values_from = pct, values_fill = 0)
+}, events_full)
 ```
 
 La conséquence la plus répandue est le manque de vivres, directement lié aux pertes agricoles. Les décès et disparitions, bien que rares, sont signalés pour certains cataclysmes (inondations, cyclones).
@@ -480,6 +618,27 @@ ggplot(severite_plot, aes(x = Catastrophe, y = pct, fill = Niveau)) +
   )
 ```
 
+```{r dl_g2_severite_profil}
+#| include: false
+dl_fig_variants("fig_severite_profil", "11", function(d) {
+  top5 <- d %>% count(Catastrophe, sort = TRUE) %>% slice_head(n = 5) %>% pull(Catastrophe)
+  sev <- d %>%
+    filter(Catastrophe %in% top5, !is.na(cc1a3)) %>%
+    mutate(Niveau = factor(degats_labels[as.character(cc1a3)],
+                           levels = c("Destruction totale", "Beaucoup", "Un peu", "Rien"))) %>%
+    count(Observatory, Catastrophe, Niveau) %>%
+    group_by(Observatory, Catastrophe) %>%
+    mutate(pct = round(n / sum(n) * 100, 1)) %>%
+    ungroup()
+  ggplot(sev, aes(x = Catastrophe, y = pct, fill = Niveau)) +
+    geom_col(position = "stack") + facet_wrap(~Observatory) + coord_flip() +
+    labs(title = "Sévérité des dégâts sur l'élevage", x = NULL, y = "% de ménages", fill = "Niveau") +
+    scale_fill_manual(values = c("Destruction totale" = "#d62728", "Beaucoup" = "#ff7f0e",
+                                 "Un peu" = "#ffbb78", "Rien" = "#aec7e8")) +
+    theme_minimal() + theme(plot.title = element_text(face = "bold", size = 11))
+}, events_full, width = 10, height = 6)
+```
+
 ## Saisonnalité des cataclysmes
 
 Les événements peuvent survenir en période de soudure (lorsque les stocks sont déjà bas) ou hors soudure. La coïncidence avec la soudure aggrave considérablement l'impact sur la sécurité alimentaire.
@@ -525,6 +684,25 @@ saisonnalite %>%
   )
 ```
 
+```{r dl_t7_saisonnalite}
+#| include: false
+dl_tbl_variants("tbl_saisonnalite", "11", function(d) {
+  d %>%
+    mutate(
+      hors_soudure = if_else(!is.na(cc1a5_1) & cc1a5_1 == 1, 1L, 0L),
+      pendant_soudure = if_else(!is.na(cc1a5_2) & cc1a5_2 == 1, 1L, 0L)
+    ) %>%
+    group_by(Observatory, Catastrophe) %>%
+    summarise(
+      n = n(),
+      `% hors soudure` = round(sum(hors_soudure) / n() * 100, 1),
+      `% pendant soudure` = round(sum(pendant_soudure) / n() * 100, 1),
+      .groups = "drop"
+    ) %>%
+    filter(n >= 5)
+}, events_full)
+```
+
 ```{r g3_saisonnalite}
 # G3 : Barres groupées hors soudure vs pendant soudure
 saisonnalite_plot <- saisonnalite %>%
@@ -553,6 +731,30 @@ ggplot(saisonnalite_plot, aes(x = reorder(Catastrophe, pct), y = pct, fill = Pé
     plot.title = element_text(face = "bold", size = 12),
     axis.text.y = element_text(size = 9)
   )
+```
+
+```{r dl_g3_saisonnalite}
+#| include: false
+dl_fig_variants("fig_saisonnalite", "11", function(d) {
+  sais <- d %>%
+    mutate(
+      hors_soudure = if_else(!is.na(cc1a5_1) & cc1a5_1 == 1, 1L, 0L),
+      pendant_soudure = if_else(!is.na(cc1a5_2) & cc1a5_2 == 1, 1L, 0L)
+    ) %>%
+    group_by(Observatory, Catastrophe) %>%
+    summarise(
+      n = n(), pct_hors = round(sum(hors_soudure) / n() * 100, 1),
+      pct_pendant = round(sum(pendant_soudure) / n() * 100, 1), .groups = "drop"
+    ) %>%
+    filter(n >= 5) %>%
+    pivot_longer(cols = c(pct_hors, pct_pendant), names_to = "Periode", values_to = "pct") %>%
+    mutate(Periode = if_else(Periode == "pct_hors", "Hors soudure", "Pendant soudure"))
+  ggplot(sais, aes(x = reorder(Catastrophe, pct), y = pct, fill = Periode)) +
+    geom_col(position = "dodge") + facet_wrap(~Observatory) + coord_flip() +
+    labs(title = "Période de survenance des cataclysmes", x = NULL, y = "% des événements", fill = "Période") +
+    scale_fill_manual(values = c("Hors soudure" = "#2ca02c", "Pendant soudure" = "#d62728")) +
+    theme_minimal() + theme(plot.title = element_text(face = "bold", size = 12))
+}, events_full, width = 10, height = 6)
 ```
 
 La majorité des cataclysmes surviennent pendant la période de soudure, ce qui amplifie leur impact sur la sécurité alimentaire des ménages. La sécheresse et les maladies, notamment, frappent souvent lorsque les stocks sont déjà au plus bas.
@@ -605,6 +807,28 @@ cultures_touchees %>%
     locations = cells_column_labels()
   ) %>%
   tab_options(row_group.font.weight = "bold")
+```
+
+```{r dl_t8_cultures_touchees}
+#| include: false
+dl_tbl_variants("tbl_cultures_touchees", "11", function(d) {
+  d %>%
+    filter(!is.na(cc1a0) & cc1a0 != 0) %>%
+    mutate(
+      Culture = if_else(
+        as.character(cc1a0) %in% names(culture_labels),
+        culture_labels[as.character(cc1a0)],
+        paste("Code", cc1a0)
+      ),
+      Culture = iconv(Culture, from = "latin1", to = "UTF-8")
+    ) %>%
+    count(Observatory, Culture, sort = TRUE) %>%
+    group_by(Observatory) %>%
+    mutate(pct = round(n / sum(n) * 100, 1), rang = row_number()) %>%
+    filter(rang <= 10) %>%
+    ungroup() %>%
+    select(-rang)
+}, cca_full)
 ```
 
 Le riz, culture vivrière dominante, est de loin la culture la plus exposée aux cataclysmes. Le haricot, le maïs et le manioc figurent également parmi les cultures les plus touchées.
@@ -662,6 +886,26 @@ riz_champs %>%
   tab_options(row_group.font.weight = "bold")
 ```
 
+```{r dl_t9_degats_champs_riz}
+#| include: false
+dl_tbl_variants("tbl_degats_champs_riz", "11", function(d) {
+  d %>%
+    filter(cc1a0 == 101) %>%
+    select(Observatory, starts_with("cc1a5_")) %>%
+    pivot_longer(cols = starts_with("cc1a5_"), names_to = "cata_var", values_to = "niveau") %>%
+    filter(!is.na(niveau)) %>%
+    mutate(Catastrophe = cata_champs_labels[cata_var],
+           Niveau = degats_labels[as.character(niveau)]) %>%
+    count(Observatory, Catastrophe, Niveau) %>%
+    group_by(Observatory, Catastrophe) %>%
+    mutate(pct = round(n / sum(n) * 100, 1), total = sum(n)) %>%
+    ungroup() %>%
+    filter(total >= 3) %>%
+    select(-n, -total) %>%
+    pivot_wider(names_from = Niveau, values_from = pct, values_fill = 0)
+}, cca_full)
+```
+
 ### Dégâts sur les stocks de riz par type de catastrophe
 
 ```{r t10_degats_stocks_riz}
@@ -711,6 +955,26 @@ riz_stocks %>%
     locations = cells_column_labels()
   ) %>%
   tab_options(row_group.font.weight = "bold")
+```
+
+```{r dl_t10_degats_stocks_riz}
+#| include: false
+dl_tbl_variants("tbl_degats_stocks_riz", "11", function(d) {
+  d %>%
+    filter(cc1a0 == 101) %>%
+    select(Observatory, starts_with("cc1a6_")) %>%
+    pivot_longer(cols = starts_with("cc1a6_"), names_to = "cata_var", values_to = "niveau") %>%
+    filter(!is.na(niveau)) %>%
+    mutate(Catastrophe = cata_stocks_labels[cata_var],
+           Niveau = degats_labels[as.character(niveau)]) %>%
+    count(Observatory, Catastrophe, Niveau) %>%
+    group_by(Observatory, Catastrophe) %>%
+    mutate(pct = round(n / sum(n) * 100, 1), total = sum(n)) %>%
+    ungroup() %>%
+    filter(total >= 3) %>%
+    select(-n, -total) %>%
+    pivot_wider(names_from = Niveau, values_from = pct, values_fill = 0)
+}, cca_full)
 ```
 
 Les dégâts sur les stocks, bien que moins fréquents que sur les champs, affectent directement les réserves alimentaires du ménage, en particulier lorsqu'ils surviennent en période de soudure.
@@ -775,4 +1039,113 @@ ggplot(champs_vs_stocks_plot, aes(x = Culture, y = pct, fill = Type)) +
   )
 ```
 
+```{r dl_g4_champs_vs_stocks}
+#| include: false
+dl_fig_variants("fig_champs_vs_stocks", "11", function(d) {
+  top5 <- d %>% filter(!is.na(cc1a0) & cc1a0 != 0) %>%
+    count(cc1a0, sort = TRUE) %>% slice_head(n = 5) %>% pull(cc1a0)
+  cs <- d %>%
+    filter(cc1a0 %in% top5) %>%
+    mutate(Culture = iconv(culture_labels[as.character(cc1a0)], from = "latin1", to = "UTF-8")) %>%
+    rowwise() %>%
+    mutate(any_champs = any(c_across(starts_with("cc1a5_")) >= 2, na.rm = TRUE),
+           any_stocks = any(c_across(starts_with("cc1a6_")) >= 2, na.rm = TRUE)) %>%
+    ungroup() %>%
+    group_by(Observatory, Culture) %>%
+    summarise(n = n(), pct_champs = round(sum(any_champs) / n() * 100, 1),
+              pct_stocks = round(sum(any_stocks) / n() * 100, 1), .groups = "drop") %>%
+    pivot_longer(cols = c(pct_champs, pct_stocks), names_to = "Type", values_to = "pct") %>%
+    mutate(Type = if_else(Type == "pct_champs", "Champs", "Stocks"))
+  ggplot(cs, aes(x = Culture, y = pct, fill = Type)) +
+    geom_col(position = "dodge") + facet_wrap(~Observatory) +
+    labs(title = "Dégâts champs vs stocks — 5 cultures principales", x = NULL,
+         y = "% de ménages", fill = "Type de dégâts") +
+    scale_fill_manual(values = c("Champs" = "#1f77b4", "Stocks" = "#ff7f0e")) +
+    theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                            plot.title = element_text(face = "bold", size = 12))
+}, cca_full, width = 10, height = 6)
+```
+
 Les dégâts sur les champs (cultures en cours) sont systématiquement plus fréquents que les pertes de stocks. Toutefois, les pertes de stocks, même si elles concernent moins de ménages, ont un impact direct sur les réserves alimentaires disponibles.
+
+## Évolution de la prévalence des catastrophes (2003–2025) {#sec-cata-multiyear}
+
+Le module « catastrophes » (`res_cc`) est disponible depuis 2003. On retrace ici la proportion de ménages ayant déclaré au moins un aléa climatique ou biologique au cours de la campagne.
+
+```{r cata_trends_compute}
+#| include: false
+
+cata_file <- "output/cata_trends_obs.rds"
+
+if (file.exists(cata_file)) {
+  cata_trends <- readRDS(cata_file)
+} else {
+  years_dir <- "data/ROS_MDG_microdata"
+  all_years <- c(2003:2015, 2025)
+  
+  cata_trends <- map_dfr(all_years, function(yr) {
+    f_deb <- file.path(years_dir, yr, "res_deb.dta")
+    f_cc  <- file.path(years_dir, yr, "res_cc.dta")
+    if (!file.exists(f_deb) || !file.exists(f_cc)) return(tibble())
+    
+    deb <- read_dta(f_deb) |>
+      mutate(j5 = as.character(j5), year = yr) |>
+      filter(j0 %in% c(3, 21)) |>
+      mutate(Observatory = if_else(j0 == 3, "Marovoay", "Alaotra"))
+    
+    cc <- read_dta(f_cc) |> mutate(j5 = as.character(j5))
+    
+    # Two formats:
+    # 2003: one row per HH, cc1_1..cc1_7 = yes/no per catastrophe type
+    # 2008+: multiple rows per HH, cc11 = yes/no per catastrophe type row
+    
+    has_cc11 <- "cc11" %in% names(cc)
+    cc1_vars <- grep("^cc1_[0-9]", names(cc), value = TRUE)
+    
+    if (has_cc11) {
+      # Multi-row format: HH has catastrophe if any row has cc11==1
+      cc_hh <- cc |>
+        inner_join(deb |> select(j5, Observatory), by = "j5") |>
+        summarise(any_cata = any(cc11 == 1, na.rm = TRUE), .by = c(j5, Observatory))
+    } else if (length(cc1_vars) > 0) {
+      # Single-row format: HH has catastrophe if any cc1_x==1
+      cc_hh <- cc |>
+        inner_join(deb |> select(j5, Observatory), by = "j5") |>
+        rowwise() |>
+        mutate(any_cata = any(c_across(all_of(cc1_vars)) == 1, na.rm = TRUE)) |>
+        ungroup() |>
+        select(j5, Observatory, any_cata)
+    } else {
+      return(tibble())
+    }
+    
+    cc_hh |>
+      summarise(
+        n = n(),
+        pct_cata = round(mean(any_cata, na.rm = TRUE) * 100, 1),
+        .by = Observatory
+      ) |>
+      mutate(year = yr)
+  })
+  
+  saveRDS(cata_trends, cata_file)
+}
+
+cata_solid <- cata_trends |> filter(year <= 2015)
+cata_gap   <- cata_trends |> filter(year %in% c(2015, 2025))
+```
+
+```{r fig_cata_prevalence}
+#| fig-cap: "Évolution du pourcentage de ménages ayant subi au moins une catastrophe (2003–2025)"
+#| fig-width: 9
+#| fig-height: 5
+
+ggplot(mapping = aes(x = year, y = pct_cata, colour = Observatory)) +
+  geom_line(data = cata_solid, linewidth = 0.8) +
+  geom_line(data = cata_gap, linewidth = 0.8, linetype = "31") +
+  geom_point(data = cata_trends, size = 2) +
+  scale_x_continuous(breaks = seq(2003, 2025, 2)) +
+  scale_y_continuous(limits = c(0, 100)) +
+  labs(x = NULL, y = "% de ménages touchés", colour = "Observatoire") +
+  theme_minimal()
+```

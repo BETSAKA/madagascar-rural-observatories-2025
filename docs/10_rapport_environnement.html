@@ -107,6 +107,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
+<link rel="stylesheet" href="styles/downloads.css">
 </head>
 
 <body class="nav-sidebar floating quarto-light">
@@ -294,7 +295,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 data-number="7.1" class="anchored" data-anchor-id="sec-representation"><span class="header-section-number">7.1</span> Représentation de la zone protégée par les ménages</h2>
 <section id="caractérisation-de-la-zone-disponibilité-des-ressources" class="level3" data-number="7.1.1">
 <h3 data-number="7.1.1" class="anchored" data-anchor-id="caractérisation-de-la-zone-disponibilité-des-ressources"><span class="header-section-number">7.1.1</span> Caractérisation de la zone : disponibilité des ressources</h3>
-<p>Les ménages ont été interrogés sur la disponibilité de dix catégories de ressources naturelles dans la zone protégée à proximité de leur village. La <a href="#fig-ressources-dispo" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-ressources-dispo</span></a> résume les réponses, distinguant les ressources jugées abondantes, en quantité normale ou rares.</p>
+<p>Les ménages ont été interrogés sur la disponibilité de dix catégories de ressources naturelles dans la zone protégée à proximité de leur village. La <a href="#fig-ressources-dispo" class="quarto-xref">Figure&nbsp;<span>7.1</span></a> résume les réponses, distinguant les ressources jugées abondantes, en quantité normale ou rares.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -352,7 +353,7 @@ Figure&nbsp;7.1: Disponibilité perçue des ressources naturelles dans la zone p
 </section>
 <section id="évolution-perçue-des-ressources" class="level3" data-number="7.1.2">
 <h3 data-number="7.1.2" class="anchored" data-anchor-id="évolution-perçue-des-ressources"><span class="header-section-number">7.1.2</span> Évolution perçue des ressources</h3>
-<p>Les ménages estiment l’évolution de ces ressources sur les trois et cinq dernières années. La <a href="#fig-evolution-ressources" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-evolution-ressources</span></a> présente la tendance à 3 ans.</p>
+<p>Les ménages estiment l’évolution de ces ressources sur les trois et cinq dernières années. La <a href="#fig-evolution-ressources" class="quarto-xref">Figure&nbsp;<span>7.2</span></a> présente la tendance à 3 ans.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -396,7 +397,7 @@ Figure&nbsp;7.2: Évolution perçue des ressources naturelles au cours des 3 der
 </section>
 <section id="appartenance-perçue-de-la-zone" class="level3" data-number="7.1.3">
 <h3 data-number="7.1.3" class="anchored" data-anchor-id="appartenance-perçue-de-la-zone"><span class="header-section-number">7.1.3</span> Appartenance perçue de la zone</h3>
-<p>La question RM3 demande à qui appartient la zone protégée (réponses multiples). La <a href="#fig-appartenance" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-appartenance</span></a> montre les réponses par observatoire.</p>
+<p>La question RM3 demande à qui appartient la zone protégée (réponses multiples). La <a href="#fig-appartenance" class="quarto-xref">Figure&nbsp;<span>7.3</span></a> montre les réponses par observatoire.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -414,9 +415,9 @@ Figure&nbsp;7.2: Évolution perçue des ressources naturelles au cours des 3 der
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) {</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pct_oui</span>(res_op_env, var, label)</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  }) <span class="sc">|&gt;</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(Alaotra, Marovoay, Total), <span class="at">names_to =</span> <span class="st">"Groupe"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(Alaotra, Marovoay), <span class="at">names_to =</span> <span class="st">"Groupe"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(appart <span class="sc">|&gt;</span> <span class="fu">filter</span>(Groupe <span class="sc">!=</span> <span class="st">"Total"</span>),</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(appart,</span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Item, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Groupe)) <span class="sc">+</span></span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(pct, <span class="st">"%"</span>)),</span>
@@ -485,10 +486,10 @@ Figure&nbsp;7.3: À qui appartient la zone protégée ? (% de Oui, réponses mul
 <span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>  menaces <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Section =</span> <span class="st">"Principales menaces (parmi ceux qui déclarent menacé)"</span>),</span>
 <span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  resps <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Section =</span> <span class="st">"Principaux responsables"</span>)</span>
 <span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Section, Item, Alaotra, Marovoay, Total) <span class="sc">|&gt;</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Section, Item, Alaotra, Marovoay) <span class="sc">|&gt;</span></span>
 <span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>(<span class="at">groupname_col =</span> <span class="st">"Section"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(<span class="at">Item =</span> <span class="st">""</span>, <span class="at">Alaotra =</span> <span class="st">"Alaotra"</span>, <span class="at">Marovoay =</span> <span class="st">"Marovoay"</span>, <span class="at">Total =</span> <span class="st">"Total"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="fu">c</span>(Alaotra, Marovoay, Total), <span class="at">decimals =</span> <span class="dv">0</span>, <span class="at">pattern =</span> <span class="st">"{x} %"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(<span class="at">Item =</span> <span class="st">""</span>, <span class="at">Alaotra =</span> <span class="st">"Alaotra"</span>, <span class="at">Marovoay =</span> <span class="st">"Marovoay"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="fu">c</span>(Alaotra, Marovoay), <span class="at">decimals =</span> <span class="dv">0</span>, <span class="at">pattern =</span> <span class="st">"{x} %"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
 <span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(<span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>), <span class="fu">cell_fill</span>(<span class="at">color =</span> <span class="st">"#DCDCDC"</span>)),</span>
 <span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> <span class="fu">everything</span>())</span>
@@ -506,23 +507,23 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
 </figcaption>
 <div aria-describedby="tbl-menaces-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="buiegkzeta" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#buiegkzeta table {
+<div id="hmonqsqbpb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#hmonqsqbpb table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#buiegkzeta thead, #buiegkzeta tbody, #buiegkzeta tfoot, #buiegkzeta tr, #buiegkzeta td, #buiegkzeta th {
+#hmonqsqbpb thead, #hmonqsqbpb tbody, #hmonqsqbpb tfoot, #hmonqsqbpb tr, #hmonqsqbpb td, #hmonqsqbpb th {
   border-style: none;
 }
 
-#buiegkzeta p {
+#hmonqsqbpb p {
   margin: 0;
   padding: 0;
 }
 
-#buiegkzeta .gt_table {
+#hmonqsqbpb .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -548,12 +549,12 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   border-left-color: #D3D3D3;
 }
 
-#buiegkzeta .gt_caption {
+#hmonqsqbpb .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#buiegkzeta .gt_title {
+#hmonqsqbpb .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -565,7 +566,7 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   border-bottom-width: 0;
 }
 
-#buiegkzeta .gt_subtitle {
+#hmonqsqbpb .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -577,7 +578,7 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   border-top-width: 0;
 }
 
-#buiegkzeta .gt_heading {
+#hmonqsqbpb .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -589,13 +590,13 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   border-right-color: #D3D3D3;
 }
 
-#buiegkzeta .gt_bottom_border {
+#hmonqsqbpb .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#buiegkzeta .gt_col_headings {
+#hmonqsqbpb .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -610,7 +611,7 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   border-right-color: #D3D3D3;
 }
 
-#buiegkzeta .gt_col_heading {
+#hmonqsqbpb .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -630,7 +631,7 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   overflow-x: hidden;
 }
 
-#buiegkzeta .gt_column_spanner_outer {
+#hmonqsqbpb .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -642,15 +643,15 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   padding-right: 4px;
 }
 
-#buiegkzeta .gt_column_spanner_outer:first-child {
+#hmonqsqbpb .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#buiegkzeta .gt_column_spanner_outer:last-child {
+#hmonqsqbpb .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#buiegkzeta .gt_column_spanner {
+#hmonqsqbpb .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -662,11 +663,11 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   width: 100%;
 }
 
-#buiegkzeta .gt_spanner_row {
+#hmonqsqbpb .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#buiegkzeta .gt_group_heading {
+#hmonqsqbpb .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -692,7 +693,7 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   text-align: left;
 }
 
-#buiegkzeta .gt_empty_group_heading {
+#hmonqsqbpb .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -707,15 +708,15 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   vertical-align: middle;
 }
 
-#buiegkzeta .gt_from_md > :first-child {
+#hmonqsqbpb .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#buiegkzeta .gt_from_md > :last-child {
+#hmonqsqbpb .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#buiegkzeta .gt_row {
+#hmonqsqbpb .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -734,7 +735,7 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   overflow-x: hidden;
 }
 
-#buiegkzeta .gt_stub {
+#hmonqsqbpb .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -747,7 +748,7 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   padding-right: 5px;
 }
 
-#buiegkzeta .gt_stub_row_group {
+#hmonqsqbpb .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -761,15 +762,15 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   vertical-align: top;
 }
 
-#buiegkzeta .gt_row_group_first td {
+#hmonqsqbpb .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#buiegkzeta .gt_row_group_first th {
+#hmonqsqbpb .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#buiegkzeta .gt_summary_row {
+#hmonqsqbpb .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -779,16 +780,16 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   padding-right: 5px;
 }
 
-#buiegkzeta .gt_first_summary_row {
+#hmonqsqbpb .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#buiegkzeta .gt_first_summary_row.thick {
+#hmonqsqbpb .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#buiegkzeta .gt_last_summary_row {
+#hmonqsqbpb .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -798,7 +799,7 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   border-bottom-color: #D3D3D3;
 }
 
-#buiegkzeta .gt_grand_summary_row {
+#hmonqsqbpb .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -808,7 +809,7 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   padding-right: 5px;
 }
 
-#buiegkzeta .gt_first_grand_summary_row {
+#hmonqsqbpb .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -818,7 +819,7 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   border-top-color: #D3D3D3;
 }
 
-#buiegkzeta .gt_last_grand_summary_row_top {
+#hmonqsqbpb .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -828,11 +829,11 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   border-bottom-color: #D3D3D3;
 }
 
-#buiegkzeta .gt_striped {
+#hmonqsqbpb .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#buiegkzeta .gt_table_body {
+#hmonqsqbpb .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -841,7 +842,7 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   border-bottom-color: #D3D3D3;
 }
 
-#buiegkzeta .gt_footnotes {
+#hmonqsqbpb .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -855,7 +856,7 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   border-right-color: #D3D3D3;
 }
 
-#buiegkzeta .gt_footnote {
+#hmonqsqbpb .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -864,7 +865,7 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   padding-right: 5px;
 }
 
-#buiegkzeta .gt_sourcenotes {
+#hmonqsqbpb .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -878,7 +879,7 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   border-right-color: #D3D3D3;
 }
 
-#buiegkzeta .gt_sourcenote {
+#hmonqsqbpb .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -886,72 +887,72 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
   padding-right: 5px;
 }
 
-#buiegkzeta .gt_left {
+#hmonqsqbpb .gt_left {
   text-align: left;
 }
 
-#buiegkzeta .gt_center {
+#hmonqsqbpb .gt_center {
   text-align: center;
 }
 
-#buiegkzeta .gt_right {
+#hmonqsqbpb .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#buiegkzeta .gt_font_normal {
+#hmonqsqbpb .gt_font_normal {
   font-weight: normal;
 }
 
-#buiegkzeta .gt_font_bold {
+#hmonqsqbpb .gt_font_bold {
   font-weight: bold;
 }
 
-#buiegkzeta .gt_font_italic {
+#hmonqsqbpb .gt_font_italic {
   font-style: italic;
 }
 
-#buiegkzeta .gt_super {
+#hmonqsqbpb .gt_super {
   font-size: 65%;
 }
 
-#buiegkzeta .gt_footnote_marks {
+#hmonqsqbpb .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#buiegkzeta .gt_asterisk {
+#hmonqsqbpb .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#buiegkzeta .gt_indent_1 {
+#hmonqsqbpb .gt_indent_1 {
   text-indent: 5px;
 }
 
-#buiegkzeta .gt_indent_2 {
+#hmonqsqbpb .gt_indent_2 {
   text-indent: 10px;
 }
 
-#buiegkzeta .gt_indent_3 {
+#hmonqsqbpb .gt_indent_3 {
   text-indent: 15px;
 }
 
-#buiegkzeta .gt_indent_4 {
+#hmonqsqbpb .gt_indent_4 {
   text-indent: 20px;
 }
 
-#buiegkzeta .gt_indent_5 {
+#hmonqsqbpb .gt_indent_5 {
   text-indent: 25px;
 }
 
-#buiegkzeta .katex-display {
+#hmonqsqbpb .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#buiegkzeta div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#hmonqsqbpb div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -962,130 +963,111 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
 <th id="Item" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col"></th>
 <th id="Alaotra" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col">Alaotra</th>
 <th id="Marovoay" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col">Marovoay</th>
-<th id="Total" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col">Total</th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
 <tr class="gt_group_heading_row odd">
-<th colspan="4" class="gt_empty_group_heading" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #B0E0E6" scope="colgroup"></th>
+<th colspan="3" class="gt_empty_group_heading" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #B0E0E6" scope="colgroup"></th>
 </tr>
 <tr class="gt_row_group_first even">
 <td class="gt_row gt_left" headers="  Item">Considèrent que l'environnement est menacé</td>
 <td class="gt_row gt_right" headers="  Alaotra">82 %</td>
 <td class="gt_row gt_right" headers="  Marovoay">79 %</td>
-<td class="gt_row gt_right" headers="  Total">80 %</td>
 </tr>
 <tr class="gt_group_heading_row odd">
-<th colspan="4" id="Principales menaces (parmi ceux qui déclarent menacé)" class="gt_group_heading" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #B0E0E6" scope="colgroup">Principales menaces (parmi ceux qui déclarent menacé)</th>
+<th colspan="3" id="Principales menaces (parmi ceux qui déclarent menacé)" class="gt_group_heading" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #B0E0E6" scope="colgroup">Principales menaces (parmi ceux qui déclarent menacé)</th>
 </tr>
 <tr class="gt_row_group_first even">
 <td class="gt_row gt_left" headers="Principales menaces (parmi ceux qui déclarent menacé)  Item">Feux</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Alaotra">84 %</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Marovoay">95 %</td>
-<td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Total">89 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Principales menaces (parmi ceux qui déclarent menacé)  Item">Défrichage</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Alaotra">56 %</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Marovoay">52 %</td>
-<td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Total">54 %</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Principales menaces (parmi ceux qui déclarent menacé)  Item">Prélèvement (faune)</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Alaotra">40 %</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Marovoay">20 %</td>
-<td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Total">30 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Principales menaces (parmi ceux qui déclarent menacé)  Item">Prélèvement (flore)</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Alaotra">40 %</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Marovoay">21 %</td>
-<td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Total">31 %</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Principales menaces (parmi ceux qui déclarent menacé)  Item">Prospection minière</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Alaotra">29 %</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Marovoay">6 %</td>
-<td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Total">18 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Principales menaces (parmi ceux qui déclarent menacé)  Item">Nomadisme (passage non-résidents)</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Alaotra">16 %</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Marovoay">16 %</td>
-<td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Total">16 %</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Principales menaces (parmi ceux qui déclarent menacé)  Item">Zébu / pâturage</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Alaotra">20 %</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Marovoay">10 %</td>
-<td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Total">15 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Principales menaces (parmi ceux qui déclarent menacé)  Item">Tourisme</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Alaotra">2 %</td>
 <td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Marovoay">3 %</td>
-<td class="gt_row gt_right" headers="Principales menaces (parmi ceux qui déclarent menacé)  Total">3 %</td>
 </tr>
 <tr class="gt_group_heading_row even">
-<th colspan="4" id="Principaux responsables" class="gt_group_heading" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #B0E0E6" scope="colgroup">Principaux responsables</th>
+<th colspan="3" id="Principaux responsables" class="gt_group_heading" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #B0E0E6" scope="colgroup">Principaux responsables</th>
 </tr>
 <tr class="gt_row_group_first odd">
 <td class="gt_row gt_left" headers="Principaux responsables  Item">L'ensemble des riverains</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Alaotra">87 %</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Marovoay">70 %</td>
-<td class="gt_row gt_right" headers="Principaux responsables  Total">78 %</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Principaux responsables  Item">Les riverains migrants</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Alaotra">47 %</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Marovoay">37 %</td>
-<td class="gt_row gt_right" headers="Principaux responsables  Total">42 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Principaux responsables  Item">L'État (Fanjakana)</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Alaotra">10 %</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Marovoay">8 %</td>
-<td class="gt_row gt_right" headers="Principaux responsables  Total">9 %</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Principaux responsables  Item">Les braconniers</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Alaotra">30 %</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Marovoay">10 %</td>
-<td class="gt_row gt_right" headers="Principaux responsables  Total">20 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Principaux responsables  Item">Le gestionnaire</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Alaotra">9 %</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Marovoay">3 %</td>
-<td class="gt_row gt_right" headers="Principaux responsables  Total">6 %</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Principaux responsables  Item">Les nomades ou semi-nomades</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Alaotra">22 %</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Marovoay">17 %</td>
-<td class="gt_row gt_right" headers="Principaux responsables  Total">20 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Principaux responsables  Item">Les ONG ou entreprises</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Alaotra">3 %</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Marovoay">4 %</td>
-<td class="gt_row gt_right" headers="Principaux responsables  Total">4 %</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Principaux responsables  Item">Les chercheurs</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Alaotra">0 %</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Marovoay">2 %</td>
-<td class="gt_row gt_right" headers="Principaux responsables  Total">1 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Principaux responsables  Item">Les touristes</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Alaotra">1 %</td>
 <td class="gt_row gt_right" headers="Principaux responsables  Marovoay">2 %</td>
-<td class="gt_row gt_right" headers="Principaux responsables  Total">2 %</td>
 </tr>
 </tbody><tfoot>
 <tr class="gt_sourcenotes odd">
-<td colspan="4" class="gt_sourcenote"><strong>Source : Enquête auprès des OR 2025</strong></td>
+<td colspan="3" class="gt_sourcenote"><strong>Source : Enquête auprès des OR 2025</strong></td>
 </tr>
 </tfoot>
 
@@ -1122,9 +1104,9 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>repr <span class="ot">&lt;-</span> rm5_items <span class="sc">|&gt;</span></span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui</span>(res_op_env, var, label)) <span class="sc">|&gt;</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(Alaotra, Marovoay, Total), <span class="at">names_to =</span> <span class="st">"Groupe"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(Alaotra, Marovoay), <span class="at">names_to =</span> <span class="st">"Groupe"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(repr <span class="sc">|&gt;</span> <span class="fu">filter</span>(Groupe <span class="sc">!=</span> <span class="st">"Total"</span>),</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(repr,</span>
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Item, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Groupe)) <span class="sc">+</span></span>
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(pct, <span class="st">"%"</span>)),</span>
@@ -1153,7 +1135,7 @@ Figure&nbsp;7.4: Que représente la zone protégée pour les ménages ? (% de Ou
 <h2 data-number="7.2" class="anchored" data-anchor-id="sec-exploitation"><span class="header-section-number">7.2</span> Exploitation forestière et usage de l’Aire protégée</h2>
 <section id="collecte-de-bois-et-charbon" class="level3" data-number="7.2.1">
 <h3 data-number="7.2.1" class="anchored" data-anchor-id="collecte-de-bois-et-charbon"><span class="header-section-number">7.2.1</span> Collecte de bois et charbon</h3>
-<p>Le fichier <code>res_ef</code> recense les produits forestiers collectés par les ménages : charbon (<em>saribao</em>), bois de chauffe (<em>kitay</em>) et bois d’oeuvre. La <a href="#fig-ef-produits" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-ef-produits</span></a> présente le pourcentage de ménages concernés par chaque produit et la <a href="#fig-ef-origine" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-ef-origine</span></a> distingue l’origine (dans ou hors aire protégée).</p>
+<p>Le fichier <code>res_ef</code> recense les produits forestiers collectés par les ménages : charbon (<em>saribao</em>), bois de chauffe (<em>kitay</em>) et bois d’oeuvre. La <a href="#fig-ef-produits" class="quarto-xref">Figure&nbsp;<span>7.5</span></a> présente le pourcentage de ménages concernés par chaque produit et la <a href="#fig-ef-origine" class="quarto-xref">Figure&nbsp;<span>7.6</span></a> distingue l’origine (dans ou hors aire protégée).</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1313,23 +1295,23 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
 </figcaption>
 <div aria-describedby="tbl-ef-vente-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="bchtshdqmv" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#bchtshdqmv table {
+<div id="huoboxzjzt" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#huoboxzjzt table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#bchtshdqmv thead, #bchtshdqmv tbody, #bchtshdqmv tfoot, #bchtshdqmv tr, #bchtshdqmv td, #bchtshdqmv th {
+#huoboxzjzt thead, #huoboxzjzt tbody, #huoboxzjzt tfoot, #huoboxzjzt tr, #huoboxzjzt td, #huoboxzjzt th {
   border-style: none;
 }
 
-#bchtshdqmv p {
+#huoboxzjzt p {
   margin: 0;
   padding: 0;
 }
 
-#bchtshdqmv .gt_table {
+#huoboxzjzt .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1355,12 +1337,12 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   border-left-color: #D3D3D3;
 }
 
-#bchtshdqmv .gt_caption {
+#huoboxzjzt .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#bchtshdqmv .gt_title {
+#huoboxzjzt .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1372,7 +1354,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   border-bottom-width: 0;
 }
 
-#bchtshdqmv .gt_subtitle {
+#huoboxzjzt .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1384,7 +1366,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   border-top-width: 0;
 }
 
-#bchtshdqmv .gt_heading {
+#huoboxzjzt .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1396,13 +1378,13 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   border-right-color: #D3D3D3;
 }
 
-#bchtshdqmv .gt_bottom_border {
+#huoboxzjzt .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#bchtshdqmv .gt_col_headings {
+#huoboxzjzt .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1417,7 +1399,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   border-right-color: #D3D3D3;
 }
 
-#bchtshdqmv .gt_col_heading {
+#huoboxzjzt .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1437,7 +1419,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   overflow-x: hidden;
 }
 
-#bchtshdqmv .gt_column_spanner_outer {
+#huoboxzjzt .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1449,15 +1431,15 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   padding-right: 4px;
 }
 
-#bchtshdqmv .gt_column_spanner_outer:first-child {
+#huoboxzjzt .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#bchtshdqmv .gt_column_spanner_outer:last-child {
+#huoboxzjzt .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#bchtshdqmv .gt_column_spanner {
+#huoboxzjzt .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1469,11 +1451,11 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   width: 100%;
 }
 
-#bchtshdqmv .gt_spanner_row {
+#huoboxzjzt .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#bchtshdqmv .gt_group_heading {
+#huoboxzjzt .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1499,7 +1481,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   text-align: left;
 }
 
-#bchtshdqmv .gt_empty_group_heading {
+#huoboxzjzt .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1514,15 +1496,15 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   vertical-align: middle;
 }
 
-#bchtshdqmv .gt_from_md > :first-child {
+#huoboxzjzt .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#bchtshdqmv .gt_from_md > :last-child {
+#huoboxzjzt .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#bchtshdqmv .gt_row {
+#huoboxzjzt .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1541,7 +1523,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   overflow-x: hidden;
 }
 
-#bchtshdqmv .gt_stub {
+#huoboxzjzt .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1554,7 +1536,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   padding-right: 5px;
 }
 
-#bchtshdqmv .gt_stub_row_group {
+#huoboxzjzt .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1568,15 +1550,15 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   vertical-align: top;
 }
 
-#bchtshdqmv .gt_row_group_first td {
+#huoboxzjzt .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#bchtshdqmv .gt_row_group_first th {
+#huoboxzjzt .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#bchtshdqmv .gt_summary_row {
+#huoboxzjzt .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1586,16 +1568,16 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   padding-right: 5px;
 }
 
-#bchtshdqmv .gt_first_summary_row {
+#huoboxzjzt .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#bchtshdqmv .gt_first_summary_row.thick {
+#huoboxzjzt .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#bchtshdqmv .gt_last_summary_row {
+#huoboxzjzt .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1605,7 +1587,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   border-bottom-color: #D3D3D3;
 }
 
-#bchtshdqmv .gt_grand_summary_row {
+#huoboxzjzt .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1615,7 +1597,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   padding-right: 5px;
 }
 
-#bchtshdqmv .gt_first_grand_summary_row {
+#huoboxzjzt .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1625,7 +1607,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   border-top-color: #D3D3D3;
 }
 
-#bchtshdqmv .gt_last_grand_summary_row_top {
+#huoboxzjzt .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1635,11 +1617,11 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   border-bottom-color: #D3D3D3;
 }
 
-#bchtshdqmv .gt_striped {
+#huoboxzjzt .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#bchtshdqmv .gt_table_body {
+#huoboxzjzt .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1648,7 +1630,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   border-bottom-color: #D3D3D3;
 }
 
-#bchtshdqmv .gt_footnotes {
+#huoboxzjzt .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1662,7 +1644,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   border-right-color: #D3D3D3;
 }
 
-#bchtshdqmv .gt_footnote {
+#huoboxzjzt .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1671,7 +1653,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   padding-right: 5px;
 }
 
-#bchtshdqmv .gt_sourcenotes {
+#huoboxzjzt .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1685,7 +1667,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   border-right-color: #D3D3D3;
 }
 
-#bchtshdqmv .gt_sourcenote {
+#huoboxzjzt .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1693,72 +1675,72 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
   padding-right: 5px;
 }
 
-#bchtshdqmv .gt_left {
+#huoboxzjzt .gt_left {
   text-align: left;
 }
 
-#bchtshdqmv .gt_center {
+#huoboxzjzt .gt_center {
   text-align: center;
 }
 
-#bchtshdqmv .gt_right {
+#huoboxzjzt .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#bchtshdqmv .gt_font_normal {
+#huoboxzjzt .gt_font_normal {
   font-weight: normal;
 }
 
-#bchtshdqmv .gt_font_bold {
+#huoboxzjzt .gt_font_bold {
   font-weight: bold;
 }
 
-#bchtshdqmv .gt_font_italic {
+#huoboxzjzt .gt_font_italic {
   font-style: italic;
 }
 
-#bchtshdqmv .gt_super {
+#huoboxzjzt .gt_super {
   font-size: 65%;
 }
 
-#bchtshdqmv .gt_footnote_marks {
+#huoboxzjzt .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#bchtshdqmv .gt_asterisk {
+#huoboxzjzt .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#bchtshdqmv .gt_indent_1 {
+#huoboxzjzt .gt_indent_1 {
   text-indent: 5px;
 }
 
-#bchtshdqmv .gt_indent_2 {
+#huoboxzjzt .gt_indent_2 {
   text-indent: 10px;
 }
 
-#bchtshdqmv .gt_indent_3 {
+#huoboxzjzt .gt_indent_3 {
   text-indent: 15px;
 }
 
-#bchtshdqmv .gt_indent_4 {
+#huoboxzjzt .gt_indent_4 {
   text-indent: 20px;
 }
 
-#bchtshdqmv .gt_indent_5 {
+#huoboxzjzt .gt_indent_5 {
   text-indent: 25px;
 }
 
-#bchtshdqmv .katex-display {
+#huoboxzjzt .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#bchtshdqmv div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#huoboxzjzt div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1832,7 +1814,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
 </section>
 <section id="fréquentation-de-laire-protégée" class="level3" data-number="7.2.4">
 <h3 data-number="7.2.4" class="anchored" data-anchor-id="fréquentation-de-laire-protégée"><span class="header-section-number">7.2.4</span> Fréquentation de l’Aire protégée</h3>
-<p>La variable <code>UM1</code> indique si le ménage se rend dans la zone protégée. Le <a href="#tbl-frequentation" class="quarto-xref">Table&nbsp;<span class="quarto-unresolved-ref">tbl-frequentation</span></a> résume la fréquentation et ses caractéristiques.</p>
+<p>La variable <code>UM1</code> indique si le ménage se rend dans la zone protégée. Le <a href="#tbl-frequentation" class="quarto-xref">Table&nbsp;<span>7.3</span></a> résume la fréquentation et ses caractéristiques.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1857,31 +1839,25 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
 <span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n) <span class="sc">|&gt;</span></span>
 <span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Observatory, <span class="at">values_from =</span> pct, <span class="at">values_fill =</span> <span class="dv">0</span>)</span>
 <span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>conn_total <span class="ot">&lt;-</span> conn_all <span class="sc">|&gt;</span></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Conn) <span class="sc">|&gt;</span></span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Total =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">0</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Conn, Total)</span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>conn_tbl <span class="ot">&lt;-</span> conn_by_obs <span class="sc">|&gt;</span></span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(conn_total, <span class="at">by =</span> <span class="st">"Conn"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Item =</span> Conn) <span class="sc">|&gt;</span></span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Item =</span> <span class="fu">paste0</span>(<span class="st">"  - "</span>, Item))</span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>  freq_items,</span>
-<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">Item =</span> <span class="st">"Connaissance du lieu (parmi usagers) :"</span>,</span>
-<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>         <span class="at">Alaotra =</span> <span class="cn">NA_real_</span>, <span class="at">Marovoay =</span> <span class="cn">NA_real_</span>, <span class="at">Total =</span> <span class="cn">NA_real_</span>),</span>
-<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>  conn_tbl</span>
-<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(<span class="at">Item =</span> <span class="st">""</span>, <span class="at">Alaotra =</span> <span class="st">"Alaotra"</span>, <span class="at">Marovoay =</span> <span class="st">"Marovoay"</span>, <span class="at">Total =</span> <span class="st">"Total"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="fu">c</span>(Alaotra, Marovoay, Total), <span class="at">decimals =</span> <span class="dv">0</span>, <span class="at">pattern =</span> <span class="st">"{x} %"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sub_missing</span>(<span class="at">missing_text =</span> <span class="st">""</span>) <span class="sc">|&gt;</span></span>
-<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
-<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(<span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>), <span class="fu">cell_fill</span>(<span class="at">color =</span> <span class="st">"#DCDCDC"</span>)),</span>
-<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> <span class="fu">everything</span>())</span>
-<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_source_note</span>(<span class="at">source_note =</span> <span class="fu">md</span>(<span class="st">"**Source : Enquête auprès des OR 2025**"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>conn_tbl <span class="ot">&lt;-</span> conn_by_obs <span class="sc">|&gt;</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Item =</span> Conn) <span class="sc">|&gt;</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Item =</span> <span class="fu">paste0</span>(<span class="st">"  - "</span>, Item))</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>  freq_items,</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">Item =</span> <span class="st">"Connaissance du lieu (parmi usagers) :"</span>,</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">Alaotra =</span> <span class="cn">NA_real_</span>, <span class="at">Marovoay =</span> <span class="cn">NA_real_</span>),</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  conn_tbl</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(<span class="at">Item =</span> <span class="st">""</span>, <span class="at">Alaotra =</span> <span class="st">"Alaotra"</span>, <span class="at">Marovoay =</span> <span class="st">"Marovoay"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="fu">c</span>(Alaotra, Marovoay), <span class="at">decimals =</span> <span class="dv">0</span>, <span class="at">pattern =</span> <span class="st">"{x} %"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sub_missing</span>(<span class="at">missing_text =</span> <span class="st">""</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(<span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>), <span class="fu">cell_fill</span>(<span class="at">color =</span> <span class="st">"#DCDCDC"</span>)),</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> <span class="fu">everything</span>())</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_source_note</span>(<span class="at">source_note =</span> <span class="fu">md</span>(<span class="st">"**Source : Enquête auprès des OR 2025**"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="tbl-frequentation" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -1890,23 +1866,23 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
 </figcaption>
 <div aria-describedby="tbl-frequentation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="zjchldaajl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#zjchldaajl table {
+<div id="opxhfdmbzl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#opxhfdmbzl table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#zjchldaajl thead, #zjchldaajl tbody, #zjchldaajl tfoot, #zjchldaajl tr, #zjchldaajl td, #zjchldaajl th {
+#opxhfdmbzl thead, #opxhfdmbzl tbody, #opxhfdmbzl tfoot, #opxhfdmbzl tr, #opxhfdmbzl td, #opxhfdmbzl th {
   border-style: none;
 }
 
-#zjchldaajl p {
+#opxhfdmbzl p {
   margin: 0;
   padding: 0;
 }
 
-#zjchldaajl .gt_table {
+#opxhfdmbzl .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1932,12 +1908,12 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   border-left-color: #D3D3D3;
 }
 
-#zjchldaajl .gt_caption {
+#opxhfdmbzl .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#zjchldaajl .gt_title {
+#opxhfdmbzl .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1949,7 +1925,7 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   border-bottom-width: 0;
 }
 
-#zjchldaajl .gt_subtitle {
+#opxhfdmbzl .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1961,7 +1937,7 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   border-top-width: 0;
 }
 
-#zjchldaajl .gt_heading {
+#opxhfdmbzl .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1973,13 +1949,13 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   border-right-color: #D3D3D3;
 }
 
-#zjchldaajl .gt_bottom_border {
+#opxhfdmbzl .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#zjchldaajl .gt_col_headings {
+#opxhfdmbzl .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1994,7 +1970,7 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   border-right-color: #D3D3D3;
 }
 
-#zjchldaajl .gt_col_heading {
+#opxhfdmbzl .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2014,7 +1990,7 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   overflow-x: hidden;
 }
 
-#zjchldaajl .gt_column_spanner_outer {
+#opxhfdmbzl .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2026,15 +2002,15 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   padding-right: 4px;
 }
 
-#zjchldaajl .gt_column_spanner_outer:first-child {
+#opxhfdmbzl .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#zjchldaajl .gt_column_spanner_outer:last-child {
+#opxhfdmbzl .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#zjchldaajl .gt_column_spanner {
+#opxhfdmbzl .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2046,11 +2022,11 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   width: 100%;
 }
 
-#zjchldaajl .gt_spanner_row {
+#opxhfdmbzl .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#zjchldaajl .gt_group_heading {
+#opxhfdmbzl .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2076,7 +2052,7 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   text-align: left;
 }
 
-#zjchldaajl .gt_empty_group_heading {
+#opxhfdmbzl .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2091,15 +2067,15 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   vertical-align: middle;
 }
 
-#zjchldaajl .gt_from_md > :first-child {
+#opxhfdmbzl .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#zjchldaajl .gt_from_md > :last-child {
+#opxhfdmbzl .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#zjchldaajl .gt_row {
+#opxhfdmbzl .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2118,7 +2094,7 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   overflow-x: hidden;
 }
 
-#zjchldaajl .gt_stub {
+#opxhfdmbzl .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2131,7 +2107,7 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   padding-right: 5px;
 }
 
-#zjchldaajl .gt_stub_row_group {
+#opxhfdmbzl .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2145,15 +2121,15 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   vertical-align: top;
 }
 
-#zjchldaajl .gt_row_group_first td {
+#opxhfdmbzl .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#zjchldaajl .gt_row_group_first th {
+#opxhfdmbzl .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#zjchldaajl .gt_summary_row {
+#opxhfdmbzl .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2163,16 +2139,16 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   padding-right: 5px;
 }
 
-#zjchldaajl .gt_first_summary_row {
+#opxhfdmbzl .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#zjchldaajl .gt_first_summary_row.thick {
+#opxhfdmbzl .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#zjchldaajl .gt_last_summary_row {
+#opxhfdmbzl .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2182,7 +2158,7 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   border-bottom-color: #D3D3D3;
 }
 
-#zjchldaajl .gt_grand_summary_row {
+#opxhfdmbzl .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2192,7 +2168,7 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   padding-right: 5px;
 }
 
-#zjchldaajl .gt_first_grand_summary_row {
+#opxhfdmbzl .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2202,7 +2178,7 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   border-top-color: #D3D3D3;
 }
 
-#zjchldaajl .gt_last_grand_summary_row_top {
+#opxhfdmbzl .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2212,11 +2188,11 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   border-bottom-color: #D3D3D3;
 }
 
-#zjchldaajl .gt_striped {
+#opxhfdmbzl .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#zjchldaajl .gt_table_body {
+#opxhfdmbzl .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2225,7 +2201,7 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   border-bottom-color: #D3D3D3;
 }
 
-#zjchldaajl .gt_footnotes {
+#opxhfdmbzl .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2239,7 +2215,7 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   border-right-color: #D3D3D3;
 }
 
-#zjchldaajl .gt_footnote {
+#opxhfdmbzl .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -2248,7 +2224,7 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   padding-right: 5px;
 }
 
-#zjchldaajl .gt_sourcenotes {
+#opxhfdmbzl .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2262,7 +2238,7 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   border-right-color: #D3D3D3;
 }
 
-#zjchldaajl .gt_sourcenote {
+#opxhfdmbzl .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2270,89 +2246,87 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
   padding-right: 5px;
 }
 
-#zjchldaajl .gt_left {
+#opxhfdmbzl .gt_left {
   text-align: left;
 }
 
-#zjchldaajl .gt_center {
+#opxhfdmbzl .gt_center {
   text-align: center;
 }
 
-#zjchldaajl .gt_right {
+#opxhfdmbzl .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#zjchldaajl .gt_font_normal {
+#opxhfdmbzl .gt_font_normal {
   font-weight: normal;
 }
 
-#zjchldaajl .gt_font_bold {
+#opxhfdmbzl .gt_font_bold {
   font-weight: bold;
 }
 
-#zjchldaajl .gt_font_italic {
+#opxhfdmbzl .gt_font_italic {
   font-style: italic;
 }
 
-#zjchldaajl .gt_super {
+#opxhfdmbzl .gt_super {
   font-size: 65%;
 }
 
-#zjchldaajl .gt_footnote_marks {
+#opxhfdmbzl .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#zjchldaajl .gt_asterisk {
+#opxhfdmbzl .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#zjchldaajl .gt_indent_1 {
+#opxhfdmbzl .gt_indent_1 {
   text-indent: 5px;
 }
 
-#zjchldaajl .gt_indent_2 {
+#opxhfdmbzl .gt_indent_2 {
   text-indent: 10px;
 }
 
-#zjchldaajl .gt_indent_3 {
+#opxhfdmbzl .gt_indent_3 {
   text-indent: 15px;
 }
 
-#zjchldaajl .gt_indent_4 {
+#opxhfdmbzl .gt_indent_4 {
   text-indent: 20px;
 }
 
-#zjchldaajl .gt_indent_5 {
+#opxhfdmbzl .gt_indent_5 {
   text-indent: 25px;
 }
 
-#zjchldaajl .katex-display {
+#opxhfdmbzl .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#zjchldaajl div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#opxhfdmbzl div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
 
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
 <colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
 </colgroup>
 <thead>
 <tr class="gt_col_headings header">
 <th id="Item" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col"></th>
 <th id="Alaotra" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col">Alaotra</th>
 <th id="Marovoay" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col">Marovoay</th>
-<th id="Total" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col">Total</th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
@@ -2360,13 +2334,11 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
 <td class="gt_row gt_left" headers="Item">Se rend dans l'Aire protégée</td>
 <td class="gt_row gt_right" headers="Alaotra">44 %</td>
 <td class="gt_row gt_right" headers="Marovoay">27 %</td>
-<td class="gt_row gt_right" headers="Total">35 %</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Item">Considère vital / nécessaire d'y aller</td>
 <td class="gt_row gt_right" headers="Alaotra">31 %</td>
 <td class="gt_row gt_right" headers="Marovoay">21 %</td>
-<td class="gt_row gt_right" headers="Total">27 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Item">Connaissance du lieu (parmi usagers) :</td>
@@ -2374,30 +2346,25 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
 </td>
 <td class="gt_row gt_right" headers="Marovoay"><br>
 </td>
-<td class="gt_row gt_right" headers="Total"><br>
-</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Item">- Plus ou moins</td>
 <td class="gt_row gt_right" headers="Alaotra">45 %</td>
 <td class="gt_row gt_right" headers="Marovoay">33 %</td>
-<td class="gt_row gt_right" headers="Total">41 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Item">- Très bien</td>
 <td class="gt_row gt_right" headers="Alaotra">11 %</td>
 <td class="gt_row gt_right" headers="Marovoay">14 %</td>
-<td class="gt_row gt_right" headers="Total">12 %</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Item">- Très peu</td>
 <td class="gt_row gt_right" headers="Alaotra">44 %</td>
 <td class="gt_row gt_right" headers="Marovoay">53 %</td>
-<td class="gt_row gt_right" headers="Total">48 %</td>
 </tr>
 </tbody><tfoot>
 <tr class="gt_sourcenotes odd">
-<td colspan="4" class="gt_sourcenote"><strong>Source : Enquête auprès des OR 2025</strong></td>
+<td colspan="3" class="gt_sourcenote"><strong>Source : Enquête auprès des OR 2025</strong></td>
 </tr>
 </tfoot>
 
@@ -2429,9 +2396,9 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>non_freq <span class="ot">&lt;-</span> non_items <span class="sc">|&gt;</span></span>
 <span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui</span>(um1_non, var, label)) <span class="sc">|&gt;</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(Alaotra, Marovoay, Total), <span class="at">names_to =</span> <span class="st">"Groupe"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(Alaotra, Marovoay), <span class="at">names_to =</span> <span class="st">"Groupe"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
 <span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(non_freq <span class="sc">|&gt;</span> <span class="fu">filter</span>(Groupe <span class="sc">!=</span> <span class="st">"Total"</span>),</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(non_freq,</span>
 <span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Item, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Groupe)) <span class="sc">+</span></span>
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
 <span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(pct, <span class="st">"%"</span>)),</span>
@@ -2457,7 +2424,7 @@ Figure&nbsp;7.8: Raisons de ne pas se rendre dans l’Aire protégée (% de Oui 
 </section>
 <section id="usages-de-laire-protégée" class="level3" data-number="7.2.6">
 <h3 data-number="7.2.6" class="anchored" data-anchor-id="usages-de-laire-protégée"><span class="header-section-number">7.2.6</span> Usages de l’Aire protégée</h3>
-<p>Parmi les ménages qui se rendent dans l’AP, la <a href="#fig-usages-ap" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-usages-ap</span></a> détaille les raisons et la <a href="#fig-freq-usages" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-freq-usages</span></a> la fréquence des déplacements.</p>
+<p>Parmi les ménages qui se rendent dans l’AP, la <a href="#fig-usages-ap" class="quarto-xref">Figure&nbsp;<span>7.9</span></a> détaille les raisons et la <a href="#fig-freq-usages" class="quarto-xref">Figure&nbsp;<span>7.10</span></a> la fréquence des déplacements.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2622,9 +2589,9 @@ Figure&nbsp;7.11: Saisonnalité des usages de l’AP (% d’usagers actifs par m
 <span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>feu_raisons <span class="ot">&lt;-</span> feu_items <span class="sc">|&gt;</span></span>
 <span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui</span>(res_feubrousse, var, label)) <span class="sc">|&gt;</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(Alaotra, Marovoay, Total), <span class="at">names_to =</span> <span class="st">"Groupe"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(Alaotra, Marovoay), <span class="at">names_to =</span> <span class="st">"Groupe"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
 <span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(feu_raisons <span class="sc">|&gt;</span> <span class="fu">filter</span>(Groupe <span class="sc">!=</span> <span class="st">"Total"</span>),</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(feu_raisons,</span>
 <span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Item, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Groupe)) <span class="sc">+</span></span>
 <span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
 <span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(pct, <span class="st">"%"</span>)),</span>
@@ -2675,43 +2642,31 @@ Figure&nbsp;7.12: Raisons perçues de faire des feux (% de Oui)
 <span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n) <span class="sc">|&gt;</span></span>
 <span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Observatory, <span class="at">values_from =</span> pct, <span class="at">values_fill =</span> <span class="dv">0</span>)</span>
 <span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>loc_total <span class="ot">&lt;-</span> res_feubrousse <span class="sc">|&gt;</span></span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(s18_b <span class="sc">==</span> <span class="dv">1</span>, s18_c <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) <span class="sc">|&gt;</span></span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Lieu =</span> <span class="fu">case_when</span>(</span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    s18_c <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Près du village"</span>,</span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    s18_c <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"Loin (hors AP)"</span>,</span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    s18_c <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">"Dans l'AP"</span></span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Lieu) <span class="sc">|&gt;</span></span>
-<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Total =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">0</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Lieu, Total)</span>
-<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>loc_tbl <span class="ot">&lt;-</span> loc_feux <span class="sc">|&gt;</span></span>
-<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(loc_total, <span class="at">by =</span> <span class="st">"Lieu"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Item =</span> Lieu) <span class="sc">|&gt;</span></span>
-<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Item =</span> <span class="fu">paste0</span>(<span class="st">"  - "</span>, Item))</span>
-<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Maîtrise et échappement</span></span>
-<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>maitr <span class="ot">&lt;-</span> <span class="fu">pct_oui</span>(res_feubrousse <span class="sc">|&gt;</span> <span class="fu">filter</span>(s18 <span class="sc">==</span> <span class="dv">1</span>), <span class="st">"s19"</span>, <span class="st">"Cherche à maîtriser le feu"</span>)</span>
-<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a>echap <span class="ot">&lt;-</span> <span class="fu">pct_oui</span>(res_feubrousse <span class="sc">|&gt;</span> <span class="fu">filter</span>(s18 <span class="sc">==</span> <span class="dv">1</span>), <span class="st">"s20"</span>, <span class="st">"Un feu lui a déjà échappé"</span>)</span>
-<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a>  feu_tbl,</span>
-<span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">Item =</span> <span class="st">"Si feux dans l'année, localisation :"</span>,</span>
-<span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a>         <span class="at">Alaotra =</span> <span class="cn">NA_real_</span>, <span class="at">Marovoay =</span> <span class="cn">NA_real_</span>, <span class="at">Total =</span> <span class="cn">NA_real_</span>),</span>
-<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a>  loc_tbl,</span>
-<span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a>  maitr,</span>
-<span id="cb16-49"><a href="#cb16-49" aria-hidden="true" tabindex="-1"></a>  echap</span>
-<span id="cb16-50"><a href="#cb16-50" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb16-51"><a href="#cb16-51" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb16-52"><a href="#cb16-52" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(<span class="at">Item =</span> <span class="st">""</span>, <span class="at">Alaotra =</span> <span class="st">"Alaotra"</span>, <span class="at">Marovoay =</span> <span class="st">"Marovoay"</span>, <span class="at">Total =</span> <span class="st">"Total"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb16-53"><a href="#cb16-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="fu">c</span>(Alaotra, Marovoay, Total), <span class="at">decimals =</span> <span class="dv">0</span>, <span class="at">pattern =</span> <span class="st">"{x} %"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb16-54"><a href="#cb16-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sub_missing</span>(<span class="at">missing_text =</span> <span class="st">""</span>) <span class="sc">|&gt;</span></span>
-<span id="cb16-55"><a href="#cb16-55" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
-<span id="cb16-56"><a href="#cb16-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(<span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>), <span class="fu">cell_fill</span>(<span class="at">color =</span> <span class="st">"#DCDCDC"</span>)),</span>
-<span id="cb16-57"><a href="#cb16-57" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> <span class="fu">everything</span>())</span>
-<span id="cb16-58"><a href="#cb16-58" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb16-59"><a href="#cb16-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_source_note</span>(<span class="at">source_note =</span> <span class="fu">md</span>(<span class="st">"**Source : Enquête auprès des OR 2025**"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>loc_tbl <span class="ot">&lt;-</span> loc_feux <span class="sc">|&gt;</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">Item =</span> Lieu) <span class="sc">|&gt;</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Item =</span> <span class="fu">paste0</span>(<span class="st">"  - "</span>, Item))</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Maîtrise et échappement</span></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>maitr <span class="ot">&lt;-</span> <span class="fu">pct_oui</span>(res_feubrousse <span class="sc">|&gt;</span> <span class="fu">filter</span>(s18 <span class="sc">==</span> <span class="dv">1</span>), <span class="st">"s19"</span>, <span class="st">"Cherche à maîtriser le feu"</span>)</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>echap <span class="ot">&lt;-</span> <span class="fu">pct_oui</span>(res_feubrousse <span class="sc">|&gt;</span> <span class="fu">filter</span>(s18 <span class="sc">==</span> <span class="dv">1</span>), <span class="st">"s20"</span>, <span class="st">"Un feu lui a déjà échappé"</span>)</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>  feu_tbl,</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">Item =</span> <span class="st">"Si feux dans l'année, localisation :"</span>,</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>         <span class="at">Alaotra =</span> <span class="cn">NA_real_</span>, <span class="at">Marovoay =</span> <span class="cn">NA_real_</span>),</span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>  loc_tbl,</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>  maitr,</span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>  echap</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(<span class="at">Item =</span> <span class="st">""</span>, <span class="at">Alaotra =</span> <span class="st">"Alaotra"</span>, <span class="at">Marovoay =</span> <span class="st">"Marovoay"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="fu">c</span>(Alaotra, Marovoay), <span class="at">decimals =</span> <span class="dv">0</span>, <span class="at">pattern =</span> <span class="st">"{x} %"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sub_missing</span>(<span class="at">missing_text =</span> <span class="st">""</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(<span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>), <span class="fu">cell_fill</span>(<span class="at">color =</span> <span class="st">"#DCDCDC"</span>)),</span>
+<span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> <span class="fu">everything</span>())</span>
+<span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_source_note</span>(<span class="at">source_note =</span> <span class="fu">md</span>(<span class="st">"**Source : Enquête auprès des OR 2025**"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="tbl-feux" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -2720,23 +2675,23 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
 </figcaption>
 <div aria-describedby="tbl-feux-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="bqiwjzzeti" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#bqiwjzzeti table {
+<div id="fkucxdpcwt" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#fkucxdpcwt table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#bqiwjzzeti thead, #bqiwjzzeti tbody, #bqiwjzzeti tfoot, #bqiwjzzeti tr, #bqiwjzzeti td, #bqiwjzzeti th {
+#fkucxdpcwt thead, #fkucxdpcwt tbody, #fkucxdpcwt tfoot, #fkucxdpcwt tr, #fkucxdpcwt td, #fkucxdpcwt th {
   border-style: none;
 }
 
-#bqiwjzzeti p {
+#fkucxdpcwt p {
   margin: 0;
   padding: 0;
 }
 
-#bqiwjzzeti .gt_table {
+#fkucxdpcwt .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -2762,12 +2717,12 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   border-left-color: #D3D3D3;
 }
 
-#bqiwjzzeti .gt_caption {
+#fkucxdpcwt .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#bqiwjzzeti .gt_title {
+#fkucxdpcwt .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -2779,7 +2734,7 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   border-bottom-width: 0;
 }
 
-#bqiwjzzeti .gt_subtitle {
+#fkucxdpcwt .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -2791,7 +2746,7 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   border-top-width: 0;
 }
 
-#bqiwjzzeti .gt_heading {
+#fkucxdpcwt .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -2803,13 +2758,13 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   border-right-color: #D3D3D3;
 }
 
-#bqiwjzzeti .gt_bottom_border {
+#fkucxdpcwt .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#bqiwjzzeti .gt_col_headings {
+#fkucxdpcwt .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2824,7 +2779,7 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   border-right-color: #D3D3D3;
 }
 
-#bqiwjzzeti .gt_col_heading {
+#fkucxdpcwt .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2844,7 +2799,7 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   overflow-x: hidden;
 }
 
-#bqiwjzzeti .gt_column_spanner_outer {
+#fkucxdpcwt .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2856,15 +2811,15 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   padding-right: 4px;
 }
 
-#bqiwjzzeti .gt_column_spanner_outer:first-child {
+#fkucxdpcwt .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#bqiwjzzeti .gt_column_spanner_outer:last-child {
+#fkucxdpcwt .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#bqiwjzzeti .gt_column_spanner {
+#fkucxdpcwt .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -2876,11 +2831,11 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   width: 100%;
 }
 
-#bqiwjzzeti .gt_spanner_row {
+#fkucxdpcwt .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#bqiwjzzeti .gt_group_heading {
+#fkucxdpcwt .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2906,7 +2861,7 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   text-align: left;
 }
 
-#bqiwjzzeti .gt_empty_group_heading {
+#fkucxdpcwt .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -2921,15 +2876,15 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   vertical-align: middle;
 }
 
-#bqiwjzzeti .gt_from_md > :first-child {
+#fkucxdpcwt .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#bqiwjzzeti .gt_from_md > :last-child {
+#fkucxdpcwt .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#bqiwjzzeti .gt_row {
+#fkucxdpcwt .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2948,7 +2903,7 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   overflow-x: hidden;
 }
 
-#bqiwjzzeti .gt_stub {
+#fkucxdpcwt .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2961,7 +2916,7 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   padding-right: 5px;
 }
 
-#bqiwjzzeti .gt_stub_row_group {
+#fkucxdpcwt .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -2975,15 +2930,15 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   vertical-align: top;
 }
 
-#bqiwjzzeti .gt_row_group_first td {
+#fkucxdpcwt .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#bqiwjzzeti .gt_row_group_first th {
+#fkucxdpcwt .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#bqiwjzzeti .gt_summary_row {
+#fkucxdpcwt .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -2993,16 +2948,16 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   padding-right: 5px;
 }
 
-#bqiwjzzeti .gt_first_summary_row {
+#fkucxdpcwt .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#bqiwjzzeti .gt_first_summary_row.thick {
+#fkucxdpcwt .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#bqiwjzzeti .gt_last_summary_row {
+#fkucxdpcwt .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3012,7 +2967,7 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   border-bottom-color: #D3D3D3;
 }
 
-#bqiwjzzeti .gt_grand_summary_row {
+#fkucxdpcwt .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3022,7 +2977,7 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   padding-right: 5px;
 }
 
-#bqiwjzzeti .gt_first_grand_summary_row {
+#fkucxdpcwt .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3032,7 +2987,7 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   border-top-color: #D3D3D3;
 }
 
-#bqiwjzzeti .gt_last_grand_summary_row_top {
+#fkucxdpcwt .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3042,11 +2997,11 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   border-bottom-color: #D3D3D3;
 }
 
-#bqiwjzzeti .gt_striped {
+#fkucxdpcwt .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#bqiwjzzeti .gt_table_body {
+#fkucxdpcwt .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3055,7 +3010,7 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   border-bottom-color: #D3D3D3;
 }
 
-#bqiwjzzeti .gt_footnotes {
+#fkucxdpcwt .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3069,7 +3024,7 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   border-right-color: #D3D3D3;
 }
 
-#bqiwjzzeti .gt_footnote {
+#fkucxdpcwt .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -3078,7 +3033,7 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   padding-right: 5px;
 }
 
-#bqiwjzzeti .gt_sourcenotes {
+#fkucxdpcwt .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3092,7 +3047,7 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   border-right-color: #D3D3D3;
 }
 
-#bqiwjzzeti .gt_sourcenote {
+#fkucxdpcwt .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -3100,89 +3055,87 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
   padding-right: 5px;
 }
 
-#bqiwjzzeti .gt_left {
+#fkucxdpcwt .gt_left {
   text-align: left;
 }
 
-#bqiwjzzeti .gt_center {
+#fkucxdpcwt .gt_center {
   text-align: center;
 }
 
-#bqiwjzzeti .gt_right {
+#fkucxdpcwt .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#bqiwjzzeti .gt_font_normal {
+#fkucxdpcwt .gt_font_normal {
   font-weight: normal;
 }
 
-#bqiwjzzeti .gt_font_bold {
+#fkucxdpcwt .gt_font_bold {
   font-weight: bold;
 }
 
-#bqiwjzzeti .gt_font_italic {
+#fkucxdpcwt .gt_font_italic {
   font-style: italic;
 }
 
-#bqiwjzzeti .gt_super {
+#fkucxdpcwt .gt_super {
   font-size: 65%;
 }
 
-#bqiwjzzeti .gt_footnote_marks {
+#fkucxdpcwt .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#bqiwjzzeti .gt_asterisk {
+#fkucxdpcwt .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#bqiwjzzeti .gt_indent_1 {
+#fkucxdpcwt .gt_indent_1 {
   text-indent: 5px;
 }
 
-#bqiwjzzeti .gt_indent_2 {
+#fkucxdpcwt .gt_indent_2 {
   text-indent: 10px;
 }
 
-#bqiwjzzeti .gt_indent_3 {
+#fkucxdpcwt .gt_indent_3 {
   text-indent: 15px;
 }
 
-#bqiwjzzeti .gt_indent_4 {
+#fkucxdpcwt .gt_indent_4 {
   text-indent: 20px;
 }
 
-#bqiwjzzeti .gt_indent_5 {
+#fkucxdpcwt .gt_indent_5 {
   text-indent: 25px;
 }
 
-#bqiwjzzeti .katex-display {
+#fkucxdpcwt .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#bqiwjzzeti div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#fkucxdpcwt div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
 
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
 <colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
 </colgroup>
 <thead>
 <tr class="gt_col_headings header">
 <th id="Item" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col"></th>
 <th id="Alaotra" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col">Alaotra</th>
 <th id="Marovoay" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col">Marovoay</th>
-<th id="Total" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col">Total</th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
@@ -3190,25 +3143,21 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
 <td class="gt_row gt_left" headers="Item">Faire des feux est une pratique normale</td>
 <td class="gt_row gt_right" headers="Alaotra">67 %</td>
 <td class="gt_row gt_right" headers="Marovoay">77 %</td>
-<td class="gt_row gt_right" headers="Total">72 %</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Item">Faire des feux est vital / nécessaire</td>
 <td class="gt_row gt_right" headers="Alaotra">8 %</td>
 <td class="gt_row gt_right" headers="Marovoay">62 %</td>
-<td class="gt_row gt_right" headers="Total">36 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Item">A déjà fait des feux</td>
 <td class="gt_row gt_right" headers="Alaotra">11 %</td>
 <td class="gt_row gt_right" headers="Marovoay">54 %</td>
-<td class="gt_row gt_right" headers="Total">33 %</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Item">Feux au cours des 12 derniers mois</td>
 <td class="gt_row gt_right" headers="Alaotra">10 %</td>
 <td class="gt_row gt_right" headers="Marovoay">72 %</td>
-<td class="gt_row gt_right" headers="Total">34 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Item">Si feux dans l'année, localisation :</td>
@@ -3216,36 +3165,30 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
 </td>
 <td class="gt_row gt_right" headers="Marovoay"><br>
 </td>
-<td class="gt_row gt_right" headers="Total"><br>
-</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Item">- Loin (hors AP)</td>
 <td class="gt_row gt_right" headers="Alaotra">80 %</td>
 <td class="gt_row gt_right" headers="Marovoay">52 %</td>
-<td class="gt_row gt_right" headers="Total">57 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Item">- Près du village</td>
 <td class="gt_row gt_right" headers="Alaotra">20 %</td>
 <td class="gt_row gt_right" headers="Marovoay">48 %</td>
-<td class="gt_row gt_right" headers="Total">43 %</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Item">Cherche à maîtriser le feu</td>
 <td class="gt_row gt_right" headers="Alaotra">82 %</td>
 <td class="gt_row gt_right" headers="Marovoay">81 %</td>
-<td class="gt_row gt_right" headers="Total">81 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Item">Un feu lui a déjà échappé</td>
 <td class="gt_row gt_right" headers="Alaotra">33 %</td>
 <td class="gt_row gt_right" headers="Marovoay">5 %</td>
-<td class="gt_row gt_right" headers="Total">10 %</td>
 </tr>
 </tbody><tfoot>
 <tr class="gt_sourcenotes odd">
-<td colspan="4" class="gt_sourcenote"><strong>Source : Enquête auprès des OR 2025</strong></td>
+<td colspan="3" class="gt_sourcenote"><strong>Source : Enquête auprès des OR 2025</strong></td>
 </tr>
 </tfoot>
 
@@ -3429,8 +3372,8 @@ Figure&nbsp;7.16: La pratique du feu devrait être… (par observatoire)
 <span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>ap_items <span class="sc">|&gt;</span></span>
 <span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(<span class="at">Item =</span> <span class="st">""</span>, <span class="at">Alaotra =</span> <span class="st">"Alaotra"</span>, <span class="at">Marovoay =</span> <span class="st">"Marovoay"</span>, <span class="at">Total =</span> <span class="st">"Total"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="fu">c</span>(Alaotra, Marovoay, Total), <span class="at">decimals =</span> <span class="dv">0</span>, <span class="at">pattern =</span> <span class="st">"{x} %"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(<span class="at">Item =</span> <span class="st">""</span>, <span class="at">Alaotra =</span> <span class="st">"Alaotra"</span>, <span class="at">Marovoay =</span> <span class="st">"Marovoay"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="fu">c</span>(Alaotra, Marovoay), <span class="at">decimals =</span> <span class="dv">0</span>, <span class="at">pattern =</span> <span class="st">"{x} %"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_style</span>(</span>
 <span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(<span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>), <span class="fu">cell_fill</span>(<span class="at">color =</span> <span class="st">"#DCDCDC"</span>)),</span>
 <span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> <span class="fu">everything</span>())</span>
@@ -3444,23 +3387,23 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
 </figcaption>
 <div aria-describedby="tbl-connaissance-ap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="paxgdrpzjk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#paxgdrpzjk table {
+<div id="ibyladmary" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ibyladmary table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#paxgdrpzjk thead, #paxgdrpzjk tbody, #paxgdrpzjk tfoot, #paxgdrpzjk tr, #paxgdrpzjk td, #paxgdrpzjk th {
+#ibyladmary thead, #ibyladmary tbody, #ibyladmary tfoot, #ibyladmary tr, #ibyladmary td, #ibyladmary th {
   border-style: none;
 }
 
-#paxgdrpzjk p {
+#ibyladmary p {
   margin: 0;
   padding: 0;
 }
 
-#paxgdrpzjk .gt_table {
+#ibyladmary .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -3486,12 +3429,12 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   border-left-color: #D3D3D3;
 }
 
-#paxgdrpzjk .gt_caption {
+#ibyladmary .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#paxgdrpzjk .gt_title {
+#ibyladmary .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -3503,7 +3446,7 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   border-bottom-width: 0;
 }
 
-#paxgdrpzjk .gt_subtitle {
+#ibyladmary .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -3515,7 +3458,7 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   border-top-width: 0;
 }
 
-#paxgdrpzjk .gt_heading {
+#ibyladmary .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -3527,13 +3470,13 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   border-right-color: #D3D3D3;
 }
 
-#paxgdrpzjk .gt_bottom_border {
+#ibyladmary .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#paxgdrpzjk .gt_col_headings {
+#ibyladmary .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3548,7 +3491,7 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   border-right-color: #D3D3D3;
 }
 
-#paxgdrpzjk .gt_col_heading {
+#ibyladmary .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3568,7 +3511,7 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   overflow-x: hidden;
 }
 
-#paxgdrpzjk .gt_column_spanner_outer {
+#ibyladmary .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3580,15 +3523,15 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   padding-right: 4px;
 }
 
-#paxgdrpzjk .gt_column_spanner_outer:first-child {
+#ibyladmary .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#paxgdrpzjk .gt_column_spanner_outer:last-child {
+#ibyladmary .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#paxgdrpzjk .gt_column_spanner {
+#ibyladmary .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -3600,11 +3543,11 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   width: 100%;
 }
 
-#paxgdrpzjk .gt_spanner_row {
+#ibyladmary .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#paxgdrpzjk .gt_group_heading {
+#ibyladmary .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3630,7 +3573,7 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   text-align: left;
 }
 
-#paxgdrpzjk .gt_empty_group_heading {
+#ibyladmary .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -3645,15 +3588,15 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   vertical-align: middle;
 }
 
-#paxgdrpzjk .gt_from_md > :first-child {
+#ibyladmary .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#paxgdrpzjk .gt_from_md > :last-child {
+#ibyladmary .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#paxgdrpzjk .gt_row {
+#ibyladmary .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3672,7 +3615,7 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   overflow-x: hidden;
 }
 
-#paxgdrpzjk .gt_stub {
+#ibyladmary .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3685,7 +3628,7 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   padding-right: 5px;
 }
 
-#paxgdrpzjk .gt_stub_row_group {
+#ibyladmary .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -3699,15 +3642,15 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   vertical-align: top;
 }
 
-#paxgdrpzjk .gt_row_group_first td {
+#ibyladmary .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#paxgdrpzjk .gt_row_group_first th {
+#ibyladmary .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#paxgdrpzjk .gt_summary_row {
+#ibyladmary .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3717,16 +3660,16 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   padding-right: 5px;
 }
 
-#paxgdrpzjk .gt_first_summary_row {
+#ibyladmary .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#paxgdrpzjk .gt_first_summary_row.thick {
+#ibyladmary .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#paxgdrpzjk .gt_last_summary_row {
+#ibyladmary .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3736,7 +3679,7 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   border-bottom-color: #D3D3D3;
 }
 
-#paxgdrpzjk .gt_grand_summary_row {
+#ibyladmary .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -3746,7 +3689,7 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   padding-right: 5px;
 }
 
-#paxgdrpzjk .gt_first_grand_summary_row {
+#ibyladmary .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3756,7 +3699,7 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   border-top-color: #D3D3D3;
 }
 
-#paxgdrpzjk .gt_last_grand_summary_row_top {
+#ibyladmary .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -3766,11 +3709,11 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   border-bottom-color: #D3D3D3;
 }
 
-#paxgdrpzjk .gt_striped {
+#ibyladmary .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#paxgdrpzjk .gt_table_body {
+#ibyladmary .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -3779,7 +3722,7 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   border-bottom-color: #D3D3D3;
 }
 
-#paxgdrpzjk .gt_footnotes {
+#ibyladmary .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3793,7 +3736,7 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   border-right-color: #D3D3D3;
 }
 
-#paxgdrpzjk .gt_footnote {
+#ibyladmary .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -3802,7 +3745,7 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   padding-right: 5px;
 }
 
-#paxgdrpzjk .gt_sourcenotes {
+#ibyladmary .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -3816,7 +3759,7 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   border-right-color: #D3D3D3;
 }
 
-#paxgdrpzjk .gt_sourcenote {
+#ibyladmary .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -3824,72 +3767,72 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
   padding-right: 5px;
 }
 
-#paxgdrpzjk .gt_left {
+#ibyladmary .gt_left {
   text-align: left;
 }
 
-#paxgdrpzjk .gt_center {
+#ibyladmary .gt_center {
   text-align: center;
 }
 
-#paxgdrpzjk .gt_right {
+#ibyladmary .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#paxgdrpzjk .gt_font_normal {
+#ibyladmary .gt_font_normal {
   font-weight: normal;
 }
 
-#paxgdrpzjk .gt_font_bold {
+#ibyladmary .gt_font_bold {
   font-weight: bold;
 }
 
-#paxgdrpzjk .gt_font_italic {
+#ibyladmary .gt_font_italic {
   font-style: italic;
 }
 
-#paxgdrpzjk .gt_super {
+#ibyladmary .gt_super {
   font-size: 65%;
 }
 
-#paxgdrpzjk .gt_footnote_marks {
+#ibyladmary .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#paxgdrpzjk .gt_asterisk {
+#ibyladmary .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#paxgdrpzjk .gt_indent_1 {
+#ibyladmary .gt_indent_1 {
   text-indent: 5px;
 }
 
-#paxgdrpzjk .gt_indent_2 {
+#ibyladmary .gt_indent_2 {
   text-indent: 10px;
 }
 
-#paxgdrpzjk .gt_indent_3 {
+#ibyladmary .gt_indent_3 {
   text-indent: 15px;
 }
 
-#paxgdrpzjk .gt_indent_4 {
+#ibyladmary .gt_indent_4 {
   text-indent: 20px;
 }
 
-#paxgdrpzjk .gt_indent_5 {
+#ibyladmary .gt_indent_5 {
   text-indent: 25px;
 }
 
-#paxgdrpzjk .katex-display {
+#ibyladmary .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#paxgdrpzjk div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#ibyladmary div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -3900,7 +3843,6 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
 <th id="Item" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col"></th>
 <th id="Alaotra" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col">Alaotra</th>
 <th id="Marovoay" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col">Marovoay</th>
-<th id="Total" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" style="font-weight: bold; background-color: #DCDCDC" scope="col">Total</th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
@@ -3908,35 +3850,30 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
 <td class="gt_row gt_left" headers="Item">A entendu parler de l'AP</td>
 <td class="gt_row gt_right" headers="Alaotra">80 %</td>
 <td class="gt_row gt_right" headers="Marovoay">82 %</td>
-<td class="gt_row gt_right" headers="Total">81 %</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Item">Nécessaire de protéger l'environnement</td>
 <td class="gt_row gt_right" headers="Alaotra">100 %</td>
 <td class="gt_row gt_right" headers="Marovoay">99 %</td>
-<td class="gt_row gt_right" headers="Total">99 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Item">Nécessaire de protéger cette AP</td>
 <td class="gt_row gt_right" headers="Alaotra">100 %</td>
 <td class="gt_row gt_right" headers="Marovoay">99 %</td>
-<td class="gt_row gt_right" headers="Total">100 %</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="Item">Perte de biodiversité à Madagascar</td>
 <td class="gt_row gt_right" headers="Alaotra">98 %</td>
 <td class="gt_row gt_right" headers="Marovoay">94 %</td>
-<td class="gt_row gt_right" headers="Total">96 %</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="Item">Les AP ont des résultats positifs</td>
 <td class="gt_row gt_right" headers="Alaotra">98 %</td>
 <td class="gt_row gt_right" headers="Marovoay">98 %</td>
-<td class="gt_row gt_right" headers="Total">98 %</td>
 </tr>
 </tbody><tfoot>
 <tr class="gt_sourcenotes odd">
-<td colspan="4" class="gt_sourcenote"><strong>Source : Enquête auprès des OR 2025</strong></td>
+<td colspan="3" class="gt_sourcenote"><strong>Source : Enquête auprès des OR 2025</strong></td>
 </tr>
 </tfoot>
 
@@ -4075,9 +4012,9 @@ Figure&nbsp;7.18: Qui devrait gérer l’AP ? (parmi ceux favorables à la prote
 <span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>mesures <span class="ot">&lt;-</span> ap5b_items <span class="sc">|&gt;</span></span>
 <span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui</span>(ap_favorable, var, label)) <span class="sc">|&gt;</span></span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(Alaotra, Marovoay, Total), <span class="at">names_to =</span> <span class="st">"Groupe"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(Alaotra, Marovoay), <span class="at">names_to =</span> <span class="st">"Groupe"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
 <span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(mesures <span class="sc">|&gt;</span> <span class="fu">filter</span>(Groupe <span class="sc">!=</span> <span class="st">"Total"</span>),</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(mesures,</span>
 <span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Item, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Groupe)) <span class="sc">+</span></span>
 <span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
 <span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(pct, <span class="st">"%"</span>)),</span>
@@ -4146,7 +4083,7 @@ Figure&nbsp;7.20: Pauvreté vs.&nbsp;protection de l’environnement : quelle pr
 </section>
 <section id="connaissance-des-actions-de-protection" class="level3" data-number="7.4.6">
 <h3 data-number="7.4.6" class="anchored" data-anchor-id="connaissance-des-actions-de-protection"><span class="header-section-number">7.4.6</span> Connaissance des actions de protection</h3>
-<p>La <a href="#fig-actions-ap" class="quarto-xref">Figure&nbsp;<span class="quarto-unresolved-ref">fig-actions-ap</span></a> présente le degré d’information, de consultation et de bénéfice des ménages vis-à-vis des différents types d’actions menées autour de l’AP.</p>
+<p>La <a href="#fig-actions-ap" class="quarto-xref">Figure&nbsp;<span>7.21</span></a> présente le degré d’information, de consultation et de bénéfice des ménages vis-à-vis des différents types d’actions menées autour de l’AP.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
