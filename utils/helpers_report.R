@@ -49,10 +49,19 @@ fix_hameau <- function(j4) {
 #' @param pct_cols Names of percentage columns to also suppress
 #' @param threshold Minimum count to keep (default 5)
 #' @return Data frame with small cells replaced by NA
-suppress_small_counts <- function(data, n_col = "n", pct_cols = NULL, threshold = 5) {
-  if (!n_col %in% names(data)) return(data)
+suppress_small_counts <- function(
+  data,
+  n_col = "n",
+  pct_cols = NULL,
+  threshold = 5
+) {
+  if (!n_col %in% names(data)) {
+    return(data)
+  }
   mask <- !is.na(data[[n_col]]) & data[[n_col]] < threshold
-  if (!any(mask)) return(data)
+  if (!any(mask)) {
+    return(data)
+  }
   data[[n_col]][mask] <- NA_real_
   # Auto-detect percentage columns if not specified
   if (is.null(pct_cols)) {
@@ -75,7 +84,9 @@ suppress_small_counts <- function(data, n_col = "n", pct_cols = NULL, threshold 
 #' @param n_col Name of the count column (default "n")
 #' @param threshold Minimum count to keep (default 5)
 suppress_in_plot_data <- function(data, n_col = "n", threshold = 5) {
-  if (!n_col %in% names(data)) return(data)
+  if (!n_col %in% names(data)) {
+    return(data)
+  }
   data[is.na(data[[n_col]]) | data[[n_col]] >= threshold, ]
 }
 
@@ -89,13 +100,24 @@ suppress_for_export <- function(data, threshold = 5) {
   # Identify likely count columns
   count_cols <- intersect(
     names(data),
-    c("n", "N", "Effectif", "effectif", "n_oui", "n_non",
-      "n_envoyeurs", "n_total", "nb", "Nb", "count", "Count")
+    c(
+      "n",
+      "N",
+      "Effectif",
+      "effectif",
+      "n_oui",
+      "n_non",
+      "n_envoyeurs",
+      "n_total",
+      "nb",
+      "Nb",
+      "count",
+      "Count"
+    )
   )
   pct_cols <- intersect(
     names(data),
-    c("pct", "%", "Percent", "percent", "prop", "proportion",
-      "Pct", "pct_oui")
+    c("pct", "%", "Percent", "percent", "prop", "proportion", "Pct", "pct_oui")
   )
   for (nc in count_cols) {
     mask <- !is.na(data[[nc]]) & data[[nc]] < threshold
@@ -178,8 +200,30 @@ classify_activity <- function(a1) {
     a1 %in% c(45, 38, 41, 42, 43, 35, 8) ~ "Commerce & Restauration",
     a1 %in% c(96, 98, 99, 6, 59, 48, 81, 97, 4, 5, 70) ~
       "Elevage, P\u00eache & Ress. nat.",
-    a1 %in% c(80, 63, 47, 51, 82, 91, 7, 88, 1, 30, 31,
-              52, 64, 58, 74, 28, 69, 16, 54, 73, 11) ~
+    a1 %in%
+      c(
+        80,
+        63,
+        47,
+        51,
+        82,
+        91,
+        7,
+        88,
+        1,
+        30,
+        31,
+        52,
+        64,
+        58,
+        74,
+        28,
+        69,
+        16,
+        54,
+        73,
+        11
+      ) ~
       "Artisanat, BTP & Transport",
     a1 == 14 ~ "El\u00e8ve / Etudiant",
     is.na(a1) ~ NA_character_,
