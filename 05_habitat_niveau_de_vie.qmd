@@ -8,6 +8,11 @@ editor_options:
 
 Cette section decrit les conditions d'habitat, les equipements des menages, leurs transferts et revenus.
 
+::: {.callout-warning}
+## Travail de vérification en cours
+Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
+:::
+
 ```{r setup_habitat}
 #| include: false
 library(tidyverse)
@@ -421,7 +426,7 @@ val_par_type <- res_t2_obs |>
     val_med = round(median(t21d, na.rm = TRUE)),
     .by = c(Observatory, Type)
   ) |>
-  filter(n >= 3)
+  filter(n >= 5)
 
 val_par_type |>
   ggplot(aes(x = reorder(Type, val_moy), y = val_moy / 1000, fill = Observatory)) +
@@ -441,7 +446,7 @@ dl_fig_variants("fig_transferts", "05", function(d) {
       as.character(as.integer(t21a)) %in% names(type_transf_labs),
       type_transf_labs[as.character(as.integer(t21a))], "Non precise")) |>
     summarise(val_moy = round(mean(t21d, na.rm = TRUE)), n = n(),
-              .by = c(Observatory, Type)) |> filter(n >= 3)
+              .by = c(Observatory, Type)) |> filter(n >= 5)
   ggplot(val, aes(x = reorder(Type, val_moy), y = val_moy / 1000, fill = Observatory)) +
     geom_col(position = "dodge") + coord_flip() +
     labs(x = NULL, y = "Valeur moyenne (milliers Ar)", fill = "Site") +

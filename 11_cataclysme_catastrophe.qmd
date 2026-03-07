@@ -13,6 +13,11 @@ Deux fichiers de données sont mobilisés :
 - **`res_cc`** : un enregistrement par ménage et par type de catastrophe, avec les dégâts sur le logement, l'élevage et les personnes ;
 - **`res_cca`** : les dégâts agricoles détaillés par culture et par type d'aléa (champs et stocks).
 
+::: {.callout-warning}
+## Travail de vérification en cours
+Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
+:::
+
 ```{r data_loading_cc}
 options(encoding = "UTF-8")
 
@@ -868,7 +873,7 @@ riz_champs <- res_cca %>%
     total = sum(n)
   ) %>%
   ungroup() %>%
-  filter(total >= 3) %>%
+  filter(total >= 5) %>%
   select(-n, -total) %>%
   pivot_wider(names_from = Niveau, values_from = pct, values_fill = 0)
 
@@ -900,7 +905,7 @@ dl_tbl_variants("tbl_degats_champs_riz", "11", function(d) {
     group_by(Observatory, Catastrophe) %>%
     mutate(pct = round(n / sum(n) * 100, 1), total = sum(n)) %>%
     ungroup() %>%
-    filter(total >= 3) %>%
+    filter(total >= 5) %>%
     select(-n, -total) %>%
     pivot_wider(names_from = Niveau, values_from = pct, values_fill = 0)
 }, cca_full)
@@ -939,7 +944,7 @@ riz_stocks <- res_cca %>%
     total = sum(n)
   ) %>%
   ungroup() %>%
-  filter(total >= 3) %>%
+  filter(total >= 5) %>%
   select(-n, -total) %>%
   pivot_wider(names_from = Niveau, values_from = pct, values_fill = 0)
 
@@ -971,7 +976,7 @@ dl_tbl_variants("tbl_degats_stocks_riz", "11", function(d) {
     group_by(Observatory, Catastrophe) %>%
     mutate(pct = round(n / sum(n) * 100, 1), total = sum(n)) %>%
     ungroup() %>%
-    filter(total >= 3) %>%
+    filter(total >= 5) %>%
     select(-n, -total) %>%
     pivot_wider(names_from = Niveau, values_from = pct, values_fill = 0)
 }, cca_full)

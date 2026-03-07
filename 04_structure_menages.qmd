@@ -8,6 +8,11 @@ editor_options:
 
 Le ménage est l'unité de base de l'enquête. Cette section décrit la composition des ménages, les caractéristiques des chefs de ménage et de leurs membres, ainsi que l'évolution de ces indicateurs.
 
+::: {.callout-warning}
+## Travail de vérification en cours
+Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
+:::
+
 ```{r data_loading}
 library(tidyverse)
 library(haven)
@@ -670,51 +675,12 @@ dl_tbl_variants("tbl_cm_w_sex", "04", function(d) {
 
 ### Activités principales des Chefs de ménage
 
-```{r cm_act_all}
-# Detailed activity table
-cm_all_act <- cm |>
-  mutate(
-    Activite = iconv(as.character(labelled::to_factor(a1)), from = "latin1", to = "UTF-8"),
-    Activite = gsub("&#39;", "'", Activite, fixed = TRUE)
-  ) |>
-  count(Observatory, Activite, name = "n") |>
-  mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  arrange(Observatory, desc(n))
-
-gt(cm_all_act, groupname_col = "Observatory") |>
-  tab_header(title = "Activités principales des CM (détail)") |>
-  cols_label(Activite = "Activité", n = "Effectif", Percent = "%") |>
-  fmt_number(columns = Percent, decimals = 1) |>
-  style_table()
-```
-
-```{r dl_tbl_cm_act_all}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_cm_act_all", "04", function(d) {
-  d |> filter(m6 == 1) |>
-    mutate(Activite = iconv(as.character(labelled::to_factor(a1)),
-                            from = "latin1", to = "UTF-8")) |>
-    count(Observatory, Activite) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, members)
-```
-
-Les cultivateurs exploitants, les ouvriers agricoles et les commerçants sont les activités les plus fréquentes dans les deux observatoires.
+Les activités principales des chefs de ménage sont regroupées en catégories sectorielles inspirées de la CITI Rév. 4 (Classification internationale type, par industrie, de toutes les branches d'activité économique) afin de garantir un effectif suffisant dans chaque classe et de préserver la confidentialité statistique.
 
 ```{r cm_act}
-# Simplified activities
 cm_act <- cm |>
-  mutate(
-    Act_principal = case_when(
-      a1 == 95 ~ "Cultivateur",
-      a1 == 76 ~ "Ouvrier agricole",
-      a1 == 45 ~ "Commerçant",
-      a1 == 96 ~ "Éleveur",
-      TRUE     ~ "Autres"
-    )
-  ) |>
+  mutate(Act_principal = classify_activity(a1)) |>
+  filter(!is.na(Act_principal)) |>
   count(Observatory, Act_principal, name = "n") |>
   mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory) |>
   arrange(Observatory, desc(n))
@@ -725,19 +691,15 @@ gt(cm_act, groupname_col = "Observatory") |>
   fmt_number(columns = Percent, decimals = 1) |>
   style_table()
 
-# Pie chart
-ggplot(cm_act, aes(x = "", y = Percent, fill = Act_principal)) +
-  geom_col(width = 1, color = "white") +
-  coord_polar(theta = "y") +
-  facet_wrap(~Observatory) +
-  geom_text(aes(label = paste0(Percent, "%")),
-            position = position_stack(vjust = 0.5),
-            color = "white", fontface = "bold", size = 4) +
-  labs(title = "Répartition des activités principales des CM (%)",
-       fill = "Activité") +
-  theme_void() +
-  theme(plot.title = element_text(face = "bold", hjust = 0.5),
-        strip.text = element_text(face = "bold"))
+# Bar chart (better suited to >5 categories than a pie chart)
+ggplot(cm_act, aes(x = reorder(Act_principal, Percent), y = Percent,
+                   fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(title = "Activités principales des CM (%)",
+       x = NULL, y = "%", fill = "Observatoire") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
 ```
 
 ```{r dl_tbl_cm_act}
@@ -745,9 +707,8 @@ ggplot(cm_act, aes(x = "", y = Percent, fill = Act_principal)) +
 #| results: asis
 dl_tbl_variants("tbl_cm_act", "04", function(d) {
   d |> filter(m6 == 1) |>
-    mutate(Act_principal = case_when(
-      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
-      a1 == 45 ~ "Commerçant", a1 == 96 ~ "Éleveur", TRUE ~ "Autres")) |>
+    mutate(Act_principal = classify_activity(a1)) |>
+    filter(!is.na(Act_principal)) |>
     count(Observatory, Act_principal) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
@@ -759,23 +720,18 @@ dl_tbl_variants("tbl_cm_act", "04", function(d) {
 #| results: asis
 dl_fig_variants("fig_cm_act", "04", function(d) {
   act <- d |> filter(m6 == 1) |>
-    mutate(Act_principal = case_when(
-      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
-      a1 == 45 ~ "Commerçant", a1 == 96 ~ "Éleveur", TRUE ~ "Autres")) |>
+    mutate(Act_principal = classify_activity(a1)) |>
+    filter(!is.na(Act_principal)) |>
     count(Observatory, Act_principal, name = "n") |>
     mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory)
-  ggplot(act, aes(x = "", y = Percent, fill = Act_principal)) +
-    geom_col(width = 1, color = "white") +
-    coord_polar(theta = "y") +
-    facet_wrap(~Observatory) +
-    geom_text(aes(label = paste0(Percent, "%")),
-              position = position_stack(vjust = 0.5),
-              color = "white", fontface = "bold", size = 4) +
-    labs(title = "Répartition des activités principales des CM (%)",
-         fill = "Activité") +
-    theme_void() +
-    theme(plot.title = element_text(face = "bold", hjust = 0.5),
-          strip.text = element_text(face = "bold"))
+  ggplot(act, aes(x = reorder(Act_principal, Percent), y = Percent,
+                   fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(title = "Activités principales des CM (%)",
+         x = NULL, y = "%", fill = "Observatoire") +
+    theme_minimal() +
+    theme(plot.title = element_text(face = "bold"))
 }, members)
 ```
 
@@ -784,22 +740,21 @@ dl_fig_variants("fig_cm_act", "04", function(d) {
 ```{r cm_act_sex}
 cm_act_sex <- cm |>
   mutate(
-    Act_principal = case_when(
-      a1 == 95 ~ "Cultivateur",
-      a1 == 76 ~ "Ouvrier agricole",
-      a1 == 45 ~ "Commerçant",
-      a1 == 96 ~ "Éleveur",
-      TRUE     ~ "Autres"
-    ),
+    Act_principal = classify_activity(a1),
     Sexe = classify_sex(m4)
   ) |>
+  filter(!is.na(Act_principal)) |>
   filter(!is.na(Sexe)) |>
   count(Observatory, Sexe, Act_principal, name = "n") |>
   mutate(Percent = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
   arrange(Observatory, Sexe, desc(n))
 
+# Suppress small cells (n < 5) for confidentiality
+cm_act_sex_tbl <- suppress_small_counts(cm_act_sex, "n", "Percent")
+cm_act_sex_plt <- suppress_in_plot_data(cm_act_sex)
+
 # Wide table
-cm_act_wide <- cm_act_sex |>
+cm_act_wide <- cm_act_sex_tbl |>
   pivot_wider(names_from = Sexe, values_from = c(n, Percent),
               names_glue = "{Sexe}_{.value}")
 
@@ -811,20 +766,19 @@ gt(cm_act_wide, groupname_col = "Observatory") |>
   tab_spanner(label = "Homme", columns = c(Homme_n, Homme_Percent)) |>
   tab_spanner(label = "Femme", columns = c(Femme_n, Femme_Percent)) |>
   fmt_number(columns = c(Homme_Percent, Femme_Percent), decimals = 1) |>
+  sub_missing(missing_text = "< 5") |>
   style_table()
 
-# Pie chart by sex
-ggplot(cm_act_sex, aes(x = "", y = Percent, fill = Act_principal)) +
-  geom_col(width = 1, color = "white") +
-  coord_polar(theta = "y") +
-  facet_grid(Observatory ~ Sexe) +
-  geom_text(aes(label = paste0(Percent, "%")),
-            position = position_stack(vjust = 0.5),
-            color = "white", fontface = "bold", size = 3) +
+# Bar chart by sex (small cells removed)
+ggplot(cm_act_sex_plt, aes(x = reorder(Act_principal, Percent), y = Percent,
+                       fill = Sexe)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  facet_wrap(~Observatory) +
   labs(title = "Activités principales des CM par observatoire et sexe (%)",
-       fill = "Activité") +
-  theme_void() +
-  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+       x = NULL, y = "%", fill = "Sexe") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"),
         strip.text = element_text(face = "bold"))
 ```
 
@@ -833,11 +787,9 @@ ggplot(cm_act_sex, aes(x = "", y = Percent, fill = Act_principal)) +
 #| results: asis
 dl_tbl_variants("tbl_cm_act_sex", "04", function(d) {
   d |> filter(m6 == 1) |>
-    mutate(Act_principal = case_when(
-      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
-      a1 == 45 ~ "Commerçant", a1 == 96 ~ "Éleveur", TRUE ~ "Autres"),
+    mutate(Act_principal = classify_activity(a1),
       Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
+    filter(!is.na(Act_principal), !is.na(Sexe)) |>
     count(Observatory, Sexe, Act_principal) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
@@ -849,24 +801,20 @@ dl_tbl_variants("tbl_cm_act_sex", "04", function(d) {
 #| results: asis
 dl_fig_variants("fig_cm_act_sex", "04", function(d) {
   act <- d |> filter(m6 == 1) |>
-    mutate(Act_principal = case_when(
-      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
-      a1 == 45 ~ "Commerçant", a1 == 96 ~ "Éleveur", TRUE ~ "Autres"),
+    mutate(Act_principal = classify_activity(a1),
       Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
+    filter(!is.na(Act_principal), !is.na(Sexe)) |>
     count(Observatory, Sexe, Act_principal, name = "n") |>
     mutate(Percent = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe))
-  ggplot(act, aes(x = "", y = Percent, fill = Act_principal)) +
-    geom_col(width = 1, color = "white") +
-    coord_polar(theta = "y") +
-    facet_grid(Observatory ~ Sexe) +
-    geom_text(aes(label = paste0(Percent, "%")),
-              position = position_stack(vjust = 0.5),
-              color = "white", fontface = "bold", size = 3) +
+  ggplot(act, aes(x = reorder(Act_principal, Percent), y = Percent,
+                   fill = Sexe)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    facet_wrap(~Observatory) +
     labs(title = "Activités principales des CM par observatoire et sexe (%)",
-         fill = "Activité") +
-    theme_void() +
-    theme(plot.title = element_text(face = "bold", hjust = 0.5),
+         x = NULL, y = "%", fill = "Sexe") +
+    theme_minimal() +
+    theme(plot.title = element_text(face = "bold"),
           strip.text = element_text(face = "bold"))
 }, members)
 ```
@@ -1435,25 +1383,20 @@ dl_fig_variants("fig_other_act", "04", function(d) {
 ```{r other_act_sex}
 other_act_sex <- others |>
   mutate(
-    Act_principal = case_when(
-      a1 == 95 ~ "Cultivateur",
-      a1 == 76 ~ "Ouvrier agricole",
-      a1 == 45 ~ "Commerçant",
-      a1 == 14 ~ "Étudiant",
-      a1 == 0  ~ "Chômeur",
-      a1 == 96 ~ "Éleveur",
-      a1 == 99 ~ "Pêcheur exploitant",
-      TRUE     ~ "Autres"
-    ),
+    Act_principal = classify_activity(a1),
     Sexe = classify_sex(m4)
   ) |>
-  filter(!is.na(Sexe)) |>
+  filter(!is.na(Act_principal), !is.na(Sexe)) |>
   count(Observatory, Sexe, Act_principal, name = "n") |>
   mutate(Percent = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
   arrange(Observatory, Sexe, desc(n))
 
+# Suppress small cells
+other_act_sex_tbl <- suppress_small_counts(other_act_sex, "n", "Percent")
+other_act_sex_plt <- suppress_in_plot_data(other_act_sex)
+
 # Wide table
-other_act_wide <- other_act_sex |>
+other_act_wide <- other_act_sex_tbl |>
   pivot_wider(names_from = Sexe, values_from = c(n, Percent),
               names_glue = "{Sexe}_{.value}")
 
@@ -1465,19 +1408,18 @@ gt(other_act_wide, groupname_col = "Observatory") |>
   tab_spanner(label = "Homme", columns = c(Homme_n, Homme_Percent)) |>
   tab_spanner(label = "Femme", columns = c(Femme_n, Femme_Percent)) |>
   fmt_number(columns = c(Homme_Percent, Femme_Percent), decimals = 1) |>
+  sub_missing(missing_text = "< 5") |>
   style_table()
 
-# Pie chart by sex
-ggplot(other_act_sex, aes(x = "", y = Percent, fill = Act_principal)) +
-  geom_col(width = 1, color = "white") +
-  coord_polar(theta = "y") +
-  facet_grid(Observatory ~ Sexe) +
-  geom_text(aes(label = paste0(Percent, "%")),
-            position = position_stack(vjust = 0.5),
-            color = "white", fontface = "bold", size = 3) +
+# Bar chart by sex (small cells removed)
+ggplot(other_act_sex_plt, aes(x = reorder(Act_principal, Percent), y = Percent,
+                              fill = Sexe)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  facet_wrap(~Observatory) +
   labs(title = "Activités des autres membres par observatoire et sexe (%)",
-       fill = "Activité") +
-  theme_void() +
+       x = NULL, y = "%", fill = "Sexe") +
+  theme_minimal() +
   theme(plot.title = element_text(face = "bold", hjust = 0.5),
         strip.text = element_text(face = "bold"))
 ```
@@ -1532,6 +1474,12 @@ dl_fig_variants("fig_other_act_sex", "04", function(d) {
 ## Évolution des indicateurs démographiques (1996-2025) {#sec-demog-multiyear}
 
 Les observatoires d'Alaotra et de Marovoay disposent de données démographiques depuis 1996. Cette section retrace l'évolution de quatre indicateurs clés : la taille moyenne des ménages, la proportion de chefs de ménage femmes, le taux de scolarisation des 6-14 ans et l'âge moyen du chef de ménage.
+
+::: {.callout-caution}
+## Interprétation : effet du panel et de l'échantillonnage
+
+Les tendances présentées dans cette section doivent être interprétées avec prudence. Entre 1996 et 2015, les observatoires suivaient un dispositif de **panel** : les mêmes ménages étaient réinterrogés d'une année sur l'autre (avec remplacement partiel en cas d'attrition). En 2025, après dix ans d'interruption, un **nouveau tirage** a été effectué à partir du dénombrement. Les évolutions observées reflètent donc à la fois les dynamiques réelles dans les localités et les changements de composition de l'échantillon (vieillissement du panel, attrition sélective, renouvellement complet en 2025). Une analyse de la représentativité et de la pondération est proposée au @sec-representativite.
+:::
 
 ```{r demog_trends_compute}
 #| include: false

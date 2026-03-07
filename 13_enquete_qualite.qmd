@@ -12,6 +12,11 @@ Cette partie rassemble les indicateurs de qualité de la collecte. Les trois var
 - `qual1aa` — *« Qualité de la réponse en générale »* : évaluation de la qualité des réponses obtenues, renseignée dans le module de remarques en fin de questionnaire (fichier `res_remq`).
 - `qual2aa` — *« Réaction du répondant »* : appréciation de l'attitude du répondant pendant l'entretien, renseignée dans le même module de fin de questionnaire.
 
+::: {.callout-warning}
+## Travail de vérification en cours
+Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
+:::
+
 ```{r setup_qualite}
 #| include: false
 library(tidyverse)
@@ -244,32 +249,34 @@ dl_fig_variants("fig_reaction", "13", function(d) {
 
 **`qual1aa` = 3** (21 observations : 3 Alaotra, 18 Marovoay) — Le code 3 n'existe pas dans la grille de codage (`1 = Bonne`, `2 = Mauvaise`). L'hypothèse la plus probable est une **erreur de saisie** : l'enquêteur a noté `j11 = 3` (Mauvaise) sur la page de couverture et l'opérateur a reporté ce code par erreur dans `qual1aa`. On note d'ailleurs que 12 de ces 21 cas ont également `qual2aa = 3` (Méfiant) et que `j11` vaut 2 ou 3 dans la quasi-totalité des cas, ce qui confirme qu'il s'agit d'entretiens difficiles. **Action recommandée** : recoder ces 21 observations en `qual1aa = 2` (Mauvaise), ou les laisser en NA si l'on ne peut confirmer.
 
-**`qual2aa` = 4** (1 observation : j5 = 2121035, Alaotra, enquêteur 20, hameau Mangabe) — Le code 4 n'existe pas dans la grille (`1 = Ouvert`, `2 = Neutre`, `3 = Méfiant`). `qual1aa` vaut 1 (Bonne) et la remarque est vide. Il s'agit d'une **erreur de saisie isolée**. **Action recommandée** : recoder en NA.
+**`qual2aa` = 4** (1 observation, Alaotra) — Le code 4 n'existe pas dans la grille (`1 = Ouvert`, `2 = Neutre`, `3 = Méfiant`). `qual1aa` vaut 1 (Bonne) et la remarque est vide. Il s'agit d'une **erreur de saisie isolée**. **Action recommandée** : recoder en NA.
 
-**Valeurs manquantes** : 3 ménages (j5 = 2111000, 320413, 320113) ont `qual1aa` et `qual2aa` à NA. Ces cas sont à vérifier auprès de l'équipe de saisie.
+**Valeurs manquantes** : 3 ménages ont `qual1aa` et `qual2aa` à NA. Ces cas sont à vérifier auprès de l'équipe de saisie.
+
+*Les identifiants précis des ménages concernés sont disponibles dans les données brutes (`res_remq.dta`) et ne sont pas reproduits ici pour des raisons de confidentialité.*
 :::
 
 ```{r}
-#| tbl-cap: "Observations avec codes aberrants dans qual1aa ou qual2aa"
+#| tbl-cap: "Observations avec codes aberrants dans qual1aa ou qual2aa (anonymisé)"
 #| label: tbl-codes-aberrants
 
 res_remq |>
-  left_join(res_deb |> select(j5, j1, j4, j11), by = "j5") |>
+  left_join(res_deb |> select(j5, j1, j11), by = "j5") |>
   filter(
     (!qual1aa %in% c(1, 2) & !is.na(qual1aa)) |
     (!qual2aa %in% c(1, 2, 3) & !is.na(qual2aa)) |
     is.na(qual1aa) | is.na(qual2aa)
   ) |>
   mutate(
-    Enquêteur = paste0("E", sprintf("%02d", j1)),
+    Obs_n = row_number(),
     j11_lbl = case_when(j11 == 1 ~ "Bonne", j11 == 2 ~ "Moyenne", j11 == 3 ~ "Mauvaise"),
     qual1aa = as.numeric(qual1aa),
     qual2aa = as.numeric(qual2aa)
   ) |>
-  select(j5, Observatory, Enquêteur, Hameau = j4, j11 = j11_lbl, qual1aa, qual2aa) |>
+  select(Obs_n, Observatory, j11 = j11_lbl, qual1aa, qual2aa) |>
   gt() |>
-  cols_label(j5 = "ID ménage", Hameau = "Hameau", Enquêteur = "Enquêteur",
-             j11 = "j11 (couverture)", qual1aa = "qual1aa", qual2aa = "qual2aa") |>
+  cols_label(Obs_n = "#", j11 = "j11 (couverture)",
+             qual1aa = "qual1aa", qual2aa = "qual2aa") |>
   tab_style(
     style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
     locations = cells_column_labels(columns = everything())
@@ -289,26 +296,26 @@ res_remq |>
       rows = !qual2aa %in% c(1, 2, 3) | is.na(qual2aa)
     )
   ) |>
-  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025 — à corriger lors de l'apurement**"))
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025 — identifiants ménages anonymisés**"))
 ```
 
 ```{r dl_tbl_codes_aberrants}
 #| include: false
 dl_tbl_variants("tbl_codes_aberrants", "13", function(d) {
   d |>
-    left_join(res_deb |> select(j5, j1, j4, j11), by = "j5") |>
+    left_join(res_deb |> select(j5, j1, j11), by = "j5") |>
     filter(
       (!qual1aa %in% c(1, 2) & !is.na(qual1aa)) |
       (!qual2aa %in% c(1, 2, 3) & !is.na(qual2aa)) |
       is.na(qual1aa) | is.na(qual2aa)
     ) |>
     mutate(
-      Enqueteur = paste0("E", sprintf("%02d", j1)),
+      Obs_n = row_number(),
       j11_lbl = case_when(j11 == 1 ~ "Bonne", j11 == 2 ~ "Moyenne", j11 == 3 ~ "Mauvaise"),
       qual1aa = as.numeric(qual1aa),
       qual2aa = as.numeric(qual2aa)
     ) |>
-    select(j5, Observatory, Enqueteur, Hameau = j4, j11 = j11_lbl, qual1aa, qual2aa)
+    select(Obs_n, Observatory, j11 = j11_lbl, qual1aa, qual2aa)
 }, res_remq)
 ```
 
@@ -331,12 +338,14 @@ res_remq |>
     )
   ) |>
   count(Observatory, `Qualité réponse`, `Réaction répondant`) |>
+  mutate(n = if_else(n < 5, NA_integer_, n)) |>
   pivot_wider(names_from = Observatory, values_from = n, values_fill = 0) |>
   gt() |>
   tab_style(
     style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
     locations = cells_column_labels(columns = everything())
   ) |>
+  sub_missing(missing_text = "< 5") |>
   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 ```
 
