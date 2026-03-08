@@ -1,0 +1,1016 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Foncier
+
+Ce chapitre analyse la situation foncière des ménages des observatoires d'Alaotra et de Marovoay : patrimoine foncier possédé, parcelles exploitées sans en être propriétaire, cessions à des tiers, sécurisation foncière, et satisfaction des ménages par rapport à leur dotation en terre.
+
+::: {.callout-warning}
+## Travail de vérification en cours
+Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
+:::
+
+```{r setup_foncier}
+#| include: false
+library(tidyverse)
+library(haven)
+library(labelled)
+library(gt)
+library(scales)
+source("utils/helpers_report.R")
+source("utils/sites.R")
+source("utils/downloadable_output.R")
+
+# --- Données de base ---
+res_deb <- read_dta("data/res_deb.dta") |>
+  mutate(
+    j5 = as.character(j5),
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    )
+  ) |>
+  assign_site()
+
+add_obs <- function(df) {
+  df |>
+    mutate(j5 = as.character(j5)) |>
+    left_join(res_deb |> select(j5, Observatory, Site), by = "j5")
+}
+
+n_men <- nrow(res_deb)
+
+safe_to_char <- function(x) {
+  out <- labelled::to_character(x)
+  out <- as.character(out)
+  Encoding(out[!is.na(out)]) <- "latin1"
+  iconv(out, from = "latin1", to = "UTF-8", sub = "?")
+}
+
+# --- Données foncières ---
+res_fr30  <- read_dta("data/res_fr30.dta")  |> add_obs()
+res_fr30a <- read_dta("data/res_fr30a.dta") |> add_obs()
+res_fr33  <- read_dta("data/res_fr33.dta")  |> add_obs()
+res_fr34  <- read_dta("data/res_fr34.dta")  |> add_obs()
+
+# Labels communs
+type_labs <- c(
+  "1" = "Rizière", "2" = "Champs", "3" = "Terrain boisé",
+  "4" = "Culture pérenne", "9" = "Autre"
+)
+
+loc_labs <- c(
+  "1" = "Plaine", "2" = "Tanety", "3" = "Bas-fonds",
+  "4" = "Baiboho", "9" = "Autre"
+)
+
+irrig_labs <- c(
+  "1" = "Réseau aménagé", "2" = "Réseau traditionnel",
+  "3" = "Sans irrigation (diguette)", "4" = "Sans irrigation",
+  "5" = "Motopompe"
+)
+
+fv_labs <- c(
+  "1" = "Prêt", "2" = "Location", "3" = "Métayage",
+  "4" = "Mise en gage", "9" = "Autre"
+)
+```
+
+
+## Patrimoine foncier {#sec-patrimoine}
+
+### Nombre de parcelles possédées
+
+Sur les `r n_men` ménages enquêtés, `r sum(res_fr30a$fr30a == 0, na.rm = TRUE)` ne possèdent aucune parcelle. Les ménages propriétaires possèdent en moyenne un peu plus de deux parcelles.
+
+```{r}
+#| label: fig-nb-parcelles
+#| fig-cap: "Distribution du nombre de parcelles possédées par ménage"
+#| fig-width: 8
+#| fig-height: 5
+
+res_fr30a |>
+  filter(!is.na(fr30a)) |>
+  ggplot(aes(x = fr30a, fill = Observatory)) +
+  geom_histogram(position = "dodge", binwidth = 1) +
+  labs(x = "Nombre de parcelles possédées", y = "Nombre de ménages", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_nb_parcelles}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_nb_parcelles", "07", function(d) {
+  d |>
+    filter(!is.na(fr30a)) |>
+    ggplot(aes(x = fr30a, fill = Observatory)) +
+    geom_histogram(position = "dodge", binwidth = 1) +
+    labs(x = "Nombre de parcelles possédées", y = "Nombre de ménages",
+         fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, res_fr30a)
+```
+
+```{r}
+#| label: tbl-parcelles-stats
+#| tbl-cap: "Statistiques sur le patrimoine foncier possédé"
+
+fr30_data <- res_fr30 |> filter(!is.na(fr30c))
+
+bind_rows(
+  fr30_data |>
+    count(j5, Observatory) |>
+    summarise(
+      Moyenne = round(mean(n), 1),
+      Mediane = median(n),
+      .by = Observatory
+    ) |>
+    pivot_longer(-Observatory, names_to = "Stat", values_to = "val") |>
+    pivot_wider(names_from = Observatory, values_from = val) |>
+    mutate(Indicateur = "Nb parcelles / ménage", .before = 1),
+
+  fr30_data |>
+    filter(!is.na(fr30d)) |>
+    summarise(
+      Moyenne = round(mean(fr30d), 1),
+      Mediane = round(median(fr30d), 1),
+      .by = Observatory
+    ) |>
+    pivot_longer(-Observatory, names_to = "Stat", values_to = "val") |>
+    pivot_wider(names_from = Observatory, values_from = val) |>
+    mutate(Indicateur = "Superficie / parcelle (ares)", .before = 1),
+
+  fr30_data |>
+    summarise(sup = sum(fr30d, na.rm = TRUE), .by = c(j5, Observatory)) |>
+    summarise(
+      Moyenne = round(mean(sup), 1),
+      Mediane = round(median(sup), 1),
+      .by = Observatory
+    ) |>
+    pivot_longer(-Observatory, names_to = "Stat", values_to = "val") |>
+    pivot_wider(names_from = Observatory, values_from = val) |>
+    mutate(Indicateur = "Superficie totale / ménage (ares)", .before = 1)
+) |>
+  gt() |>
+  tab_header(title = "Patrimoine foncier des ménages propriétaires")
+```
+
+```{r dl_tbl_parcelles_stats}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_parcelles_stats", "07", function(d) {
+  d <- d |> filter(!is.na(fr30c))
+  nb <- d |> count(j5, Observatory) |>
+    summarise(nb_parcelles_moy = round(mean(n), 1),
+              nb_parcelles_med = median(n), .by = Observatory)
+  sup_p <- d |> filter(!is.na(fr30d)) |>
+    summarise(sup_parcelle_moy = round(mean(fr30d), 1),
+              sup_parcelle_med = round(median(fr30d), 1), .by = Observatory)
+  sup_t <- d |>
+    summarise(sup = sum(fr30d, na.rm = TRUE), .by = c(j5, Observatory)) |>
+    summarise(sup_totale_moy = round(mean(sup), 1),
+              sup_totale_med = round(median(sup), 1), .by = Observatory)
+  nb |>
+    left_join(sup_p, by = "Observatory") |>
+    left_join(sup_t, by = "Observatory") |>
+    rename(Site = Observatory)
+}, res_fr30)
+```
+
+### Type et localisation des parcelles possédées
+
+```{r}
+#| label: fig-type-parcelle
+#| fig-cap: "Type des parcelles possédées"
+#| fig-width: 9
+#| fig-height: 5
+
+fr30_data |>
+  mutate(Type = factor(as.character(fr30c), levels = names(type_labs), labels = type_labs)) |>
+  count(Observatory, Type) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Type, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_type_parcelle}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_type_parcelle", "07", function(d) {
+  d |>
+    mutate(Type = factor(as.character(fr30c), levels = names(type_labs), labels = type_labs)) |>
+    count(Observatory, Type) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = reorder(Type, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, res_fr30 |> filter(!is.na(fr30c)))
+```
+
+```{r}
+#| label: fig-localisation-parcelle
+#| fig-cap: "Localisation des parcelles possédées"
+#| fig-width: 9
+#| fig-height: 5
+
+fr30_data |>
+  filter(!is.na(fr30e)) |>
+  mutate(Localisation = factor(as.character(fr30e), levels = names(loc_labs), labels = loc_labs)) |>
+  count(Observatory, Localisation) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Localisation, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_localisation_parcelle}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_localisation_parcelle", "07", function(d) {
+  d |>
+    filter(!is.na(fr30e)) |>
+    mutate(Localisation = factor(as.character(fr30e), levels = names(loc_labs), labels = loc_labs)) |>
+    count(Observatory, Localisation) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = reorder(Localisation, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, res_fr30 |> filter(!is.na(fr30c)))
+```
+
+### Irrigation des parcelles possédées
+
+```{r}
+#| label: fig-irrigation-possedee
+#| fig-cap: "Mode d'irrigation des parcelles possédées"
+#| fig-width: 10
+#| fig-height: 5
+
+fr30_data |>
+  filter(!is.na(fr30f)) |>
+  mutate(Irrigation = factor(as.character(fr30f), levels = names(irrig_labs), labels = irrig_labs)) |>
+  count(Observatory, Irrigation) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Irrigation, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_irrigation_possedee}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_irrigation_possedee", "07", function(d) {
+  d |>
+    filter(!is.na(fr30f)) |>
+    mutate(Irrigation = factor(as.character(fr30f), levels = names(irrig_labs), labels = irrig_labs)) |>
+    count(Observatory, Irrigation) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = reorder(Irrigation, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, fr30_data)
+```
+
+### Mode d'acquisition et ancienneté
+
+```{r}
+#| label: fig-acquisition
+#| fig-cap: "Mode d'acquisition des parcelles possédées"
+#| fig-width: 10
+#| fig-height: 5
+
+acq_labs <- c(
+  "11" = "Achat", "13" = "Don", "15" = "Mise en valeur",
+  "21" = "Héritage (partage définitif)", "22" = "Héritage (partage non définitif)",
+  "23" = "Héritage tournant"
+)
+
+fr30_data |>
+  filter(!is.na(fr30h)) |>
+  mutate(Acquisition = factor(as.character(fr30h), levels = names(acq_labs), labels = acq_labs)) |>
+  count(Observatory, Acquisition) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Acquisition, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_acquisition}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_acquisition", "07", function(d) {
+  d |>
+    filter(!is.na(fr30h)) |>
+    mutate(Acquisition = factor(as.character(fr30h), levels = names(acq_labs), labels = acq_labs)) |>
+    count(Observatory, Acquisition) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = reorder(Acquisition, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, fr30_data)
+```
+
+```{r}
+#| label: fig-anciennete
+#| fig-cap: "Ancienneté de possession des parcelles"
+#| fig-width: 9
+#| fig-height: 5
+
+anc_labs <- c(
+  "1" = "Avant 1970", "2" = "Années 1970", "3" = "Années 1980",
+  "4" = "Années 1990", "5" = "Années 2000", "6" = "Années 2010",
+  "8" = "Ne se rappelle pas"
+)
+
+fr30_data |>
+  filter(!is.na(fr30g)) |>
+  mutate(Periode = factor(as.character(fr30g), levels = names(anc_labs), labels = anc_labs)) |>
+  count(Observatory, Periode) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = Periode, y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top", axis.text.x = element_text(angle = 30, hjust = 1))
+```
+
+```{r dl_fig_anciennete}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_anciennete", "07", function(d) {
+  d |>
+    filter(!is.na(fr30g)) |>
+    mutate(Periode = factor(as.character(fr30g), levels = names(anc_labs), labels = anc_labs)) |>
+    count(Observatory, Periode) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = Periode, y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top", axis.text.x = element_text(angle = 30, hjust = 1))
+}, fr30_data)
+```
+
+### Propriétaire dans le ménage
+
+```{r}
+#| label: fig-proprietaire
+#| fig-cap: "Qui dans le ménage est propriétaire de la parcelle"
+#| fig-width: 10
+#| fig-height: 5
+
+prop_labs <- c(
+  "0" = "Tous les membres", "1" = "Chef de ménage", "2" = "Conjoint",
+  "3" = "Chef et conjoint", "41" = "Parents du chef", "42" = "Parents du conjoint",
+  "81" = "Indivision (chef)", "82" = "Indivision (conjoint)", "99" = "Autre"
+)
+
+fr30_data |>
+  filter(!is.na(fr30i)) |>
+  mutate(
+    fr30i_chr = as.character(fr30i),
+    Proprietaire = if_else(
+      fr30i_chr %in% names(prop_labs),
+      prop_labs[fr30i_chr],
+      "Autre"
+    )
+  ) |>
+  count(Observatory, Proprietaire) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  filter(pct >= 1) |>
+  ggplot(aes(x = reorder(Proprietaire, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_proprietaire}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_proprietaire", "07", function(d) {
+  d |>
+    filter(!is.na(fr30i)) |>
+    mutate(
+      fr30i_chr = as.character(fr30i),
+      Proprietaire = if_else(
+        fr30i_chr %in% names(prop_labs),
+        prop_labs[fr30i_chr],
+        "Autre"
+      )
+    ) |>
+    count(Observatory, Proprietaire) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    filter(pct >= 1) |>
+    ggplot(aes(x = reorder(Proprietaire, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, fr30_data)
+```
+
+
+## Sécurisation foncière {#sec-securisation}
+
+La sécurisation foncière est un enjeu majeur à Madagascar. Les ménages peuvent détenir un titre foncier, un certificat foncier (délivré par le guichet foncier communal), ou divers documents informels.
+
+```{r}
+#| label: tbl-securisation
+#| tbl-cap: "Sécurisation foncière des parcelles possédées"
+
+sec_data <- fr30_data |>
+  mutate(
+    Titre = if_else(fr30j == 1, "Oui", "Non"),
+    Certificat = if_else(fr30l == 1, "Oui", "Non")
+  )
+
+titre_pct <- sec_data |>
+  filter(!is.na(Titre)) |>
+  count(Observatory, Titre) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  filter(Titre == "Oui") |>
+  select(Observatory, pct) |>
+  pivot_wider(names_from = Observatory, values_from = pct) |>
+  mutate(Document = "Titre foncier", .before = 1)
+
+cert_pct <- sec_data |>
+  filter(!is.na(Certificat)) |>
+  count(Observatory, Certificat) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  filter(Certificat == "Oui") |>
+  select(Observatory, pct) |>
+  pivot_wider(names_from = Observatory, values_from = pct) |>
+  mutate(Document = "Certificat foncier", .before = 1)
+
+bind_rows(titre_pct, cert_pct) |>
+  gt() |>
+  tab_header(title = "% des parcelles disposant d'un document de sécurisation") |>
+  cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
+```
+
+```{r dl_tbl_securisation}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_securisation", "07", function(d) {
+  sec <- d |> mutate(
+    Titre = if_else(fr30j == 1, "Oui", "Non"),
+    Certificat = if_else(fr30l == 1, "Oui", "Non")
+  )
+  bind_rows(
+    sec |> filter(!is.na(Titre)) |>
+      count(Observatory, Titre) |>
+      mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+      filter(Titre == "Oui") |>
+      transmute(Observatory, Document = "Titre foncier", `%` = pct),
+    sec |> filter(!is.na(Certificat)) |>
+      count(Observatory, Certificat) |>
+      mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+      filter(Certificat == "Oui") |>
+      transmute(Observatory, Document = "Certificat foncier", `%` = pct)
+  ) |> rename(Site = Observatory)
+}, fr30_data)
+```
+
+```{r}
+#| label: fig-papiers
+#| fig-cap: "Autres documents prouvant la possession"
+#| fig-width: 10
+#| fig-height: 5
+
+papier_labs <- c(
+  "1" = "Aucun document", "2" = "Taratasy non visé",
+  "3" = "Bokimpianakaviana", "4" = "Taratasy visa Fokontany",
+  "5" = "Visa Mairie", "6" = "Visa Arrondissement", "9" = "Autre"
+)
+
+fr30_data |>
+  filter(!is.na(fr30n)) |>
+  mutate(Papier = factor(as.character(fr30n), levels = names(papier_labs), labels = papier_labs)) |>
+  count(Observatory, Papier) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Papier, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_papiers}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_papiers", "07", function(d) {
+  d |>
+    filter(!is.na(fr30n)) |>
+    mutate(Papier = factor(as.character(fr30n), levels = names(papier_labs), labels = papier_labs)) |>
+    count(Observatory, Papier) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = reorder(Papier, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, fr30_data)
+```
+
+
+## Parcelles cédées à des tiers {#sec-cessions}
+
+Les ménages propriétaires peuvent céder certaines de leurs parcelles à d'autres exploitants, sous forme de prêt, location, métayage ou mise en gage.
+
+```{r}
+#| label: tbl-cession-pratique
+#| tbl-cap: "Ménages cédant des parcelles à des tiers"
+
+res_fr30a |>
+  filter(!is.na(fr33a)) |>
+  summarise(
+    `Nb ménages` = n(),
+    `Cèdent (nb)` = sum(fr33a == 1, na.rm = TRUE),
+    `Cèdent (%)` = round(sum(fr33a == 1, na.rm = TRUE) / n() * 100, 1),
+    .by = Observatory
+  ) |>
+  gt() |>
+  tab_header(title = "Ménages cédant des parcelles à des tiers")
+```
+
+```{r dl_tbl_cession_pratique}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cession_pratique", "07", function(d) {
+  d |>
+    filter(!is.na(fr33a)) |>
+    summarise(
+      `Nb ménages` = n(),
+      `Cèdent (nb)` = sum(fr33a == 1, na.rm = TRUE),
+      `Cèdent (%)` = round(sum(fr33a == 1, na.rm = TRUE) / n() * 100, 1),
+      .by = Observatory
+    ) |>
+    rename(Site = Observatory)
+}, res_fr30a)
+```
+
+```{r}
+#| label: fig-mode-cession
+#| fig-cap: "Mode de faire-valoir des parcelles cédées"
+#| fig-width: 9
+#| fig-height: 5
+
+fr33_data <- res_fr33 |> filter(!is.na(fr33gc))
+
+fr33_data |>
+  mutate(Mode = factor(as.character(fr33gc), levels = names(fv_labs), labels = fv_labs)) |>
+  count(Observatory, Mode) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Mode, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles cédées", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_mode_cession}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_mode_cession", "07", function(d) {
+  d |>
+    mutate(Mode = factor(as.character(fr33gc), levels = names(fv_labs), labels = fv_labs)) |>
+    count(Observatory, Mode) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = reorder(Mode, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(x = NULL, y = "% des parcelles cédées", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, fr33_data)
+```
+
+```{r}
+#| label: fig-motif-cession
+#| fig-cap: "Motif de la cession de parcelles"
+#| fig-width: 10
+#| fig-height: 6
+
+fr33_data |>
+  filter(!is.na(fr33h)) |>
+  mutate(Motif = safe_to_char(fr33h)) |>
+  mutate(Motif = str_trunc(Motif, 45)) |>
+  count(Observatory, Motif) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Motif, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles cédées", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_motif_cession}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_motif_cession", "07", function(d) {
+  d |>
+    filter(!is.na(fr33h)) |>
+    mutate(Motif = safe_to_char(fr33h)) |>
+    mutate(Motif = str_trunc(Motif, 45)) |>
+    count(Observatory, Motif) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = reorder(Motif, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(x = NULL, y = "% des parcelles cédées", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, fr33_data)
+```
+
+```{r}
+#| label: fig-cedee-a-qui
+#| fig-cap: "À qui la parcelle est-elle cédée"
+#| fig-width: 10
+#| fig-height: 5
+
+fr33_data |>
+  filter(!is.na(fr33k)) |>
+  mutate(Destinataire = safe_to_char(fr33k)) |>
+  mutate(Destinataire = str_trunc(Destinataire, 40)) |>
+  count(Observatory, Destinataire) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Destinataire, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles cédées", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_cedee_a_qui}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_cedee_a_qui", "07", function(d) {
+  d |>
+    filter(!is.na(fr33k)) |>
+    mutate(Destinataire = safe_to_char(fr33k)) |>
+    mutate(Destinataire = str_trunc(Destinataire, 40)) |>
+    count(Observatory, Destinataire) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = reorder(Destinataire, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(x = NULL, y = "% des parcelles cédées", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, fr33_data)
+```
+
+
+## Parcelles exploitées non possédées {#sec-exploitees}
+
+En plus de leurs propres parcelles, de nombreux ménages exploitent des terres appartenant à d'autres propriétaires.
+
+```{r}
+#| label: tbl-exploitation-autres
+#| tbl-cap: "Ménages exploitant des parcelles non possédées"
+
+res_fr30a |>
+  filter(!is.na(fr34a)) |>
+  summarise(
+    `Nb ménages` = n(),
+    `Exploitent (nb)` = sum(fr34a == 1, na.rm = TRUE),
+    `Exploitent (%)` = round(sum(fr34a == 1, na.rm = TRUE) / n() * 100, 1),
+    .by = Observatory
+  ) |>
+  gt() |>
+  tab_header(title = "Ménages exploitant des parcelles d'autrui")
+```
+
+```{r dl_tbl_exploitation_autres}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_exploitation_autres", "07", function(d) {
+  d |>
+    filter(!is.na(fr34a)) |>
+    summarise(
+      `Nb ménages` = n(),
+      `Exploitent (nb)` = sum(fr34a == 1, na.rm = TRUE),
+      `Exploitent (%)` = round(sum(fr34a == 1, na.rm = TRUE) / n() * 100, 1),
+      .by = Observatory
+    ) |>
+    rename(Site = Observatory)
+}, res_fr30a)
+```
+
+```{r}
+#| label: fig-type-exploitee
+#| fig-cap: "Type des parcelles exploitées (non possédées)"
+#| fig-width: 9
+#| fig-height: 5
+
+fr34_data <- res_fr34 |> filter(!is.na(fr30c1))
+
+fr34_data |>
+  mutate(Type = factor(as.character(fr30c1), levels = names(type_labs), labels = type_labs)) |>
+  count(Observatory, Type) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Type, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_type_exploitee}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_type_exploitee", "07", function(d) {
+  d |>
+    mutate(Type = factor(as.character(fr30c1), levels = names(type_labs), labels = type_labs)) |>
+    count(Observatory, Type) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = reorder(Type, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, fr34_data)
+```
+
+```{r}
+#| label: fig-fv-exploitee
+#| fig-cap: "Mode de faire-valoir des parcelles exploitées"
+#| fig-width: 9
+#| fig-height: 5
+
+fr34_data |>
+  filter(!is.na(fr34g)) |>
+  mutate(Mode = factor(as.character(fr34g), levels = names(fv_labs), labels = fv_labs)) |>
+  count(Observatory, Mode) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Mode, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles exploitées", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_fv_exploitee}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_fv_exploitee", "07", function(d) {
+  d |>
+    filter(!is.na(fr34g)) |>
+    mutate(Mode = factor(as.character(fr34g), levels = names(fv_labs), labels = fv_labs)) |>
+    count(Observatory, Mode) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = reorder(Mode, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(x = NULL, y = "% des parcelles exploitées", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, fr34_data)
+```
+
+```{r}
+#| label: fig-proprietaire-exploitee
+#| fig-cap: "Propriétaire des parcelles exploitées"
+#| fig-width: 10
+#| fig-height: 6
+
+fr34_data |>
+  filter(!is.na(fr34k)) |>
+  mutate(Proprietaire = safe_to_char(fr34k)) |>
+  mutate(Proprietaire = str_trunc(Proprietaire, 40)) |>
+  count(Observatory, Proprietaire) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Proprietaire, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles exploitées", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_proprietaire_exploitee}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_proprietaire_exploitee", "07", function(d) {
+  d |>
+    filter(!is.na(fr34k)) |>
+    mutate(Proprietaire = safe_to_char(fr34k)) |>
+    mutate(Proprietaire = str_trunc(Proprietaire, 40)) |>
+    count(Observatory, Proprietaire) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = reorder(Proprietaire, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(x = NULL, y = "% des parcelles exploitées", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, fr34_data)
+```
+
+```{r}
+#| label: fig-irrigation-exploitee
+#| fig-cap: "Mode d'irrigation des parcelles exploitées"
+#| fig-width: 10
+#| fig-height: 5
+
+fr34_data |>
+  filter(!is.na(fr34f)) |>
+  mutate(Irrigation = factor(as.character(fr34f), levels = names(irrig_labs), labels = irrig_labs)) |>
+  count(Observatory, Irrigation) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = reorder(Irrigation, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "% des parcelles exploitées", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_irrigation_exploitee}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_irrigation_exploitee", "07", function(d) {
+  d |>
+    filter(!is.na(fr34f)) |>
+    mutate(Irrigation = factor(as.character(fr34f), levels = names(irrig_labs), labels = irrig_labs)) |>
+    count(Observatory, Irrigation) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = reorder(Irrigation, pct), y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(x = NULL, y = "% des parcelles exploitées", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, fr34_data)
+```
+
+```{r}
+#| label: tbl-rente-exploitee
+#| tbl-cap: "Rentes versées pour les parcelles exploitées"
+
+fr34_data |>
+  filter(!is.na(fr34g)) |>
+  mutate(Mode = factor(as.character(fr34g), levels = names(fv_labs), labels = fv_labs)) |>
+  summarise(
+    `Nb parcelles` = n(),
+    `Rente argent moy. (Ar)` = round(mean(fr34n, na.rm = TRUE)),
+    `Rente produit moy. (kg)` = round(mean(fr34o, na.rm = TRUE)),
+    `% métayage moyen` = round(mean(fr34p, na.rm = TRUE), 1),
+    .by = c(Observatory, Mode)
+  ) |>
+  arrange(Observatory, desc(`Nb parcelles`)) |>
+  gt() |>
+  tab_header(title = "Conditions des parcelles exploitées par mode de faire-valoir") |>
+  fmt_number(columns = c(`Rente argent moy. (Ar)`, `Rente produit moy. (kg)`),
+             use_seps = TRUE, decimals = 0)
+```
+
+```{r dl_tbl_rente_exploitee}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_rente_exploitee", "07", function(d) {
+  d |>
+    filter(!is.na(fr34g)) |>
+    mutate(Mode = factor(as.character(fr34g), levels = names(fv_labs), labels = fv_labs)) |>
+    summarise(
+      `Nb parcelles` = n(),
+      `Rente argent moy. (Ar)` = round(mean(fr34n, na.rm = TRUE)),
+      `Rente produit moy. (kg)` = round(mean(fr34o, na.rm = TRUE)),
+      `% métayage moyen` = round(mean(fr34p, na.rm = TRUE), 1),
+      .by = c(Observatory, Mode)
+    ) |>
+    arrange(Observatory, desc(`Nb parcelles`)) |>
+    rename(Site = Observatory)
+}, fr34_data)
+```
+
+
+## Abandon de parcelles {#sec-abandon}
+
+```{r}
+#| label: tbl-abandon
+#| tbl-cap: "Ménages ayant abandonné la culture de parcelles"
+
+res_fr30a |>
+  filter(!is.na(fr30p)) |>
+  summarise(
+    `Nb ménages` = n(),
+    `Ont abandonné (nb)` = sum(fr30p == 1, na.rm = TRUE),
+    `Ont abandonné (%)` = round(sum(fr30p == 1, na.rm = TRUE) / n() * 100, 1),
+    .by = Observatory
+  ) |>
+  gt() |>
+  tab_header(title = "Abandon de la culture d'une ou plusieurs parcelles")
+```
+
+```{r dl_tbl_abandon}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_abandon", "07", function(d) {
+  d |>
+    filter(!is.na(fr30p)) |>
+    summarise(
+      `Nb ménages` = n(),
+      `Ont abandonné (nb)` = sum(fr30p == 1, na.rm = TRUE),
+      `Ont abandonné (%)` = round(sum(fr30p == 1, na.rm = TRUE) / n() * 100, 1),
+      .by = Observatory
+    ) |>
+    rename(Site = Observatory)
+}, res_fr30a)
+```
+
+
+## Satisfaction à l'égard de la surface possédée {#sec-satisfaction}
+
+```{r}
+#| label: fig-satisfaction
+#| fig-cap: "Satisfaction des ménages par rapport à leur surface foncière"
+#| fig-width: 9
+#| fig-height: 5
+
+satis_labs <- c("1" = "Très insuffisante", "2" = "Insuffisante", "3" = "Suffisante")
+
+res_fr30a |>
+  filter(!is.na(fr30o)) |>
+  mutate(Satisfaction = factor(as.character(fr30o), levels = names(satis_labs), labels = satis_labs)) |>
+  count(Observatory, Satisfaction) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  ggplot(aes(x = Satisfaction, y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  labs(x = NULL, y = "% des ménages", fill = "Observatoire") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "top")
+```
+
+```{r dl_fig_satisfaction}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_satisfaction", "07", function(d) {
+  d |>
+    filter(!is.na(fr30o)) |>
+    mutate(Satisfaction = factor(as.character(fr30o), levels = names(satis_labs), labels = satis_labs)) |>
+    count(Observatory, Satisfaction) |>
+    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    ggplot(aes(x = Satisfaction, y = pct, fill = Observatory)) +
+    geom_col(position = "dodge") +
+    labs(x = NULL, y = "% des ménages", fill = "Observatoire") +
+    theme_minimal(base_size = 12) +
+    theme(legend.position = "top")
+}, res_fr30a)
+```
+
+
+## Pistes d'analyse complémentaires {#sec-pistes-foncier}
+
+Les données foncières offrent d'autres possibilités d'analyse qui n'ont pas été développées ici :
+
+- **Raisons de l'abandon de parcelles** (`fr30q_a` à `fr30q_e`) : cinq variables binaires dont les libellés exacts restent à confirmer dans le questionnaire.
+- **Croisement sécurisation × mode d'acquisition** : les parcelles héritées sont-elles moins souvent titrées que les parcelles achetées ?
+- **Superficie possédée vs. superficie exploitée** : reconstituer la surface effectivement cultivée par le ménage en combinant `res_fr30` et `res_fr34`.
+- **Rentes perçues sur les parcelles cédées** (`fr33m1`, `fr33m2`, `fr33n`) : montants moyens des loyers et parts de métayage perçus.
+- **Nom sur le titre/certificat** (`fr30k`, `fr30m`) : la correspondance entre le titulaire du document et le propriétaire déclaré mériterait une analyse genrée.
+

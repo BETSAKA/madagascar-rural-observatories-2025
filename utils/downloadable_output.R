@@ -76,6 +76,8 @@ prepare_variant_data <- function(data, obs, site) {
 #' Generate site-level PNG variants for a figure and emit download dropdown
 #'
 #' Call in a chunk with `#| echo: false` and `#| results: asis`.
+#' Site-level variants with very small sample sizes may produce
+#' unreliable graphs; a footnote is added automatically.
 #'
 #' @param id       Unique output identifier (e.g. "fig_age_obs")
 #' @param chapter  Chapter identifier for sub-folder (e.g. "04")
@@ -84,6 +86,7 @@ prepare_variant_data <- function(data, obs, site) {
 #' @param width    PNG width in inches (default 10)
 #' @param height   PNG height in inches (default 6)
 #' @param dpi      PNG resolution (default 150)
+#' @param min_cell Minimum site sample size to include (default 10)
 dl_fig_variants <- function(
   id,
   chapter,
@@ -91,7 +94,8 @@ dl_fig_variants <- function(
   data,
   width = 10,
   height = 6,
-  dpi = 150
+  dpi = 150,
+  min_cell = 10
 ) {
   disk_dir <- file.path("docs", "downloads", chapter)
   dir.create(disk_dir, recursive = TRUE, showWarnings = FALSE)
@@ -106,6 +110,12 @@ dl_fig_variants <- function(
     variant <- prepare_variant_data(data, obs, site)
     if (nrow(variant) == 0) {
       next
+    }
+
+    # Skip individual-site figures when the site is too small
+    if (site != "Tous") {
+      site_n <- sum(data$Observatory == obs & data$Site == site)
+      if (site_n < min_cell) next
     }
 
     fname <- make_dl_filename(id, obs, site, "png")
@@ -141,12 +151,15 @@ dl_fig_variants <- function(
 #' Generate site-level XLSX variants for a table and emit download dropdown
 #'
 #' Call in a chunk with `#| echo: false` and `#| results: asis`.
+#' Cells with counts below `min_cell` (default 5) are automatically
+#' suppressed for statistical confidentiality.
 #'
 #' @param id       Unique output identifier (e.g. "tbl_men_obs")
 #' @param chapter  Chapter identifier for sub-folder (e.g. "04")
 #' @param tbl_fn   Function(data) -> data.frame suitable for XLSX export
 #' @param data     Data frame with Observatory and Site columns
-dl_tbl_variants <- function(id, chapter, tbl_fn, data) {
+#' @param min_cell Minimum cell count for confidentiality (default 5)
+dl_tbl_variants <- function(id, chapter, tbl_fn, data, min_cell = 5) {
   disk_dir <- file.path("docs", "downloads", chapter)
   dir.create(disk_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -169,6 +182,7 @@ dl_tbl_variants <- function(id, chapter, tbl_fn, data) {
     tryCatch(
       {
         tbl_df <- tbl_fn(variant)
+        tbl_df <- suppress_for_export(tbl_df, threshold = min_cell)
         writexl::write_xlsx(tbl_df, disk_path)
         links[[length(links) + 1]] <- list(
           label = site,

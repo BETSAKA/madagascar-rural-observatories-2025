@@ -37,6 +37,100 @@ fix_hameau <- function(j4) {
   )
 }
 
+# ----------------------------------------------------------
+# Confidentiality suppression utilities
+# ----------------------------------------------------------
+
+#' Suppress cells with small counts for confidentiality
+#'
+#' Replaces count and associated percentage columns with NA where n < threshold.
+#' @param data Data frame
+#' @param n_col Name of the count column (default "n")
+#' @param pct_cols Names of percentage columns to also suppress
+#' @param threshold Minimum count to keep (default 5)
+#' @return Data frame with small cells replaced by NA
+suppress_small_counts <- function(
+  data,
+  n_col = "n",
+  pct_cols = NULL,
+  threshold = 5
+) {
+  if (!n_col %in% names(data)) {
+    return(data)
+  }
+  mask <- !is.na(data[[n_col]]) & data[[n_col]] < threshold
+  if (!any(mask)) {
+    return(data)
+  }
+  data[[n_col]][mask] <- NA_real_
+  # Auto-detect percentage columns if not specified
+  if (is.null(pct_cols)) {
+    pct_cols <- intersect(
+      names(data),
+      c("pct", "%", "Percent", "percent", "prop", "proportion")
+    )
+  }
+  for (pc in pct_cols) {
+    if (pc %in% names(data)) data[[pc]][mask] <- NA_real_
+  }
+  data
+}
+
+#' Remove rows with counts below threshold (for plot data)
+#'
+#' Use this to clean data before passing to ggplot so that small
+#' categories do not appear as bars/segments.
+#' @param data Data frame
+#' @param n_col Name of the count column (default "n")
+#' @param threshold Minimum count to keep (default 5)
+suppress_in_plot_data <- function(data, n_col = "n", threshold = 5) {
+  if (!n_col %in% names(data)) {
+    return(data)
+  }
+  data[is.na(data[[n_col]]) | data[[n_col]] >= threshold, ]
+}
+
+#' Auto-suppress small cells in a data frame for XLSX export
+#'
+#' Scans for common count/percentage column patterns and suppresses.
+#' Used as post-processing in dl_tbl_variants.
+#' @param data Data frame (output of tbl_fn)
+#' @param threshold Minimum count to keep (default 5)
+suppress_for_export <- function(data, threshold = 5) {
+  # Identify likely count columns
+  count_cols <- intersect(
+    names(data),
+    c(
+      "n",
+      "N",
+      "Effectif",
+      "effectif",
+      "n_oui",
+      "n_non",
+      "n_envoyeurs",
+      "n_total",
+      "nb",
+      "Nb",
+      "count",
+      "Count"
+    )
+  )
+  pct_cols <- intersect(
+    names(data),
+    c("pct", "%", "Percent", "percent", "prop", "proportion", "Pct", "pct_oui")
+  )
+  for (nc in count_cols) {
+    mask <- !is.na(data[[nc]]) & data[[nc]] < threshold
+    if (any(mask)) {
+      data[[nc]][mask] <- NA_real_
+      for (pc in pct_cols) {
+        if (pc %in% names(data)) data[[pc]][mask] <- NA_real_
+      }
+    }
+  }
+  data
+}
+
 #' Standard GT table styling for observatory reports
 style_table <- function(gt_obj) {
   gt_obj |>
@@ -64,8 +158,7 @@ classify_education <- function(s3a) {
   dplyr::case_when(
     (s3a >= 1 & s3a <= 5) | s3a == 99 ~ "Primaire",
     s3a >= 6 & s3a <= 9 ~ "Secondaire 1er cycle",
-    s3a >= 10 & s3a <= 12 ~ "Secondaire 2ème cycle",
-    s3a >= 13 & s3a <= 22 ~ "Universitaire",
+    s3a >= 10 ~ "Secondaire 2\u00e8me cycle & sup.",
     TRUE ~ NA_character_
   )
 }
@@ -78,9 +171,7 @@ classify_marital <- function(m7) {
     m7 == 3 ~ "En concubinage",
     m7 == 4 ~ "Divorcé(e)",
     m7 == 5 ~ "Veuf(ve)",
-    m7 == 6 ~ "Polygame",
-    m7 == 7 ~ "Marié(e) civilement",
-    m7 == 8 ~ "Marié(e) religieusement",
+    m7 %in% c(6, 7, 8) ~ "Marié(e) civil / religieux / polygame",
     TRUE ~ NA_character_
   )
 }
@@ -91,6 +182,52 @@ classify_sex <- function(m4) {
     m4 == 1 ~ "Homme",
     m4 == 2 ~ "Femme",
     TRUE ~ NA_character_
+  )
+}
+
+#' Classify main activity into broad sectoral categories
+#'
+#' Groups the detailed ROR activity code (a1) into 8 categories loosely
+#' aligned with ISIC Rev.4 sections: primary sector (agriculture, livestock,
+#' fishing, natural resources), secondary (crafts, construction, transport),
+#' tertiary (commerce, services), plus inactive/student.
+#' This grouping ensures a minimum cell size per observatory suitable
+#' for publication while preserving meaningful distinctions.
+classify_activity <- function(a1) {
+  dplyr::case_when(
+    a1 == 95 ~ "Cultivateur exploitant",
+    a1 == 76 ~ "Ouvrier agricole",
+    a1 %in% c(45, 38, 41, 42, 43, 35, 8) ~ "Commerce & Restauration",
+    a1 %in% c(96, 98, 99, 6, 59, 48, 81, 97, 4, 5, 70) ~
+      "Elevage, P\u00eache & Ress. nat.",
+    a1 %in%
+      c(
+        80,
+        63,
+        47,
+        51,
+        82,
+        91,
+        7,
+        88,
+        1,
+        30,
+        31,
+        52,
+        64,
+        58,
+        74,
+        28,
+        69,
+        16,
+        54,
+        73,
+        11
+      ) ~
+      "Artisanat, BTP & Transport",
+    a1 == 14 ~ "El\u00e8ve / Etudiant",
+    is.na(a1) ~ NA_character_,
+    TRUE ~ "Services & Autres"
   )
 }
 
@@ -128,11 +265,7 @@ classify_reason <- function(mg4a) {
     mg4a == 2 ~ "Mariage",
     mg4a == 3 ~ "Travail agricole",
     mg4a == 4 ~ "Travail non agricole",
-    mg4a == 5 ~ "Scolarisation",
-    mg4a == 6 ~ "Suivi famille",
-    mg4a == 7 ~ "Accès terre",
-    mg4a == 8 ~ "Insécurité",
-    mg4a == 9 ~ "Autre",
+    mg4a %in% c(5, 6, 7, 8, 9) ~ "Autre raison",
     TRUE ~ NA_character_
   )
 }
@@ -160,6 +293,9 @@ make_origin_table <- function(data, var_col, classify_fn, var_label, title) {
       pct = round(n / sum(n) * 100, 1),
       .by = c(Observatory, Member_Type)
     )
+
+  # Suppress cells with n < 5 for confidentiality
+  tbl <- suppress_small_counts(tbl, "n", "pct")
 
   wide <- tbl |>
     tidyr::complete(
@@ -208,6 +344,7 @@ make_origin_table <- function(data, var_col, classify_fn, var_label, title) {
     ) |>
     gt::fmt_number(columns = c(`Chef N`, `Conjoint N`), decimals = 0) |>
     gt::fmt_number(columns = c(`Chef %`, `Conjoint %`), decimals = 1) |>
+    gt::sub_missing(missing_text = "< 5") |>
     style_table()
 }
 
@@ -232,7 +369,8 @@ make_origin_histogram <- function(
     dplyr::mutate(
       pct = round(n / sum(n) * 100, 1),
       .by = c(Observatory, Member_Type)
-    )
+    ) |>
+    suppress_in_plot_data()
 
   ggplot2::ggplot(
     base,
