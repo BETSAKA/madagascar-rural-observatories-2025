@@ -11,7 +11,12 @@ editor_options:
 Les résultats présentés ci-dessous sont provisoires et susceptibles de corrections.
 :::
 
-Ce chapitre examine dans quelle mesure l'échantillon 2025 des observatoires ruraux est représentatif des populations des zones d'étude, et propose des stratégies de pondération pour corriger les biais d'échantillonnage. La démarche s'articule en trois volets : (i) caractériser le plan de sondage et calculer les poids de base, (ii) confronter l'échantillon aux données du Recensement Général de la Population et de l'Habitation (RGPH-3) de 2018, et (iii) discuter les options de calage et d'estimation pour petits domaines.
+Ce chapitre évalue la représentativité de l'échantillon 2025 des observatoires ruraux et propose des stratégies de pondération pour corriger les biais d'échantillonnage. La démarche suit une progression logique en quatre étapes :
+
+1. **Plan de sondage et poids de base** — caractériser le dispositif d'échantillonnage et calculer les poids initiaux.
+2. **Évaluation de la représentativité** — confronter l'échantillon au RGPH-3 (2018) sur un ensemble élargi d'indicateurs.
+3. **Méthodes de correction** — appliquer successivement post-stratification, calage et estimation pour petits domaines afin de corriger les biais identifiés.
+4. **Perspective historique** — examiner la dérive du panel (1995–2015) et le cadre de recalibration.
 
 L'analyse repose sur la théorie de l'échantillonnage assistée par modèle [@sarndal2003] et sur les méthodes de calibration [@deville1992]. Les calculs sont réalisés avec le package `survey` pour R [@lumley2010 ; @lumley2004].
 
@@ -31,7 +36,7 @@ source("utils/sites.R")
 options(survey.lonely.psu = "adjust")
 ```
 
-## Plan de sondage
+## Plan de sondage et poids de base
 
 ### Structure de l'échantillon
 
@@ -55,18 +60,19 @@ res_m_a <- read_dta("data/res_m_a.dta") |>
   left_join(res_deb |> select(j5, j0, Observatory), by = "j5")
 
 # Dénombrement
-al_raw <- read_excel("data/Synthèse Dénombrement OR 2025.xlsx",
+al_raw <- read_excel("data/Synthèse Dénombrement OR 2025_clean.xlsx",
                      sheet = "ALAOTRA ")
-mr_raw <- read_excel("data/Synthèse Dénombrement OR 2025.xlsx",
+mr_raw <- read_excel("data/Synthèse Dénombrement OR 2025_clean.xlsx",
                      sheet = "MAROVOAY ")
 
 clean_enum <- function(df, obs_name) {
   df |>
-    mutate(`Nbr Mén E` = as.character(`Nbr Mén E`)) |>
-    filter(!(Fokontany %in% "TOTAL") | is.na(Fokontany)) |>
-    fill(Fokontany, .direction = "down") |>
+    fill(Commune, Fokontany, .direction = "down") |>
     filter(!is.na(`Nbr toit D`)) |>
-    mutate(Observatory = obs_name)
+    mutate(
+      `Nbr Mén E` = suppressWarnings(as.numeric(`Nbr Mén E`)),
+      Observatory = obs_name
+    )
 }
 
 enum_all <- bind_rows(
@@ -75,28 +81,16 @@ enum_all <- bind_rows(
 )
 ```
 
-### Taux de sondage par hameau
+### Taux de sondage par site
 
-Le taux de sondage varie sensiblement d'un hameau à l'autre. Pour chaque ménage, le poids de base (ou poids de design) est l'inverse du taux de sondage de son hameau :
+Le taux de sondage varie d'un site (fokontany) à l'autre. Pour chaque ménage, le poids de base (ou poids de design) est l'inverse du taux de sondage de son site :
 
-$$w_i = \frac{N_h}{n_h}$$
+$$w_i = \frac{N_s}{n_s}$$
 
-où $N_h$ est le nombre de ménages dénombrés dans le hameau $h$ et $n_h$ le nombre de ménages enquêtés [@kish1965].
+où $N_s$ est le nombre de ménages dénombrés dans le site $s$ et $n_s$ le nombre de ménages enquêtés [@kish1965]. L'appariement entre la liste de dénombrement et les données d'enquête se fait au niveau du fokontany : pour Marovoay, le préfixe du site est extrait du nom composé du hameau ; pour Alaotra, une table de correspondance relie chaque hameau d'enquête à son fokontany de rattachement. Les fokontany d'Analamiranga et de Maritampona, situés dans la commune d'Amparafaravola, sont traités comme un seul site (« Ambatoharanana-Maritampona ») car ils ont été couverts par la même équipe d'enquêteurs.
 
 ```{r tbl-sampling-rates}
-#| tbl-cap: "Taux de sondage par hameau"
-
-# Ménages enquêtés par hameau
-enquetes_ham <- res_deb |>
-  count(Observatory, j4, name = "n_enquetes")
-
-# Ménages dénombrés par hameau
-denom_ham <- enum_all |>
-  group_by(Observatory, Hameau) |>
-  summarise(
-    n_denombrés = sum(`Nbr ménage D`, na.rm = TRUE),
-    .groups = "drop"
-  )
+#| tbl-cap: "Taux de sondage par site (fokontany)"
 
 # Clé normalisée pour l'appariement
 normalize_name <- function(x) {
@@ -106,74 +100,84 @@ normalize_name <- function(x) {
     str_squish()
 }
 
-enquetes_ham <- enquetes_ham |>
-  mutate(key = normalize_name(j4))
+# --- Marovoay : agrégation par site (Fokontany) ---
+mr_sites <- c("ampijoroa", "bepako", "madiromiongana", "maroala")
 
-denom_ham <- denom_ham |>
-  mutate(key = normalize_name(Hameau))
+denom_mr <- enum_all |>
+  filter(Observatory == "Marovoay") |>
+  summarise(n_denombrés = sum(`Nbr ménage D`, na.rm = TRUE), .by = Fokontany) |>
+  mutate(site_key = normalize_name(Fokontany)) |>
+  rename(Site = Fokontany)
 
-# Appariement robuste : d'abord jonction exacte sur la clé normalisée, puis
-# tentative d'appariement flou (string distance) pour les clés non appariées.
-sampling <- denom_ham |>
-  left_join(enquetes_ham, by = c("Observatory", "key"))
+enquetes_mr <- res_deb |>
+  filter(Observatory == "Marovoay") |>
+  mutate(site_key = str_extract(normalize_name(j4),
+                                str_c(mr_sites, collapse = "|"))) |>
+  count(site_key, name = "n_enquetes")
 
-if (requireNamespace("stringdist", quietly = TRUE)) {
-  missing_idx <- which(is.na(sampling$n_enquetes))
-  if (length(missing_idx) > 0) {
-    for (i in missing_idx) {
-      obs <- sampling$Observatory[i]
-      k <- sampling$key[i]
-      candidates <- enquetes_ham$key[enquetes_ham$Observatory == obs]
-      if (length(candidates) == 0) {
-        sampling$n_enquetes[i] <- 0
-        next
-      }
-      m <- stringdist::amatch(k, candidates, method = "jw", maxDist = 0.20)
-      if (!is.na(m)) {
-        sampling$n_enquetes[i] <- enquetes_ham$n_enquetes[enquetes_ham$Observatory == obs][m]
-      } else {
-        # Try a more permissive levenshtein match
-        m2 <- stringdist::amatch(k, candidates, method = "lv", maxDist = 5)
-        if (!is.na(m2)) {
-          sampling$n_enquetes[i] <- enquetes_ham$n_enquetes[enquetes_ham$Observatory == obs][m2]
-        } else {
-          sampling$n_enquetes[i] <- 0
-        }
-      }
-    }
-  }
-} else {
-  # fallback: use agrep for approximate matching if stringdist not available
-  missing_idx <- which(is.na(sampling$n_enquetes))
-  if (length(missing_idx) > 0) {
-    for (i in missing_idx) {
-      obs <- sampling$Observatory[i]
-      k <- sampling$key[i]
-      candidates <- enquetes_ham$key[enquetes_ham$Observatory == obs]
-      m <- agrep(k, candidates, max.distance = 0.2, value = FALSE)
-      if (length(m) >= 1) {
-        sampling$n_enquetes[i] <- enquetes_ham$n_enquetes[enquetes_ham$Observatory == obs][m[1]]
-      } else {
-        sampling$n_enquetes[i] <- 0
-      }
-    }
-  }
-}
+sampling_mr <- denom_mr |>
+  left_join(enquetes_mr, by = "site_key") |>
+  mutate(n_enquetes = replace_na(n_enquetes, 0), Observatory = "Marovoay") |>
+  select(Observatory, Site, site_key, n_denombrés, n_enquetes)
 
-sampling <- sampling |>
+# --- Alaotra : correspondance j4 (hameau) → Fokontany ---
+# Maritampona et Analamiranga = même site (mêmes enquêteurs, commune Amparafaravola)
+al_j4_fkt <- tribble(
+  ~j4_norm,             ~site_key,
+  "ambatoharanana",     "ambatoharanana-maritampona",
+  "ambatomanga",        "ambatomanga",
+  "ambodivoara",        "ambatoharanana-maritampona",
+  "ambohidrony",        "ambohidrony",
+  "analamiranga",       "ambatoharanana-maritampona",
+  "avaradrano",         "avaradrano",
+  "feramanga atsimo",   "feramanga atsimo",
+  "mangabe",            "mangabe"
+)
+
+denom_al <- enum_all |>
+  filter(Observatory == "Alaotra") |>
   mutate(
-    n_enquetes = replace_na(n_enquetes, 0),
+    site_key = case_when(
+      Fokontany %in% c("Analamiranga", "Maritampona") ~
+        "ambatoharanana-maritampona",
+      TRUE ~ normalize_name(Fokontany)
+    ),
+    Site = case_when(
+      Fokontany %in% c("Analamiranga", "Maritampona") ~
+        "Ambatoharanana-Maritampona",
+      TRUE ~ Fokontany
+    )
+  ) |>
+  summarise(
+    n_denombrés = sum(`Nbr ménage D`, na.rm = TRUE),
+    .by = c(Site, site_key)
+  )
+
+enquetes_al <- res_deb |>
+  filter(Observatory == "Alaotra") |>
+  mutate(j4_norm = normalize_name(j4)) |>
+  left_join(al_j4_fkt, by = "j4_norm") |>
+  count(site_key, name = "n_enquetes")
+
+sampling_al <- denom_al |>
+  left_join(enquetes_al, by = "site_key") |>
+  mutate(n_enquetes = replace_na(n_enquetes, 0), Observatory = "Alaotra") |>
+  select(Observatory, Site, site_key, n_denombrés, n_enquetes)
+
+# --- Tableau combiné ---
+sampling <- bind_rows(sampling_al, sampling_mr) |>
+  mutate(
     taux_sondage = ifelse(n_denombrés > 0,
                           round(n_enquetes / n_denombrés * 100, 1), NA_real_),
     poids_base = ifelse(n_enquetes > 0, n_denombrés / n_enquetes, NA_real_)
   )
 
 sampling |>
-  select(Observatory, Hameau, n_denombrés, n_enquetes, taux_sondage, poids_base) |>
-  arrange(Observatory, Hameau) |>
+  select(Observatory, Site, n_denombrés, n_enquetes, taux_sondage, poids_base) |>
+  arrange(Observatory, Site) |>
   gt(groupname_col = "Observatory") |>
   cols_label(
-    Hameau = "Hameau",
+    Site = "Site (Fokontany)",
     n_denombrés = "Ménages dénombrés",
     n_enquetes = "Ménages enquêtés",
     taux_sondage = "Taux de sondage (%)",
@@ -187,49 +191,58 @@ sampling |>
 ```
 
 ```{r fig-sampling-rates}
-#| fig-cap: "Distribution des taux de sondage par hameau et observatoire"
+#| fig-cap: "Distribution des taux de sondage par site et observatoire"
 
 sampling |>
   filter(!is.na(taux_sondage)) |>
-  ggplot(aes(x = reorder(Hameau, taux_sondage), y = taux_sondage,
+  ggplot(aes(x = reorder(Site, taux_sondage), y = taux_sondage,
              fill = Observatory)) +
   geom_col() +
   coord_flip() +
   facet_wrap(~Observatory, scales = "free_y") +
   labs(x = NULL, y = "Taux de sondage (%)", fill = "Observatoire",
-       title = "Taux de sondage par hameau") +
+       title = "Taux de sondage par site") +
   theme_minimal() +
   theme(plot.title = element_text(face = "bold"),
         legend.position = "none")
 ```
 
-## Estimations pondérées
+### Estimations pondérées vs. non pondérées
 
-Nous construisons un objet `svydesign` en spécifiant les hameaux comme strates. Dans la mesure où les hameaux sont exhaustivement couverts (il ne s'agit pas d'un tirage d'UPS parmi un ensemble plus large), chaque hameau est traité comme une strate avec un tirage à un seul degré.
+Nous construisons un objet `svydesign` en spécifiant les sites (fokontany) comme strates. Dans la mesure où les sites sont exhaustivement couverts (il ne s'agit pas d'un tirage d'UPS parmi un ensemble plus large), chaque fokontany est traité comme une strate avec un tirage à un seul degré.
+
+L'écart entre les estimations pondérées et non pondérées indique dans quelle mesure les taux de sondage inégaux affectent les statistiques descriptives. Un écart faible suggère un plan approximativement auto-pondéré ; un écart important justifie l'usage systématique des poids.
 
 ```{r svydesign}
+#| include: false
+
 # Rattacher les poids aux données ménages
+# Marovoay : clé = préfixe du site, Alaotra : clé = Fokontany via correspondance
 deb_w <- res_deb |>
-  mutate(key = normalize_name(j4)) |>
+  mutate(
+    j4_norm = normalize_name(j4),
+    site_key = case_when(
+      Observatory == "Marovoay" ~
+        str_extract(j4_norm, str_c(mr_sites, collapse = "|")),
+      Observatory == "Alaotra" ~
+        al_j4_fkt$site_key[match(j4_norm, al_j4_fkt$j4_norm)]
+    )
+  ) |>
   left_join(
-    sampling |> select(Observatory, key, poids_base, n_denombrés),
-    by = c("Observatory", "key")
+    sampling |> select(Observatory, site_key, poids_base),
+    by = c("Observatory", "site_key")
   ) |>
   mutate(poids_base = replace_na(poids_base, 1))
 
-# Objet svydesign
+# Objet svydesign — strates = sites (fokontany), pas hameaux
 design_or <- svydesign(
   ids = ~1,
-  strata = ~j4,
+  strata = ~site_key,
   weights = ~poids_base,
   data = deb_w,
   nest = TRUE
 )
 ```
-
-### Comparaison pondérée / non pondérée
-
-L'écart entre les estimations pondérées et non pondérées indique dans quelle mesure les taux de sondage inégaux affectent les statistiques descriptives. Un écart faible suggère un plan approximativement auto-pondéré ; un écart important justifie l'usage systématique des poids.
 
 ```{r tbl-weighted-hh-size}
 #| tbl-cap: "Taille moyenne des ménages : estimation non pondérée vs. pondérée"
@@ -243,7 +256,7 @@ deb_w2 <- deb_w |>
 
 design_or2 <- svydesign(
   ids = ~1,
-  strata = ~j4,
+  strata = ~site_key,
   weights = ~poids_base,
   data = deb_w2,
   nest = TRUE
@@ -293,9 +306,9 @@ bind_rows(np, p) |>
   style_table()
 ```
 
-## Comparaison avec le RGPH 2018
+## Évaluation de la représentativité
 
-Pour évaluer la représentativité externe de l'échantillon, nous confrontons certaines caractéristiques aux données du 3^e^ Recensement Général de la Population et de l'Habitation (RGPH-3) de 2018 [@instat2020rgph]. Le RGPH-3 fournit un échantillon de 10 % des ménages et résidents au niveau national.
+Pour évaluer la représentativité externe de l'échantillon, nous le confrontons aux données du 3^e^ Recensement Général de la Population et de l'Habitation (RGPH-3) de 2018 [@instat2020rgph]. Le RGPH-3 fournit un échantillon de 10 % des ménages et résidents au niveau national. Nous comparons sur un ensemble élargi d'indicateurs — démographie, scolarisation, alphabétisation, situation matrimoniale et habitat — afin d'identifier d'éventuels biais de couverture de l'échantillon OR.
 
 ::: {.callout-note}
 ## Périmètre et limites de la comparaison
@@ -304,7 +317,7 @@ Trois réserves sont nécessaires :
 
 1. **Écart temporel** : sept années séparent le RGPH (2018) de l'enquête (2025). Les structures démographiques ont pu évoluer, notamment du fait des migrations, de la transition démographique et des chocs climatiques récurrents.
 
-2. **Maille géographique** : le RGPH-3 ne descend pas au niveau du fokontany. Nous comparons au niveau des **districts** d'Amparafaravola (code 333) et de Marovoay (code 414), en ne retenant que le **milieu rural** (`MILIEU = 2`). Les observatoires couvrent des hameaux spécifiques au sein de ces districts ; les profils démographiques des autres communes du même district peuvent différer.
+2. **Maille géographique** : le RGPH-3 ne descend pas au niveau du fokontany. Nous comparons au niveau des **communes** couvertes par les observatoires (4 communes pour Alaotra, 3 pour Marovoay), en ne retenant que le **milieu rural** (`MILIEU = 2`). Les observatoires couvrent des hameaux spécifiques au sein de ces communes ; les profils démographiques de l'ensemble de la commune peuvent différer de ceux des sites enquêtés.
 
 3. **Nature de la source** : le RGPH est un recensement de droit (population résidente habituelle) alors que l'enquête OR interroge les ménages présents au moment de l'enquête.
 
@@ -328,18 +341,34 @@ rgph_available <- file.exists(rgph_men_path) && file.exists(rgph_res_path)
 rgph_men <- read_spss(rgph_men_path)
 rgph_res <- read_spss(rgph_res_path)
 
-# --- Filtrage par district et milieu rural ---
-# Alaotra : district d'Amparafaravola (333), Marovoay : district de Marovoay (414)
-# MILIEU = 2 : rural uniquement
+# --- Filtrage par communes des observatoires (milieu rural) ---
+# Codes communes RGPH correspondant aux communes couvertes par les OR
+or_commune_codes_al <- c(33102, 33107, 33122, 33319)
+# Feramange Nord, Ilafy, Ambohiboromanga, Morarano Chrome
+or_commune_codes_mr <- c(41404, 41408, 41410)
+# Ankazomborona, Tsararano, Antanimasaka
+
+# COMMUNES est dans rgph_men ; jointure via IDMEN pour les résidents
+commune_id <- rgph_men |>
+  select(IDMEN, COMMUNES) |>
+  mutate(COMMUNES = as.numeric(COMMUNES))
+
 rgph_men_or <- rgph_men |>
-  mutate(DISTRICT = as.numeric(DISTRICT), MILIEU = as.numeric(MILIEU)) |>
-  filter(DISTRICT %in% c(333, 414), MILIEU == 2) |>
-  mutate(Observatory = if_else(DISTRICT == 333, "Alaotra", "Marovoay"))
+  mutate(MILIEU = as.numeric(MILIEU), COMMUNES = as.numeric(COMMUNES)) |>
+  filter(MILIEU == 2,
+         COMMUNES %in% c(or_commune_codes_al, or_commune_codes_mr)) |>
+  mutate(Observatory = if_else(
+    COMMUNES %in% or_commune_codes_al, "Alaotra", "Marovoay"
+  ))
 
 rgph_res_or <- rgph_res |>
-  mutate(DISTRICT = as.numeric(DISTRICT), MILIEU = as.numeric(MILIEU)) |>
-  filter(DISTRICT %in% c(333, 414), MILIEU == 2) |>
-  mutate(Observatory = if_else(DISTRICT == 333, "Alaotra", "Marovoay"))
+  mutate(MILIEU = as.numeric(MILIEU)) |>
+  filter(MILIEU == 2) |>
+  left_join(commune_id, by = "IDMEN") |>
+  filter(COMMUNES %in% c(or_commune_codes_al, or_commune_codes_mr)) |>
+  mutate(Observatory = if_else(
+    COMMUNES %in% or_commune_codes_al, "Alaotra", "Marovoay"
+  ))
 
 # --- Effectifs RGPH ---
 n_men_rgph <- rgph_men_or |> count(Observatory, name = "n_menages_rgph")
@@ -355,9 +384,9 @@ or_hh_size <- hh_size |>
   summarise(Moyenne_OR = mean(taille), .by = Observatory)
 
 # --- Proportion de femmes CM (RGPH) ---
-# P03 = lien avec le CM (1 = CM), P05 = sexe (2 = Féminin)
+# P03 = lien avec le CM (0 = CM), P05 = sexe (2 = Féminin)
 rgph_fem_cm <- rgph_res_or |>
-  filter(as.numeric(P03) == 1) |>
+  filter(as.numeric(P03) == 0) |>
   summarise(
     Pct_fem_CM_RGPH = mean(as.numeric(P05) == 2, na.rm = TRUE) * 100,
     .by = Observatory
@@ -373,7 +402,7 @@ or_fem_cm <- res_m_a |>
 
 # --- Âge moyen du CM (RGPH) ---
 rgph_age_cm <- rgph_res_or |>
-  filter(as.numeric(P03) == 1) |>
+  filter(as.numeric(P03) == 0) |>
   summarise(Age_CM_RGPH = mean(as.numeric(P08), na.rm = TRUE),
             .by = Observatory)
 
@@ -394,6 +423,8 @@ or_sex_ratio <- res_m_a |>
     .by = Observatory
   )
 ```
+
+### Indicateurs démographiques de base
 
 ```{r tbl-rgph-comparison}
 #| eval: !expr rgph_available
@@ -436,10 +467,248 @@ comparison |>
              decimals = 1, pattern = "{x} %") |>
   tab_source_note(source_note = md(
     "**Sources** : Enquête OR 2025 ; RGPH-3 2018 (INSTAT), échantillon 10 %.<br>
-    RGPH filtré sur le milieu rural des districts d'Amparafaravola (Alaotra) et Marovoay."
+    RGPH filtré sur le milieu rural des communes couvertes par les observatoires."
   )) |>
   style_table()
 ```
+
+### Indicateurs socio-économiques complémentaires
+
+Au-delà de la démographie de base, le RGPH et l'enquête OR partagent plusieurs dimensions socio-économiques : alphabétisation, scolarisation, situation matrimoniale du chef de ménage, et caractéristiques de l'habitat. L'examen de ces indicateurs permet de préciser dans quelles dimensions l'échantillon est (ou n'est pas) représentatif.
+
+```{r extended_comparison}
+#| eval: !expr rgph_available
+#| include: false
+
+# --- Alphabétisation (≥15 ans) ---
+# RGPH P20MG (lit/écrit malgache) : 1=Oui, 2=Non
+# OR s1a (sait lire) : 1=Oui, 2=Avec effort, 3=Non
+rgph_lit <- rgph_res_or |>
+  filter(as.numeric(P08) >= 15) |>
+  summarise(
+    pct_lit_RGPH = mean(as.numeric(P20MG) == 1, na.rm = TRUE) * 100,
+    .by = Observatory
+  )
+
+or_lit <- res_m_a |>
+  filter(m5 >= 15) |>
+  summarise(
+    pct_lit_OR = mean(s1a %in% c(1, 2), na.rm = TRUE) * 100,
+    .by = Observatory
+  )
+
+# --- Scolarisation : % jamais fréquenté (≥6 ans) ---
+# RGPH P21 : 0=Jamais, 1=A fréquenté, 2=Fréquente actuellement
+# OR s2 : 1=Oui, 2=Non
+rgph_educ <- rgph_res_or |>
+  filter(as.numeric(P08) >= 6) |>
+  summarise(
+    pct_jamais_RGPH = mean(as.numeric(P21) == 0, na.rm = TRUE) * 100,
+    .by = Observatory
+  )
+
+or_educ <- res_m_a |>
+  filter(m5 >= 6) |>
+  summarise(
+    pct_jamais_OR = mean(s2 == 2, na.rm = TRUE) * 100,
+    .by = Observatory
+  )
+
+# --- Situation matrimoniale du CM ---
+# RGPH P28 : 1=Célib., 2=Marié(e), 3=Divorcé/séparé, 4=Veuf
+# OR m7 : 1=Célib., 2=Marié trad., 3=Union libre, 4=Div/sép., 5=Veuf, 6=Polygame, 7=Marié civil
+# Harmonisation en 3 catégories
+rgph_marital <- rgph_res_or |>
+  filter(as.numeric(P03) == 0) |>
+  mutate(
+    marital = case_when(
+      as.numeric(P28) == 2 ~ "marie",
+      as.numeric(P28) == 1 ~ "celib",
+      as.numeric(P28) %in% c(3, 4) ~ "veuf_div",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  filter(!is.na(marital)) |>
+  count(Observatory, marital) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  select(-n) |>
+  pivot_wider(names_from = marital, values_from = pct, names_prefix = "RGPH_")
+
+or_marital <- res_m_a |>
+  filter(m6 == 1) |>
+  mutate(
+    marital = case_when(
+      m7 %in% c(2, 3, 6, 7) ~ "marie",
+      m7 == 1 ~ "celib",
+      m7 %in% c(4, 5) ~ "veuf_div",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  filter(!is.na(marital)) |>
+  count(Observatory, marital) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  select(-n) |>
+  pivot_wider(names_from = marital, values_from = pct, names_prefix = "OR_")
+
+# --- Habitat : type de murs ---
+# RGPH H05$1 : 0-1=Dur, 2=Terre/pisé, 3/6=Végétal, 4-5=Bois/Tôle
+# OR h1 : 1=Dur, 2-3=Terre/pisé, 4-6=Bois/tôle, 7=Végétal
+res_h <- read_dta("data/res_h.dta") |>
+  left_join(res_deb |> select(j5, Observatory), by = "j5")
+
+or_wall <- res_h |>
+  mutate(
+    wall = case_when(
+      h1 == 1 ~ "Dur",
+      h1 %in% c(2, 3) ~ "Terre/pisé",
+      h1 %in% c(4, 5, 6) ~ "Bois/tôle",
+      h1 == 7 ~ "Végétal",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  filter(!is.na(wall)) |>
+  count(Observatory, wall) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  select(-n) |>
+  pivot_wider(names_from = wall, values_from = pct, names_prefix = "OR_")
+
+rgph_wall <- rgph_res_or |>
+  filter(as.numeric(P03) == 0) |>
+  mutate(
+    wall = case_when(
+      as.numeric(`H05$1`) %in% c(0, 1) ~ "Dur",
+      as.numeric(`H05$1`) == 2 ~ "Terre/pisé",
+      as.numeric(`H05$1`) %in% c(4, 5) ~ "Bois/tôle",
+      as.numeric(`H05$1`) %in% c(3, 6) ~ "Végétal",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  filter(!is.na(wall)) |>
+  count(Observatory, wall) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  select(-n) |>
+  pivot_wider(names_from = wall, values_from = pct, names_prefix = "RGPH_")
+
+# --- Accès à l'eau améliorée ---
+# RGPH H09$1 : 1-7,9 = amélioré ; 8,10-12 = non amélioré (15=non déclaré→NA)
+# OR h4 : 1-4 = amélioré ; 5-8 = non amélioré
+or_water <- res_h |>
+  mutate(
+    eau = case_when(
+      h4 %in% c(1, 2, 3, 4) ~ "Amélioré",
+      h4 %in% c(5, 6, 7, 8) ~ "Non amélioré",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  filter(!is.na(eau)) |>
+  count(Observatory, eau) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  select(-n) |>
+  pivot_wider(names_from = eau, values_from = pct, names_prefix = "OR_")
+
+rgph_water <- rgph_res_or |>
+  filter(as.numeric(P03) == 0) |>
+  mutate(
+    h09 = as.numeric(`H09$1`),
+    eau = case_when(
+      h09 %in% c(1:7, 9) ~ "Amélioré",
+      h09 %in% c(8, 10, 11, 12) ~ "Non amélioré",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  filter(!is.na(eau)) |>
+  count(Observatory, eau) |>
+  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  select(-n) |>
+  pivot_wider(names_from = eau, values_from = pct, names_prefix = "RGPH_")
+```
+
+```{r tbl-extended-comparison}
+#| eval: !expr rgph_available
+#| tbl-cap: "Indicateurs socio-économiques complémentaires — OR 2025 vs. RGPH 2018"
+
+# Fonction utilitaire pour extraire une valeur
+get_v <- function(df, obs, col) {
+  val <- df[[col]][df$Observatory == obs]
+  if (length(val) == 0 || is.null(val)) NA_real_ else val
+}
+
+ext_comp <- tibble(
+  Indicateur = c(
+    "Alphabétisation (≥15 ans, %)",
+    "Jamais scolarisé (≥6 ans, %)",
+    "CM marié(e)/en union (%)",
+    "CM veuf/divorcé (%)",
+    "Murs en dur (%)",
+    "Murs en terre/pisé (%)",
+    "Eau améliorée (%)"
+  ),
+  Alaotra_OR = c(
+    get_v(or_lit, "Alaotra", "pct_lit_OR"),
+    get_v(or_educ, "Alaotra", "pct_jamais_OR"),
+    get_v(or_marital, "Alaotra", "OR_marie"),
+    get_v(or_marital, "Alaotra", "OR_veuf_div"),
+    get_v(or_wall, "Alaotra", "OR_Dur"),
+    get_v(or_wall, "Alaotra", "OR_Terre/pisé"),
+    get_v(or_water, "Alaotra", "OR_Amélioré")
+  ),
+  Alaotra_RGPH = c(
+    get_v(rgph_lit, "Alaotra", "pct_lit_RGPH"),
+    get_v(rgph_educ, "Alaotra", "pct_jamais_RGPH"),
+    get_v(rgph_marital, "Alaotra", "RGPH_marie"),
+    get_v(rgph_marital, "Alaotra", "RGPH_veuf_div"),
+    get_v(rgph_wall, "Alaotra", "RGPH_Dur"),
+    get_v(rgph_wall, "Alaotra", "RGPH_Terre/pisé"),
+    get_v(rgph_water, "Alaotra", "RGPH_Amélioré")
+  ),
+  Marovoay_OR = c(
+    get_v(or_lit, "Marovoay", "pct_lit_OR"),
+    get_v(or_educ, "Marovoay", "pct_jamais_OR"),
+    get_v(or_marital, "Marovoay", "OR_marie"),
+    get_v(or_marital, "Marovoay", "OR_veuf_div"),
+    get_v(or_wall, "Marovoay", "OR_Dur"),
+    get_v(or_wall, "Marovoay", "OR_Terre/pisé"),
+    get_v(or_water, "Marovoay", "OR_Amélioré")
+  ),
+  Marovoay_RGPH = c(
+    get_v(rgph_lit, "Marovoay", "pct_lit_RGPH"),
+    get_v(rgph_educ, "Marovoay", "pct_jamais_RGPH"),
+    get_v(rgph_marital, "Marovoay", "RGPH_marie"),
+    get_v(rgph_marital, "Marovoay", "RGPH_veuf_div"),
+    get_v(rgph_wall, "Marovoay", "RGPH_Dur"),
+    get_v(rgph_wall, "Marovoay", "RGPH_Terre/pisé"),
+    get_v(rgph_water, "Marovoay", "RGPH_Amélioré")
+  )
+)
+
+ext_comp |>
+  gt() |>
+  cols_label(
+    Indicateur = "Indicateur",
+    Alaotra_OR = "OR 2025", Alaotra_RGPH = "RGPH 2018",
+    Marovoay_OR = "OR 2025", Marovoay_RGPH = "RGPH 2018"
+  ) |>
+  tab_spanner(label = "Alaotra", columns = starts_with("Alaotra")) |>
+  tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) |>
+  fmt_number(columns = -Indicateur, decimals = 1) |>
+  tab_source_note(source_note = md(
+    "**Sources** : Enquête OR 2025 ; RGPH-3 2018 (INSTAT), échantillon 10 %, milieu rural.<br>
+    Alphabétisation : sait lire et écrire en malgache (RGPH) ; sait lire (OR, y compris « avec effort »).<br>
+    Situation matrimoniale harmonisée (marié + union libre + polygame = marié/union).<br>
+    Eau améliorée : robinet, borne fontaine, puits protégé, forage, source (définition JMP/OMS).<br>
+    Murs : « dur » = parpaing, pierre, brique cuite."
+  )) |>
+  style_table()
+```
+
+La comparaison élargie confirme que l'échantillon OR reproduit raisonnablement les structures de la population RGPH pour la plupart des indicateurs, avec quelques écarts notables :
+
+- **Alphabétisation** : l'échantillon OR affiche des taux d'alphabétisation plus élevés que le RGPH, en particulier à Marovoay. L'écart s'explique en partie par le progrès de la scolarisation entre 2018 et 2025, et en partie par la définition plus inclusive retenue dans l'OR (« sait lire, même avec effort »).
+- **Scolarisation** : le pourcentage de personnes n'ayant jamais fréquenté l'école est nettement plus faible dans l'OR, ce qui va dans le même sens.
+- **Situation matrimoniale** : les proportions de CM veufs/divorcés sont plus élevées dans l'OR, signe possible d'un biais de sélection (les ménages stables, dirigés par des personnes plus âgées, sont plus facilement enquêtés).
+- **Habitat** : des écarts importants apparaissent sur les matériaux de construction (murs en dur, terre/pisé), reflet possible de la couverture géographique différente entre les sites OR et l'ensemble des communes RGPH. L'accès à l'eau améliorée est plus élevé dans l'OR que dans le RGPH, possiblement en raison d'améliorations intervenues entre 2018 et 2025.
+
+### Pyramides des âges
 
 ```{r fig-rgph-age-pyramid}
 #| eval: !expr rgph_available
@@ -475,68 +744,175 @@ rgph_pyramid <- rgph_res_or |>
   mutate(pct = n / sum(n) * 100, .by = c(Observatory, Source))
 
 # Combinaison
-bind_rows(or_pyramid, rgph_pyramid) |>
-  mutate(pct = if_else(Sexe == "Homme", -pct, pct)) |>
-  ggplot(aes(x = Tranche, y = pct, fill = Sexe, alpha = Source)) +
-  geom_col(position = "identity") +
+pyramid_combined <- bind_rows(or_pyramid, rgph_pyramid) |>
+  mutate(pct = if_else(Sexe == "Homme", -pct, pct))
+
+ggplot(pyramid_combined, aes(x = Tranche, y = pct)) +
+  # OR 2025 : barres pleines
+  geom_col(
+    data = \(d) filter(d, Source == "OR 2025"),
+    aes(fill = Sexe), position = "identity", color = NA
+  ) +
+  # RGPH 2018 : contours noirs
+  geom_col(
+    data = \(d) filter(d, Source == "RGPH 2018"),
+    position = "identity",
+    fill = NA, color = "black", linewidth = 0.6
+  ) +
   coord_flip() +
   facet_wrap(~Observatory) +
-  scale_alpha_manual(values = c("OR 2025" = 1, "RGPH 2018" = 0.4)) +
-  scale_fill_manual(values = c("Homme" = "#4E79A7", "Femme" = "#E15759")) +
+  scale_fill_manual(values = c("Homme" = "#4E79A7", "Femme" = "#E15759"),
+                    name = "OR 2025") +
   labs(title = "Comparaison des pyramides des âges",
-       x = NULL, y = "% de la population", fill = "Sexe", alpha = "Source") +
+       subtitle = "Barres pleines : OR 2025 — Contours noirs : RGPH 2018",
+       x = NULL, y = "% de la population") +
   theme_minimal() +
   theme(plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(color = "grey40"),
         strip.text = element_text(face = "bold"))
 ```
 
 ### Détail communal
 
-Le tableau ci-dessous présente les effectifs du RGPH-3 (échantillon 10 %, milieu rural uniquement) par commune au sein des deux districts d'intérêt. Il permet de situer les communes couvertes par les observatoires dans leur contexte démographique local.
+Le tableau ci-dessous présente les caractéristiques démographiques des communes couvertes par les observatoires, d'après le RGPH-3 (échantillon 10 %, milieu rural uniquement) et l'enquête OR 2025. Seules les communes comprenant au moins un site enquêté sont affichées ; la commune d'Amparafaravola (site Ambatoharanana-Maritampona) ne figure pas dans les données rurales du RGPH.
 
 ```{r tbl-communes}
 #| eval: !expr rgph_available
-#| tbl-cap: "Effectifs RGPH-3 par commune (milieu rural, échantillon 10 %)"
+#| tbl-cap: "Caractéristiques démographiques par commune — OR 2025 vs. RGPH 2018 (milieu rural)"
 
 codes_communes <- read.csv(
   "data/RGPH_2018_Madagascar/data/codes_communes_mg.csv"
 )
 
-# COMMUNES est dans rgph_men, pas rgph_res — jointure via IDMEN
-commune_lookup <- rgph_men_or |>
-  select(IDMEN, COMMUNES) |>
-  mutate(COMMUNES = as.numeric(COMMUNES))
+# --- Correspondance site → commune (depuis le dénombrement nettoyé) ---
+site_commune_map <- enum_all |>
+  mutate(
+    site_key = case_when(
+      Observatory == "Alaotra" &
+        Fokontany %in% c("Analamiranga", "Maritampona") ~
+        "ambatoharanana-maritampona",
+      TRUE ~ normalize_name(Fokontany)
+    )
+  ) |>
+  filter(!is.na(Commune)) |>
+  distinct(site_key, Commune, Observatory)
 
-commune_stats <- rgph_res_or |>
-  left_join(commune_lookup, by = "IDMEN") |>
+# --- Crosswalk commune OR → RGPH (gestion des casses et orthographes) ---
+commune_xwalk_tbl <- tribble(
+  ~Commune,            ~Commune_RGPH,
+  "Ambohiboromanga",   "AMBOHIBOROMANGA",
+  "Morarano Chrome",   "MORARANO CHROME",
+  "Ilafy",             "ILAFY",
+  "Feramanga Nord",    "FERAMANGE NORD",
+  "Amparafaravola",    NA_character_,
+  "Tsararano",         "TSARARANO",
+  "Ankazomborona",     "ANKAZOMBORONA",
+  "Antanimasaka",      "ANTANIMASAKA"
+)
+
+# --- RGPH stats par commune ---
+commune_rgph <- rgph_res_or |>
   left_join(
-    codes_communes |> rename(COMMUNES = CODECOM, Commune = COMMUNEARRONDISSEMENT),
+    codes_communes |> rename(COMMUNES = CODECOM, Commune_RGPH = COMMUNEARRONDISSEMENT),
     by = "COMMUNES"
   ) |>
   summarise(
-    Résidents = n(),
-    Ménages = n_distinct(IDMEN),
-    Taille_moy = round(n() / n_distinct(IDMEN), 1),
-    Pct_femmes = round(mean(as.numeric(P05) == 2, na.rm = TRUE) * 100, 1),
-    Age_moyen = round(mean(as.numeric(P08), na.rm = TRUE), 1),
-    .by = c(Observatory, COMMUNES, Commune)
+    Rés_RGPH = n(),
+    Mén_RGPH = n_distinct(IDMEN),
+    Taille_RGPH = round(n() / n_distinct(IDMEN), 1),
+    Fem_RGPH = round(mean(as.numeric(P05) == 2, na.rm = TRUE) * 100, 1),
+    Âge_RGPH = round(mean(as.numeric(P08), na.rm = TRUE), 1),
+    .by = c(Observatory, COMMUNES, Commune_RGPH)
   ) |>
   arrange(Observatory, COMMUNES)
 
+# --- OR stats par commune ---
+or_commune_hh <- res_m_a |>
+  count(j5, Observatory, name = "taille") |>
+  left_join(
+    res_deb |>
+      mutate(
+        j4_norm = normalize_name(j4),
+        site_key = case_when(
+          Observatory == "Marovoay" ~
+            str_extract(j4_norm, str_c(mr_sites, collapse = "|")),
+          Observatory == "Alaotra" ~
+            al_j4_fkt$site_key[match(j4_norm, al_j4_fkt$j4_norm)]
+        )
+      ) |>
+      select(j5, site_key),
+    by = "j5"
+  ) |>
+  left_join(site_commune_map |> select(site_key, Commune), by = "site_key")
+
+commune_or <- or_commune_hh |>
+  filter(!is.na(Commune)) |>
+  summarise(
+    Mén_OR = n_distinct(j5),
+    Taille_OR = round(mean(taille), 1),
+    .by = c(Observatory, Commune)
+  )
+
+or_commune_indiv <- res_m_a |>
+  left_join(
+    res_deb |>
+      mutate(
+        j4_norm = normalize_name(j4),
+        site_key = case_when(
+          Observatory == "Marovoay" ~
+            str_extract(j4_norm, str_c(mr_sites, collapse = "|")),
+          Observatory == "Alaotra" ~
+            al_j4_fkt$site_key[match(j4_norm, al_j4_fkt$j4_norm)]
+        )
+      ) |>
+      select(j5, site_key),
+    by = "j5"
+  ) |>
+  left_join(site_commune_map |> select(site_key, Commune), by = "site_key") |>
+  filter(!is.na(Commune))
+
+commune_or2 <- or_commune_indiv |>
+  summarise(
+    Rés_OR = n(),
+    Fem_OR = round(mean(m4 == 2, na.rm = TRUE) * 100, 1),
+    Âge_OR = round(mean(m5, na.rm = TRUE), 1),
+    .by = c(Observatory, Commune)
+  )
+
+commune_or_full <- commune_or |>
+  left_join(commune_or2, by = c("Observatory", "Commune")) |>
+  left_join(commune_xwalk_tbl, by = "Commune")
+
+# --- Tableau combiné via crosswalk ---
+commune_stats <- commune_rgph |>
+  full_join(
+    commune_or_full,
+    by = c("Observatory", "Commune_RGPH")
+  ) |>
+  mutate(Commune = coalesce(Commune, Commune_RGPH)) |>
+  filter(!is.na(Commune_RGPH) | !is.na(Mén_OR))
+
 commune_stats |>
-  select(-COMMUNES) |>
+  select(Observatory, Commune, Rés_RGPH, Mén_RGPH, Taille_RGPH, Fem_RGPH, Âge_RGPH,
+         Rés_OR, Mén_OR, Taille_OR, Fem_OR, Âge_OR) |>
   gt(groupname_col = "Observatory") |>
   cols_label(
     Commune = "Commune",
-    Résidents = "Résidents",
-    Ménages = "Ménages",
-    Taille_moy = "Taille moy.",
-    Pct_femmes = "% femmes",
-    Age_moyen = "Âge moyen"
+    Rés_RGPH = "Rés.", Mén_RGPH = "Mén.", Taille_RGPH = "Taille",
+    Fem_RGPH = "% fem.", Âge_RGPH = "Âge moy.",
+    Rés_OR = "Rés.", Mén_OR = "Mén.", Taille_OR = "Taille",
+    Fem_OR = "% fem.", Âge_OR = "Âge moy."
   ) |>
-  fmt_number(columns = c(Pct_femmes, Age_moyen), decimals = 1) |>
+  tab_spanner(label = "RGPH 2018",
+              columns = c(Rés_RGPH, Mén_RGPH, Taille_RGPH, Fem_RGPH, Âge_RGPH)) |>
+  tab_spanner(label = "OR 2025",
+              columns = c(Rés_OR, Mén_OR, Taille_OR, Fem_OR, Âge_OR)) |>
+  fmt_number(columns = c(Fem_RGPH, Âge_RGPH, Fem_OR, Âge_OR), decimals = 1) |>
+  sub_missing(missing_text = "—") |>
   tab_source_note(
-    source_note = md("**Source** : RGPH-3 2018, échantillon 10 %, milieu rural uniquement.")
+    source_note = md("**Sources** : RGPH-3 2018 (échantillon 10 %, milieu rural) ; Enquête OR 2025.<br>
+    Le site d'Ambatoharanana-Maritampona correspond à la commune d'Amparafaravola,<br>
+    qui n'apparaît pas dans les données rurales du RGPH.")
   ) |>
   style_table()
 ```
@@ -544,48 +920,294 @@ commune_stats |>
 ```{r rgph_not_available}
 #| eval: !expr '!rgph_available'
 #| results: asis
+knitr::asis_output("
+::: {.callout-important}
+## Données RGPH non disponibles
 
-cat("::: {.callout-important}\n## Données RGPH non disponibles\n\n",
-    "Les fichiers SPSS du RGPH 2018 n'ont pas été trouvés dans ",
-    "`data/RGPH_2018_Madagascar/data/`. La comparaison n'a pas pu être ",
-    "effectuée.\n:::\n")
+Les fichiers SPSS du RGPH 2018 n'ont pas été trouvés dans `data/RGPH_2018_Madagascar/data/`.
+La comparaison n'a pas pu être effectuée.
+:::
+")
 ```
 
-## Discussion méthodologique
+## Méthodes de correction
 
-### Poids de sondage de base
+Les comparaisons précédentes montrent que l'échantillon OR reproduit raisonnablement les grandes structures de la population, mais avec des écarts ponctuels (surreprésentation des CM veufs/divorcés, sous-représentation des jeunes non scolarisés, divergences sur l'habitat). Trois familles de méthodes, d'ambition croissante, permettent de corriger ces biais :
 
-Le poids de base $w_i = N_h / n_h$ cale déjà l'effectif total de ménages par hameau sur le dénombrement. Pour les indicateurs calculés sur l'ensemble de l'observatoire, ces poids corrigent le biais dû aux taux de sondage inégaux entre hameaux. Si l'écart entre estimations pondérées et non pondérées est faible, le plan est approximativement auto-pondéré et la correction a un impact limité.
+1. **Post-stratification** — repondérer l'échantillon pour que la distribution d'une variable catégorielle (sexe du CM, classe d'âge) corresponde exactement aux proportions connues dans la population. C'est la correction la plus simple : elle partitionne l'échantillon en strates définies *a posteriori*, puis ajuste les poids strate par strate.
+
+2. **Calage sur marges** (*calibration*) — généralisation de la post-stratification à **plusieurs variables simultanées** (sexe × classe d'âge, taille du ménage, etc.). La méthode de @deville1992 ajuste les poids de manière continue en minimisant une distance aux poids initiaux, sous la contrainte que les totaux pondérés de variables auxiliaires reproduisent exactement les marges connues. Avec une seule variable binaire, calage et post-stratification sont algébriquement équivalents ; l'intérêt du calage apparaît avec des contraintes multidimensionnelles.
+
+3. **Estimation pour petits domaines** — lorsque l'on souhaite des estimations à une maille fine (commune, fokontany), les effectifs par domaine sont trop faibles pour une estimation directe fiable. Les modèles de type Fay-Herriot [@fay1979] combinent l'information directe de l'échantillon avec des **covariables auxiliaires** connues pour tous les domaines, « empruntant de la force » aux relations observées entre domaines [@rao2015].
+
+### Post-stratification par sexe du chef de ménage
+
+Nous illustrons la post-stratification avec le sexe du CM. Les marges — effectifs de CM masculins et féminins — proviennent du RGPH (milieu rural, communes couvertes). Si les strates de post-stratification sont corrélées à la variable d'intérêt, la variance de l'estimateur est réduite [@sarndal2003, chap. 7].
+
+```{r post-strat}
+#| eval: !expr rgph_available
+#| include: false
+
+# --- Ajouter sexe et âge du CM aux données ménage ---
+cm_info <- res_m_a |>
+  filter(m6 == 1) |>
+  select(j5, sexe_cm = m4, age_cm = m5) |>
+  mutate(sexe_cm = as.integer(sexe_cm))
+
+deb_w3 <- deb_w2 |>
+  left_join(cm_info, by = "j5") |>
+  mutate(
+    sexe_cm = replace_na(sexe_cm, 1L),
+    age_grp_cm = cut(age_cm, breaks = c(0, 30, 45, 60, Inf),
+                     labels = c("<30", "30-44", "45-59", "60+"), right = FALSE),
+    age_grp_cm = fct_na_value_to_level(age_grp_cm, level = "<30")
+  )
+
+# Design avec strates = site_key
+design3 <- svydesign(ids = ~1, strata = ~site_key, weights = ~poids_base,
+                     data = deb_w3, nest = TRUE)
+
+# --- Marges RGPH : effectifs CM par sexe et observatoire ---
+# (milieu rural, communes des OR uniquement)
+rgph_cm_sex_pop <- rgph_res_or |>
+  filter(as.numeric(P03) == 0) |>
+  mutate(sexe_cm = as.integer(as.numeric(P05))) |>
+  count(Observatory, sexe_cm, name = "Freq")
+
+# Post-stratification par observatoire
+des_al <- subset(design3, Observatory == "Alaotra")
+des_mr <- subset(design3, Observatory == "Marovoay")
+
+pop_al <- rgph_cm_sex_pop |>
+  filter(Observatory == "Alaotra") |>
+  select(sexe_cm, Freq) |>
+  as.data.frame()
+
+pop_mr <- rgph_cm_sex_pop |>
+  filter(Observatory == "Marovoay") |>
+  select(sexe_cm, Freq) |>
+  as.data.frame()
+
+ps_al <- postStratify(des_al, strata = ~sexe_cm, population = pop_al)
+ps_mr <- postStratify(des_mr, strata = ~sexe_cm, population = pop_mr)
+```
+
+```{r tbl-post-strat}
+#| eval: !expr rgph_available
+#| tbl-cap: "Taille moyenne des ménages — comparaison des estimateurs"
+
+# Pondéré simple
+w_al <- svymean(~taille, des_al, na.rm = TRUE)
+w_mr <- svymean(~taille, des_mr, na.rm = TRUE)
+
+# Post-stratifié
+ps_al_est <- svymean(~taille, ps_al, na.rm = TRUE)
+ps_mr_est <- svymean(~taille, ps_mr, na.rm = TRUE)
+
+tibble(
+  Observatoire = c("Alaotra", "Marovoay"),
+  `Moy. pondérée` = c(coef(w_al), coef(w_mr)),
+  `ES pondérée` = c(SE(w_al), SE(w_mr)),
+  `Moy. post-strat.` = c(coef(ps_al_est), coef(ps_mr_est)),
+  `ES post-strat.` = c(SE(ps_al_est), SE(ps_mr_est))
+) |>
+  gt() |>
+  fmt_number(decimals = 3) |>
+  tab_spanner(label = "Pondération de base", columns = 2:3) |>
+  tab_spanner(label = "Post-stratification (sexe CM)", columns = 4:5) |>
+  tab_source_note(
+    source_note = md("ES = erreur standard. Post-stratification sur le sexe du CM, marges RGPH-3 2018.")
+  ) |>
+  style_table()
+```
+
+La post-stratification modifie très légèrement les estimations ponctuelles et réduit marginalement l'erreur standard. L'impact limité s'explique par le fait que la proportion de femmes CM dans l'échantillon OR est déjà proche de celle du RGPH.
 
 ### Calage sur marges (calibration)
 
-Au-delà des poids de base, un **calage sur marges** permettrait d'ajuster les poids pour que la distribution pondérée de certaines variables auxiliaires (sexe, âge, taille du ménage) corresponde exactement à des totaux connus dans la population cible [@deville1992 ; @haziza2017]. Les sources de calage envisageables sont :
+Nous appliquons le calage linéaire (`survey::calibrate()`) avec le sexe du CM comme seule variable de calage. La méthode minimise la distance chi-deux entre les poids initiaux et les poids calés, sous la contrainte que le total pondéré de femmes CM corresponde exactement à la marge RGPH.
 
-1. **Dénombrement 2025** : nombre total de ménages et de toits par hameau — déjà exploité par les poids de base.
+```{r calibration}
+#| eval: !expr rgph_available
+#| include: false
 
-2. **RGPH 2018** : si les données sont disponibles au niveau district, un calage sur la structure par sexe, âge ou taille du ménage corrigerait les biais de couverture. L'écart temporel (sept ans) constitue toutefois une limite importante : une population cible datée de 2018 ne reflète plus nécessairement la structure de 2025.
+# Calage linéaire sur le sexe du CM
+cal_al <- calibrate(des_al,
+                    formula = ~factor(sexe_cm),
+                    population = c(`(Intercept)` = sum(pop_al$Freq),
+                                   `factor(sexe_cm)2` = pop_al$Freq[pop_al$sexe_cm == 2]))
 
-3. **Projections démographiques INSTAT** : des projections communales post-RGPH pourraient servir de marges actualisées, si elles sont rendues disponibles.
+cal_mr <- calibrate(des_mr,
+                    formula = ~factor(sexe_cm),
+                    population = c(`(Intercept)` = sum(pop_mr$Freq),
+                                   `factor(sexe_cm)2` = pop_mr$Freq[pop_mr$sexe_cm == 2]))
+```
 
-La méthode de @deville1992, implémentée dans `survey::calibrate()`, minimise la distance entre poids initiaux et poids finaux sous les contraintes de marges (calage linéaire, raking ou borné).
+```{r tbl-calibration}
+#| eval: !expr rgph_available
+#| tbl-cap: "Comparaison des estimateurs — pondération de base, post-stratification et calage"
 
-### Estimation pour petits domaines
+cal_al_est <- svymean(~taille, cal_al, na.rm = TRUE)
+cal_mr_est <- svymean(~taille, cal_mr, na.rm = TRUE)
 
-L'effectif de l'échantillon (environ 500 ménages par observatoire) impose des limites à la finesse de la désagrégation. Les estimations par hameau ou par sous-groupe (sexe × activité × hameau) comportent des intervalles de confiance larges et des risques de non-représentativité [@rao2015].
+tibble(
+  Observatoire = c("Alaotra", "Marovoay"),
+  `Moy. pondérée` = c(coef(w_al), coef(w_mr)),
+  `ES pondérée` = c(SE(w_al), SE(w_mr)),
+  `Moy. post-strat.` = c(coef(ps_al_est), coef(ps_mr_est)),
+  `ES post-strat.` = c(SE(ps_al_est), SE(ps_mr_est)),
+  `Moy. calée` = c(coef(cal_al_est), coef(cal_mr_est)),
+  `ES calée` = c(SE(cal_al_est), SE(cal_mr_est))
+) |>
+  gt() |>
+  fmt_number(decimals = 3) |>
+  tab_spanner(label = "Pondération de base", columns = 2:3) |>
+  tab_spanner(label = "Post-stratification", columns = 4:5) |>
+  tab_spanner(label = "Calage (sexe CM)", columns = 6:7) |>
+  tab_source_note(
+    source_note = md("Post-stratification et calage sur le sexe du CM ; marges RGPH-3 2018.<br>
+    Avec une seule variable binaire, les deux méthodes produisent des résultats identiques [@deville1992].")
+  ) |>
+  style_table()
+```
 
-Deux familles de méthodes permettent de produire des estimations fiables pour de petits domaines géographiques [@rao2015 ; @battese1988] :
+Comme attendu, calage et post-stratification produisent des résultats identiques avec une seule variable binaire. L'intérêt du calage apparaîtrait avec plusieurs variables simultanées (sexe × classe d'âge du CM, taille du ménage, etc.), permettant de corriger des biais multidimensionnels en un seul ajustement.
 
-- **Estimateurs de type EBLUP** (Battese-Harter-Fuller) : ils combinent l'information directe de l'échantillon avec un modèle auxiliaire de régression exploitant des covariables connues au niveau de l'ensemble de la population (par exemple issues du RGPH). L'idée est "d'emprunter de la force" aux domaines voisins ou aux relations statistiques observées sur l'ensemble des données.
+### Estimation pour petits domaines : modèle de Fay-Herriot
 
-- **Estimateurs de type Fay-Herriot** : variante adaptée lorsque seules les estimations directes agrégées par domaine (et non les micro-données) sont disponibles, couplées à des covariables auxiliaires au même niveau d'agrégation.
+Le modèle de Fay-Herriot [@fay1979] combine les estimations directes au niveau communal avec des covariables auxiliaires issues du RGPH :
 
-Dans le contexte des observatoires ruraux, une estimation pour petits domaines permettrait de produire des indicateurs au niveau des communes ou des fokontany en exploitant les structures apprises sur l'ensemble de l'échantillon et les marges du RGPH. Cette approche présuppose toutefois un modèle reliant correctement les variables d'intérêt aux covariables auxiliaires — hypothèse dont la validité est discutable en l'absence de mise à jour du recensement.
+$$\hat{y}_i^{FH} = \gamma_i \hat{y}_i^{dir} + (1 - \gamma_i) \mathbf{x}_i' \hat{\boldsymbol{\beta}}$$
 
-### Post-stratification
+où $\gamma_i = \hat{\sigma}_v^2 / (\hat{\sigma}_v^2 + \hat{\psi}_i)$ est le facteur de retrait (*shrinkage*), $\hat{\sigma}_v^2$ la variance inter-domaines estimée et $\hat{\psi}_i$ la variance d'échantillonnage du domaine $i$.
 
-La **post-stratification** est une forme simplifiée de calage. Elle consiste à partitionner l'échantillon en strates définies *a posteriori* (par exemple selon le sexe ou la classe d'âge du chef de ménage), puis à repondérer chaque strate de sorte que sa contribution au total pondéré corresponde à la proportion connue dans la population [@sarndal2003, chap. 7]. Si les strates de post-stratification sont corrélées à la variable d'intérêt, la variance de l'estimateur est réduite.
+```{r sae-fh}
+#| eval: !expr rgph_available
+#| include: false
+#| warning: false
+library(sae)
+select <- dplyr::select
 
-Avec deux observatoires et quelques variables de stratification, le nombre de cellules de post-stratification reste modeste, ce qui rend la méthode applicable. Son intérêt dépend néanmoins de la qualité et de l'actualité des marges disponibles.
+# --- Données auxiliaires RGPH par commune ---
+commune_xwalk <- tribble(
+  ~Commune_OR,          ~Commune_RGPH,
+  "Amparafaravola",     NA_character_,
+  "Morarano Chrome",    "MORARANO CHROME",
+  "Ilafy",              "ILAFY",
+  "Feramanga Nord",     "FERAMANGE NORD",
+  "Ambohiboromanga",    "AMBOHIBOROMANGA",
+  "Antanimasaka",       "ANTANIMASAKA",
+  "Ankazomborona",      "ANKAZOMBORONA",
+  "Tsararano",          "TSARARANO"
+)
+
+# Correspondance site → commune (réutilise celle du chunk tbl-communes)
+# site_commune_map est déjà défini plus haut
+
+# Estimations directes par commune (OR)
+or_hh_by_site <- deb_w3 |>
+  left_join(site_commune_map |> dplyr::select(site_key, Commune), by = "site_key") |>
+  filter(!is.na(Commune))
+
+or_commune_direct <- or_hh_by_site |>
+  summarise(
+    y_dir = mean(taille, na.rm = TRUE),
+    var_dir = var(taille, na.rm = TRUE) / n(),
+    n_obs = n(),
+    .by = c(Observatory, Commune)
+  )
+
+# Covariables RGPH par commune
+rgph_commune_aux <- rgph_res_or |>
+  left_join(
+    codes_communes |> rename(COMMUNES = CODECOM, Commune_RGPH = COMMUNEARRONDISSEMENT),
+    by = "COMMUNES"
+  ) |>
+  filter(!is.na(Commune_RGPH)) |>
+  summarise(
+    x_taille = n() / n_distinct(IDMEN),
+    x_pct_fem_cm = mean(as.numeric(P05[as.numeric(P03) == 0]) == 2, na.rm = TRUE) * 100,
+    .by = c(Observatory, Commune_RGPH)
+  )
+
+# Fusion
+fh_data <- or_commune_direct |>
+  left_join(commune_xwalk, by = c("Commune" = "Commune_OR")) |>
+  left_join(rgph_commune_aux, by = c("Observatory", "Commune_RGPH")) |>
+  filter(!is.na(x_taille))  # exclure Amparafaravola (urbain)
+
+# Fay-Herriot REML
+fh_y <- fh_data$y_dir
+fh_x <- fh_data$x_taille
+fh_var <- fh_data$var_dir
+
+fh_result <- mseFH(
+  formula = fh_y ~ fh_x,
+  vardir = fh_var,
+  method = "REML"
+)
+```
+
+```{r tbl-fay-herriot}
+#| eval: !expr rgph_available
+#| tbl-cap: "Estimation de la taille moyenne des ménages par commune — estimateur direct vs. Fay-Herriot"
+
+fh_table <- fh_data |>
+  mutate(
+    FH_EBLUP = round(as.numeric(fh_result$est$eblup), 2),
+    SE_direct = round(sqrt(var_dir), 3),
+    SE_FH = round(sqrt(fh_result$mse), 3),
+    y_dir = round(y_dir, 2),
+    x_taille = round(x_taille, 2)
+  )
+
+fh_table |>
+  dplyr::select(Observatory, Commune, n_obs, y_dir, SE_direct, x_taille, FH_EBLUP, SE_FH) |>
+  gt(groupname_col = "Observatory") |>
+  cols_label(
+    Commune = "Commune",
+    n_obs = "n (OR)",
+    y_dir = "Directe",
+    SE_direct = "ES dir.",
+    x_taille = "RGPH",
+    FH_EBLUP = "FH-EBLUP",
+    SE_FH = "ES FH"
+  ) |>
+  tab_spanner(label = "Taille moy. ménage", columns = c(y_dir, SE_direct)) |>
+  tab_spanner(label = "Covariable", columns = x_taille) |>
+  tab_spanner(label = "Fay-Herriot", columns = c(FH_EBLUP, SE_FH)) |>
+  tab_source_note(
+    source_note = md("Modèle de Fay-Herriot (REML) ; covariable : taille moyenne des ménages RGPH-3 2018.<br>
+    Amparafaravola (entièrement urbaine dans le RGPH) est exclue.")
+  ) |>
+  style_table()
+```
+
+::: {.callout-note}
+## Interprétation du modèle de Fay-Herriot
+
+Le modèle estimé a une variance inter-domaines $\hat{\sigma}_v^2 = 0$, ce qui signifie que toute la variabilité entre communes est expliquée par la covariable (taille moyenne des ménages RGPH). Le modèle se réduit alors à un **estimateur synthétique** pur : les estimations FH-EBLUP sont entièrement tirées de la régression, sans composante aléatoire spécifique au domaine.
+
+Ce résultat n'est pas surprenant : avec seulement 7 communes, le nombre de domaines est insuffisant pour estimer une variance inter-domaines de manière fiable. L'intérêt pratique du modèle de Fay-Herriot apparaîtrait avec un nombre plus élevé de petits domaines, par exemple en étendant l'analyse à l'ensemble des communes des districts concernés.
+:::
+
+### Sources de données auxiliaires
+
+Les méthodes de calage et d'estimation pour petits domaines reposent sur des **covariables auxiliaires** connues au niveau de la population ou des domaines. Au-delà du RGPH-3, plusieurs sources de données géospatiales ouvertes pourraient enrichir les modèles :
+
+| Source | Résolution | Variable | Pertinence |
+|--------|-----------|----------|------------|
+| [GHS Population Grid](https://ghsl.jrc.ec.europa.eu/) | 100 m | Densité de population | Proxy de l'urbanisation |
+| [Meta Data for Good](https://dataforgood.facebook.com/) | 30 m | Densité de population | Mise à jour récente |
+| [ESA WorldCover](https://esa-worldcover.org/) | 10 m | Occupation du sol | Part de surface cultivée |
+| [VIIRS Nighttime Lights](https://eogdata.mines.edu/products/vnl/) | 500 m | Luminosité nocturne | Proxy de l'activité économique |
+| [CHELSA Climate](https://chelsa-climate.org/) | 1 km | Précipitations, température | Potentiel agro-climatique |
+| [SoilGrids](https://soilgrids.org/) | 250 m | Propriétés des sols | Fertilité agricole |
+| [MODIS NDVI](https://lpdaac.usgs.gov/) | 250 m | Indice de végétation (NDVI) | Potentiel agricole annuel |
+| [Accessibility Map](https://malariaatlas.org/) | 1 km | Temps de trajet | Enclavement |
+: Sources de données auxiliaires potentielles pour l'estimation sur petits domaines {#tbl-aux-data}
+
+Les données géospatiales sont accessibles via le catalogue [OpenLandMap](https://docs.openlandmap.org/012-compendium.html). L'extraction par agrégation zonale des rasters sur les limites des communes des observatoires permettrait de construire des covariables au niveau communal ou infra-communal. En particulier, le **NDVI annuel** (MODIS) constitue un proxy du potentiel agricole qui varie dans le temps, ce qui le rend complémentaire des données statiques du RGPH pour des analyses longitudinales.
 
 ::: {.callout-tip}
 ## Recommandations
@@ -594,8 +1216,197 @@ Avec deux observatoires et quelques variables de stratification, le nombre de ce
 
 2. **Calage** : un calage sur la structure par sexe et âge du RGPH 2018, en retenant le milieu rural des districts concernés, améliorerait la représentativité externe. L'écart temporel (2018–2025) est une limite à garder à l'esprit.
 
-3. **Estimation pour petits domaines** : si des analyses infra-observatoire (par commune, fokontany ou hameau) sont requises, une modélisation de type Battese-Harter-Fuller ou Fay-Herriot est préférable à une estimation directe, compte tenu des effectifs réduits.
+3. **Estimation pour petits domaines** : si des analyses infra-observatoire (par commune, fokontany ou hameau) sont requises, une modélisation de type Fay-Herriot est préférable à une estimation directe, compte tenu des effectifs réduits.
 
 4. **Prudence dans les comparaisons temporelles** : la rupture du panel (2015–2025) et le renouvellement complet de l'échantillon empêchent de distinguer les évolutions démographiques réelles des effets de composition de l'échantillon. Les analyses longitudinales doivent signaler cette limite.
 :::
 
+
+## Dérive du panel et recalibration historique
+
+### Structure historique du panel (1995–2015)
+
+Les observatoires ruraux de Marovoay et d'Alaotra ont fonctionné en panel : les mêmes ménages ont été ré-enquêtés chaque année, avec un remplacement progressif des ménages défaillants. Marovoay a été suivi de 1995 à 2014 (sauf 2009 et 2015) ; Alaotra de 1999 à 2014. Après dix ans d'interruption, l'enquête de 2025 a procédé à un **renouvellement complet** de l'échantillon sur la base d'un nouveau dénombrement.
+
+```{r hist-panel}
+#| include: false
+
+select <- dplyr::select  # sae charge MASS qui masque dplyr::select
+
+# Charger les données historiques (res_deb et res_m_a) pour les années disponibles
+hist_years <- as.character(c(1999:2008, 2010:2014))
+
+hist_cm <- map_dfr(hist_years, \(y) {
+  deb_y <- read_dta(file.path("data/ROS_MDG_microdata", y, "res_deb.dta")) |>
+    mutate(j0 = as.character(j0), j5 = as.character(j5)) |>
+    filter(j0 %in% c("3", "21")) |>
+    distinct(j5, j0)
+
+  ma_y <- read_dta(file.path("data/ROS_MDG_microdata", y, "res_m_a.dta")) |>
+    filter(m6 == 1) |>
+    mutate(j5 = as.character(j5)) |>
+    distinct(j5, .keep_all = TRUE) |>
+    select(j5, m4, m5)
+
+  deb_y |>
+    left_join(ma_y, by = "j5") |>
+    mutate(
+      Observatory = if_else(j0 == "21", "Alaotra", "Marovoay"),
+      year = as.integer(y)
+    )
+})
+
+# Ajouter Marovoay seul pour 1995–1998
+hist_mr_early <- map_dfr(as.character(1995:1998), \(y) {
+  deb_y <- read_dta(file.path("data/ROS_MDG_microdata", y, "res_deb.dta")) |>
+    mutate(j0 = as.character(j0), j5 = as.character(j5)) |>
+    filter(j0 == "3") |>
+    distinct(j5, j0)
+
+  has_ma <- file.exists(file.path("data/ROS_MDG_microdata", y, "res_m_a.dta"))
+  if (!has_ma) return(deb_y |> mutate(m4 = NA_real_, m5 = NA_real_,
+                                       Observatory = "Marovoay", year = as.integer(y)))
+
+  ma_y <- read_dta(file.path("data/ROS_MDG_microdata", y, "res_m_a.dta")) |>
+    filter(m6 == 1) |>
+    mutate(j5 = as.character(j5)) |>
+    distinct(j5, .keep_all = TRUE) |>
+    select(j5, m4, m5)
+
+  deb_y |>
+    left_join(ma_y, by = "j5") |>
+    mutate(Observatory = "Marovoay", year = as.integer(y))
+})
+
+# 2025
+hist_2025 <- res_deb |>
+  filter(Observatory %in% c("Alaotra", "Marovoay")) |>
+  mutate(j5 = as.character(j5)) |>
+  distinct(j5, Observatory) |>
+  left_join(
+    res_m_a |> filter(m6 == 1) |>
+      mutate(j5 = as.character(j5)) |>
+      distinct(j5, .keep_all = TRUE) |> select(j5, m4, m5),
+    by = "j5"
+  ) |>
+  mutate(j0 = NA_character_, year = 2025L)
+
+hist_all <- bind_rows(hist_mr_early, hist_cm, hist_2025)
+
+# Résumé annuel
+hist_summary <- hist_all |>
+  summarise(
+    n_hh = n(),
+    age_moy_cm = mean(m5, na.rm = TRUE),
+    pct_fem_cm = mean(m4 == 2, na.rm = TRUE) * 100,
+    .by = c(Observatory, year)
+  ) |>
+  arrange(year, Observatory)
+```
+
+```{r tbl-hist-panel}
+#| tbl-cap: "Effectifs et caractéristiques des CM par année et observatoire"
+
+hist_summary |>
+  arrange(year, Observatory) |>
+  mutate(
+    age_moy_cm = round(age_moy_cm, 1),
+    pct_fem_cm = round(pct_fem_cm, 1)
+  ) |>
+  pivot_wider(
+    names_from = Observatory,
+    values_from = c(n_hh, age_moy_cm, pct_fem_cm),
+    names_glue = "{Observatory}_{.value}"
+  ) |>
+  rename(Année = year) |>
+  gt() |>
+  cols_label(
+    Alaotra_n_hh = "n", Alaotra_age_moy_cm = "Âge CM", Alaotra_pct_fem_cm = "% fem. CM",
+    Marovoay_n_hh = "n", Marovoay_age_moy_cm = "Âge CM", Marovoay_pct_fem_cm = "% fem. CM"
+  ) |>
+  tab_spanner(label = "Alaotra", columns = starts_with("Alaotra")) |>
+  tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) |>
+  fmt_number(columns = ends_with("age_moy_cm"), decimals = 1) |>
+  fmt_number(columns = ends_with("pct_fem_cm"), decimals = 1, pattern = "{x} %") |>
+  sub_missing(missing_text = "—") |>
+  tab_source_note(
+    source_note = md("**Source** : Microdonnées ROS 1995–2014, Enquête OR 2025.<br>
+    Alaotra n'a pas été enquêté avant 1999. 2005 Marovoay : échantillon réduit (273 ménages).<br>
+    2025 : renouvellement complet de l'échantillon après 10 ans d'interruption.")
+  ) |>
+  style_table()
+```
+
+### Dérive du panel : vieillissement des chefs de ménage
+
+Un panel de ménages vieillit mécaniquement : si les mêmes ménages sont suivis année après année, l'âge moyen du chef de ménage augmente. Ce **vieillissement structurel** rend l'échantillon progressivement moins représentatif de la population, où de nouveaux ménages (plus jeunes) se forment continuellement.
+
+```{r fig-panel-drift}
+#| fig-cap: "Évolution de l'âge moyen du chef de ménage (1995–2025)"
+#| fig-width: 9
+#| fig-height: 5
+
+hist_summary |>
+  filter(!is.na(age_moy_cm)) |>
+  ggplot(aes(x = year, y = age_moy_cm, color = Observatory)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  # Rupture 2014-2025
+  geom_segment(
+    data = hist_summary |>
+      filter(year %in% c(2014, 2025)) |>
+      arrange(Observatory, year) |>
+      reframe(
+        x = year[1], xend = year[2],
+        y = age_moy_cm[1], yend = age_moy_cm[2],
+        .by = Observatory
+      ),
+    aes(x = x, xend = xend, y = y, yend = yend, color = Observatory),
+    linetype = "dashed", linewidth = 0.5, show.legend = FALSE
+  ) +
+  annotate("rect", xmin = 2014.5, xmax = 2024.5, ymin = -Inf, ymax = Inf,
+           fill = "grey90", alpha = 0.5) +
+  annotate("text", x = 2019.5, y = 50, label = "Interruption\n(2015–2024)",
+           size = 3, color = "grey50") +
+  scale_x_continuous(breaks = c(seq(1995, 2015, 5), 2025)) +
+  labs(x = "Année", y = "Âge moyen du CM",
+       title = "Dérive du panel : vieillissement des chefs de ménage",
+       color = "Observatoire") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"),
+        legend.position = "bottom")
+```
+
+La @fig-panel-drift montre que l'âge moyen du chef de ménage a augmenté d'environ 3 ans entre 1999 et 2014, passant de ~45 à ~48 ans pour les deux observatoires. Le renouvellement de 2025 ramène l'âge moyen autour de 45–46 ans, plus proche de la structure de la population.
+
+Le vieillissement du panel a plusieurs conséquences :
+
+1. **Biais de composition** : les ménages âgés sont surreprésentés par rapport à la population réelle, qui comprend aussi de jeunes ménages formés depuis le début du suivi.
+
+2. **Attrition sélective** : les ménages qui disparaissent du panel (migration, décès, refus) ne sont pas aléatoires — les ménages les plus mobiles (souvent les plus jeunes) sortent plus vite, accentuant le biais vers les âges élevés.
+
+3. **Comparaisons temporelles** : une partie des évolutions observées dans les indicateurs entre 1999 et 2014 reflète le vieillissement de la cohorte, et non des changements réels dans la population.
+
+### Cadre de recalibration historique
+
+Pour corriger rétrospectivement les biais du panel, une **post-stratification annuelle** sur les marges démographiques connues est envisageable :
+
+1. **Marges cibles** : la distribution par sexe (et éventuellement classe d'âge) des chefs de ménage dans la population de référence.
+
+2. **Source des marges** : le RGPH-3 (2018) fournit les marges les plus fiables. Pour les années antérieures à 2018, ces marges peuvent être utilisées avec une interpolation linéaire entre le RGPH-2 (1993) et le RGPH-3 (2018), ou directement avec les marges 2018 en acceptant un biais temporel.
+
+3. **Méthode** : pour chaque année $t$, on calcule des poids de post-stratification $w_{it}$ tels que la distribution pondérée du sexe du CM dans l'échantillon corresponde aux marges de la population. Les poids de base (issus du dénombrement, quand il est disponible) sont ajustés par le facteur de calage.
+
+4. **Données de dénombrement historiques** : les dénombrements de 2007–2008 sont documentés dans un fichier PDF scanné (`Dénombrements Alaotra 2007-2008 et Marovoay 2008.pdf`). La numérisation de ces données permettrait de calculer des poids de base historiques pour ces années. Pour les autres années, seule la post-stratification sur les marges RGPH est applicable.
+
+::: {.callout-warning}
+## Limites de la recalibration historique
+
+- **Absence de dénombrement** : pour la plupart des années (hors 2007–2008 et 2025), aucune donnée de dénombrement n'est disponible. Les poids de base ne peuvent pas être calculés ; seule la post-stratification sur des marges externes est possible.
+
+- **Temporalité des marges** : les marges du RGPH-3 (2018) ne reflètent pas nécessairement la structure de la population en 1995 ou en 2005. L'utilisation de marges datées introduit un biais dont l'ampleur dépend de la vitesse des changements démographiques.
+
+- **Stabilité des sites** : la correspondance entre les hameaux enquêtés et les sites peut varier légèrement d'une année à l'autre (cf. la variabilité des noms de hameaux dans les données historiques). Un nettoyage préalable des identifiants géographiques est nécessaire.
+
+- **2005 Marovoay** : l'échantillon de Marovoay en 2005 ne comprend que 273 ménages (environ la moitié de l'effectif habituel), avec un profil démographique atypique. Cette année nécessite un traitement particulier.
+:::
