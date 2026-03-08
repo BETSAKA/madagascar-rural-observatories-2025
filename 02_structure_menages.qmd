@@ -1266,50 +1266,12 @@ dl_tbl_variants("tbl_raisons_non_scol", "04", function(d) {
 
 ### Activités principales des autres membres de ménages
 
-```{r other_act_all}
-other_all_act <- others |>
-  mutate(
-    Activite = iconv(as.character(labelled::to_factor(a1)), from = "latin1", to = "UTF-8"),
-    Activite = gsub("&#39;", "'", Activite, fixed = TRUE)
-  ) |>
-  count(Observatory, Activite, name = "n") |>
-  mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  arrange(Observatory, desc(n))
+Les activités des autres membres de ménage sont regroupées selon la même nomenclature sectorielle que pour les CM.
 
-gt(other_all_act, groupname_col = "Observatory") |>
-  tab_header(title = "Activités principales des autres membres (détail)") |>
-  cols_label(Activite = "Activité", n = "Effectif", Percent = "%") |>
-  fmt_number(columns = Percent, decimals = 1) |>
-  style_table()
-```
-
-```{r dl_tbl_other_act_all}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_other_act_all", "04", function(d) {
-  d |> filter(m6 != 1) |>
-    mutate(Activite = iconv(as.character(labelled::to_factor(a1)),
-                            from = "latin1", to = "UTF-8")) |>
-    count(Observatory, Activite) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, members)
-```
-
-```{r other_act}
+```{r other_act_grouped}
 other_act <- others |>
-  mutate(
-    Act_principal = case_when(
-      a1 == 95 ~ "Cultivateur",
-      a1 == 76 ~ "Ouvrier agricole",
-      a1 == 45 ~ "Commerçant",
-      a1 == 14 ~ "Étudiant",
-      a1 == 0  ~ "Chômeur",
-      a1 == 96 ~ "Éleveur",
-      a1 == 99 ~ "Pêcheur exploitant",
-      TRUE     ~ "Autres"
-    )
-  ) |>
+  mutate(Act_principal = classify_activity(a1)) |>
+  filter(!is.na(Act_principal)) |>
   count(Observatory, Act_principal, name = "n") |>
   mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory) |>
   arrange(Observatory, desc(n))
@@ -1320,19 +1282,14 @@ gt(other_act, groupname_col = "Observatory") |>
   fmt_number(columns = Percent, decimals = 1) |>
   style_table()
 
-# Pie chart
-ggplot(other_act, aes(x = "", y = Percent, fill = Act_principal)) +
-  geom_col(width = 1, color = "white") +
-  coord_polar(theta = "y") +
-  facet_wrap(~Observatory) +
-  geom_text(aes(label = paste0(Percent, "%")),
-            position = position_stack(vjust = 0.5),
-            color = "white", fontface = "bold", size = 4) +
-  labs(title = "Répartition des activités des autres membres (%)",
-       fill = "Activité") +
-  theme_void() +
-  theme(plot.title = element_text(face = "bold", hjust = 0.5),
-        strip.text = element_text(face = "bold"))
+ggplot(other_act, aes(x = reorder(Act_principal, Percent), y = Percent,
+                      fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(title = "Activités principales des autres membres (%)",
+       x = NULL, y = "%", fill = "Observatoire") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
 ```
 
 ```{r dl_tbl_other_act}
@@ -1340,11 +1297,8 @@ ggplot(other_act, aes(x = "", y = Percent, fill = Act_principal)) +
 #| results: asis
 dl_tbl_variants("tbl_other_act", "04", function(d) {
   d |> filter(m6 != 1) |>
-    mutate(Act_principal = case_when(
-      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
-      a1 == 45 ~ "Commerçant", a1 == 14 ~ "Étudiant",
-      a1 == 0 ~ "Chômeur", a1 == 96 ~ "Éleveur",
-      a1 == 99 ~ "Pêcheur exploitant", TRUE ~ "Autres")) |>
+    mutate(Act_principal = classify_activity(a1)) |>
+    filter(!is.na(Act_principal)) |>
     count(Observatory, Act_principal) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
@@ -1356,25 +1310,18 @@ dl_tbl_variants("tbl_other_act", "04", function(d) {
 #| results: asis
 dl_fig_variants("fig_other_act", "04", function(d) {
   act <- d |> filter(m6 != 1) |>
-    mutate(Act_principal = case_when(
-      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
-      a1 == 45 ~ "Commerçant", a1 == 14 ~ "Étudiant",
-      a1 == 0 ~ "Chômeur", a1 == 96 ~ "Éleveur",
-      a1 == 99 ~ "Pêcheur exploitant", TRUE ~ "Autres")) |>
+    mutate(Act_principal = classify_activity(a1)) |>
+    filter(!is.na(Act_principal)) |>
     count(Observatory, Act_principal, name = "n") |>
     mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory)
-  ggplot(act, aes(x = "", y = Percent, fill = Act_principal)) +
-    geom_col(width = 1, color = "white") +
-    coord_polar(theta = "y") +
-    facet_wrap(~Observatory) +
-    geom_text(aes(label = paste0(Percent, "%")),
-              position = position_stack(vjust = 0.5),
-              color = "white", fontface = "bold", size = 4) +
-    labs(title = "Répartition des activités des autres membres (%)",
-         fill = "Activité") +
-    theme_void() +
-    theme(plot.title = element_text(face = "bold", hjust = 0.5),
-          strip.text = element_text(face = "bold"))
+  ggplot(act, aes(x = reorder(Act_principal, Percent), y = Percent,
+                  fill = Observatory)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    labs(title = "Activités principales des autres membres (%)",
+         x = NULL, y = "%", fill = "Observatoire") +
+    theme_minimal() +
+    theme(plot.title = element_text(face = "bold"))
 }, members)
 ```
 
@@ -1429,13 +1376,9 @@ ggplot(other_act_sex_plt, aes(x = reorder(Act_principal, Percent), y = Percent,
 #| results: asis
 dl_tbl_variants("tbl_other_act_sex", "04", function(d) {
   d |> filter(m6 != 1) |>
-    mutate(Act_principal = case_when(
-      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
-      a1 == 45 ~ "Commerçant", a1 == 14 ~ "Étudiant",
-      a1 == 0 ~ "Chômeur", a1 == 96 ~ "Éleveur",
-      a1 == 99 ~ "Pêcheur exploitant", TRUE ~ "Autres"),
-      Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
+    mutate(Act_principal = classify_activity(a1),
+           Sexe = classify_sex(m4)) |>
+    filter(!is.na(Act_principal), !is.na(Sexe)) |>
     count(Observatory, Sexe, Act_principal) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
@@ -1447,25 +1390,19 @@ dl_tbl_variants("tbl_other_act_sex", "04", function(d) {
 #| results: asis
 dl_fig_variants("fig_other_act_sex", "04", function(d) {
   act <- d |> filter(m6 != 1) |>
-    mutate(Act_principal = case_when(
-      a1 == 95 ~ "Cultivateur", a1 == 76 ~ "Ouvrier agricole",
-      a1 == 45 ~ "Commerçant", a1 == 14 ~ "Étudiant",
-      a1 == 0 ~ "Chômeur", a1 == 96 ~ "Éleveur",
-      a1 == 99 ~ "Pêcheur exploitant", TRUE ~ "Autres"),
-      Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
+    mutate(Act_principal = classify_activity(a1),
+           Sexe = classify_sex(m4)) |>
+    filter(!is.na(Act_principal), !is.na(Sexe)) |>
     count(Observatory, Sexe, Act_principal, name = "n") |>
     mutate(Percent = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe))
-  ggplot(act, aes(x = "", y = Percent, fill = Act_principal)) +
-    geom_col(width = 1, color = "white") +
-    coord_polar(theta = "y") +
-    facet_grid(Observatory ~ Sexe) +
-    geom_text(aes(label = paste0(Percent, "%")),
-              position = position_stack(vjust = 0.5),
-              color = "white", fontface = "bold", size = 3) +
+  ggplot(act, aes(x = reorder(Act_principal, Percent), y = Percent,
+                  fill = Sexe)) +
+    geom_col(position = "dodge") +
+    coord_flip() +
+    facet_wrap(~Observatory) +
     labs(title = "Activités des autres membres par observatoire et sexe (%)",
-         fill = "Activité") +
-    theme_void() +
+         x = NULL, y = "%", fill = "Sexe") +
+    theme_minimal() +
     theme(plot.title = element_text(face = "bold", hjust = 0.5),
           strip.text = element_text(face = "bold"))
 }, members)
