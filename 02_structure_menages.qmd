@@ -115,7 +115,7 @@ dl_tbl_variants("tbl_age_obs", "04", function(d) {
 ```{r fig_age_obs}
 #| fig-cap: "Répartition des membres des ménages par tranche d'âge selon les observatoires"
 
-ggplot(hh_age, aes(x = AgeGroup, y = Percent, fill = AgeGroup)) +
+ggplot(hh_age, aes(x = AgeGroup, y = Percent)) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~Observatory) +
   labs(x = "Tranche d'âge", y = "%") +
@@ -133,7 +133,7 @@ dl_fig_variants("fig_age_obs", "04", function(d) {
     filter(!is.na(AgeGroup)) |>
     count(Observatory, AgeGroup, name = "n") |>
     mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory)
-  ggplot(agg, aes(x = AgeGroup, y = Percent, fill = AgeGroup)) +
+  ggplot(agg, aes(x = AgeGroup, y = Percent)) +
     geom_col(show.legend = FALSE) +
     facet_wrap(~Observatory) +
     labs(x = "Tranche d'âge", y = "%") +
