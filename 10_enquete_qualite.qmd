@@ -84,7 +84,8 @@ ggplot(qual, aes(x = Qualité, y = n, fill = Observatory)) +
 ```
 
 ```{r dl_fig_qualite}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_qualite", "13", function(d) {
   q <- d |>
     mutate(
@@ -129,7 +130,8 @@ res_deb |>
 ```
 
 ```{r dl_tbl_repondant}
-#| include: false
+#| echo: false
+#| results: asis
 dl_tbl_variants("tbl_repondant", "13", function(d) {
   d |>
     mutate(Repondant = case_when(
@@ -174,7 +176,8 @@ ggplot(qual_rep, aes(x = Qualité, y = n, fill = Observatory)) +
 ```
 
 ```{r dl_fig_qual_reponse}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_qual_reponse", "13", function(d) {
   qr <- d |>
     filter(!is.na(qual1aa), qual1aa %in% c(1, 2)) |>
@@ -225,7 +228,8 @@ ggplot(reaction, aes(x = Réaction, y = n, fill = Observatory)) +
 ```
 
 ```{r dl_fig_reaction}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_reaction", "13", function(d) {
   r <- d |>
     filter(!is.na(qual2aa), qual2aa %in% c(1, 2, 3)) |>
@@ -300,7 +304,8 @@ res_remq |>
 ```
 
 ```{r dl_tbl_codes_aberrants}
-#| include: false
+#| echo: false
+#| results: asis
 dl_tbl_variants("tbl_codes_aberrants", "13", function(d) {
   d |>
     left_join(res_deb |> select(j5, j1, j11), by = "j5") |>
@@ -350,7 +355,8 @@ res_remq |>
 ```
 
 ```{r dl_tbl_synthese_qualite}
-#| include: false
+#| echo: false
+#| results: asis
 dl_tbl_variants("tbl_synthese_qualite", "13", function(d) {
   d |>
     filter(qual1aa %in% c(1, 2), qual2aa %in% c(1, 2, 3)) |>
