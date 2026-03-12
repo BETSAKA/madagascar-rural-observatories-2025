@@ -136,7 +136,8 @@ ggplot(dispo, aes(x = fct_reorder(Ressource, pct, .fun = max), y = pct, fill = D
 ```
 
 ```{r dl_fig_ressources_dispo}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_ressources_dispo", "10", function(d) {
   res_labels <- tribble(
     ~rm2_lig, ~Ressource,
@@ -199,7 +200,8 @@ ggplot(evol, aes(x = fct_reorder(Ressource, pct, .fun = max), y = pct, fill = É
 ```
 
 ```{r dl_fig_evolution_ressources}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_evolution_ressources", "10", function(d) {
   res_labels <- tribble(
     ~rm2_lig, ~Ressource,
@@ -264,7 +266,8 @@ ggplot(appart,
 ```
 
 ```{r dl_fig_appartenance}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_appartenance", "10", function(d) {
   rm3_items <- tribble(
     ~var, ~label,
@@ -345,7 +348,8 @@ bind_rows(
 ```
 
 ```{r dl_tbl_menaces}
-#| include: false
+#| echo: false
+#| results: asis
 dl_tbl_variants("tbl_menaces", "10", function(d) {
   pct_v <- function(df, var, label) {
     var_sym <- sym(var)
@@ -412,7 +416,8 @@ ggplot(repr,
 ```
 
 ```{r dl_fig_representation}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_representation", "10", function(d) {
   rm5_items <- tribble(
     ~var, ~label,
@@ -472,7 +477,8 @@ ggplot(ef_pct, aes(x = Produit, y = pct, fill = Observatory)) +
 ```
 
 ```{r dl_fig_ef_produits}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_ef_produits", "10", function(d) {
   ef_labels <- tribble(~ef_lig, ~Produit, 1, "Charbon", 2, "Bois de chauffe", 3, "Bois d'oeuvre")
   ef_men <- d |> filter(ef_lig %in% 1:3) |> left_join(ef_labels, by = "ef_lig") |> distinct(j5, Observatory, Produit)
@@ -512,7 +518,8 @@ ggplot(ef_orig, aes(x = Produit, y = pct, fill = Origine)) +
 ```
 
 ```{r dl_fig_ef_origine}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_ef_origine", "10", function(d) {
   ef_labels <- tribble(~ef_lig, ~Produit, 1, "Charbon", 2, "Bois de chauffe", 3, "Bois d'oeuvre")
   ef_orig <- d |>
@@ -560,7 +567,8 @@ ggplot(ef_saison, aes(x = Mois, y = pct, color = Produit, group = Produit)) +
 ```
 
 ```{r dl_fig_ef_saison}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_ef_saison", "10", function(d) {
   ef_labels <- tribble(~ef_lig, ~Produit, 1, "Charbon", 2, "Bois de chauffe", 3, "Bois d'oeuvre")
   mois_labs <- c("Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc")
@@ -620,7 +628,8 @@ ef_vente |>
 ```
 
 ```{r dl_tbl_ef_vente}
-#| include: false
+#| echo: false
+#| results: asis
 dl_tbl_variants("tbl_ef_vente", "10", function(d) {
   ef_labels <- tribble(~ef_lig, ~Produit, 1, "Charbon", 2, "Bois de chauffe", 3, "Bois d'oeuvre")
   d |>
@@ -689,7 +698,8 @@ bind_rows(
 ```
 
 ```{r dl_tbl_frequentation}
-#| include: false
+#| echo: false
+#| results: asis
 dl_tbl_variants("tbl_frequentation", "10", function(d) {
   pct_v <- function(df, var, label) {
     var_sym <- sym(var)
@@ -745,7 +755,8 @@ ggplot(non_freq,
 ```
 
 ```{r dl_fig_non_freq}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_non_freq", "10", function(d) {
   non_items <- tribble(
     ~var, ~label,
@@ -812,7 +823,8 @@ ggplot(usages, aes(x = fct_reorder(Raison, pct, .fun = max), y = pct, fill = Obs
 ```
 
 ```{r dl_fig_usages_ap}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_usages_ap", "10", function(d) {
   um2_labels <- tribble(
     ~um2_lig, ~Raison,
@@ -833,7 +845,7 @@ dl_fig_variants("fig_usages_ap", "10", function(d) {
 ```
 
 ```{r}
-#| fig-cap: "Fréquence des déplacements dans l'AP selon l'usage (ensemble des deux observatoires)"
+#| fig-cap: "Fréquence des déplacements dans l'AP selon l'usage, par observatoire"
 #| fig-width: 10
 #| fig-height: 6
 #| label: fig-freq-usages
@@ -852,20 +864,22 @@ freq_usage <- res_um2 |>
                             levels = rev(freq_labels)))
 
 freq_pct <- freq_usage |>
-  count(Raison, Fréquence) |>
-  mutate(pct = n / sum(n) * 100, .by = Raison)
+  count(Observatory, Raison, Fréquence) |>
+  mutate(pct = n / sum(n) * 100, .by = c(Observatory, Raison))
 
 ggplot(freq_pct, aes(x = fct_reorder(Raison, n, .fun = sum), y = pct, fill = Fréquence)) +
   geom_col(position = "fill") +
   scale_y_continuous(labels = scales::percent) +
   scale_fill_brewer(palette = "YlOrRd", direction = -1) +
   coord_flip() +
+  facet_wrap(~Observatory) +
   labs(x = NULL, y = NULL, fill = "Fréquence") +
   theme_minimal()
 ```
 
 ```{r dl_fig_freq_usages}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_freq_usages", "10", function(d) {
   um2_labels <- tribble(
     ~um2_lig, ~Raison,
@@ -893,7 +907,7 @@ dl_fig_variants("fig_freq_usages", "10", function(d) {
 ### Saisonnalité de la fréquentation de l'AP
 
 ```{r}
-#| fig-cap: "Saisonnalité des usages de l'AP (% d'usagers actifs par mois, principales raisons)"
+#| fig-cap: "Saisonnalité des usages de l'AP (% d'usagers actifs par mois, principales raisons), par observatoire"
 #| fig-width: 10
 #| fig-height: 5
 #| label: fig-saison-ap
@@ -915,19 +929,21 @@ ap_saison <- res_um2 |>
     Mois = factor(mois_labs[mois_num], levels = mois_labs),
     actif = if_else(actif == 1, 1, 0, missing = 0)
   ) |>
-  summarise(n_actif = sum(actif), n_total = n(), .by = c(Raison, Mois)) |>
+  summarise(n_actif = sum(actif), n_total = n(), .by = c(Observatory, Raison, Mois)) |>
   mutate(pct = n_actif / n_total * 100)
 
 ggplot(ap_saison, aes(x = Mois, y = pct, color = Raison, group = Raison)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 1.5) +
+  facet_wrap(~Observatory) +
   labs(x = NULL, y = "% actifs", color = "Raison") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ```{r dl_fig_saison_ap}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_saison_ap", "10", function(d) {
   um2_labels <- tribble(
     ~um2_lig, ~Raison,
@@ -999,7 +1015,8 @@ ggplot(feu_raisons,
 ```
 
 ```{r dl_fig_raisons_feux}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_raisons_feux", "10", function(d) {
   feu_items <- tribble(
     ~var, ~label,
@@ -1077,7 +1094,8 @@ bind_rows(
 ```
 
 ```{r dl_tbl_feux}
-#| include: false
+#| echo: false
+#| results: asis
 dl_tbl_variants("tbl_feux", "10", function(d) {
   pct_v <- function(df, var, label) {
     var_sym <- sym(var)
@@ -1125,7 +1143,8 @@ ggplot(feu_saison, aes(x = Mois, y = pct, color = Observatory, group = Observato
 ```
 
 ```{r dl_fig_saison_feux}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_saison_feux", "10", function(d) {
   mois_labs <- c("Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc")
   feu_mois <- paste0("s18_a_", sprintf("%02d", 1:12))
@@ -1174,7 +1193,8 @@ ggplot(evol_feux, aes(x = Évolution, y = pct, fill = Observatory)) +
 ```
 
 ```{r dl_fig_evol_feux}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_evol_feux", "10", function(d) {
   evol <- d |>
     filter(s21 %in% 1:3) |>
@@ -1221,7 +1241,8 @@ ggplot(prob_feux, aes(x = Importance, y = pct, fill = Observatory)) +
 ```
 
 ```{r dl_fig_probleme_feux}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_probleme_feux", "10", function(d) {
   prob <- d |>
     filter(s22 %in% 1:4) |>
@@ -1269,7 +1290,8 @@ ggplot(regl_feux, aes(x = Avis, y = pct, fill = Observatory)) +
 ```
 
 ```{r dl_fig_reglementation_feux}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_reglementation_feux", "10", function(d) {
   regl <- d |>
     filter(s23 %in% 1:3) |>
@@ -1314,7 +1336,8 @@ ap_items |>
 ```
 
 ```{r dl_tbl_connaissance_ap}
-#| include: false
+#| echo: false
+#| results: asis
 dl_tbl_variants("tbl_connaissance_ap", "10", function(d) {
   pct_v <- function(df, var, label) {
     var_sym <- sym(var)
@@ -1378,7 +1401,8 @@ ggplot(ap3_data, aes(x = Dimension, y = pct, fill = Jugement)) +
 ```
 
 ```{r dl_fig_jugement_ap}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_jugement_ap", "10", function(d) {
   ap3_labels <- c("1" = "Très positif", "2" = "Plutôt positif", "3" = "Plutôt négatif", "4" = "Très négatif", "9" = "Ne connaît pas")
   ap3_data <- d |>
@@ -1436,7 +1460,8 @@ ggplot(gest, aes(x = fct_reorder(Gestionnaire, pct, .fun = max), y = pct, fill =
 ```
 
 ```{r dl_fig_gestionnaire}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_gestionnaire", "10", function(d) {
   gest_labels <- c("1" = "Communautés locales", "2" = "Riverains", "3" = "État", "4" = "ONG malgache", "5" = "ONG étrangère", "6" = "Partenariat mixte", "7" = "COBA")
   gest <- d |>
@@ -1493,7 +1518,8 @@ ggplot(mesures,
 ```
 
 ```{r dl_fig_mesures_protection}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_mesures_protection", "10", function(d) {
   ap5b_items <- tribble(
     ~var, ~label,
@@ -1552,7 +1578,8 @@ ggplot(priorite, aes(x = fct_reorder(Priorité, pct, .fun = max), y = pct, fill 
 ```
 
 ```{r dl_fig_priorite}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_priorite", "10", function(d) {
   ap8_labels <- c("1" = "Priorité pauvreté", "2" = "Priorité environnement", "3" = "Les deux", "4" = "Uniquement pauvreté", "5" = "Uniquement environnement", "6" = "Ni l'une ni l'autre")
   prio <- d |>
@@ -1571,7 +1598,7 @@ dl_fig_variants("fig_priorite", "10", function(d) {
 La @fig-actions-ap présente le degré d'information, de consultation et de bénéfice des ménages vis-à-vis des différents types d'actions menées autour de l'AP.
 
 ```{r}
-#| fig-cap: "Information, consultation et bénéfice des actions de l'AP (% de Oui, ensemble)"
+#| fig-cap: "Information, consultation et bénéfice des actions de l'AP (% de Oui), par observatoire"
 #| fig-width: 10
 #| fig-height: 7
 #| label: fig-actions-ap
@@ -1596,7 +1623,7 @@ ap2_data <- res_ap2 |>
     `Informé`   = round(sum(ap2_a == 1, na.rm = TRUE) / sum(!is.na(ap2_a)) * 100, 0),
     `Consulté`  = round(sum(ap2_b == 1, na.rm = TRUE) / sum(!is.na(ap2_b)) * 100, 0),
     `Bénéficié` = round(sum(ap2_c == 1, na.rm = TRUE) / sum(!is.na(ap2_c)) * 100, 0),
-    .by = Action
+    .by = c(Observatory, Action)
   ) |>
   pivot_longer(c(`Informé`, `Consulté`, `Bénéficié`), names_to = "Indicateur", values_to = "pct") |>
   mutate(Indicateur = factor(Indicateur, levels = c("Informé", "Consulté", "Bénéficié")))
@@ -1608,12 +1635,14 @@ ggplot(ap2_data, aes(x = fct_reorder(Action, pct, .fun = max), y = pct, fill = I
   coord_flip() +
   scale_y_continuous(limits = c(0, 80)) +
   scale_fill_brewer(palette = "Set2") +
+  facet_wrap(~Observatory) +
   labs(x = NULL, y = "% de ménages", fill = NULL) +
   theme_minimal()
 ```
 
 ```{r dl_fig_actions_ap}
-#| include: false
+#| echo: false
+#| results: asis
 dl_fig_variants("fig_actions_ap", "10", function(d) {
   ap2_labels <- tribble(
     ~ap2_lig, ~Action,
