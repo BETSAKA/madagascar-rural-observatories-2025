@@ -46,7 +46,7 @@ En 2025, après dix ans d'interruption, l'échantillon a été reconstitué via 
 
 ```{r load_data}
 #| include: false
-res_deb <- read_dta("data/res_deb.dta") |>
+res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   mutate(
     j0 = as.character(j0),
     Observatory = case_when(
@@ -56,7 +56,7 @@ res_deb <- read_dta("data/res_deb.dta") |>
     )
   )
 
-res_m_a <- read_dta("data/res_m_a.dta") |>
+res_m_a <- read_dta("data/ROS_MDG_microdata/2025/res_m_a.dta") |>
   left_join(res_deb |> select(j5, j0, Observatory), by = "j5")
 
 # Dénombrement
@@ -553,7 +553,7 @@ or_marital <- res_m_a |>
 # --- Habitat : type de murs ---
 # RGPH H05$1 : 0-1=Dur, 2=Terre/pisé, 3/6=Végétal, 4-5=Bois/Tôle
 # OR h1 : 1=Dur, 2-3=Terre/pisé, 4-6=Bois/tôle, 7=Végétal
-res_h <- read_dta("data/res_h.dta") |>
+res_h <- read_dta("data/ROS_MDG_microdata/2025/res_h.dta") |>
   left_join(res_deb |> select(j5, Observatory), by = "j5")
 
 or_wall <- res_h |>

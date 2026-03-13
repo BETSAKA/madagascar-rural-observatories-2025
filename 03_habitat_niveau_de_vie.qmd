@@ -25,14 +25,14 @@ source("utils/helpers_report.R")
 source("utils/sites.R")
 source("utils/downloadable_output.R")
 
-res_deb <- read_dta("data/res_deb.dta") |>
+res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   mutate(j5 = as.character(j5)) |>
   add_obs() |>
   assign_site()
 
-res_h <- read_dta("data/res_h.dta") |> mutate(j5 = as.character(j5))
-res_v <- read_dta("data/res_v.dta") |> mutate(j5 = as.character(j5))
-res_e <- read_dta("data/res_E.dta") |> mutate(j5 = as.character(j5))
+res_h <- read_dta("data/ROS_MDG_microdata/2025/res_h.dta") |> mutate(j5 = as.character(j5))
+res_v <- read_dta("data/ROS_MDG_microdata/2025/res_v.dta") |> mutate(j5 = as.character(j5))
+res_e <- read_dta("data/ROS_MDG_microdata/2025/res_E.dta") |> mutate(j5 = as.character(j5))
 
 obs <- res_deb |> select(j5, Observatory, Site)
 ```
@@ -396,7 +396,7 @@ dl_fig_variants("fig_communication", "05", function(d) {
 Le fichier `res_t2` recense les transferts envoyes par les menages a des personnes exterieures au foyer. Chaque ligne correspond a un destinataire. Les variables cles sont le type de transfert (`t21a`), le lieu de residence du destinataire (`t41`), le poids de riz envoye (`t42`, en kg) et la valeur totale (`t21d`, en Ar).
 
 ```{r transfers_load}
-res_t2 <- read_dta("data/res_t2.dta") |> mutate(j5 = as.character(j5))
+res_t2 <- read_dta("data/ROS_MDG_microdata/2025/res_t2.dta") |> mutate(j5 = as.character(j5))
 
 type_transf_labs <- c(
   "1" = "Argent", "2" = "Riz", "3" = "Autres produits", "99" = "Autre"

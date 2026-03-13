@@ -26,7 +26,7 @@ source("utils/sites.R")
 source("utils/downloadable_output.R")
 
 # --- Données de base ---
-res_deb <- read_dta("data/res_deb.dta") |>
+res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   mutate(
     j5 = as.character(j5),
     j0 = as.character(j0),
@@ -55,11 +55,11 @@ safe_to_char <- function(x) {
 }
 
 # --- Données insertion sociale ---
-res_respg  <- read_dta("data/res_respg.dta")  |> add_obs()
-res_respg0 <- read_dta("data/res_respg0.dta") |> add_obs()
+res_respg  <- read_dta("data/ROS_MDG_microdata/2025/res_respg.dta")  |> add_obs()
+res_respg0 <- read_dta("data/ROS_MDG_microdata/2025/res_respg0.dta") |> add_obs()
 
 # --- Données projets ---
-res_pro <- read_dta("data/res_pro.dta") |> add_obs()
+res_pro <- read_dta("data/ROS_MDG_microdata/2025/res_pro.dta") |> add_obs()
 
 # Labels types d'organisation
 org_labs <- c(

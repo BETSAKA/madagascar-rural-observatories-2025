@@ -25,7 +25,7 @@ source("utils/sites.R")
 source("utils/downloadable_output.R")
 
 # --- Données de base ---
-res_deb <- read_dta("data/res_deb.dta") |>
+res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   mutate(
     j5 = as.character(j5),
     j0 = as.character(j0),
@@ -53,10 +53,10 @@ safe_to_char <- function(x) {
 }
 
 # --- Données foncières ---
-res_fr30  <- read_dta("data/res_fr30.dta")  |> add_obs()
-res_fr30a <- read_dta("data/res_fr30a.dta") |> add_obs()
-res_fr33  <- read_dta("data/res_fr33.dta")  |> add_obs()
-res_fr34  <- read_dta("data/res_fr34.dta")  |> add_obs()
+res_fr30  <- read_dta("data/ROS_MDG_microdata/2025/res_fr30.dta")  |> add_obs()
+res_fr30a <- read_dta("data/ROS_MDG_microdata/2025/res_fr30a.dta") |> add_obs()
+res_fr33  <- read_dta("data/ROS_MDG_microdata/2025/res_fr33.dta")  |> add_obs()
+res_fr34  <- read_dta("data/ROS_MDG_microdata/2025/res_fr34.dta")  |> add_obs()
 
 # Labels communs
 type_labs <- c(

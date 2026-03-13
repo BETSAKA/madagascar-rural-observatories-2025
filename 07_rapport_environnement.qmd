@@ -25,7 +25,7 @@ source("utils/sites.R")
 source("utils/downloadable_output.R")
 
 # --- Données de base ---
-res_deb <- read_dta("data/res_deb.dta") |>
+res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   mutate(
     j0 = as.character(j0),
     Observatory = case_when(
@@ -38,15 +38,15 @@ res_deb <- read_dta("data/res_deb.dta") |>
 res_deb <- assign_site(res_deb)
 
 # --- Données environnement ---
-res_ap_def     <- read_dta("data/res_ap_def.dta")
-res_biodiv     <- read_dta("data/res_biodiv.dta")
-res_op_env     <- read_dta("data/res_op_env.dta")
-res_ef         <- read_dta("data/res_ef.dta")
-res_um1        <- read_dta("data/res_um1.dta")
-res_um2        <- read_dta("data/res_um2.dta")
-res_feubrousse <- read_dta("data/res_feubrousse.dta")
-res_ap         <- read_dta("data/res_ap.dta")
-res_ap2        <- read_dta("data/res_ap2.dta")
+res_ap_def     <- read_dta("data/ROS_MDG_microdata/2025/res_ap_def.dta")
+res_biodiv     <- read_dta("data/ROS_MDG_microdata/2025/res_biodiv.dta")
+res_op_env     <- read_dta("data/ROS_MDG_microdata/2025/res_op_env.dta")
+res_ef         <- read_dta("data/ROS_MDG_microdata/2025/res_ef.dta")
+res_um1        <- read_dta("data/ROS_MDG_microdata/2025/res_um1.dta")
+res_um2        <- read_dta("data/ROS_MDG_microdata/2025/res_um2.dta")
+res_feubrousse <- read_dta("data/ROS_MDG_microdata/2025/res_feubrousse.dta")
+res_ap         <- read_dta("data/ROS_MDG_microdata/2025/res_ap.dta")
+res_ap2        <- read_dta("data/ROS_MDG_microdata/2025/res_ap2.dta")
 
 # Ajout de l'observatoire et du site à chaque fichier
 add_obs <- function(df) {

@@ -25,7 +25,7 @@ source("utils/sites.R")
 source("utils/downloadable_output.R")
 
 # --- Données de base ---
-res_deb <- read_dta("data/res_deb.dta") |>
+res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   mutate(
     j5 = as.character(j5),
     j0 = as.character(j0),
@@ -48,32 +48,32 @@ add_obs <- function(df) {
 n_men <- nrow(res_deb)
 
 # --- Riziculture ---
-res_r    <- read_dta("data/res_r.dta")    |> add_obs()
-res_r1   <- read_dta("data/res_r1.dta")   |> add_obs()
-res_dc1  <- read_dta("data/res_dc1.dta")  |> add_obs()
-res_dc20 <- read_dta("data/res_dc20.dta") |> add_obs()
-res_dc21 <- read_dta("data/res_dc21.dta") |> add_obs()
+res_r    <- read_dta("data/ROS_MDG_microdata/2025/res_r.dta")    |> add_obs()
+res_r1   <- read_dta("data/ROS_MDG_microdata/2025/res_r1.dta")   |> add_obs()
+res_dc1  <- read_dta("data/ROS_MDG_microdata/2025/res_dc1.dta")  |> add_obs()
+res_dc20 <- read_dta("data/ROS_MDG_microdata/2025/res_dc20.dta") |> add_obs()
+res_dc21 <- read_dta("data/ROS_MDG_microdata/2025/res_dc21.dta") |> add_obs()
 
 # --- Autres cultures ---
-res_c  <- read_dta("data/res_c.dta")  |> add_obs()
-res_c0 <- read_dta("data/res_c0.dta") |> add_obs()
+res_c  <- read_dta("data/ROS_MDG_microdata/2025/res_c.dta")  |> add_obs()
+res_c0 <- read_dta("data/ROS_MDG_microdata/2025/res_c0.dta") |> add_obs()
 
 # --- Jardins potagers / cueillette ---
-res_jp       <- read_dta("data/res_jp.dta")       |> add_obs()
-res_jpchphef <- read_dta("data/res_jpchphef.dta") |> add_obs()
+res_jp       <- read_dta("data/ROS_MDG_microdata/2025/res_jp.dta")       |> add_obs()
+res_jpchphef <- read_dta("data/ROS_MDG_microdata/2025/res_jpchphef.dta") |> add_obs()
 
 # --- Élevage ---
-res_el2 <- read_dta("data/res_el2.dta") |> add_obs()
-res_ele <- read_dta("data/res_ele.dta") |> add_obs()
-res_pe  <- read_dta("data/res_pe.dta")  |> add_obs()
+res_el2 <- read_dta("data/ROS_MDG_microdata/2025/res_el2.dta") |> add_obs()
+res_ele <- read_dta("data/ROS_MDG_microdata/2025/res_ele.dta") |> add_obs()
+res_pe  <- read_dta("data/ROS_MDG_microdata/2025/res_pe.dta")  |> add_obs()
 
 # --- Chasse / Pêche ---
-res_chph <- read_dta("data/res_chph.dta") |> add_obs()
+res_chph <- read_dta("data/ROS_MDG_microdata/2025/res_chph.dta") |> add_obs()
 
 # --- Main d'oeuvre ---
-res_mor <- read_dta("data/res_mor.dta") |> add_obs()
-res_mp  <- read_dta("data/res_mp.dta")  |> add_obs()
-res_mp0 <- read_dta("data/res_mp0.dta") |> add_obs()
+res_mor <- read_dta("data/ROS_MDG_microdata/2025/res_mor.dta") |> add_obs()
+res_mp  <- read_dta("data/ROS_MDG_microdata/2025/res_mp.dta")  |> add_obs()
+res_mp0 <- read_dta("data/ROS_MDG_microdata/2025/res_mp0.dta") |> add_obs()
 
 # Fonction : % de Oui (code 1) par observatoire + total
 pct_oui <- function(df, var, label) {
@@ -1109,7 +1109,7 @@ dl_fig_variants("fig_top_jardin", "08", function(d) {
 #| fig-width: 9
 #| fig-height: 5
 
-res_ef <- read_dta("data/res_ef.dta") |> add_obs()
+res_ef <- read_dta("data/ROS_MDG_microdata/2025/res_ef.dta") |> add_obs()
 
 res_ef |>
   filter(ef_lib != "", !is.na(ef_lib)) |>
