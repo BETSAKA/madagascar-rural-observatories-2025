@@ -92,6 +92,19 @@ role_labs <- c(
 )
 ```
 
+```{r stats_insertion}
+#| include: false
+# --- Statistiques clés ---
+pct_membre_a <- res_respg0 |> filter(Observatory == "Alaotra") |>
+  summarise(pct = round(mean(respga == 1, na.rm = TRUE) * 100, 1)) |> pull(pct)
+pct_membre_m <- res_respg0 |> filter(Observatory == "Marovoay") |>
+  summarise(pct = round(mean(respga == 1, na.rm = TRUE) * 100, 1)) |> pull(pct)
+pct_benef_a <- res_respg0 |> filter(Observatory == "Alaotra", pro1 %in% c(1, 2)) |>
+  summarise(pct = round(mean(pro1 == 1) * 100, 1)) |> pull(pct)
+pct_benef_m <- res_respg0 |> filter(Observatory == "Marovoay", pro1 %in% c(1, 2)) |>
+  summarise(pct = round(mean(pro1 == 1) * 100, 1)) |> pull(pct)
+```
+
 
 ## Insertion sociale {#sec-insertion}
 
@@ -316,6 +329,20 @@ Le questionnaire demande aux ménages s'ils ont bénéficié de projets ou de fo
 
 ### Bénéficiaires de projets
 
+L'accès aux projets de développement reste inégal entre les deux sites.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** `r pct_benef_a` % des ménages déclarent avoir bénéficié d'au moins un projet ou d'une formation.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** `r pct_benef_m` % des ménages déclarent avoir bénéficié d'au moins un projet ou d'une formation.
+:::
+:::
+
 ```{r}
 #| label: tbl-pro1
 #| tbl-cap: "Ménages bénéficiaires de projets ou formations"
@@ -535,7 +562,19 @@ dl_tbl_variants("tbl_source_global", "12", function(d) {
 
 ## Croisement insertion sociale et accès aux projets {#sec-croisement}
 
-Les ménages membres d'une organisation sont-ils davantage bénéficiaires de projets ?
+Les ménages membres d'une organisation sont-ils davantage bénéficiaires de projets ? Ce croisement permet de tester l'hypothèse selon laquelle le capital social facilite l'accès aux interventions de développement.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** `r pct_membre_a` % des ménages sont membres d'une organisation.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** `r pct_membre_m` % des ménages sont membres d'une organisation.
+:::
+:::
 
 ```{r}
 #| label: tbl-croisement

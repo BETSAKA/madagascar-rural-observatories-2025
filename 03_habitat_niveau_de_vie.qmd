@@ -13,6 +13,18 @@ Cette section decrit les conditions d'habitat, les equipements des menages, leur
 Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
 :::
 
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** À Marovoay, les conditions d'habitat sont étroitement liées à la position des ménages par rapport au fleuve Betsiboka. Les fokontany de la rive droite (Bepako, Madiromiongana), situés en lisière du Parc national d'Ankarafantsika, ont un accès plus limité aux ressources en bois et matériaux de construction, notamment en raison des restrictions liées à la conservation. L'approvisionnement en eau dépend en grande partie du fleuve et de puits traditionnels. L'équipement agricole y est dominé par les outils manuels, complétés par le recours à la traction bovine pour le labour des rizières.
+:::
+:::
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** Dans l'Alaotra, les conditions d'habitat bénéficient de la relative prospérité du premier bassin rizicole du pays. L'accès à l'eau est facilité par la proximité du lac et du réseau d'irrigation, mais la qualité de l'eau potable reste un enjeu sanitaire. Les ménages des fokontany proches des périmètres irrigués (Avaradrano, Feramanga Atsimo, Mangabe) disposent en moyenne d'un meilleur équipement agricole que ceux des zones périphériques. La possession de biens de confort courants y est plus répandue que dans d'autres observatoires ruraux de Madagascar.
+:::
+:::
+
 ```{r setup_habitat}
 #| include: false
 library(tidyverse)
@@ -37,9 +49,71 @@ res_e <- read_dta("data/ROS_MDG_microdata/2025/res_E.dta") |> mutate(j5 = as.cha
 obs <- res_deb |> select(j5, Observatory, Site)
 ```
 
+```{r stats_habitat}
+#| include: false
+# --- Statistiques clés pour le texte narratif ---
+h_obs <- res_h |> left_join(obs, by = "j5")
+n_men_h <- n_distinct(h_obs$j5)
+
+# Statut d'occupation
+statut_s <- h_obs |> mutate(S = decode_labelled(h0)) |>
+  count(Observatory, S) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+top_statut_a <- statut_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(S)
+pct_statut_a <- statut_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+top_statut_m <- statut_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(S)
+pct_statut_m <- statut_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+
+# Latrine
+latrine_s <- h_obs |> mutate(S = decode_labelled(h5)) |>
+  count(Observatory, S) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+top_lat_a <- latrine_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(S)
+pct_lat_a <- latrine_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+top_lat_m <- latrine_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(S)
+pct_lat_m <- latrine_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+
+# Eau
+water_s <- h_obs |> mutate(S = decode_labelled(h4)) |>
+  count(Observatory, S) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+top_eau_a <- water_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(S)
+pct_eau_a <- water_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+top_eau_m <- water_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(S)
+pct_eau_m <- water_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+```
+
 ## Habitat
 
+Les conditions d'habitat des ménages enquêtés témoignent des réalités du milieu rural malgache. Le statut d'occupation, le type d'assainissement, l'accès à l'eau, le mode d'éclairage et la source d'énergie de cuisson constituent des indicateurs essentiels du cadre de vie.
+
 ### Statut d'occupation du logement
+
+Le statut d'occupation du logement traduit la sécurité résidentielle des ménages.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** `r pct_statut_a` % des ménages occupent un logement en « `r top_statut_a` ».
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** `r pct_statut_m` % des ménages occupent un logement en « `r top_statut_m` ».
+:::
+:::
 
 ```{r house_status}
 house <- res_h |>
@@ -78,6 +152,20 @@ dl_fig_variants("fig_house_status", "05", function(d) {
 
 ### Type de latrine
 
+Le type de latrine constitue un indicateur sanitaire fondamental.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** Le type dominant est « `r top_lat_a` » (`r pct_lat_a` % des ménages).
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** Le type dominant est « `r top_lat_m` » (`r pct_lat_m` % des ménages).
+:::
+:::
+
 ```{r latrine}
 latrine <- res_h |>
   left_join(obs, by = "j5") |>
@@ -114,6 +202,20 @@ dl_fig_variants("fig_latrine", "05", function(d) {
 ```
 
 ### Acces a l'eau
+
+L'approvisionnement en eau détermine en grande partie les conditions sanitaires des ménages ruraux.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** La source principale est « `r top_eau_a` » (`r pct_eau_a` %).
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** La source principale est « `r top_eau_m` » (`r pct_eau_m` %).
+:::
+:::
 
 ```{r water}
 water <- res_h |>
@@ -152,6 +254,8 @@ dl_fig_variants("fig_water", "05", function(d) {
 
 ### Mode d'eclairage
 
+Le mode d'éclairage reflète le niveau d'accès à l'énergie moderne. Les ménages ruraux dépendent encore largement de sources traditionnelles, même si la pénétration du solaire progresse.
+
 ```{r lighting}
 light <- res_h |>
   left_join(obs, by = "j5") |>
@@ -182,6 +286,8 @@ dl_fig_variants("fig_lighting", "05", function(d) {
 ```
 
 ### Source d'energie pour la cuisson
+
+La quasi-totalité des ménages ruraux malgaches dépendent de la biomasse pour la cuisson. La nature exacte du combustible utilisé (bois, charbon de bois) varie selon la disponibilité locale des ressources forestières.
 
 ```{r cooking}
 cooking <- res_h |>
@@ -217,7 +323,11 @@ dl_fig_variants("fig_cooking", "05", function(d) {
 
 ## Niveau de vie
 
+La possession de biens durables constitue un proxy classique du niveau de vie des ménages en milieu rural, où les revenus monétaires sont souvent difficiles à mesurer.
+
 ### Biens de confort courant
+
+Les biens de confort courant (mobilier, ustensiles, outils) renseignent sur le niveau d'équipement quotidien des ménages et constituent un indicateur de bien-être matériel.
 
 ```{r comfort_goods}
 comfort <- res_v |>
@@ -252,6 +362,8 @@ dl_fig_variants("fig_comfort", "05", function(d) {
 ```
 
 ### Equipement agricole
+
+L'équipement agricole conditionne la productivité et la capacité d'extension des surfaces cultivées. La possession de matériel mécanisé ou de traction animale constitue un facteur de différenciation important entre les ménages.
 
 ```{r agri_equipment}
 equip_data <- res_e |>
@@ -320,6 +432,8 @@ dl_fig_variants("fig_agri_equip", "05", function(d) {
 ```
 
 ### Materiel de communication audiovisuelle et telecommunication
+
+L'accès aux technologies de communication et d'information constitue un vecteur de connexion aux marchés, aux services et à l'information. La pénétration du téléphone mobile a transformé les pratiques économiques et sociales en milieu rural.
 
 ```{r communication}
 comm_vars <- c("v5", "v8", "v9", "v20", "v11")
@@ -530,6 +644,9 @@ dl_fig_variants("fig_destination", "05", function(d) {
 }, res_t2 |> left_join(obs, by = "j5"))
 ```
 
+::: {.content-visible when-profile="consolidated"}
+::: {.obs-technical}
+
 ## Revenu
 
 Les revenus presentes ici sont des revenus annuels par menage, calcules sur la periode de reference (PR) de la campagne 2025. Le revenu total (`revtot`) se decompose en revenu courant (`revcou`) et revenu exceptionnel (`revexcept`).
@@ -554,6 +671,8 @@ inc <- compute_income_year(2025) |>
 ```
 
 ### Structure du revenu total
+
+Le revenu total annuel par ménage synthétise l'ensemble des ressources monétaires et non-monétaires. Les écarts entre moyenne et médiane reflètent le degré d'inégalité au sein de chaque observatoire.
 
 ```{r t_revtot_obs}
 inc |>
@@ -589,6 +708,8 @@ dl_tbl_variants("tbl_revtot", "05", function(d) {
 ```
 
 ### Decomposition du revenu courant
+
+La décomposition du revenu courant en ses sept composantes met en lumière la structure productive de chaque observatoire et le degré de dépendance à l'égard de la riziculture.
 
 ```{r t_revcou_decomp}
 decomp <- inc |>
@@ -697,6 +818,8 @@ dl_fig_variants("fig_revcou_shares", "05", function(d) {
 
 ### Distribution du revenu total
 
+La distribution du revenu total illustre le degré d'inégalité au sein de chaque observatoire. L'utilisation d'une échelle logarithmique permet de mieux visualiser l'étalement de la distribution et la concentration des ménages à bas revenus.
+
 ```{r fig_revtot_dist}
 #| fig-cap: "Distribution du revenu total par observatoire (echelle log)"
 #| fig-width: 8
@@ -727,6 +850,8 @@ dl_fig_variants("fig_revtot_dist", "05", function(d) {
 ```
 
 ### Revenu courant et revenu exceptionnel
+
+La distinction entre revenu courant (activités régulières) et revenu exceptionnel (transferts, décapitalisation, travaux HIMO) renseigne sur la durabilité des ressources des ménages. Un poids élevé du revenu exceptionnel peut signaler une vulnérabilité économique.
 
 ```{r t_revcou_revexcept}
 inc |>
@@ -1168,3 +1293,5 @@ if ("pct_eau_amelioree" %in% names(habitat_trends)) {
     theme_minimal()
 }
 ```
+:::
+:::

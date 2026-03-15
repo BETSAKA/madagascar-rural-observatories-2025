@@ -56,11 +56,68 @@ sa_full  <- res_sa  %>% left_join(res_deb %>% select(j5, Observatory, Site), by 
 ssa_full <- res_ssa %>% left_join(res_deb %>% select(j5, Observatory, Site), by = "j5")
 ```
 
+```{r stats_sa}
+#| include: false
+# --- Statistiques clés pour le texte narratif ---
+sa_obs <- res_sa %>% left_join(res_deb, by = "j5")
+n_men_sa <- n_distinct(sa_obs$j5)
+
+# Soudure
+soud_s <- sa_obs %>%
+  group_by(Observatory) %>%
+  summarise(moy = round(mean(sal2d, na.rm = TRUE), 1),
+            med = median(sal2d, na.rm = TRUE), .groups = "drop")
+soud_moy_a <- soud_s %>% filter(Observatory == "Alaotra") %>% pull(moy)
+soud_moy_m <- soud_s %>% filter(Observatory == "Marovoay") %>% pull(moy)
+soud_med_a <- soud_s %>% filter(Observatory == "Alaotra") %>% pull(med)
+soud_med_m <- soud_s %>% filter(Observatory == "Marovoay") %>% pull(med)
+
+# Stress alimentaire
+stress_s <- sa_obs %>%
+  group_by(Observatory) %>%
+  summarise(moy = round(mean(sal15a, na.rm = TRUE), 1),
+            med = median(sal15a, na.rm = TRUE), .groups = "drop")
+stress_moy_a <- stress_s %>% filter(Observatory == "Alaotra") %>% pull(moy)
+stress_moy_m <- stress_s %>% filter(Observatory == "Marovoay") %>% pull(moy)
+
+# Pct ménages en soudure > 0 mois
+pct_soud_a <- sa_obs %>% filter(Observatory == "Alaotra") %>%
+  summarise(pct = round(mean(sal2d > 0, na.rm = TRUE) * 100, 1)) %>% pull(pct)
+pct_soud_m <- sa_obs %>% filter(Observatory == "Marovoay") %>%
+  summarise(pct = round(mean(sal2d > 0, na.rm = TRUE) * 100, 1)) %>% pull(pct)
+```
+
 ## Disponibilité alimentaire
+
+La sécurité alimentaire des ménages ruraux est étroitement liée au calendrier agricole et à la gestion des stocks.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** `r pct_soud_a` % des ménages déclarent au moins un mois de soudure.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** `r pct_soud_m` % des ménages déclarent au moins un mois de soudure.
+:::
+:::
 
 ### Période de soudure
 
 La période de soudure désigne les mois durant lesquels les stocks alimentaires du ménage sont insuffisants pour couvrir ses besoins.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** La soudure dure en moyenne `r soud_moy_a` mois (médiane : `r soud_med_a`).
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** La soudure dure en moyenne `r soud_moy_m` mois (médiane : `r soud_med_m`).
+:::
+:::
 
 #### Durée de la soudure par observatoire
 
@@ -300,7 +357,19 @@ dl_fig_variants("g2_calendrier_soudure", "09", function(d) {
 
 ### Stress alimentaire
 
-Le stress alimentaire reflète les mois durant lesquels le ménage éprouve des difficultés à se nourrir correctement, que ce soit en quantité ou en qualité.
+Le stress alimentaire reflète les mois durant lesquels le ménage éprouve des difficultés à se nourrir correctement, que ce soit en quantité ou en qualité. Sa durée est généralement supérieure à celle de la soudure stricto sensu.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** La durée moyenne du stress alimentaire atteint `r stress_moy_a` mois.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** La durée moyenne du stress alimentaire atteint `r stress_moy_m` mois.
+:::
+:::
 
 #### Durée du stress alimentaire par observatoire
 
@@ -469,7 +538,7 @@ dl_fig_variants("g3_soudure_vs_stress", "09", function(d) {
 
 ### Alimentation de base
 
-Cette section compare les aliments de base consommés aux trois repas, hors et pendant la période de soudure.
+Cette section compare les aliments de base consommés aux trois repas, hors et pendant la période de soudure. Le riz constitue la base alimentaire dans les deux observatoires, mais sa place relative varie selon la saison et le site. Les substitutions opérées pendant la soudure (manioc, patate douce, maïs) témoignent des stratégies d'adaptation alimentaire des ménages.
 
 ```{r alim_labels}
 # Définir les labels des aliments
@@ -757,7 +826,7 @@ dl_tbl_variants("t8_transition", "09", function(d) {
 
 ## Stratégies de sécurité alimentaire
 
-Cette section analyse les stratégies d'adaptation adoptées par les ménages en période d'insécurité alimentaire. Chaque stratégie est évaluée sur une échelle de fréquence : 0 = Jamais, 1 = Rarement, 2 = Quelquefois, 3 = Souvent.
+Face à l'insécurité alimentaire, les ménages déploient un éventail de stratégies d'adaptation dont la sévérité varie : réduction des portions, substitution d'aliments, endettement, cueillette sauvage, voire décapitalisation. Chaque stratégie est évaluée sur une échelle de fréquence : 0 = Jamais, 1 = Rarement, 2 = Quelquefois, 3 = Souvent.
 
 ### Fréquence des stratégies d'adaptation
 

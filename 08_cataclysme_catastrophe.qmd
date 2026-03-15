@@ -117,7 +117,39 @@ cca_full <- res_cca %>%
   left_join(res_deb %>% select(j5, Observatory, Site), by = "j5")
 ```
 
+```{r stats_cata}
+#| include: false
+# --- Statistiques clés pour le texte narratif ---
+n_men_cc <- n_distinct(res_deb$j5)
+pct_touch_a <- hh_cata %>% filter(Observatory == "Alaotra") %>%
+  summarise(pct = round(mean(touched) * 100, 1)) %>% pull(pct)
+pct_touch_m <- hh_cata %>% filter(Observatory == "Marovoay") %>%
+  summarise(pct = round(mean(touched) * 100, 1)) %>% pull(pct)
+nb_moy_a <- hh_cata %>% filter(Observatory == "Alaotra", touched) %>%
+  summarise(moy = round(mean(nb_events), 1)) %>% pull(moy)
+nb_moy_m <- hh_cata %>% filter(Observatory == "Marovoay", touched) %>%
+  summarise(moy = round(mean(nb_events), 1)) %>% pull(moy)
+top_cata_a <- events_full %>% filter(Observatory == "Alaotra") %>%
+  count(Catastrophe) %>% slice_max(n, n = 1, with_ties = FALSE) %>% pull(Catastrophe)
+top_cata_m <- events_full %>% filter(Observatory == "Marovoay") %>%
+  count(Catastrophe) %>% slice_max(n, n = 1, with_ties = FALSE) %>% pull(Catastrophe)
+```
+
 ## Prévalence des cataclysmes
+
+L'exposition aux aléas climatiques et biologiques est très élevée dans les deux observatoires.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** `r pct_touch_a` % des ménages déclarent avoir été touchés par au moins un événement. Les ménages affectés subissent en moyenne `r nb_moy_a` événements. Le cataclysme le plus fréquemment cité est « `r top_cata_a` ».
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** `r pct_touch_m` % des ménages déclarent avoir été touchés par au moins un événement. Les ménages affectés subissent en moyenne `r nb_moy_m` événements. Le cataclysme le plus fréquemment cité est « `r top_cata_m` ».
+:::
+:::
 
 ### Taux d'exposition global
 
@@ -383,6 +415,8 @@ Les niveaux de dégâts sont codés ainsi :
 - **Personnes** : 1 = Aucun, 2 = Blessure/Maladie, 3 = Décès/Porté disparu, 4 = Manque de vivres
 
 ### Dégâts sur le logement
+
+Les dégâts sur le logement sont évalués selon quatre niveaux de gravité, du plus bénin (« Rien ») à la destruction totale. Le croisement avec le type de catastrophe permet d'identifier les aléas les plus destructeurs pour l'habitat.
 
 ```{r t4_degats_logement}
 # T4 : Gravité des dégâts sur le logement par type de Catastrophe et observatoire
@@ -659,6 +693,8 @@ dl_fig_variants("fig_severite_profil", "11", function(d) {
 }, events_full, width = 10, height = 6)
 ```
 
+Le graphique précédent révèle que la sévérité des dégâts sur l'élevage varie fortement selon le type de catastrophe. Les destructions totales sont surtout associées aux événements les plus violents (cyclones, inondations), tandis que les sécheresses et les maladies animales engendrent des pertes plus diffuses mais néanmoins significatives.
+
 ## Saisonnalité des cataclysmes
 
 Les événements peuvent survenir en période de soudure (lorsque les stocks sont déjà bas) ou hors soudure. La coïncidence avec la soudure aggrave considérablement l'impact sur la sécurité alimentaire.
@@ -858,6 +894,8 @@ Le riz, culture vivrière dominante, est de loin la culture la plus exposée aux
 
 ### Dégâts sur les champs de riz par type de catastrophe
 
+Le riz étant la culture la plus exposée, il est utile de décomposer la gravité des dégâts sur les champs de riz selon le type de catastrophe. La lecture croisée de la sévérité et du type d'événement permet de hiérarchiser les risques pour la production rizicole.
+
 ```{r t9_degats_champs_riz}
 # T9 : Gravité des dégâts sur les champs pour le riz (cc1a0 == 101)
 # Variables cc1a5_01 à cc1a5_13 = dégâts champs par type de catastrophe
@@ -1002,7 +1040,7 @@ dl_tbl_variants("tbl_degats_stocks_riz", "11", function(d) {
 }, cca_full)
 ```
 
-Les dégâts sur les stocks, bien que moins fréquents que sur les champs, affectent directement les réserves alimentaires du ménage, en particulier lorsqu'ils surviennent en période de soudure.
+Les dégâts sur les stocks, bien que moins fréquents que sur les champs, affectent directement les réserves alimentaires du ménage, en particulier lorsqu'ils surviennent en période de soudure. Les rats et les insectes nuisibles constituent les principales causes de pertes post-récolte, auxquelles s'ajoutent les conditions de stockage précaires face aux intempéries.
 
 ### Comparaison dégâts champs vs stocks pour les principales cultures
 
@@ -1175,3 +1213,5 @@ ggplot(mapping = aes(x = year, y = pct_cata, colour = Observatory)) +
   labs(x = NULL, y = "% de ménages touchés", colour = "Observatoire") +
   theme_minimal()
 ```
+
+L'évolution de la prévalence des catastrophes sur la période 2003--2025 met en évidence des fluctuations interannuelles importantes, avec des pics correspondant aux passages cycloniques majeurs et aux épisodes de sécheresse prolongée. La tendance de long terme, difficile à isoler des aléas ponctuels, mérite d'être mise en regard de l'évolution des pratiques d'adaptation décrites dans les chapitres précédents.

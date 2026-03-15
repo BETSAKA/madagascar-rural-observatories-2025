@@ -288,6 +288,8 @@ dl_fig_variants("fig_appartenance", "10", function(d) {
 
 ### Menaces perçues et responsables
 
+Les ménages ont été interrogés sur les menaces qu'ils perçoivent vis-à-vis de l'environnement local et sur les responsables qu'ils identifient. Ces perceptions reflètent la conscience environnementale des populations et orientent les stratégies de sensibilisation.
+
 ```{r}
 #| tbl-cap: "Menaces perçues sur l'environnement et responsables identifiés (% de Oui)"
 #| label: tbl-menaces
@@ -328,7 +330,7 @@ resps <- resp_items |>
   pmap_dfr(\(var, label) pct_oui(op_menace, var, label))
 
 bind_rows(
-  menace_global |> mutate(Section = ""),
+  menace_global |> mutate(Section = "Perception globale"),
   menaces |> mutate(Section = "Principales menaces (parmi ceux qui déclarent menacé)"),
   resps |> mutate(Section = "Principaux responsables")
 ) |>
@@ -537,6 +539,8 @@ dl_fig_variants("fig_ef_origine", "10", function(d) {
 
 ### Saisonnalité de la collecte forestière
 
+La collecte de produits forestiers suit un calendrier saisonnier lié aux besoins énergétiques des ménages et aux contraintes climatiques. La période de préparation de la campagne agricole et la saison sèche correspondent généralement aux pics d'activité.
+
 ```{r}
 #| fig-cap: "Saisonnalité de la collecte de produits forestiers (% de ménages actifs par mois)"
 #| fig-width: 10
@@ -591,6 +595,8 @@ dl_fig_variants("fig_ef_saison", "10", function(d) {
 ```
 
 ### Commercialisation des produits forestiers
+
+Une partie des produits forestiers collectés (charbon, bois de chauffe, bois d'œuvre) fait l'objet d'une commercialisation. La proportion de ménages qui vendent et les montants moyens de vente donnent une indication de l'importance économique de cette activité.
 
 ```{r}
 #| tbl-cap: "Part des ménages vendant les produits forestiers et montant moyen de vente (Ar)"
@@ -906,6 +912,8 @@ dl_fig_variants("fig_freq_usages", "10", function(d) {
 
 ### Saisonnalité de la fréquentation de l'AP
 
+La fréquentation de l'Aire protégée n'est pas uniforme au cours de l'année. Les variations saisonnières reflètent les besoins en ressources naturelles, le calendrier agricole et l'accessibilité physique de la zone.
+
 ```{r}
 #| fig-cap: "Saisonnalité des usages de l'AP (% d'usagers actifs par mois, principales raisons), par observatoire"
 #| fig-width: 10
@@ -1040,6 +1048,8 @@ dl_fig_variants("fig_raisons_feux", "10", function(d) {
 
 ### Pratique du feu
 
+Au-delà des opinions, une partie des ménages déclarent avoir eux-mêmes pratiqué le brûlis. Le taux de pratique et les motivations avancées permettent de mesurer l'écart entre les discours et les comportements effectifs.
+
 ```{r}
 #| tbl-cap: "Pratique et perception des feux par observatoire"
 #| label: tbl-feux
@@ -1115,6 +1125,8 @@ dl_tbl_variants("tbl_feux", "10", function(d) {
 
 ### Saisonnalité des feux
 
+Les feux de brousse suivent un calendrier saisonnier bien défini, lié à la préparation des terres de culture et aux conditions de sécheresse favorisant la propagation.
+
 ```{r}
 #| fig-cap: "Saisonnalité des feux de brousse pratiqués (% de ménages actifs par mois, parmi ceux qui ont fait du feu)"
 #| fig-width: 10
@@ -1164,6 +1176,8 @@ dl_fig_variants("fig_saison_feux", "10", function(d) {
 ```
 
 ### Avis sur les feux
+
+Les ménages expriment une perception contrastée de l'évolution des feux de brousse au cours des trois dernières années. Leur avis sur le caractère problématique des feux et sur la nécessité d'une réglementation complète le tableau de la gouvernance locale du feu.
 
 ```{r}
 #| fig-cap: "Évolution perçue des feux depuis 3 ans, par observatoire"
@@ -1312,6 +1326,8 @@ dl_fig_variants("fig_reglementation_feux", "10", function(d) {
 
 ### Connaissance de l'Aire protégée
 
+Le niveau de connaissance de l'Aire protégée et l'adhésion des ménages au principe de protection constituent des préalables à toute stratégie de conservation participative.
+
 ```{r}
 #| tbl-cap: "Connaissance de l'Aire protégée et demande de protection"
 #| label: tbl-connaissance-ap
@@ -1427,6 +1443,8 @@ dl_fig_variants("fig_jugement_ap", "10", function(d) {
 
 ### Gestionnaire souhaité
 
+Parmi les ménages favorables à la protection, la question du gestionnaire idéal révèle les préférences des communautés en matière de gouvernance environnementale : gestion communautaire, étatique ou partenariale.
+
 ```{r}
 #| fig-cap: "Qui devrait gérer l'AP ? (parmi ceux favorables à la protection)"
 #| fig-width: 9
@@ -1476,6 +1494,8 @@ dl_fig_variants("fig_gestionnaire", "10", function(d) {
 ```
 
 ### Mesures de protection souhaitées
+
+Les mesures de protection souhaitées par les ménages vont de l'interdiction stricte des accès à des approches plus souples intégrant le développement d'activités génératrices de revenus (AGR) et la valorisation des savoirs traditionnels.
 
 ```{r}
 #| fig-cap: "Mesures souhaitées pour protéger l'AP (% de Oui, parmi ceux favorables)"
@@ -1545,6 +1565,8 @@ dl_fig_variants("fig_mesures_protection", "10", function(d) {
 ```
 
 ### Pauvreté vs. environnement : quelle priorité ?
+
+Cette question met en tension deux impératifs : la lutte contre la pauvreté et la protection de l'environnement. La répartition des réponses éclaire le positionnement des ménages face à ce dilemme central pour les politiques de développement durable.
 
 ```{r}
 #| fig-cap: "Pauvreté vs. protection de l'environnement : quelle priorité ? (par observatoire)"

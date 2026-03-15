@@ -97,6 +97,13 @@ dl_fig_variants <- function(
   dpi = 150,
   min_cell = 10
 ) {
+  # Skip in consolidated mode (user does not want per-site downloads)
+  # and in non-HTML output (the dropdown is HTML-only)
+  profile <- Sys.getenv("QUARTO_PROFILE", "consolidated")
+  if (profile == "consolidated" || !knitr::is_html_output()) {
+    return(invisible(NULL))
+  }
+
   disk_dir <- file.path("docs", "downloads", chapter)
   dir.create(disk_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -160,6 +167,12 @@ dl_fig_variants <- function(
 #' @param data     Data frame with Observatory and Site columns
 #' @param min_cell Minimum cell count for confidentiality (default 5)
 dl_tbl_variants <- function(id, chapter, tbl_fn, data, min_cell = 5) {
+  # Skip in consolidated mode or non-HTML output
+  profile <- Sys.getenv("QUARTO_PROFILE", "consolidated")
+  if (profile == "consolidated" || !knitr::is_html_output()) {
+    return(invisible(NULL))
+  }
+
   disk_dir <- file.path("docs", "downloads", chapter)
   dir.create(disk_dir, recursive = TRUE, showWarnings = FALSE)
 

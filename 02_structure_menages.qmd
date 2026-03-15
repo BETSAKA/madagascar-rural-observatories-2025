@@ -13,6 +13,24 @@ Le ménage est l'unité de base de l'enquête. Cette section décrit la composit
 Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
 :::
 
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** À Marovoay, la structure des ménages est marquée par l'hétérogénéité des  stratégies économiques et des structures familiales. La proximité de la ville de Marovoay et de la route nationale RN4 reliant Antananarivo à Mahajanga facilite les échanges et influence les activités non agricoles des ménages.
+:::
+:::
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** Dans l'Alaotra, la riziculture irriguée constitue le socle de l'économie domestique, et la taille des exploitations rizicoles influence directement la structure et les revenus des ménages. Les fokontany proches des périmètres irrigués (Avaradrano, Feramanga Atsimo) présentent des profils économiques distincts de ceux situés en périphérie de la cuvette (Analamiranga, Maritampona), où la dépendance au riz pluvial et à l'élevage est plus marquée.
+:::
+:::
+
+::: {.content-visible when-profile="consolidated"}
+::: {.obs-technical}
+*Note technique.* Les indicateurs démographiques présentés dans cette section sont calculés à partir du fichier ménage (`res_deb`) et du fichier des membres (`res_m_a`). La classification des activités principales s'appuie sur une nomenclature sectorielle inspirée de la CITI Rév. 4. Les effectifs inférieurs à cinq sont masqués par souci de confidentialité statistique. Les comparaisons entre les deux observatoires doivent tenir compte de la différence de taille des échantillons et de la structure spatiale des zones enquêtées.
+:::
+:::
+
 ```{r data_loading}
 library(tidyverse)
 library(haven)
@@ -33,7 +51,133 @@ members <- res_deb |>
   assign_site()
 ```
 
+```{r stats_structure}
+#| include: false
+# --- Statistiques clés pour le texte narratif ---
+n_members <- nrow(members)
+n_men <- n_distinct(members$j5)
+cm_s <- members |> filter(m6 == 1)
+
+# Taille des ménages
+hh_sz <- members |>
+  summarise(taille = n(), .by = c(j5, Observatory)) |>
+  summarise(moy = round(mean(taille), 1), med = median(taille), .by = Observatory)
+taille_moy_a <- hh_sz |> filter(Observatory == "Alaotra") |> pull(moy)
+taille_moy_m <- hh_sz |> filter(Observatory == "Marovoay") |> pull(moy)
+
+# Structure par âge
+age_str <- members |> filter(!is.na(m5)) |>
+  summarise(
+    pct_j = round(mean(m5 < 15) * 100, 1),
+    pct_a = round(mean(m5 >= 15 & m5 <= 64) * 100, 1),
+    pct_v = round(mean(m5 >= 65) * 100, 1),
+    .by = Observatory)
+pct_moins15_a <- age_str |> filter(Observatory == "Alaotra") |> pull(pct_j)
+pct_moins15_m <- age_str |> filter(Observatory == "Marovoay") |> pull(pct_j)
+pct_15_64_a <- age_str |> filter(Observatory == "Alaotra") |> pull(pct_a)
+pct_15_64_m <- age_str |> filter(Observatory == "Marovoay") |> pull(pct_a)
+pct_65plus_a <- age_str |> filter(Observatory == "Alaotra") |> pull(pct_v)
+pct_65plus_m <- age_str |> filter(Observatory == "Marovoay") |> pull(pct_v)
+
+# Sexe CM
+sex_cm_s <- cm_s |> filter(!is.na(m4)) |>
+  summarise(pct_h = round(mean(m4 == 1) * 100, 1), .by = Observatory)
+pct_cm_h_a <- sex_cm_s |> filter(Observatory == "Alaotra") |> pull(pct_h)
+pct_cm_h_m <- sex_cm_s |> filter(Observatory == "Marovoay") |> pull(pct_h)
+pct_cm_f_a <- round(100 - pct_cm_h_a, 1)
+pct_cm_f_m <- round(100 - pct_cm_h_m, 1)
+
+# Âge CM
+age_cm_s <- cm_s |> summarise(moy = round(mean(m5, na.rm = TRUE), 1), .by = Observatory)
+age_cm_a <- age_cm_s |> filter(Observatory == "Alaotra") |> pull(moy)
+age_cm_m <- age_cm_s |> filter(Observatory == "Marovoay") |> pull(moy)
+
+# Couple CM (m7: 2=marié tradition, 3=concubinage, 6-8=marié civil/religieux/polygame)
+couple_cm <- cm_s |> filter(!is.na(m7)) |>
+  summarise(pct = round(mean(m7 %in% c(2, 3, 6, 7, 8)) * 100, 1), .by = Observatory)
+pct_couple_a <- couple_cm |> filter(Observatory == "Alaotra") |> pull(pct)
+pct_couple_m <- couple_cm |> filter(Observatory == "Marovoay") |> pull(pct)
+
+# Éducation CM
+educ_cm_s <- cm_s |>
+  mutate(Niv = classify_education(s3a)) |> filter(!is.na(Niv)) |>
+  count(Observatory, Niv) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+top_educ_a <- educ_cm_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(Niv)
+pct_top_educ_a <- educ_cm_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+top_educ_m <- educ_cm_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(Niv)
+pct_top_educ_m <- educ_cm_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+
+# Alphabétisation CM
+alpha_cm <- cm_s |> filter(!is.na(s1a), !is.na(s1b)) |>
+  summarise(pct = round(mean(s1a == 1 & s1b == 1) * 100, 1), .by = Observatory)
+pct_alpha_a <- alpha_cm |> filter(Observatory == "Alaotra") |> pull(pct)
+pct_alpha_m <- alpha_cm |> filter(Observatory == "Marovoay") |> pull(pct)
+
+# Activité CM
+act_cm_s <- cm_s |>
+  mutate(Act = classify_activity(a1)) |> filter(!is.na(Act)) |>
+  count(Observatory, Act) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+top_act_a <- act_cm_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(Act)
+pct_top_act_a <- act_cm_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+top_act_m <- act_cm_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(Act)
+pct_top_act_m <- act_cm_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+
+# Scolarisation 6-14 ans
+scol_614 <- members |>
+  filter(m5 >= 6, m5 <= 14, s2 %in% c(1, 2)) |>
+  summarise(taux = round(mean(s2 == 1) * 100, 1), .by = Observatory)
+taux_scol_a <- scol_614 |> filter(Observatory == "Alaotra") |> pull(taux)
+taux_scol_m <- scol_614 |> filter(Observatory == "Marovoay") |> pull(taux)
+
+# Top raison non-scolarisation
+raisons_labs_s <- c(
+  "1" = "Niveau suffisant", "2" = "Main-d'oeuvre", "3" = "Besoin de revenu",
+  "4" = "Frais trop élevés", "5" = "Sans intérêt", "6" = "Échec scolaire",
+  "7" = "Grossesse/mariage", "8" = "Handicap/maladie", "9" = "École en mauvais état",
+  "10" = "Instituteur absent", "11" = "École éloignée", "12" = "Trop jeune",
+  "16" = "Autre", "17" = "Famine", "19" = "Paresse")
+non_scol_s <- members |>
+  filter(m5 >= 6, m5 <= 15, m6 != 1, s2 == 2, !is.na(s5)) |>
+  mutate(Raison = if_else(
+    as.character(as.integer(s5)) %in% names(raisons_labs_s),
+    raisons_labs_s[as.character(as.integer(s5))], "Autre")) |>
+  count(Observatory, Raison) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+top_raison_a <- non_scol_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(Raison)
+pct_top_raison_a <- non_scol_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+top_raison_m <- non_scol_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(Raison)
+pct_top_raison_m <- non_scol_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+```
+
 ## Description des ménages
+
+L'enquête a permis de recenser `r n_members` individus répartis dans `r n_men` ménages au sein des deux observatoires.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** La taille moyenne des ménages s'établit à `r taille_moy_a` personnes.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** La taille moyenne des ménages s'établit à `r taille_moy_m` personnes.
+:::
+:::
 
 ### Taille des ménages par observatoire
 
@@ -82,6 +226,20 @@ gt(hh_size_hameau, groupname_col = "Observatory") |>
 ```
 
 ### Structure par âge
+
+La structure démographique des ménages enquêtés révèle une population jeune. Cette distribution, caractéristique des populations rurales malgaches, implique un fort taux de dépendance.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** `r pct_moins15_a` % des individus ont moins de 15 ans. La population en âge de travailler (15–64 ans) représente `r pct_15_64_a` %, tandis que les personnes de 65 ans et plus ne constituent que `r pct_65plus_a` %.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** `r pct_moins15_m` % des individus ont moins de 15 ans. La population en âge de travailler (15–64 ans) représente `r pct_15_64_m` %, tandis que les personnes de 65 ans et plus ne constituent que `r pct_65plus_m` %.
+:::
+:::
 
 #### Au niveau des observatoires
 
@@ -190,7 +348,7 @@ dl_fig_variants("fig_pyramide", "04", function(d) {
 
 ### Origine des CM et conjoints
 
-Variables concernées : m6 (lien de parenté, 1 = CM, 2 = conjoint), m3 (origine).
+L'origine géographique des chefs de ménage et de leurs conjoints renseigne sur les dynamiques migratoires et le degré d'ancrage local des familles. La classification distingue les *tompon-tany* (autochtones), les *zana-tany* (nés sur place de parents migrants), les *valivotaka* (migrants installés durablement) et les *mpihavy* (arrivants récents). La répartition de ces catégories diffère sensiblement entre les deux observatoires.
 
 ```{r origine}
 make_origin_table(members, m3, classify_origin, "Origine",
@@ -227,6 +385,8 @@ dl_fig_variants("fig_origine", "04", function(d) {
 ```
 
 ### Région d'origine
+
+La provenance régionale des CM et conjoints qui ne sont pas natifs de la localité permet d'identifier les principaux bassins migratoires alimentant chaque observatoire.
 
 ```{r homeland}
 # Homeland variable (m3a) - use labels from Stata
@@ -310,6 +470,8 @@ dl_fig_variants("fig_homeland", "04", function(d) {
 
 ### Raison d'installation
 
+Les raisons d'installation des CM et conjoints non originaires du lieu éclairent les motivations migratoires. Elles distinguent notamment les installations liées au mariage de celles motivées par les opportunités économiques (travail agricole ou non agricole).
+
 ```{r raison}
 make_origin_table(members, mg4a, classify_reason, "Raison",
                   "Raison d'implantation des CM et conjoints par observatoire")
@@ -345,6 +507,20 @@ dl_fig_variants("fig_raison", "04", function(d) {
 ```
 
 ## Caractéristiques des chefs de ménages
+
+Le profil des chefs de ménage (CM) est décrit ci-dessous.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** `r pct_cm_h_a` % des CM sont des hommes, soit `r pct_cm_f_a` % de ménages dirigés par des femmes. L'âge moyen des CM est de `r age_cm_a` ans. Sur le plan conjugal, `r pct_couple_a` % des CM vivent en couple (mariés ou en concubinage).
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** `r pct_cm_h_m` % des CM sont des hommes, soit `r pct_cm_f_m` % de ménages dirigés par des femmes. L'âge moyen des CM est de `r age_cm_m` ans. Sur le plan conjugal, `r pct_couple_m` % des CM vivent en couple (mariés ou en concubinage).
+:::
+:::
 
 ### Caractéristiques socio-démographiques
 
@@ -437,6 +613,20 @@ dl_tbl_variants("tbl_cm_chars", "04", function(d) {
 
 ### Niveau d'éducation
 
+Le niveau d'éducation des chefs de ménage constitue un déterminant majeur de la capacité d'adaptation et de la vulnérabilité des ménages ruraux. L'analyse croisée par sexe met en évidence des disparités supplémentaires.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** Le niveau le plus fréquemment atteint est « `r top_educ_a` » (`r pct_top_educ_a` % des CM).
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** Le niveau le plus fréquemment atteint est « `r top_educ_m` » (`r pct_top_educ_m` % des CM).
+:::
+:::
+
 #### Niveau d'éducation du Chef de ménage
 
 ```{r cm_educ}
@@ -509,6 +699,20 @@ dl_tbl_variants("tbl_cm_educ_sex", "04", function(d) {
 ```
 
 ### Alphabétisation des chefs de ménage
+
+L'aptitude à lire et écrire conditionne l'accès à l'information, aux services publics et aux opportunités économiques. Les sections suivantes détaillent les compétences en lecture et en écriture séparément, avec une ventilation par sexe.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** `r pct_alpha_a` % des CM savent lire et écrire.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** `r pct_alpha_m` % des CM savent lire et écrire.
+:::
+:::
 
 ```{r cm_literacy_helpers}
 #| include: false
@@ -675,7 +879,19 @@ dl_tbl_variants("tbl_cm_w_sex", "04", function(d) {
 
 ### Activités principales des Chefs de ménage
 
-Les activités principales des chefs de ménage sont regroupées en catégories sectorielles inspirées de la CITI Rév. 4 (Classification internationale type, par industrie, de toutes les branches d'activité économique) afin de garantir un effectif suffisant dans chaque classe et de préserver la confidentialité statistique.
+L'activité économique principale des chefs de ménage traduit la structure productive de chaque observatoire. Les activités sont regroupées en catégories sectorielles inspirées de la CITI Rév. 4 afin de garantir un effectif suffisant dans chaque classe et de préserver la confidentialité statistique.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** L'activité dominante est « `r top_act_a` » (`r pct_top_act_a` % des CM).
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** L'activité dominante est « `r top_act_m` » (`r pct_top_act_m` % des CM).
+:::
+:::
 
 ```{r cm_act}
 cm_act <- cm |>
@@ -821,6 +1037,8 @@ dl_fig_variants("fig_cm_act_sex", "04", function(d) {
 
 ## Caractéristiques des autres membres de ménages
 
+Les autres membres du ménage (conjoints, enfants, dépendants) constituent la majorité de la population recensée. Leur profil démographique, éducatif et économique complète celui des chefs de ménage et permet de dresser un portrait plus complet du capital humain des familles rurales.
+
 ### Caractéristiques socio-démographiques
 
 ```{r other_chars}
@@ -913,6 +1131,8 @@ dl_tbl_variants("tbl_other_chars", "04", function(d) {
 ```
 
 ### Éducation et scolarisation
+
+Le niveau d'éducation des autres membres de ménage complète le portrait éducatif des familles. Les disparités entre sexes et entre observatoires donnent un aperçu des inégalités d'accès à l'éducation.
 
 #### Niveau d'éducation des autres membres
 
@@ -1091,6 +1311,20 @@ dl_tbl_variants("tbl_other_w_sex", "04", function(d) {
 
 ### Scolarisation
 
+Le taux de scolarisation des enfants de 6 à 14 ans constitue un indicateur clé du développement humain et de l'investissement des ménages dans l'éducation.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** Le taux de scolarisation s'élève à `r taux_scol_a` %.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** Le taux de scolarisation s'élève à `r taux_scol_m` %.
+:::
+:::
+
 #### Taux de scolarisation des enfants de 6 à 14 ans
 
 ```{r schooling}
@@ -1171,7 +1405,19 @@ dl_tbl_variants("tbl_class", "04", function(d) {
 
 #### Raisons de non fréquentation de l'école pour les 6 à 15 ans
 
-La variable `s5` recense le motif principal de non-scolarisation ou d'arrêt des études.
+La @fig-raisons-non-scol et le @tbl-raisons-non-scol détaillent l'ensemble des motifs de non-scolarisation cités.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** Parmi les enfants de 6 à 15 ans non scolarisés, la première raison invoquée est « `r top_raison_a` » (`r pct_top_raison_a` %).
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** Parmi les enfants de 6 à 15 ans non scolarisés, la première raison invoquée est « `r top_raison_m` » (`r pct_top_raison_m` %).
+:::
+:::
 
 ```{r fig-raisons-non-scol}
 #| fig-cap: "Principales raisons de non-scolarisation ou d'arrêt des études (6-15 ans)"
@@ -1266,7 +1512,7 @@ dl_tbl_variants("tbl_raisons_non_scol", "04", function(d) {
 
 ### Activités principales des autres membres de ménages
 
-Les activités des autres membres de ménage sont regroupées selon la même nomenclature sectorielle que pour les CM.
+La répartition sectorielle des activités des autres membres de ménage reflète la diversification économique au sein des familles et le rôle des conjoints et enfants dans l'économie du ménage. Les activités sont regroupées selon la même nomenclature sectorielle que pour les CM.
 
 ```{r other_act_grouped}
 other_act <- others |>

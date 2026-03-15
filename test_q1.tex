@@ -1,0 +1,115 @@
+% Options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  french,
+  letterpaper,
+]{report}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\begin{document}
+
+\begin{table}
+
+\caption{\label{tbl-menaces}Menaces perçues sur l'environnement et
+responsables identifiés (\% de Oui)}
+
+\centering{
+
+\fontsize{12.0pt}{14.0pt}\selectfont
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrr}
+\toprule
+ & {\bfseries {Alaotra}} & {\bfseries {Marovoay}} \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{3}{l}{{\bfseries {Perception globale}}} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+Considèrent que l'environnement est menacé & 82 % & 79 % \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{3}{l}{{\bfseries {Principales menaces (parmi ceux qui déclarent menacé)}}} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+Feux & 84 % & 95 % \\ 
+Défrichage & 56 % & 52 % \\ 
+Prélèvement (faune) & 40 % & 20 % \\ 
+Prélèvement (flore) & 40 % & 21 % \\ 
+Prospection minière & 29 % & 6 % \\ 
+Nomadisme (passage non-résidents) & 16 % & 16 % \\ 
+Zébu / pâturage & 20 % & 10 % \\ 
+Tourisme & 2 % & 3 % \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{3}{l}{{\bfseries {Principaux responsables}}} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+L'ensemble des riverains & 87 % & 70 % \\ 
+Les riverains migrants & 47 % & 37 % \\ 
+L'État (Fanjakana) & 10 % & 8 % \\ 
+Les braconniers & 30 % & 10 % \\ 
+Le gestionnaire & 9 % & 3 % \\ 
+Les nomades ou semi-nomades & 22 % & 17 % \\ 
+Les ONG ou entreprises & 3 % & 4 % \\ 
+Les chercheurs & 0 % & 2 % \\ 
+Les touristes & 1 % & 2 % \\ 
+\bottomrule
+\end{tabular*}
+\begin{minipage}{\linewidth}
+\textbf{Source : Enquête auprès des OR 2025}\\
+\end{minipage}
+
+}
+
+\end{table}%
+\end{document}

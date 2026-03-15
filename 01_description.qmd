@@ -24,6 +24,8 @@ library(lubridate)
 library(scales)
 library(readxl)
 library(wdpar)
+
+source("utils/helpers_report.R")
 ```
 
 ## Contexte et objectifs
@@ -33,11 +35,29 @@ Les Observatoires Ruraux (OR) de Madagascar sont un dispositif d'enquête longit
 - **Alaotra**, situé dans la région Alaotra-Mangoro, dans les districts d'Ambatondrazaka et d'Amparafaravola. L'Alaotra est le premier grenier à riz de Madagascar, caractérisé par de vastes plaines irriguées et des périmètres aménagés.
 - **Marovoay** , situé dans la région Boeny, dans le district de Marovoay. Marovoay constitue le deuxième pôle rizicole du pays, avec une production reposant sur l'irrigation par les eaux du fleuve Betsiboka.
 
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** L'observatoire de Marovoay est situé dans la plaine alluviale du fleuve Betsiboka, au nord-ouest de Madagascar. La zone d'enquête s'organise autour de quatre fokontany — Ampijoroa et Maroala sur la rive gauche, Bepako et Madiromiongana sur la rive droite — séparés par le fleuve. La proximité du Parc national d'Ankarafantsika, dont les limites ont été étendues en 2002, confère à cette zone un intérêt particulier pour l'étude des interactions entre conservation et développement rural. L'économie locale repose principalement sur la riziculture irriguée, complétée par l'élevage bovin et les cultures de rente.
+:::
+:::
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** L'observatoire de l'Alaotra se situe dans la cuvette du lac Alaotra, le plus grand lac de Madagascar, au centre-est de l'île. La zone d'enquête couvre sept fokontany répartis dans les districts d'Ambatondrazaka et d'Amparafaravola : Avaradrano, Feramanga Atsimo et Mangabe au sud du lac, Analamiranga, Maritampona, Ambohidrony et Ambatomanga à l'ouest. Le lac Alaotra est une nouvelle aire protégée établie temporairement en 2007, puis définitivement en 2015. Il est entouré de marais et de zones humides qui abritent des espèces endémiques. Premier bassin rizicole du pays, la région est aussi caractérisée par une pression foncière croissante et une dynamique de déforestation des bassins versants.
+:::
+:::
+
 Ces deux observatoires ont été enquêtés de manière régulière entre 1995 et 2014 (Marovoay) et 1999 et 2014 (Alaotra), avec une seule interruption l'année 2009 en raison de la crise politique qui a secoué le pays. La campagne 2025, réalisée par le projet BETSAKA, renoue avec ce suivi après une interruption de plus de dix ans. L'enquête conserve les instruments et la méthodologie des campagnes antérieures, tout en reprenant des ajustements faits dans le cadre de l'observatoire du Makay en 2022 et 2024, et en les adaptant au contexte actuel.
 
 > Introduire ici un paragraphe qui liste les modifications introduites pour cette campagne : allègement du questionnaire, modules développés pour le Makay qui ont été repris, nouveau formulaire de consentement éclairé...
 
 La période de référence couvre les douze mois précédant l'interview, soit du 1^er^ octobre 2024 au 30 septembre 2025.
+
+::: {.content-visible when-profile="consolidated"}
+::: {.obs-technical}
+*Note méthodologique.* Après plus de dix ans d'interruption (la dernière campagne régulière date de 2014), la reconstitution du panel de ménages constitue un défi majeur. Le suivi longitudinal est affecté par l'attrition (décès, migration, éclatement des ménages), ce qui a conduit à compléter le panel historique par un nouveau tirage aléatoire. Les comparaisons inter-temporelles doivent donc être interprétées avec prudence, en tenant compte de ce renouvellement partiel de l'échantillon. Un chapitre d'approfondissement est consacré à cette question, voir @sec-representativite.
+:::
+:::
 
 ## Méthodologie
 
@@ -48,7 +68,7 @@ Les unités d'observation sont les ménages résidant dans les hameaux échantil
 Les enquêteurs ont été formés par les superviseurs avant le déploiement sur le terrain. La saisie des données a été réalisée à l'aide de masques de saisie dédiés.
 
 ::: {.callout-note}
-Le protocole éthique de l'enquête a fait l'objet d'une approbation, présentée en annexe du rapport.
+Le protocole éthique de l'enquête a fait l'objet d'une approbation. Il est présenté en annexe du rapport.
 :::
 
 
@@ -167,7 +187,11 @@ pa_ankarafantsika <- st_read("data/ankarafantsika_protected_area.geojson",
 # --- Carte interactive avec tmap ---
 foko_sf <- st_as_sf(fokontany_centroids, coords = c("lon", "lat"), crs = 4326)
 
-tmap_mode("view")
+if (knitr::is_html_output()) {
+  tmap_mode("view")
+} else {
+  tmap_mode("plot")
+}
 tm_shape(foko_sf) +
   tm_dots(
     fill = "Observatory",

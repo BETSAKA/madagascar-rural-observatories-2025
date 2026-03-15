@@ -1,0 +1,315 @@
+---
+title: "Test Ch01 — Description"
+format:
+  pdf:
+    documentclass: report
+    pdf-engine: xelatex
+    lang: fr
+    toc: false
+    echo: false
+    keep-tex: true
+    include-in-header:
+      - text: |
+          \usepackage{multirow}
+          \usepackage{longtable}
+execute:
+  warning: false
+  error: false
+---
+
+```{r setup_desc}
+#| include: false
+library(tidyverse)
+library(haven)
+library(labelled)
+library(gt)
+library(readODS)
+library(tmap)
+library(sf)
+library(lubridate)
+library(scales)
+library(readxl)
+
+source("utils/helpers_report.R")
+```
+
+# Map test — tmap static
+
+```{r carte_sites}
+#| fig-cap: "Localisation approximative des fokontany enquêtés"
+#| fig-width: 7
+#| fig-height: 8
+
+fokontany_centroids <- tribble(
+  ~Observatory, ~Fokontany,           ~lat,       ~lon,
+  "Alaotra",    "Avaradrano",       -17.805414, 48.469958,
+  "Alaotra",    "Feramanga Atsimo", -17.844153, 48.373383,
+  "Alaotra",    "Mangabe",          -17.879586, 48.405244,
+  "Alaotra",    "Analamiranga",     -17.572375, 48.200017,
+  "Alaotra",    "Maritampona",      -17.603500, 48.207639,
+  "Alaotra",    "Ambohidrony",      -17.729175, 48.208611,
+  "Alaotra",    "Ambatomanga",      -17.741178, 48.200647,
+  "Marovoay",   "Ampijoroa",        -16.233414, 46.477984,
+  "Marovoay",   "Maroala",          -16.228857, 46.539738,
+  "Marovoay",   "Madiromiongana",   -16.086480, 46.749270,
+  "Marovoay",   "Bepako",           -16.163712, 46.658402
+)
+
+wdpa_mdg <- read_rds("data/wdpa/MDG_protected_areas.rds") |>
+  filter(str_detect(DESIG, "Ramsar", negate = TRUE)) |>
+  filter(str_detect(DESIG, "UNESCO", negate = TRUE))
+
+foko_sf <- st_as_sf(fokontany_centroids, coords = c("lon", "lat"), crs = 4326)
+
+tmap_mode("plot")
+tm_shape(foko_sf) +
+  tm_dots(
+    fill = "Observatory",
+    fill.scale = tm_scale_categorical(
+      values = c("Alaotra" = "#E41A1C", "Marovoay" = "#377EB8")
+    ),
+    fill.legend = tm_legend(title = "Observatoire"),
+    size = 1
+  ) +
+  tm_shape(wdpa_mdg |> mutate(`Couche` = "Aires protégées")) +
+  tm_borders(
+    col = "Couche",
+    col.scale = tm_scale_categorical(values = c("Aires protégées" = "lightgreen")),
+    col.legend = tm_legend(title = ""),
+    lwd = 2
+  ) +
+  tm_scalebar(position = c("left", "bottom"))
+```
+
+# Tables from Ch01
+
+```{r data_loading}
+res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta")
+res_m_a <- read_dta("data/ROS_MDG_microdata/2025/res_m_a.dta")
+
+res_deb <- res_deb |>
+  mutate(
+    j0 = as.character(j0),
+    Observatory = case_when(
+      j0 == "3"  ~ "Marovoay",
+      j0 == "21" ~ "Alaotra",
+      TRUE       ~ j0
+    ),
+    j4bis = case_when(
+      str_starts(str_to_lower(j4), "bepako") ~ "Bepako",
+      str_starts(str_to_lower(j4), "ampijoroa") ~ "Ampijoroa",
+      str_starts(str_to_lower(j4), "maroala") ~ "Maroala",
+      str_starts(str_to_lower(j4), "madiromiongana") ~ "Madiromiongana",
+      TRUE ~ j4
+    )
+  )
+
+res_m_a <- res_m_a |>
+  left_join(res_deb |> select(j5, Observatory), by = "j5")
+```
+
+## Table: Répartition des ménages
+
+```{r tbl-men-obs}
+#| tbl-cap: "Répartition des ménages et des individus selon les observatoires"
+
+tab <- res_deb |>
+  group_by(Observatory) |>
+  summarise(n_menages = n_distinct(j5), .groups = "drop") |>
+  left_join(
+    res_m_a |>
+      group_by(Observatory) |>
+      summarise(n_individus = n(), .groups = "drop"),
+    by = "Observatory"
+  ) |>
+  arrange(desc(n_menages)) |>
+  mutate(
+    Pourcent_menages   = round(n_menages / sum(n_menages) * 100, 1),
+    Pourcent_individus = round(n_individus / sum(n_individus) * 100, 1)
+  )
+
+tab <- tab |>
+  add_row(
+    Observatory        = "Ensemble",
+    n_menages          = sum(tab$n_menages),
+    Pourcent_menages   = 100,
+    n_individus        = sum(tab$n_individus),
+    Pourcent_individus = 100
+  )
+
+gt(tab) |>
+  fmt_number(columns = c(n_menages, n_individus), sep_mark = " ", decimals = 0) |>
+  fmt_number(columns = c(Pourcent_menages, Pourcent_individus), decimals = 1) |>
+  cols_label(
+    Observatory        = "Observatoire",
+    n_menages          = "Ménages",
+    Pourcent_menages   = "% ménages",
+    n_individus        = "Individus",
+    Pourcent_individus = "% individus"
+  ) |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
+    locations = cells_body(rows = Observatory == "Ensemble")
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+## Table: Dénombrement
+
+```{r tbl-denombrement}
+#| tbl-cap: "Dénombrement et taux de sondage par observatoire"
+
+al_raw <- read_excel("data/Synthèse Dénombrement OR 2025.xlsx", sheet = "ALAOTRA ")
+mr_raw <- read_excel("data/Synthèse Dénombrement OR 2025.xlsx", sheet = "MAROVOAY ")
+
+clean_enum <- function(df, obs_name) {
+  df |>
+    mutate(`Nbr Mén E` = as.character(`Nbr Mén E`)) |>
+    filter(!(Fokontany %in% "TOTAL") | is.na(Fokontany)) |>
+    fill(Fokontany, .direction = "down") |>
+    filter(!is.na(`Nbr toit D`)) |>
+    mutate(Observatory = obs_name)
+}
+
+enum_all <- bind_rows(
+  clean_enum(al_raw, "Alaotra"),
+  clean_enum(mr_raw, "Marovoay")
+)
+
+enum_obs <- enum_all |>
+  summarise(
+    Toits = sum(`Nbr toit D`, na.rm = TRUE),
+    Ménages_dénombrés = sum(`Nbr ménage D`, na.rm = TRUE),
+    .by = Observatory
+  ) |>
+  left_join(
+    res_deb |> count(Observatory, name = "Ménages_enquêtés"),
+    by = "Observatory"
+  ) |>
+  mutate(`Taux de sondage (%)` = round(Ménages_enquêtés / Ménages_dénombrés * 100, 1))
+
+enum_obs |>
+  gt() |>
+  fmt_number(columns = c(Toits, Ménages_dénombrés, Ménages_enquêtés),
+             sep_mark = " ", decimals = 0) |>
+  fmt_number(columns = `Taux de sondage (%)`, decimals = 1) |>
+  cols_label(
+    Observatory = "Observatoire",
+    Toits = "Toits dénombrés",
+    Ménages_dénombrés = "Ménages dénombrés",
+    Ménages_enquêtés = "Ménages enquêtés"
+  ) |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_source_note(
+    source_note = md("**Source : Synthèse Dénombrement OR 2025 & Enquête auprès des OR 2025**")
+  )
+```
+
+## Table: Ménages par hameau (grouped)
+
+```{r tbl-men-hameau}
+#| tbl-cap: "Répartition des ménages enquêtés par hameau"
+
+tab_ham <- res_deb |>
+  group_by(Observatory, j4bis) |>
+  summarise(n = n_distinct(j5), .groups = "drop_last") |>
+  mutate(Percent = round(n / sum(n) * 100, 1)) |>
+  ungroup()
+
+totals <- tab_ham |>
+  group_by(Observatory) |>
+  summarise(j4bis = "Ensemble", n = sum(n), Percent = 100)
+
+tab_ham <- bind_rows(tab_ham, totals) |>
+  arrange(Observatory, desc(j4bis != "Ensemble"), desc(n))
+
+gt(tab_ham, groupname_col = "Observatory") |>
+  fmt_number(columns = Percent, decimals = 1) |>
+  cols_label(j4bis = "Hameau", n = "Ménages", Percent = "% obs.") |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
+    locations = cells_row_groups()
+  ) |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#CECECE")),
+    locations = cells_body(rows = j4bis == "Ensemble")
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+## Figure: Chronogramme
+
+```{r fig-chronogramme}
+#| fig-cap: "Fréquences cumulées des entretiens par observatoire"
+#| fig-width: 10
+#| fig-height: 5
+
+chrono <- res_deb |>
+  mutate(
+    j14_str = sprintf("%08d", as.integer(j14)),
+    date_interview = dmy(j14_str)
+  ) |>
+  filter(!is.na(date_interview), date_interview >= as.Date("2025-10-01")) |>
+  count(Observatory, date_interview) |>
+  arrange(Observatory, date_interview) |>
+  mutate(cumul = cumsum(n), .by = Observatory)
+
+ggplot(chrono, aes(x = date_interview, y = cumul, color = Observatory)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 1.5) +
+  scale_x_date(
+    date_breaks = "1 week", date_labels = "%d %b",
+    expand = expansion(mult = c(0.01, 0.01))
+  ) +
+  labs(x = NULL, y = "Nombre cumulé d'entretiens", color = "Observatoire") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Figure: Enquêteurs
+
+```{r fig-enqueteurs}
+#| fig-cap: "Nombre de questionnaires par enquêteur et observatoire"
+#| fig-width: 9
+#| fig-height: 5
+
+enq <- res_deb |>
+  mutate(Enquêteur = paste0("E", sprintf("%02d", j1))) |>
+  count(Observatory, Enquêteur)
+
+ggplot(enq, aes(x = fct_reorder(Enquêteur, n), y = n, fill = Observatory)) +
+  geom_col() +
+  coord_flip() +
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "Questionnaires réalisés", fill = "Observatoire") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+## Table: Superviseurs (wide)
+
+```{r tbl-superviseurs}
+#| tbl-cap: "Nombre de questionnaires supervisés par superviseur"
+
+res_deb |>
+  mutate(Superviseur = paste0("S", sprintf("%02d", j3))) |>
+  count(Observatory, Superviseur) |>
+  pivot_wider(names_from = Observatory, values_from = n, values_fill = 0) |>
+  gt() |>
+  tab_style(
+    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+    locations = cells_column_labels(columns = everything())
+  ) |>
+  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
