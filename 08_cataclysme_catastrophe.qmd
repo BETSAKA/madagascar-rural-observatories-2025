@@ -54,6 +54,7 @@ res_deb <- res_deb %>%
   )
 
 res_deb <- assign_site(res_deb)
+res_deb <- res_deb %>% filter_for_profile()
 
 # Harmoniser les labels des types de cataclysmes (nettoyage des doublons de saisie)
 res_cc <- res_cc %>%
@@ -242,7 +243,7 @@ prev_type_wide <- prev_type %>%
     names_glue = "{Observatory}_{.value}",
     values_fill = 0
   ) %>%
-  arrange(desc(Alaotra_n + Marovoay_n))
+  arrange(desc(rowSums(pick(any_of(c("Alaotra_n", "Marovoay_n"))))))
 
 prev_type_wide %>%
   gt() %>%
@@ -250,9 +251,9 @@ prev_type_wide %>%
     title = "Prévalence des types de cataclysmes par observatoire",
     subtitle = "Nombre et % de ménages ayant déclaré l'événement"
   ) %>%
-  tab_spanner(label = "Alaotra", columns = starts_with("Alaotra")) %>%
-  tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
-  cols_label(
+  safe_tab_spanner(label = "Alaotra", columns = starts_with("Alaotra")) %>%
+  safe_tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
+  safe_cols_label(
     Catastrophe = "Type de Catastrophe",
     Alaotra_n = "N", Alaotra_pct = "%",
     Marovoay_n = "N", Marovoay_pct = "%"
@@ -369,7 +370,7 @@ nb_cata_combined <- nb_cata_hameau %>%
   arrange(Observatory, j4bis == "Ensemble", j4bis)
 
 nb_cata_combined %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Nombre moyen de catastrophes subies par ménage",
     subtitle = "Par hameau et observatoire"
@@ -462,9 +463,9 @@ degats_logement_resume %>%
     title = "Dégâts sur le logement par type de catastrophe",
     subtitle = "% de ménages ayant subi des dégâts (au moins « Un peu »), parmi ceux touchés"
   ) %>%
-  tab_spanner(label = "Alaotra", columns = starts_with("Alaotra")) %>%
-  tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
-  cols_label(
+  safe_tab_spanner(label = "Alaotra", columns = starts_with("Alaotra")) %>%
+  safe_tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
+  safe_cols_label(
     Catastrophe = "Catastrophe",
     Alaotra_n_total = "N", Alaotra_n_degats = "Dégâts", Alaotra_pct_degats = "%",
     Marovoay_n_total = "N", Marovoay_n_degats = "Dégâts", Marovoay_pct_degats = "%"
@@ -532,7 +533,7 @@ degats_elevage_display <- events %>%
   arrange(Observatory, desc(Rien))
 
 degats_elevage_display %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Gravité des dégâts sur l'élevage par type de Catastrophe",
     subtitle = "Distribution en % (parmi les ménages ayant renseigné les dégâts)"
@@ -594,7 +595,7 @@ degats_personnes <- events %>%
   arrange(Observatory, desc(Aucun))
 
 degats_personnes %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Conséquences des cataclysmes sur les personnes du ménage",
     subtitle = "Distribution en % par type de Catastrophe"
@@ -718,7 +719,7 @@ saisonnalite <- events %>%
   arrange(Observatory, desc(n))
 
 saisonnalite %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Saisonnalité des cataclysmes",
     subtitle = "% d'événements survenus hors soudure et pendant la soudure"
@@ -853,7 +854,7 @@ cultures_touchees <- res_cca %>%
   select(-rang)
 
 cultures_touchees %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Top 10 des cultures les plus touchées par observatoire",
     subtitle = "Nombre de ménages déclarant des dégâts sur la culture"
@@ -934,7 +935,7 @@ riz_champs <- res_cca %>%
   pivot_wider(names_from = Niveau, values_from = pct, values_fill = 0)
 
 riz_champs %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Dégâts sur les champs de riz par type de catastrophe",
     subtitle = "Distribution en % du niveau de dégâts (parmi les ménages riziculteurs ayant déclaré des dégâts)"
@@ -1006,7 +1007,7 @@ riz_stocks <- res_cca %>%
   pivot_wider(names_from = Niveau, values_from = pct, values_fill = 0)
 
 riz_stocks %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Dégâts sur les stocks de riz par type de catastrophe",
     subtitle = "Distribution en % du niveau de dégâts"

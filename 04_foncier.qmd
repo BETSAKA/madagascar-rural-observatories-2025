@@ -35,7 +35,8 @@ res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
       TRUE       ~ j0
     )
   ) |>
-  assign_site()
+  assign_site() |>
+  filter_for_profile()
 
 add_obs <- function(df) {
   df |>
@@ -723,7 +724,7 @@ cert_pct <- sec_data |>
 bind_rows(titre_pct, cert_pct) |>
   gt() |>
   tab_header(title = "% des parcelles disposant d'un document de sécurisation") |>
-  cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
+  safe_cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
 ```
 
 ```{r dl_tbl_securisation}

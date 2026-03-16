@@ -18,11 +18,12 @@
 get_report_mode <- function() {
   profile <- Sys.getenv("QUARTO_PROFILE", "consolidated")
   list(
-    profile        = profile,
+    profile = profile,
     is_consolidated = profile == "consolidated",
-    observatory    = switch(profile,
+    observatory = switch(
+      profile,
       "marovoay" = "Marovoay",
-      "alaotra"  = "Alaotra",
+      "alaotra" = "Alaotra",
       NULL
     )
   )
@@ -34,7 +35,9 @@ get_report_mode <- function() {
 #' @param mode Optional: result of `get_report_mode()`. If NULL, calls it.
 #' @return The (possibly filtered) data frame.
 filter_for_profile <- function(data, mode = NULL) {
-  if (is.null(mode)) mode <- get_report_mode()
+  if (is.null(mode)) {
+    mode <- get_report_mode()
+  }
   if (mode$is_consolidated || is.null(mode$observatory)) {
     return(data)
   }

@@ -36,6 +36,7 @@ res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   )
 
 res_deb <- assign_site(res_deb)
+res_deb <- res_deb |> filter_for_profile()
 
 # --- Données environnement ---
 res_ap_def     <- read_dta("data/ROS_MDG_microdata/2025/res_ap_def.dta")
@@ -75,7 +76,7 @@ pct_oui <- function(df, var, label) {
     ) |>
     pivot_wider(names_from = Observatory, values_from = pct) |>
     mutate(Item = label) |>
-    select(Item, Alaotra, Marovoay)
+    select(Item, any_of(c("Alaotra", "Marovoay")))
 }
 
 # Labels mois
@@ -252,7 +253,7 @@ appart <- rm3_items |>
   pmap_dfr(\(var, label) {
     pct_oui(res_op_env, var, label)
   }) |>
-  pivot_longer(c(Alaotra, Marovoay), names_to = "Groupe", values_to = "pct")
+  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Groupe", values_to = "pct")
 
 ggplot(appart,
        aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
@@ -334,10 +335,10 @@ bind_rows(
   menaces |> mutate(Section = "Principales menaces (parmi ceux qui déclarent menacé)"),
   resps |> mutate(Section = "Principaux responsables")
 ) |>
-  select(Section, Item, Alaotra, Marovoay) |>
+  select(Section, Item, any_of(c("Alaotra", "Marovoay"))) |>
   gt(groupname_col = "Section") |>
-  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
-  fmt_number(columns = c(Alaotra, Marovoay), decimals = 0, pattern = "{x} %") |>
+  safe_cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
+  fmt_number(columns = any_of(c("Alaotra", "Marovoay")), decimals = 0, pattern = "{x} %") |>
   tab_style(
     style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
     locations = cells_column_labels(columns = everything())
@@ -404,7 +405,7 @@ rm5_items <- tribble(
 
 repr <- rm5_items |>
   pmap_dfr(\(var, label) pct_oui(res_op_env, var, label)) |>
-  pivot_longer(c(Alaotra, Marovoay), names_to = "Groupe", values_to = "pct")
+  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Groupe", values_to = "pct")
 
 ggplot(repr,
        aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
@@ -614,7 +615,7 @@ ef_vente <- res_ef |>
   )
 
 ef_vente |>
-  gt(groupname_col = "Observatory") |>
+  obs_gt() |>
   cols_label(
     Produit = "Produit",
     pct_vendeurs = "% de vendeurs",
@@ -688,13 +689,14 @@ conn_tbl <- conn_by_obs |>
 
 bind_rows(
   freq_items,
-  tibble(Item = "Connaissance du lieu (parmi usagers) :",
-         Alaotra = NA_real_, Marovoay = NA_real_),
+  tibble(Item = "Connaissance du lieu (parmi usagers) :") |>
+    bind_cols(setNames(as.list(rep(NA_real_, length(intersect(c("Alaotra", "Marovoay"), names(freq_items))))),
+                       intersect(c("Alaotra", "Marovoay"), names(freq_items)))),
   conn_tbl
 ) |>
   gt() |>
-  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
-  fmt_number(columns = c(Alaotra, Marovoay), decimals = 0, pattern = "{x} %") |>
+  safe_cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
+  fmt_number(columns = any_of(c("Alaotra", "Marovoay")), decimals = 0, pattern = "{x} %") |>
   sub_missing(missing_text = "") |>
   tab_style(
     style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
@@ -747,7 +749,7 @@ non_items <- tribble(
 
 non_freq <- non_items |>
   pmap_dfr(\(var, label) pct_oui(um1_non, var, label)) |>
-  pivot_longer(c(Alaotra, Marovoay), names_to = "Groupe", values_to = "pct")
+  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Groupe", values_to = "pct")
 
 ggplot(non_freq,
        aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
@@ -1009,7 +1011,7 @@ feu_items <- tribble(
 
 feu_raisons <- feu_items |>
   pmap_dfr(\(var, label) pct_oui(res_feubrousse, var, label)) |>
-  pivot_longer(c(Alaotra, Marovoay), names_to = "Groupe", values_to = "pct")
+  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Groupe", values_to = "pct")
 
 ggplot(feu_raisons,
        aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
@@ -1086,15 +1088,16 @@ echap <- pct_oui(res_feubrousse |> filter(s18 == 1), "s20", "Un feu lui a déjà
 
 bind_rows(
   feu_tbl,
-  tibble(Item = "Si feux dans l'année, localisation :",
-         Alaotra = NA_real_, Marovoay = NA_real_),
+  tibble(Item = "Si feux dans l'année, localisation :") |>
+    bind_cols(setNames(as.list(rep(NA_real_, length(intersect(c("Alaotra", "Marovoay"), names(feu_tbl))))),
+                       intersect(c("Alaotra", "Marovoay"), names(feu_tbl)))),
   loc_tbl,
   maitr,
   echap
 ) |>
   gt() |>
-  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
-  fmt_number(columns = c(Alaotra, Marovoay), decimals = 0, pattern = "{x} %") |>
+  safe_cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
+  fmt_number(columns = any_of(c("Alaotra", "Marovoay")), decimals = 0, pattern = "{x} %") |>
   sub_missing(missing_text = "") |>
   tab_style(
     style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
@@ -1342,8 +1345,8 @@ ap_items <- bind_rows(
 
 ap_items |>
   gt() |>
-  cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
-  fmt_number(columns = c(Alaotra, Marovoay), decimals = 0, pattern = "{x} %") |>
+  safe_cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
+  fmt_number(columns = any_of(c("Alaotra", "Marovoay")), decimals = 0, pattern = "{x} %") |>
   tab_style(
     style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
     locations = cells_column_labels(columns = everything())
@@ -1524,7 +1527,7 @@ ap_favorable <- res_ap |> filter(ap5 == 1)
 
 mesures <- ap5b_items |>
   pmap_dfr(\(var, label) pct_oui(ap_favorable, var, label)) |>
-  pivot_longer(c(Alaotra, Marovoay), names_to = "Groupe", values_to = "pct")
+  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Groupe", values_to = "pct")
 
 ggplot(mesures,
        aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +

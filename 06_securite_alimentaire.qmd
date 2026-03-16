@@ -50,6 +50,7 @@ source("utils/downloadable_output.R")
 
 # Add Site column
 res_deb <- assign_site(res_deb)
+res_deb <- res_deb %>% filter_for_profile()
 
 # Pre-joined datasets for site-level downloads
 sa_full  <- res_sa  %>% left_join(res_deb %>% select(j5, Observatory, Site), by = "j5")
@@ -192,7 +193,7 @@ soudure_combined <- soudure_hameau %>%
   arrange(Observatory, j4bis == "Ensemble", j4bis)
 
 soudure_combined %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(title = "Durée moyenne de la soudure par hameau et observatoire") %>%
   cols_label(
     j4bis = "Hameau",
@@ -293,7 +294,7 @@ calendrier_soudure %>%
     title = "Calendrier de la soudure par observatoire",
     subtitle = "% de ménages en période de soudure chaque mois"
   ) %>%
-  fmt_number(columns = c(Alaotra, Marovoay), decimals = 1) %>%
+  fmt_number(columns = any_of(c("Alaotra", "Marovoay")), decimals = 1) %>%
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
@@ -453,7 +454,7 @@ calendrier_stress %>%
     title = "Calendrier du stress alimentaire par observatoire",
     subtitle = "% de ménages en stress alimentaire chaque mois"
   ) %>%
-  fmt_number(columns = c(Alaotra, Marovoay), decimals = 1) %>%
+  fmt_number(columns = any_of(c("Alaotra", "Marovoay")), decimals = 1) %>%
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
@@ -587,7 +588,7 @@ alim_hors <- res_sa %>%
 
 alim_hors %>%
   select(Observatory, Repas, Aliment, pct) %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Alimentation de base hors soudure par observatoire",
     subtitle = "Aliments représentant au moins 2% des réponses"
@@ -653,7 +654,7 @@ alim_pendant <- res_sa %>%
 
 alim_pendant %>%
   select(Observatory, Repas, Aliment, pct) %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Alimentation de base pendant la soudure par observatoire",
     subtitle = "Aliments représentant au moins 2% des réponses"
@@ -787,7 +788,7 @@ transition <- res_sa %>%
 
 transition %>%
   select(Observatory, Hors_soudure, Pendant_soudure, n, pct) %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Changement d'aliment de base au déjeuner",
     subtitle = "Transitions hors soudure → pendant soudure (≥ 1%)"
@@ -880,7 +881,7 @@ strat_resume <- strat_data %>%
   group_by(Observatory, Stratégie) %>%
   summarise(pct_freq = sum(pct), .groups = "drop") %>%
   pivot_wider(names_from = Observatory, values_from = pct_freq, values_fill = 0) %>%
-  arrange(desc(Alaotra + Marovoay))
+  arrange(desc(rowSums(pick(any_of(c("Alaotra", "Marovoay"))))))
 
 strat_resume %>%
   gt() %>%
@@ -888,8 +889,8 @@ strat_resume %>%
     title = "Stratégies d'adaptation les plus fréquentes",
     subtitle = "% de ménages ayant recours « Quelquefois » ou « Souvent »"
   ) %>%
-  cols_label(Stratégie = "Stratégie", Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)") %>%
-  fmt_number(columns = c(Alaotra, Marovoay), decimals = 1) %>%
+  safe_cols_label(Stratégie = "Stratégie", Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)") %>%
+  fmt_number(columns = any_of(c("Alaotra", "Marovoay")), decimals = 1) %>%
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
@@ -1048,9 +1049,9 @@ sources_dette %>%
     title = "Sources d'endettement pour achat alimentaire",
     subtitle = "Parmi les ménages qui s'endettent (ssa01 > 0)"
   ) %>%
-  tab_spanner(label = "Alaotra", columns = starts_with("Alaotra")) %>%
-  tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
-  cols_label(
+  safe_tab_spanner(label = "Alaotra", columns = starts_with("Alaotra")) %>%
+  safe_tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
+  safe_cols_label(
     Source = "Source",
     Alaotra_n_oui = "N", Alaotra_pct = "%",
     Marovoay_n_oui = "N", Marovoay_pct = "%"
@@ -1126,9 +1127,9 @@ sources_emprunt %>%
     title = "Sources d'emprunt d'aliments de base",
     subtitle = "Parmi les ménages qui empruntent des aliments (ssa02 > 0)"
   ) %>%
-  tab_spanner(label = "Alaotra", columns = starts_with("Alaotra")) %>%
-  tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
-  cols_label(
+  safe_tab_spanner(label = "Alaotra", columns = starts_with("Alaotra")) %>%
+  safe_tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
+  safe_cols_label(
     Source = "Source",
     Alaotra_n_oui = "N", Alaotra_pct = "%",
     Marovoay_n_oui = "N", Marovoay_pct = "%"
@@ -1166,7 +1167,7 @@ dl_tbl_variants("t11_sources_emprunt", "09", function(d) {
 # G6 : Top 5 des stratégies les plus fréquentes
 top5 <- strat_resume %>%
   slice_head(n = 5) %>%
-  pivot_longer(cols = c(Alaotra, Marovoay), names_to = "Observatory", values_to = "pct")
+  pivot_longer(cols = any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
 
 ggplot(top5, aes(x = reorder(Stratégie, pct), y = pct, fill = Observatory)) +
   geom_col(position = "dodge") +
@@ -1257,7 +1258,7 @@ csi_combined <- csi_hameau %>%
   arrange(Observatory, j4bis == "Ensemble", j4bis)
 
 csi_combined %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Score CSI simplifié par hameau et observatoire",
     subtitle = "Somme des fréquences des stratégies (0–3 par stratégie)"

@@ -38,6 +38,7 @@ res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   )
 
 res_deb <- assign_site(res_deb)
+res_deb <- res_deb |> filter_for_profile()
 
 add_obs <- function(df) {
   df |>
@@ -359,7 +360,7 @@ res_respg0 |>
   pivot_wider(names_from = Observatory, values_from = pct) |>
   gt() |>
   tab_header(title = "Le ménage a-t-il bénéficié d'un projet ou d'une formation ?") |>
-  cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
+  safe_cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
 ```
 
 ```{r dl_tbl_pro1}
@@ -443,11 +444,11 @@ pro_clean |>
     .by = c(Observatory, pro_lib_clean)
   ) |>
   pivot_wider(names_from = Observatory, values_from = pct) |>
-  arrange(desc(Alaotra)) |>
+  arrange(desc(rowSums(pick(any_of(c("Alaotra", "Marovoay")))))) |>
   rename(`Type de projet` = pro_lib_clean) |>
   gt() |>
   tab_header(title = "% de ménages bénéficiaires par type de projet") |>
-  cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
+  safe_cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
 ```
 
 ```{r dl_tbl_benef_type}

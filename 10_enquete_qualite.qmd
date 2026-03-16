@@ -45,6 +45,7 @@ res_deb <- res_deb |>
   )
 
 res_deb <- assign_site(res_deb)
+res_deb <- res_deb |> filter_for_profile()
 
 res_remq <- res_remq |>
   left_join(res_deb |> select(j5, Observatory, Site), by = "j5")
