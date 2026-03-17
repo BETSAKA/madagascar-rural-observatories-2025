@@ -2,6 +2,176 @@
 # Shared helper functions for the ROR observatory report
 # ----------------------------------------------------------
 
+# --- Report variant utilities (profile detection & filtering) ---------------
+# These were originally in utils/report_variant.R and are included here
+# so that every chapter that sources helpers_report.R gets them automatically.
+
+source("utils/report_variant.R")
+REPORT_MODE <- get_report_mode()
+
+# --- Profile-aware display helpers -----------------------------------------
+
+#' Create a gt table with conditional Observatory grouping
+#'
+#' When data contains a single observatory (observatory-specific report),
+#' the Observatory column is dropped and no grouping is applied.
+#' When data contains multiple observatories (consolidated report),
+#' `groupname_col = "Observatory"` is applied.
+#' @param data Data frame (should contain an Observatory column)
+#' @param ... Additional arguments passed to gt::gt()
+obs_gt <- function(data, ...) {
+  n_obs <- dplyr::n_distinct(data$Observatory)
+  if (n_obs <= 1 && "Observatory" %in% names(data)) {
+    data |>
+      dplyr::select(-Observatory) |>
+      gt::gt(...)
+  } else {
+    gt::gt(data, groupname_col = "Observatory", ...)
+  }
+}
+
+#' Adapt a table/figure title based on the active report profile
+#'
+#' In consolidated mode, appends "par observatoire" to the base title.
+#' In observatory-specific mode, appends the observatory name.
+#' @param base_title Character string (without "par observatoire")
+#' @return Adapted title string
+obs_title <- function(base_title) {
+  mode <- get_report_mode()
+  if (mode$is_consolidated) {
+    paste(base_title, "par observatoire")
+  } else {
+    paste0(base_title, " \u2014 ", mode$observatory)
+  }
+}
+
+#' Conditionally add facet_wrap(~Observatory) to a ggplot
+#'
+#' Adds faceting only when data has multiple observatories.
+#' @param data The data used in the plot (to check n observatories)
+#' @param ... Additional arguments passed to facet_wrap
+obs_facet <- function(data, ...) {
+  n_obs <- dplyr::n_distinct(data$Observatory)
+  if (n_obs > 1) {
+    ggplot2::facet_wrap(~Observatory, ...)
+  } else {
+    NULL
+  }
+}
+
+#' Safely label columns in gt — silently skips columns that don't exist
+#'
+#' Drop-in replacement for gt::cols_label() when some columns may be absent
+#' (e.g. after pivot_wider(names_from = Observatory) in a single-observatory
+#' report). Labels for non-existent columns are simply ignored.
+#' @param .data A gt object
+#' @param ... Name-value pairs passed to cols_label
+safe_cols_label <- function(.data, ...) {
+  labs <- list(...)
+  existing_cols <- colnames(.data[["_data"]])
+  valid_labs <- labs[names(labs) %in% existing_cols]
+  if (length(valid_labs) > 0) {
+    gt::cols_label(.data, .list = valid_labs)
+  } else {
+    .data
+  }
+}
+
+#' Safely add a tab_spanner — skips if no matching columns exist
+#'
+#' When an observatory-specific report filters out one observatory,
+#' pivot_wider columns like "Marovoay_Homme" may not exist.
+#' This wrapper silently skips the spanner rather than erroring.
+#' @param .data A gt object
+#' @param label Spanner label
+#' @param columns Tidyselect expression for columns
+safe_tab_spanner <- function(.data, label, columns) {
+  tryCatch(
+    gt::tab_spanner(.data, label = label, columns = {{ columns }}),
+    error = function(e) .data
+  )
+}
+
+# --- gt LaTeX accent fix ------------------------------------------------
+# gt 1.x converts Unicode accents to LaTeX accent commands in as_latex().
+# Two problems arise with XeLaTeX:
+#   1) Acute accents are double-escaped: é → \\'e (\\=linebreak, not accent)
+#   2) \oe ligature merges with following letters: \oeuvre → undefined command
+# Fix: convert ALL gt accent commands back to UTF-8, which XeLaTeX handles
+# natively via fontspec.
+
+fix_gt_latex_accents <- function(latex_str) {
+  # Double-escaped acute accents (gt bug): \\'e → é, \\'E → É
+  latex_str <- gsub("\\\\'e", "\u00e9", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\\\'E", "\u00c9", latex_str, fixed = TRUE)
+  # Grave accents: \`a → à, \`e → è, \`u → ù
+  latex_str <- gsub("\\`a", "\u00e0", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\`e", "\u00e8", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\`u", "\u00f9", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\`A", "\u00c0", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\`E", "\u00c8", latex_str, fixed = TRUE)
+  # Circumflex: \^a → â, \^e → ê, \^i → î, \^o → ô, \^u → û
+  latex_str <- gsub("\\^a", "\u00e2", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\^e", "\u00ea", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\^i", "\u00ee", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\^o", "\u00f4", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\^u", "\u00fb", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\^A", "\u00c2", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\^E", "\u00ca", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\^I", "\u00ce", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\^O", "\u00d4", latex_str, fixed = TRUE)
+  # Dieresis: \"e → ë, \"i → ï
+  latex_str <- gsub("\\\"e", "\u00eb", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\\"i", "\u00ef", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\\"o", "\u00f6", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\\"u", "\u00fc", latex_str, fixed = TRUE)
+  # Ligatures and cedilla
+  latex_str <- gsub("\\oe", "\u0153", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\OE", "\u0152", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\c{c}", "\u00e7", latex_str, fixed = TRUE)
+  latex_str <- gsub("\\c{C}", "\u00c7", latex_str, fixed = TRUE)
+  # Remove \cellcolor commands to avoid colortbl/booktabs conflicts in PDF.
+  # Cell colours are cosmetic; bold text + row groups provide structure.
+  latex_str <- gsub("\\\\cellcolor\\[HTML\\]\\{[A-F0-9]+\\}", "", latex_str)
+  # Strip NA row group headers generated by gt when groupname_col has NAs.
+  # Pattern: \multicolumn{N}{l}{{\bfseries {NA}}} \\[2.5pt]\n\midrule\addlinespace[2.5pt]
+  latex_str <- gsub(
+    "\\\\multicolumn\\{\\d+\\}\\{l\\}\\{\\{\\\\bfseries \\{NA\\}\\}\\} \\\\\\\\\\[2\\.5pt\\]\\s*\n\\\\midrule\\\\addlinespace\\[2\\.5pt\\]",
+    "",
+    latex_str
+  )
+  # Escape bare % signs in cell content. gt outputs "82 %" but in LaTeX %
+  # is a comment character, swallowing the rest of the line (including \\ and &).
+  # This causes "Misplaced \noalign" errors because \midrule never sees \cr.
+  # We escape any % not preceded by \ (i.e. not already \%).
+  latex_str <- gsub("(?<!\\\\)%", "\\\\%", latex_str, perl = TRUE)
+  # Restore structural end-of-line %  used by gt (e.g. \end{table}%)
+  latex_str <- gsub("\\\\end\\{table\\}\\\\%", "\\\\end{table}%", latex_str)
+  latex_str
+}
+
+knit_print.gt_tbl <- function(x, ...) {
+  if (knitr::is_latex_output()) {
+    latex_str <- as.character(gt::as_latex(x))
+    latex_str <- fix_gt_latex_accents(latex_str)
+    # Reduce gt default font size from 12pt to 9pt for better fit in PDF
+    latex_str <- gsub(
+      "\\\\fontsize\\{12\\.0pt\\}\\{14\\.0pt\\}",
+      "\\\\fontsize{9.0pt}{11.0pt}",
+      latex_str
+    )
+    return(knitr::asis_output(latex_str))
+  }
+  # HTML / DOCX: default gt rendering
+  knitr::knit_print(gt::as_raw_html(x), ...)
+}
+registerS3method(
+  "knit_print",
+  "gt_tbl",
+  knit_print.gt_tbl,
+  envir = asNamespace("knitr")
+)
+
 #' Add Observatory labels from j0 codes
 #' @param x Either a data frame (adds Observatory column) or a vector of j0 codes
 add_obs <- function(x) {
@@ -325,7 +495,7 @@ make_origin_table <- function(data, var_col, classify_fn, var_label, title) {
       `Conjoint %`
     )
 
-  gt::gt(wide, groupname_col = "Observatory") |>
+  obs_gt(wide) |>
     gt::tab_header(title = title, subtitle = "Effectifs et pourcentages") |>
     gt::cols_label(
       Variable = var_label,
@@ -372,18 +542,23 @@ make_origin_histogram <- function(
     ) |>
     suppress_in_plot_data()
 
-  ggplot2::ggplot(
+  n_obs <- dplyr::n_distinct(base$Observatory)
+
+  p <- ggplot2::ggplot(
     base,
     ggplot2::aes(x = Variable, y = pct, fill = Member_Type)
   ) +
     ggplot2::geom_col(position = "dodge") +
-    ggplot2::facet_wrap(~Observatory) +
     ggplot2::labs(title = title, x = var_label, y = "%", fill = NULL) +
     ggplot2::theme_minimal() +
     ggplot2::theme(
       axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
       plot.title = ggplot2::element_text(hjust = 0.5, face = "bold")
     )
+  if (n_obs > 1) {
+    p <- p + ggplot2::facet_wrap(~Observatory)
+  }
+  p
 }
 
 # ----------------------------------------------------------
@@ -435,14 +610,16 @@ tabulate_binary_set <- function(data, prefix) {
     dplyr::mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 }
 
-#' Standard horizontal bar chart faceted by Observatory
+#' Standard horizontal bar chart, optionally faceted by Observatory
 #'
+#' When data contains a single observatory, no faceting is applied.
 #' @param data Tibble with Observatory, a label column, and a percentage column
 #' @param x Unquoted column for labels (default: Type)
 #' @param y Unquoted column for values  (default: pct)
 #' @param title Plot title
 make_bar_obs <- function(data, x = Type, y = pct, title = "") {
-  ggplot2::ggplot(
+  n_obs <- dplyr::n_distinct(data$Observatory)
+  p <- ggplot2::ggplot(
     data,
     ggplot2::aes(
       x = stats::reorder({{ x }}, {{ y }}),
@@ -452,7 +629,6 @@ make_bar_obs <- function(data, x = Type, y = pct, title = "") {
   ) +
     ggplot2::geom_col(show.legend = FALSE) +
     ggplot2::coord_flip() +
-    ggplot2::facet_wrap(~Observatory, ncol = 1, scales = "free_y") +
     ggplot2::geom_text(
       ggplot2::aes(label = paste0({{ y }}, "%")),
       hjust = -0.1,
@@ -463,6 +639,10 @@ make_bar_obs <- function(data, x = Type, y = pct, title = "") {
     ) +
     ggplot2::labs(title = title, x = NULL, y = NULL) +
     ggplot2::theme_minimal(base_size = 13)
+  if (n_obs > 1) {
+    p <- p + ggplot2::facet_wrap(~Observatory, ncol = 1, scales = "free_y")
+  }
+  p
 }
 
 #' Standard multi-year trend plot with solid/gap line style

@@ -30,11 +30,11 @@ source("utils/sites.R")
 source("utils/downloadable_output.R")
 
 # Données observatoires
-res_deb <- read_dta("data/res_deb.dta")
+res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta")
 # Données cataclysmes (ménage × type)
-res_cc <- read_dta("data/res_cc.dta")
+res_cc <- read_dta("data/ROS_MDG_microdata/2025/res_cc.dta")
 # Données dégâts agricoles (ménage × culture)
-res_cca <- read_dta("data/res_cca.dta")
+res_cca <- read_dta("data/ROS_MDG_microdata/2025/res_cca.dta")
 
 # Préparer les variables d'observatoire et de hameau
 res_deb <- res_deb %>%
@@ -54,6 +54,7 @@ res_deb <- res_deb %>%
   )
 
 res_deb <- assign_site(res_deb)
+res_deb <- res_deb %>% filter_for_profile()
 
 # Harmoniser les labels des types de cataclysmes (nettoyage des doublons de saisie)
 res_cc <- res_cc %>%
@@ -117,7 +118,39 @@ cca_full <- res_cca %>%
   left_join(res_deb %>% select(j5, Observatory, Site), by = "j5")
 ```
 
+```{r stats_cata}
+#| include: false
+# --- Statistiques clés pour le texte narratif ---
+n_men_cc <- n_distinct(res_deb$j5)
+pct_touch_a <- hh_cata %>% filter(Observatory == "Alaotra") %>%
+  summarise(pct = round(mean(touched) * 100, 1)) %>% pull(pct)
+pct_touch_m <- hh_cata %>% filter(Observatory == "Marovoay") %>%
+  summarise(pct = round(mean(touched) * 100, 1)) %>% pull(pct)
+nb_moy_a <- hh_cata %>% filter(Observatory == "Alaotra", touched) %>%
+  summarise(moy = round(mean(nb_events), 1)) %>% pull(moy)
+nb_moy_m <- hh_cata %>% filter(Observatory == "Marovoay", touched) %>%
+  summarise(moy = round(mean(nb_events), 1)) %>% pull(moy)
+top_cata_a <- events_full %>% filter(Observatory == "Alaotra") %>%
+  count(Catastrophe) %>% slice_max(n, n = 1, with_ties = FALSE) %>% pull(Catastrophe)
+top_cata_m <- events_full %>% filter(Observatory == "Marovoay") %>%
+  count(Catastrophe) %>% slice_max(n, n = 1, with_ties = FALSE) %>% pull(Catastrophe)
+```
+
 ## Prévalence des cataclysmes
+
+L'exposition aux aléas climatiques et biologiques est très élevée dans les deux observatoires.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, `r pct_touch_a` % des ménages déclarent avoir été touchés par au moins un événement. Les ménages affectés subissent en moyenne `r nb_moy_a` événements. Le cataclysme le plus fréquemment cité est « `r top_cata_a` ».
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, `r pct_touch_m` % des ménages déclarent avoir été touchés par au moins un événement. Les ménages affectés subissent en moyenne `r nb_moy_m` événements. Le cataclysme le plus fréquemment cité est « `r top_cata_m` ».
+:::
+:::
 
 ### Taux d'exposition global
 
@@ -210,7 +243,7 @@ prev_type_wide <- prev_type %>%
     names_glue = "{Observatory}_{.value}",
     values_fill = 0
   ) %>%
-  arrange(desc(Alaotra_n + Marovoay_n))
+  arrange(desc(rowSums(pick(any_of(c("Alaotra_n", "Marovoay_n"))))))
 
 prev_type_wide %>%
   gt() %>%
@@ -218,9 +251,9 @@ prev_type_wide %>%
     title = "Prévalence des types de cataclysmes par observatoire",
     subtitle = "Nombre et % de ménages ayant déclaré l'événement"
   ) %>%
-  tab_spanner(label = "Alaotra", columns = starts_with("Alaotra")) %>%
-  tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
-  cols_label(
+  safe_tab_spanner(label = "Alaotra", columns = starts_with("Alaotra")) %>%
+  safe_tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
+  safe_cols_label(
     Catastrophe = "Type de Catastrophe",
     Alaotra_n = "N", Alaotra_pct = "%",
     Marovoay_n = "N", Marovoay_pct = "%"
@@ -337,7 +370,7 @@ nb_cata_combined <- nb_cata_hameau %>%
   arrange(Observatory, j4bis == "Ensemble", j4bis)
 
 nb_cata_combined %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Nombre moyen de catastrophes subies par ménage",
     subtitle = "Par hameau et observatoire"
@@ -384,6 +417,8 @@ Les niveaux de dégâts sont codés ainsi :
 
 ### Dégâts sur le logement
 
+Les dégâts sur le logement sont évalués selon quatre niveaux de gravité, du plus bénin (« Rien ») à la destruction totale. Le croisement avec le type de catastrophe permet d'identifier les aléas les plus destructeurs pour l'habitat.
+
 ```{r t4_degats_logement}
 # T4 : Gravité des dégâts sur le logement par type de Catastrophe et observatoire
 degats_labels <- c(
@@ -428,9 +463,9 @@ degats_logement_resume %>%
     title = "Dégâts sur le logement par type de catastrophe",
     subtitle = "% de ménages ayant subi des dégâts (au moins « Un peu »), parmi ceux touchés"
   ) %>%
-  tab_spanner(label = "Alaotra", columns = starts_with("Alaotra")) %>%
-  tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
-  cols_label(
+  safe_tab_spanner(label = "Alaotra", columns = starts_with("Alaotra")) %>%
+  safe_tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
+  safe_cols_label(
     Catastrophe = "Catastrophe",
     Alaotra_n_total = "N", Alaotra_n_degats = "Dégâts", Alaotra_pct_degats = "%",
     Marovoay_n_total = "N", Marovoay_n_degats = "Dégâts", Marovoay_pct_degats = "%"
@@ -498,7 +533,7 @@ degats_elevage_display <- events %>%
   arrange(Observatory, desc(Rien))
 
 degats_elevage_display %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Gravité des dégâts sur l'élevage par type de Catastrophe",
     subtitle = "Distribution en % (parmi les ménages ayant renseigné les dégâts)"
@@ -560,7 +595,7 @@ degats_personnes <- events %>%
   arrange(Observatory, desc(Aucun))
 
 degats_personnes %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Conséquences des cataclysmes sur les personnes du ménage",
     subtitle = "Distribution en % par type de Catastrophe"
@@ -659,6 +694,8 @@ dl_fig_variants("fig_severite_profil", "11", function(d) {
 }, events_full, width = 10, height = 6)
 ```
 
+Le graphique précédent révèle que la sévérité des dégâts sur l'élevage varie fortement selon le type de catastrophe. Les destructions totales sont surtout associées aux événements les plus violents (cyclones, inondations), tandis que les sécheresses et les maladies animales engendrent des pertes plus diffuses mais néanmoins significatives.
+
 ## Saisonnalité des cataclysmes
 
 Les événements peuvent survenir en période de soudure (lorsque les stocks sont déjà bas) ou hors soudure. La coïncidence avec la soudure aggrave considérablement l'impact sur la sécurité alimentaire.
@@ -682,7 +719,7 @@ saisonnalite <- events %>%
   arrange(Observatory, desc(n))
 
 saisonnalite %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Saisonnalité des cataclysmes",
     subtitle = "% d'événements survenus hors soudure et pendant la soudure"
@@ -817,7 +854,7 @@ cultures_touchees <- res_cca %>%
   select(-rang)
 
 cultures_touchees %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Top 10 des cultures les plus touchées par observatoire",
     subtitle = "Nombre de ménages déclarant des dégâts sur la culture"
@@ -858,6 +895,8 @@ Le riz, culture vivrière dominante, est de loin la culture la plus exposée aux
 
 ### Dégâts sur les champs de riz par type de catastrophe
 
+Le riz étant la culture la plus exposée, il est utile de décomposer la gravité des dégâts sur les champs de riz selon le type de catastrophe. La lecture croisée de la sévérité et du type d'événement permet de hiérarchiser les risques pour la production rizicole.
+
 ```{r t9_degats_champs_riz}
 # T9 : Gravité des dégâts sur les champs pour le riz (cc1a0 == 101)
 # Variables cc1a5_01 à cc1a5_13 = dégâts champs par type de catastrophe
@@ -896,7 +935,7 @@ riz_champs <- res_cca %>%
   pivot_wider(names_from = Niveau, values_from = pct, values_fill = 0)
 
 riz_champs %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Dégâts sur les champs de riz par type de catastrophe",
     subtitle = "Distribution en % du niveau de dégâts (parmi les ménages riziculteurs ayant déclaré des dégâts)"
@@ -968,7 +1007,7 @@ riz_stocks <- res_cca %>%
   pivot_wider(names_from = Niveau, values_from = pct, values_fill = 0)
 
 riz_stocks %>%
-  gt(groupname_col = "Observatory") %>%
+  obs_gt() %>%
   tab_header(
     title = "Dégâts sur les stocks de riz par type de catastrophe",
     subtitle = "Distribution en % du niveau de dégâts"
@@ -1002,7 +1041,7 @@ dl_tbl_variants("tbl_degats_stocks_riz", "11", function(d) {
 }, cca_full)
 ```
 
-Les dégâts sur les stocks, bien que moins fréquents que sur les champs, affectent directement les réserves alimentaires du ménage, en particulier lorsqu'ils surviennent en période de soudure.
+Les dégâts sur les stocks, bien que moins fréquents que sur les champs, affectent directement les réserves alimentaires du ménage, en particulier lorsqu'ils surviennent en période de soudure. Les rats et les insectes nuisibles constituent les principales causes de pertes post-récolte, auxquelles s'ajoutent les conditions de stockage précaires face aux intempéries.
 
 ### Comparaison dégâts champs vs stocks pour les principales cultures
 
@@ -1175,3 +1214,5 @@ ggplot(mapping = aes(x = year, y = pct_cata, colour = Observatory)) +
   labs(x = NULL, y = "% de ménages touchés", colour = "Observatoire") +
   theme_minimal()
 ```
+
+L'évolution de la prévalence des catastrophes sur la période 2003--2025 met en évidence des fluctuations interannuelles importantes, avec des pics correspondant aux passages cycloniques majeurs et aux épisodes de sécheresse prolongée. La tendance de long terme, difficile à isoler des aléas ponctuels, mérite d'être mise en regard de l'évolution des pratiques d'adaptation décrites dans les chapitres précédents.

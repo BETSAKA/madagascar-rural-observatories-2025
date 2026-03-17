@@ -13,6 +13,18 @@ Cette section decrit les conditions d'habitat, les equipements des menages, leur
 Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
 :::
 
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+ À Marovoay, les conditions d'habitat sont étroitement liées à la position des ménages par rapport au fleuve Betsiboka. Les fokontany de la rive droite (Bepako, Madiromiongana), situés en lisière du Parc national d'Ankarafantsika, ont un accès plus limité aux ressources en bois et matériaux de construction, notamment en raison des restrictions liées à la conservation. L'approvisionnement en eau dépend en grande partie du fleuve et de puits traditionnels. L'équipement agricole y est dominé par les outils manuels, complétés par le recours à la traction bovine pour le labour des rizières.
+:::
+:::
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, les conditions d'habitat bénéficient de la relative prospérité du premier bassin rizicole du pays. L'accès à l'eau est facilité par la proximité du lac et du réseau d'irrigation, mais la qualité de l'eau potable reste un enjeu sanitaire. Les ménages des fokontany proches des périmètres irrigués (Avaradrano, Feramanga Atsimo, Mangabe) disposent en moyenne d'un meilleur équipement agricole que ceux des zones périphériques. La possession de biens de confort courants y est plus répandue que dans d'autres observatoires ruraux de Madagascar.
+:::
+:::
+
 ```{r setup_habitat}
 #| include: false
 library(tidyverse)
@@ -25,21 +37,84 @@ source("utils/helpers_report.R")
 source("utils/sites.R")
 source("utils/downloadable_output.R")
 
-res_deb <- read_dta("data/res_deb.dta") |>
+res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   mutate(j5 = as.character(j5)) |>
   add_obs() |>
-  assign_site()
+  assign_site() |>
+  filter_for_profile()
 
-res_h <- read_dta("data/res_h.dta") |> mutate(j5 = as.character(j5))
-res_v <- read_dta("data/res_v.dta") |> mutate(j5 = as.character(j5))
-res_e <- read_dta("data/res_E.dta") |> mutate(j5 = as.character(j5))
+res_h <- read_dta("data/ROS_MDG_microdata/2025/res_h.dta") |> mutate(j5 = as.character(j5))
+res_v <- read_dta("data/ROS_MDG_microdata/2025/res_v.dta") |> mutate(j5 = as.character(j5))
+res_e <- read_dta("data/ROS_MDG_microdata/2025/res_E.dta") |> mutate(j5 = as.character(j5))
 
 obs <- res_deb |> select(j5, Observatory, Site)
 ```
 
+```{r stats_habitat}
+#| include: false
+# --- Statistiques clés pour le texte narratif ---
+h_obs <- res_h |> left_join(obs, by = "j5")
+n_men_h <- n_distinct(h_obs$j5)
+
+# Statut d'occupation
+statut_s <- h_obs |> mutate(S = decode_labelled(h0)) |>
+  count(Observatory, S) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+top_statut_a <- statut_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(S)
+pct_statut_a <- statut_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+top_statut_m <- statut_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(S)
+pct_statut_m <- statut_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+
+# Latrine
+latrine_s <- h_obs |> mutate(S = decode_labelled(h5)) |>
+  count(Observatory, S) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+top_lat_a <- latrine_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(S)
+pct_lat_a <- latrine_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+top_lat_m <- latrine_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(S)
+pct_lat_m <- latrine_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+
+# Eau
+water_s <- h_obs |> mutate(S = decode_labelled(h4)) |>
+  count(Observatory, S) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+top_eau_a <- water_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(S)
+pct_eau_a <- water_s |> filter(Observatory == "Alaotra") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+top_eau_m <- water_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(S)
+pct_eau_m <- water_s |> filter(Observatory == "Marovoay") |>
+  slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
+```
+
 ## Habitat
 
+Les conditions d'habitat des ménages enquêtés témoignent des réalités du milieu rural malgache. Le statut d'occupation, le type d'assainissement, l'accès à l'eau, le mode d'éclairage et la source d'énergie de cuisson constituent des indicateurs essentiels du cadre de vie.
+
 ### Statut d'occupation du logement
+
+Le statut d'occupation du logement traduit la sécurité résidentielle des ménages.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, `r pct_statut_a` % des ménages occupent un logement en « `r top_statut_a` ».
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, `r pct_statut_m` % des ménages occupent un logement en « `r top_statut_m` ».
+:::
+:::
 
 ```{r house_status}
 house <- res_h |>
@@ -49,8 +124,8 @@ house <- res_h |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
 house |>
-  gt(groupname_col = "Observatory") |>
-  tab_header(title = "Statut d'occupation du logement par observatoire") |>
+  obs_gt() |>
+  tab_header(title = obs_title("Statut d'occupation du logement")) |>
   cols_label(Statut = "Statut", n = "N", pct = "%") |>
   fmt_number(columns = n, decimals = 0) |>
   fmt_number(columns = pct, decimals = 1) |>
@@ -78,6 +153,20 @@ dl_fig_variants("fig_house_status", "05", function(d) {
 
 ### Type de latrine
 
+Le type de latrine constitue un indicateur sanitaire fondamental.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, Le type dominant est « `r top_lat_a` » (`r pct_lat_a` % des ménages).
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, Le type dominant est « `r top_lat_m` » (`r pct_lat_m` % des ménages).
+:::
+:::
+
 ```{r latrine}
 latrine <- res_h |>
   left_join(obs, by = "j5") |>
@@ -86,14 +175,14 @@ latrine <- res_h |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
 latrine |>
-  gt(groupname_col = "Observatory") |>
-  tab_header(title = "Types de latrine par observatoire") |>
+  obs_gt() |>
+  tab_header(title = obs_title("Types de latrine")) |>
   cols_label(Type = "Type de latrine", n = "N", pct = "%") |>
   fmt_number(columns = n, decimals = 0) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
 
-latrine |> make_bar_obs(title = "Types de latrine par observatoire")
+latrine |> make_bar_obs(title = obs_title("Types de latrine"))
 ```
 
 ```{r dl_latrine}
@@ -115,6 +204,20 @@ dl_fig_variants("fig_latrine", "05", function(d) {
 
 ### Acces a l'eau
 
+L'approvisionnement en eau détermine en grande partie les conditions sanitaires des ménages ruraux.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, La source principale est « `r top_eau_a` » (`r pct_eau_a` %).
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, La source principale est « `r top_eau_m` » (`r pct_eau_m` %).
+:::
+:::
+
 ```{r water}
 water <- res_h |>
   left_join(obs, by = "j5") |>
@@ -123,14 +226,14 @@ water <- res_h |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
 water |>
-  gt(groupname_col = "Observatory") |>
-  tab_header(title = "Mode d'approvisionnement en eau par observatoire") |>
+  obs_gt() |>
+  tab_header(title = obs_title("Mode d'approvisionnement en eau")) |>
   cols_label(Type = "Source", n = "N", pct = "%") |>
   fmt_number(columns = n, decimals = 0) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
 
-water |> make_bar_obs(title = "Mode d'approvisionnement en eau")
+water |> make_bar_obs(title = obs_title("Mode d'approvisionnement en eau"))
 ```
 
 ```{r dl_water}
@@ -152,20 +255,22 @@ dl_fig_variants("fig_water", "05", function(d) {
 
 ### Mode d'eclairage
 
+Le mode d'éclairage reflète le niveau d'accès à l'énergie moderne. Les ménages ruraux dépendent encore largement de sources traditionnelles, même si la pénétration du solaire progresse.
+
 ```{r lighting}
 light <- res_h |>
   left_join(obs, by = "j5") |>
   tabulate_binary_set("h7")
 
 light |>
-  gt(groupname_col = "Observatory") |>
-  tab_header(title = "Modes d'eclairage des menages par observatoire") |>
+  obs_gt() |>
+  tab_header(title = obs_title("Modes d'éclairage des ménages")) |>
   cols_label(Type = "Type d'eclairage", n = "N", pct = "%") |>
   fmt_number(columns = n, decimals = 0) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
 
-light |> make_bar_obs(title = "Modes d'eclairage par observatoire")
+light |> make_bar_obs(title = obs_title("Modes d'éclairage"))
 ```
 
 ```{r dl_lighting}
@@ -183,6 +288,8 @@ dl_fig_variants("fig_lighting", "05", function(d) {
 
 ### Source d'energie pour la cuisson
 
+La quasi-totalité des ménages ruraux malgaches dépendent de la biomasse pour la cuisson. La nature exacte du combustible utilisé (bois, charbon de bois) varie selon la disponibilité locale des ressources forestières.
+
 ```{r cooking}
 cooking <- res_h |>
   left_join(obs, by = "j5") |>
@@ -190,14 +297,14 @@ cooking <- res_h |>
   mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type))
 
 cooking |>
-  gt(groupname_col = "Observatory") |>
-  tab_header(title = "Modes de cuisson des menages par observatoire") |>
+  obs_gt() |>
+  tab_header(title = obs_title("Modes de cuisson des ménages")) |>
   cols_label(Type = "Source d'energie", n = "N", pct = "%") |>
   fmt_number(columns = n, decimals = 0) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
 
-cooking |> make_bar_obs(title = "Modes de cuisson par observatoire")
+cooking |> make_bar_obs(title = obs_title("Modes de cuisson"))
 ```
 
 ```{r dl_cooking}
@@ -217,7 +324,11 @@ dl_fig_variants("fig_cooking", "05", function(d) {
 
 ## Niveau de vie
 
+La possession de biens durables constitue un proxy classique du niveau de vie des ménages en milieu rural, où les revenus monétaires sont souvent difficiles à mesurer.
+
 ### Biens de confort courant
+
+Les biens de confort courant (mobilier, ustensiles, outils) renseignent sur le niveau d'équipement quotidien des ménages et constituent un indicateur de bien-être matériel.
 
 ```{r comfort_goods}
 comfort <- res_v |>
@@ -226,14 +337,14 @@ comfort <- res_v |>
   mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type))
 
 comfort |>
-  gt(groupname_col = "Observatory") |>
-  tab_header(title = "Taux de possession de biens de confort courants") |>
+  obs_gt() |>
+  tab_header(title = obs_title("Taux de possession de biens de confort courants")) |>
   cols_label(Type = "Bien", n = "N", pct = "%") |>
   fmt_number(columns = n, decimals = 0) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
 
-comfort |> make_bar_obs(title = "Biens de confort courants par observatoire")
+comfort |> make_bar_obs(title = obs_title("Biens de confort courants"))
 ```
 
 ```{r dl_comfort}
@@ -252,6 +363,8 @@ dl_fig_variants("fig_comfort", "05", function(d) {
 ```
 
 ### Equipement agricole
+
+L'équipement agricole conditionne la productivité et la capacité d'extension des surfaces cultivées. La possession de matériel mécanisé ou de traction animale constitue un facteur de différenciation important entre les ménages.
 
 ```{r agri_equipment}
 equip_data <- res_e |>
@@ -272,8 +385,8 @@ table_equip <- tools |>
   arrange(Observatory, desc(pct_menages))
 
 table_equip |>
-  gt(groupname_col = "Observatory") |>
-  tab_header(title = "Taux de possession d'equipements agricoles") |>
+  obs_gt() |>
+  tab_header(title = obs_title("Taux de possession d'équipements agricoles")) |>
   cols_label(
     Equipement = "Equipement", N_menages = "Menages (N)",
     pct_menages = "Menages (%)", N_outils = "Nb outils"
@@ -282,15 +395,18 @@ table_equip |>
   fmt_number(columns = pct_menages, decimals = 1) |>
   style_table()
 
-table_equip |>
+p_equip <- table_equip |>
   ggplot(aes(x = reorder(Equipement, pct_menages), y = pct_menages, fill = Observatory)) +
   geom_col(show.legend = FALSE) +
   coord_flip() +
-  facet_wrap(~Observatory, ncol = 1, scales = "free_y") +
   geom_text(aes(label = paste0(pct_menages, "%")), hjust = -0.1, size = 3.5) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
-  labs(title = "Equipements agricoles par observatoire", x = NULL, y = NULL) +
+  labs(title = obs_title("Équipements agricoles"), x = NULL, y = NULL) +
   theme_minimal(base_size = 13)
+if (n_distinct(table_equip$Observatory) > 1) {
+  p_equip <- p_equip + facet_wrap(~Observatory, ncol = 1, scales = "free_y")
+}
+p_equip
 ```
 
 ```{r dl_agri_equipment}
@@ -321,6 +437,8 @@ dl_fig_variants("fig_agri_equip", "05", function(d) {
 
 ### Materiel de communication audiovisuelle et telecommunication
 
+L'accès aux technologies de communication et d'information constitue un vecteur de connexion aux marchés, aux services et à l'information. La pénétration du téléphone mobile a transformé les pratiques économiques et sociales en milieu rural.
+
 ```{r communication}
 comm_vars <- c("v5", "v8", "v9", "v20", "v11")
 comm_labels <- tibble(
@@ -342,14 +460,14 @@ comm <- res_v |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
 comm |>
-  gt(groupname_col = "Observatory") |>
-  tab_header(title = "Materiels de communication audiovisuelle et telecommunication") |>
+  obs_gt() |>
+  tab_header(title = obs_title("Matériels de communication audiovisuelle et télécommunication")) |>
   cols_label(Type = "Equipement", n = "N", pct = "%") |>
   fmt_number(columns = n, decimals = 0) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
 
-comm |> make_bar_obs(title = "Materiels de communication par observatoire")
+comm |> make_bar_obs(title = obs_title("Matériels de communication"))
 ```
 
 ```{r dl_communication}
@@ -396,7 +514,7 @@ dl_fig_variants("fig_communication", "05", function(d) {
 Le fichier `res_t2` recense les transferts envoyes par les menages a des personnes exterieures au foyer. Chaque ligne correspond a un destinataire. Les variables cles sont le type de transfert (`t21a`), le lieu de residence du destinataire (`t41`), le poids de riz envoye (`t42`, en kg) et la valeur totale (`t21d`, en Ar).
 
 ```{r transfers_load}
-res_t2 <- read_dta("data/res_t2.dta") |> mutate(j5 = as.character(j5))
+res_t2 <- read_dta("data/ROS_MDG_microdata/2025/res_t2.dta") |> mutate(j5 = as.character(j5))
 
 type_transf_labs <- c(
   "1" = "Argent", "2" = "Riz", "3" = "Autres produits", "99" = "Autre"
@@ -530,6 +648,9 @@ dl_fig_variants("fig_destination", "05", function(d) {
 }, res_t2 |> left_join(obs, by = "j5"))
 ```
 
+::: {.content-visible when-profile="consolidated"}
+::: {.obs-technical}
+
 ## Revenu
 
 Les revenus presentes ici sont des revenus annuels par menage, calcules sur la periode de reference (PR) de la campagne 2025. Le revenu total (`revtot`) se decompose en revenu courant (`revcou`) et revenu exceptionnel (`revexcept`).
@@ -554,6 +675,8 @@ inc <- compute_income_year(2025) |>
 ```
 
 ### Structure du revenu total
+
+Le revenu total annuel par ménage synthétise l'ensemble des ressources monétaires et non-monétaires. Les écarts entre moyenne et médiane reflètent le degré d'inégalité au sein de chaque observatoire.
 
 ```{r t_revtot_obs}
 inc |>
@@ -589,6 +712,8 @@ dl_tbl_variants("tbl_revtot", "05", function(d) {
 ```
 
 ### Decomposition du revenu courant
+
+La décomposition du revenu courant en ses sept composantes met en lumière la structure productive de chaque observatoire et le degré de dépendance à l'égard de la riziculture.
 
 ```{r t_revcou_decomp}
 decomp <- inc |>
@@ -697,6 +822,8 @@ dl_fig_variants("fig_revcou_shares", "05", function(d) {
 
 ### Distribution du revenu total
 
+La distribution du revenu total illustre le degré d'inégalité au sein de chaque observatoire. L'utilisation d'une échelle logarithmique permet de mieux visualiser l'étalement de la distribution et la concentration des ménages à bas revenus.
+
 ```{r fig_revtot_dist}
 #| fig-cap: "Distribution du revenu total par observatoire (echelle log)"
 #| fig-width: 8
@@ -727,6 +854,8 @@ dl_fig_variants("fig_revtot_dist", "05", function(d) {
 ```
 
 ### Revenu courant et revenu exceptionnel
+
+La distinction entre revenu courant (activités régulières) et revenu exceptionnel (transferts, décapitalisation, travaux HIMO) renseigne sur la durabilité des ressources des ménages. Un poids élevé du revenu exceptionnel peut signaler une vulnérabilité économique.
 
 ```{r t_revcou_revexcept}
 inc |>
@@ -1168,3 +1297,5 @@ if ("pct_eau_amelioree" %in% names(habitat_trends)) {
     theme_minimal()
 }
 ```
+:::
+:::

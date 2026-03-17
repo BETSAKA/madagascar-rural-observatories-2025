@@ -25,7 +25,7 @@ source("utils/sites.R")
 source("utils/downloadable_output.R")
 
 # --- Données de base ---
-res_deb <- read_dta("data/res_deb.dta") |>
+res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   mutate(
     j5 = as.character(j5),
     j0 = as.character(j0),
@@ -35,7 +35,8 @@ res_deb <- read_dta("data/res_deb.dta") |>
       TRUE       ~ j0
     )
   ) |>
-  assign_site()
+  assign_site() |>
+  filter_for_profile()
 
 # Fonction utilitaire : ajout observatoire
 add_obs <- function(df) {
@@ -48,32 +49,32 @@ add_obs <- function(df) {
 n_men <- nrow(res_deb)
 
 # --- Riziculture ---
-res_r    <- read_dta("data/res_r.dta")    |> add_obs()
-res_r1   <- read_dta("data/res_r1.dta")   |> add_obs()
-res_dc1  <- read_dta("data/res_dc1.dta")  |> add_obs()
-res_dc20 <- read_dta("data/res_dc20.dta") |> add_obs()
-res_dc21 <- read_dta("data/res_dc21.dta") |> add_obs()
+res_r    <- read_dta("data/ROS_MDG_microdata/2025/res_r.dta")    |> add_obs()
+res_r1   <- read_dta("data/ROS_MDG_microdata/2025/res_r1.dta")   |> add_obs()
+res_dc1  <- read_dta("data/ROS_MDG_microdata/2025/res_dc1.dta")  |> add_obs()
+res_dc20 <- read_dta("data/ROS_MDG_microdata/2025/res_dc20.dta") |> add_obs()
+res_dc21 <- read_dta("data/ROS_MDG_microdata/2025/res_dc21.dta") |> add_obs()
 
 # --- Autres cultures ---
-res_c  <- read_dta("data/res_c.dta")  |> add_obs()
-res_c0 <- read_dta("data/res_c0.dta") |> add_obs()
+res_c  <- read_dta("data/ROS_MDG_microdata/2025/res_c.dta")  |> add_obs()
+res_c0 <- read_dta("data/ROS_MDG_microdata/2025/res_c0.dta") |> add_obs()
 
 # --- Jardins potagers / cueillette ---
-res_jp       <- read_dta("data/res_jp.dta")       |> add_obs()
-res_jpchphef <- read_dta("data/res_jpchphef.dta") |> add_obs()
+res_jp       <- read_dta("data/ROS_MDG_microdata/2025/res_jp.dta")       |> add_obs()
+res_jpchphef <- read_dta("data/ROS_MDG_microdata/2025/res_jpchphef.dta") |> add_obs()
 
 # --- Élevage ---
-res_el2 <- read_dta("data/res_el2.dta") |> add_obs()
-res_ele <- read_dta("data/res_ele.dta") |> add_obs()
-res_pe  <- read_dta("data/res_pe.dta")  |> add_obs()
+res_el2 <- read_dta("data/ROS_MDG_microdata/2025/res_el2.dta") |> add_obs()
+res_ele <- read_dta("data/ROS_MDG_microdata/2025/res_ele.dta") |> add_obs()
+res_pe  <- read_dta("data/ROS_MDG_microdata/2025/res_pe.dta")  |> add_obs()
 
 # --- Chasse / Pêche ---
-res_chph <- read_dta("data/res_chph.dta") |> add_obs()
+res_chph <- read_dta("data/ROS_MDG_microdata/2025/res_chph.dta") |> add_obs()
 
 # --- Main d'oeuvre ---
-res_mor <- read_dta("data/res_mor.dta") |> add_obs()
-res_mp  <- read_dta("data/res_mp.dta")  |> add_obs()
-res_mp0 <- read_dta("data/res_mp0.dta") |> add_obs()
+res_mor <- read_dta("data/ROS_MDG_microdata/2025/res_mor.dta") |> add_obs()
+res_mp  <- read_dta("data/ROS_MDG_microdata/2025/res_mp.dta")  |> add_obs()
+res_mp0 <- read_dta("data/ROS_MDG_microdata/2025/res_mp0.dta") |> add_obs()
 
 # Fonction : % de Oui (code 1) par observatoire + total
 pct_oui <- function(df, var, label) {
@@ -91,7 +92,7 @@ pct_oui <- function(df, var, label) {
         pull(p),
       Item = label
     ) |>
-    select(Item, Alaotra, Marovoay, Total)
+    select(Item, any_of(c("Alaotra", "Marovoay")), Total)
 }
 
 # Wrapper sûr pour to_character (encode UTF-8)
@@ -108,11 +109,122 @@ mois_labs <- c("Jan", "Fév", "Mar", "Avr", "Mai", "Jun",
                "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc")
 ```
 
+```{r stats_agri}
+#| include: false
+# --- Statistiques clés pour le texte narratif ---
+
+# Riziculture : taux de pratique
+pct_riz_a <- res_r1 |> filter(Observatory == "Alaotra") |>
+  summarise(p = round(mean(r1a == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
+pct_riz_m <- res_r1 |> filter(Observatory == "Marovoay") |>
+  summarise(p = round(mean(r1a == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
+
+# Nombre moyen de parcelles rizicoles par ménage riziculteur
+nb_parc_a <- res_r |> filter(Observatory == "Alaotra") |>
+  count(j5) |> summarise(m = round(mean(n), 1)) |> pull(m)
+nb_parc_m <- res_r |> filter(Observatory == "Marovoay") |>
+  count(j5) |> summarise(m = round(mean(n), 1)) |> pull(m)
+
+# Superficie moyenne par parcelle (ares)
+surf_moy_a <- res_r |> filter(Observatory == "Alaotra", !is.na(r1d), r1d > 0) |>
+  summarise(m = round(mean(r1d), 0)) |> pull(m)
+surf_moy_m <- res_r |> filter(Observatory == "Marovoay", !is.na(r1d), r1d > 0) |>
+  summarise(m = round(mean(r1d), 0)) |> pull(m)
+
+# Mode de faire valoir dominant
+top_tenure_a <- res_r |> filter(Observatory == "Alaotra", !is.na(r4)) |>
+  count(r4, sort = TRUE) |> slice_head(n = 1) |>
+  mutate(lab = c("0"="Autre","1"="faire valoir direct","2"="location","3"="métayage","4"="prêt gratuit","5"="mise location","6"="mise métayage","7"="mise prêt gratuit","8"="mise en gage","9"="mise gage exploitée")[as.character(r4)]) |> pull(lab)
+top_tenure_m <- res_r |> filter(Observatory == "Marovoay", !is.na(r4)) |>
+  count(r4, sort = TRUE) |> slice_head(n = 1) |>
+  mutate(lab = c("0"="Autre","1"="faire valoir direct","2"="location","3"="métayage","4"="prêt gratuit","5"="mise location","6"="mise métayage","7"="mise prêt gratuit","8"="mise en gage","9"="mise gage exploitée")[as.character(r4)]) |> pull(lab)
+pct_tenure_a <- res_r |> filter(Observatory == "Alaotra", !is.na(r4)) |>
+  count(r4, sort = TRUE) |> mutate(pct = round(n / sum(n) * 100, 1)) |> slice_head(n = 1) |> pull(pct)
+pct_tenure_m <- res_r |> filter(Observatory == "Marovoay", !is.na(r4)) |>
+  count(r4, sort = TRUE) |> mutate(pct = round(n / sum(n) * 100, 1)) |> slice_head(n = 1) |> pull(pct)
+
+# Technique culturale dominante
+top_tech_a <- res_r |> filter(Observatory == "Alaotra", !is.na(r13)) |>
+  count(r13, sort = TRUE) |> slice_head(n = 1) |>
+  mutate(lab = c("1"="repiquage traditionnel","2"="SRA","3"="SRI","4"="semis direct poquet","5"="repiquage en ligne","6"="semis à la volée","7"="semis direct amélioré","8"="zéro labour")[as.character(r13)]) |> pull(lab)
+pct_tech_a <- res_r |> filter(Observatory == "Alaotra", !is.na(r13)) |>
+  count(r13, sort = TRUE) |> mutate(pct = round(n / sum(n) * 100, 1)) |> slice_head(n = 1) |> pull(pct)
+top_tech_m <- res_r |> filter(Observatory == "Marovoay", !is.na(r13)) |>
+  count(r13, sort = TRUE) |> slice_head(n = 1) |>
+  mutate(lab = c("1"="repiquage traditionnel","2"="SRA","3"="SRI","4"="semis direct poquet","5"="repiquage en ligne","6"="semis à la volée","7"="semis direct amélioré","8"="zéro labour")[as.character(r13)]) |> pull(lab)
+pct_tech_m <- res_r |> filter(Observatory == "Marovoay", !is.na(r13)) |>
+  count(r13, sort = TRUE) |> mutate(pct = round(n / sum(n) * 100, 1)) |> slice_head(n = 1) |> pull(pct)
+
+# Rendement médian (t/ha)
+rdt_med_a <- res_r |> filter(Observatory == "Alaotra", !is.na(r23), r23 > 0, !is.na(r1d), r1d > 0) |>
+  mutate(rdt = (r23 / r1d) * 100 / 1000) |> filter(rdt < quantile(rdt, 0.95)) |>
+  summarise(m = round(median(rdt), 2)) |> pull(m)
+rdt_med_m <- res_r |> filter(Observatory == "Marovoay", !is.na(r23), r23 > 0, !is.na(r1d), r1d > 0) |>
+  mutate(rdt = (r23 / r1d) * 100 / 1000) |> filter(rdt < quantile(rdt, 0.95)) |>
+  summarise(m = round(median(rdt), 2)) |> pull(m)
+
+# Vente de riz : taux de vente
+pct_vente_a <- res_dc20 |> filter(Observatory == "Alaotra") |>
+  summarise(p = round(mean(dcva == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
+pct_vente_m <- res_dc20 |> filter(Observatory == "Marovoay") |>
+  summarise(p = round(mean(dcva == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
+
+# Autres cultures : taux de pratique
+pct_ac_a <- res_c0 |> filter(Observatory == "Alaotra") |>
+  summarise(p = round(mean(c1a == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
+pct_ac_m <- res_c0 |> filter(Observatory == "Marovoay") |>
+  summarise(p = round(mean(c1a == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
+
+# Nombre médian de cultures non rizicoles
+nb_cult_med_a <- res_c |> filter(Observatory == "Alaotra", c0 != "", !is.na(c0)) |>
+  distinct(j5, c0) |> count(j5) |> summarise(m = round(median(n), 0)) |> pull(m)
+nb_cult_med_m <- res_c |> filter(Observatory == "Marovoay", c0 != "", !is.na(c0)) |>
+  distinct(j5, c0) |> count(j5) |> summarise(m = round(median(n), 0)) |> pull(m)
+
+# Élevage : taux de pratique
+pct_elev_a <- res_el2 |> filter(Observatory == "Alaotra") |>
+  summarise(p = round(mean(el2 == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
+pct_elev_m <- res_el2 |> filter(Observatory == "Marovoay") |>
+  summarise(p = round(mean(el2 == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
+
+# Espèce dominante
+top_espece_a <- res_ele |> filter(Observatory == "Alaotra", ele_lig0 != "", !is.na(ele_lig0)) |>
+  distinct(j5, ele_lig0) |> count(ele_lig0, sort = TRUE) |> slice_head(n = 1) |>
+  mutate(lab = str_to_title(ele_lig0)) |> pull(lab)
+top_espece_m <- res_ele |> filter(Observatory == "Marovoay", ele_lig0 != "", !is.na(ele_lig0)) |>
+  distinct(j5, ele_lig0) |> count(ele_lig0, sort = TRUE) |> slice_head(n = 1) |>
+  mutate(lab = str_to_title(ele_lig0)) |> pull(lab)
+
+# Chasse/pêche : taux de pratique
+pct_chpe_a <- res_jpchphef |> filter(Observatory == "Alaotra") |>
+  summarise(p = round(mean(chapha == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
+pct_chpe_m <- res_jpchphef |> filter(Observatory == "Marovoay") |>
+  summarise(p = round(mean(chapha == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
+
+# Main d'oeuvre : taux d'emploi de MO extérieure
+pct_mo_a <- res_mp0 |> filter(Observatory == "Alaotra") |>
+  summarise(p = round(mean(mora == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
+pct_mo_m <- res_mp0 |> filter(Observatory == "Marovoay") |>
+  summarise(p = round(mean(mora == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
+```
+
 ## Agriculture {#sec-agriculture}
 
 ### Riziculture {#sec-riziculture}
 
 La riziculture est l'activité agricole dominante dans les deux observatoires.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, `r pct_riz_a` % des ménages pratiquent la riziculture. Les riziculteurs exploitent en moyenne `r nb_parc_a` parcelles (superficie moyenne de `r surf_moy_a` ares).
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, `r pct_riz_m` % des ménages pratiquent la riziculture. Les riziculteurs exploitent en moyenne `r nb_parc_m` parcelles (superficie moyenne de `r surf_moy_m` ares).
+:::
+:::
 
 ```{r}
 #| label: tbl-pratique-riz
@@ -144,6 +256,20 @@ dl_tbl_variants("tbl_pratique_riz", "08", function(d) {
 ```
 
 #### Mode de faire valoir et accès à l'eau
+
+La location et le métayage, qui témoignent d'un marché foncier actif, sont plus ou moins répandus selon l'observatoire.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, le mode de faire valoir dominant est le `r top_tenure_a` (`r pct_tenure_a` % des parcelles).
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, le mode de faire valoir dominant est le `r top_tenure_m` (`r pct_tenure_m` % des parcelles).
+:::
+:::
 
 ```{r}
 #| label: fig-tenure-riz
@@ -244,6 +370,20 @@ dl_fig_variants("fig_eau_riz", "08", function(d) {
 ```
 
 #### Techniques culturales et intrants
+
+Le choix de la technique est étroitement lié aux conditions hydrologiques, à la topographie et à l'accès aux intrants.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, la technique culturale prédominante est le `r top_tech_a` (`r pct_tech_a` % des parcelles).
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, la technique culturale prédominante est le `r top_tech_m` (`r pct_tech_m` % des parcelles).
+:::
+:::
 
 ```{r}
 #| label: fig-technique-riz
@@ -400,6 +540,20 @@ dl_tbl_variants("tbl_semences_labour", "08", function(d) {
 
 #### Rendements et production
 
+Le rendement rizicole reflète à la fois les conditions agro-écologiques locales et le degré d'intensification des pratiques.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, le rendement rizicole médian s'établit à `r rdt_med_a` t/ha (hors 5 % des valeurs extrêmes).
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, le rendement rizicole médian s'établit à `r rdt_med_m` t/ha (hors 5 % des valeurs extrêmes).
+:::
+:::
+
 ```{r}
 #| label: tbl-rendement-riz
 #| tbl-cap: "Perception des rendements rizicoles par observatoire"
@@ -495,6 +649,8 @@ dl_fig_variants("fig_production_riz", "08", function(d) {
 ```
 
 #### Topographie et saison de culture
+
+La position topographique de la parcelle (bas-fond, plaine, tanety) détermine en grande partie les possibilités de maîtrise de l'eau et le calendrier cultural. La répartition des saisons de culture reflète les stratégies d'adaptation des riziculteurs à la variabilité pluviométrique.
 
 ```{r}
 #| label: fig-topographie-riz
@@ -615,6 +771,20 @@ dl_fig_variants("fig_origine_semence", "08", function(d) {
 ```
 
 #### Ventes de riz
+
+La commercialisation du paddy est une source de revenu majeure. Le calendrier et le prix de vente sont déterminants pour le revenu rizicole net.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, `r pct_vente_a` % des ménages déclarent avoir vendu du riz au cours de la campagne.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, `r pct_vente_m` % des ménages déclarent avoir vendu du riz au cours de la campagne.
+:::
+:::
 
 ```{r}
 #| label: tbl-ventes-riz-taux
@@ -750,7 +920,7 @@ res_dc1 |>
   pivot_wider(names_from = Observatory, values_from = Moyenne) |>
   gt() |>
   tab_header(title = "Bilan rizicole moyen par ménage (kg de paddy)") |>
-  fmt_number(columns = c(Alaotra, Marovoay), use_seps = TRUE, decimals = 0)
+  fmt_number(columns = any_of(c("Alaotra", "Marovoay")), use_seps = TRUE, decimals = 0)
 ```
 
 ```{r dl_tbl_bilan_riz}
@@ -770,6 +940,20 @@ dl_tbl_variants("tbl_bilan_riz", "08", function(d) {
 ```
 
 ### Autres cultures {#sec-autres-cultures}
+
+La diversification culturale est un enjeu central pour la résilience alimentaire et économique des ménages.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, au-delà du riz, `r pct_ac_a` % des ménages pratiquent au moins une culture non rizicole.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, au-delà du riz, `r pct_ac_m` % des ménages pratiquent au moins une culture non rizicole.
+:::
+:::
 
 ```{r}
 #| label: tbl-pratique-autres
@@ -801,6 +985,20 @@ dl_tbl_variants("tbl_pratique_autres", "08", function(d) {
 ```
 
 #### Diversification et principales cultures
+
+Le portefeuille de cultures reflète les opportunités de marché et les conditions pédoclimatiques propres à chaque observatoire.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, les ménages cultivent un nombre médian de `r nb_cult_med_a` cultures non rizicoles.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, les ménages cultivent un nombre médian de `r nb_cult_med_m` cultures non rizicoles.
+:::
+:::
 
 ```{r}
 #| label: fig-diversification
@@ -884,6 +1082,8 @@ dl_fig_variants("fig_top_cultures", "08", function(d) {
 ```
 
 #### Fertilisation et production des autres cultures
+
+L'accès aux engrais (organiques et chimiques) est un facteur déterminant de la productivité des cultures non rizicoles. Les pratiques de fertilisation diffèrent sensiblement entre les deux observatoires en raison de l'accessibilité et du coût des intrants.
 
 ```{r}
 #| label: fig-engrais-autres
@@ -976,6 +1176,8 @@ dl_tbl_variants("tbl_production_autres", "08", function(d) {
 
 #### Perception des rendements
 
+Au-delà des mesures quantitatives, la perception subjective des rendements par les agriculteurs constitue un indicateur complémentaire de la performance de la campagne. Elle reflète à la fois les résultats objectifs et les attentes des producteurs.
+
 ```{r}
 #| label: tbl-rendement-autres
 #| tbl-cap: "Perception des rendements des cultures non rizicoles"
@@ -1030,6 +1232,8 @@ dl_tbl_variants("tbl_rendement_autres", "08", function(d) {
 ```
 
 ### Jardins potagers et cueillette {#sec-jardins}
+
+Les jardins potagers et la cueillette de produits sauvages complètent les activités agricoles des ménages. Ils jouent un rôle important dans la diversification alimentaire, en particulier pendant la période de soudure.
 
 ```{r}
 #| label: tbl-jardin-pratique
@@ -1103,13 +1307,15 @@ dl_fig_variants("fig_top_jardin", "08", function(d) {
 
 ### Exploitation forestière {#sec-foret}
 
+L'exploitation des ressources forestières (bois de chauffe, charbon, bois d'œuvre, plantes médicinales) constitue une activité complémentaire pour de nombreux ménages. Les produits forestiers sont essentiels à la fois comme source d'énergie domestique et comme revenu d'appoint.
+
 ```{r}
 #| label: fig-produits-foret
 #| fig-cap: "Principaux produits de l'exploitation forestière"
 #| fig-width: 9
 #| fig-height: 5
 
-res_ef <- read_dta("data/res_ef.dta") |> add_obs()
+res_ef <- read_dta("data/ROS_MDG_microdata/2025/res_ef.dta") |> add_obs()
 
 res_ef |>
   filter(ef_lib != "", !is.na(ef_lib)) |>
@@ -1152,6 +1358,20 @@ dl_fig_variants("fig_produits_foret", "08", function(d) {
 
 ### Pratique de l'élevage
 
+L'élevage remplit des fonctions multiples : épargne sur pied, force de travail, autoconsommation et source de revenu.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, L'élevage est pratiqué par `r pct_elev_a` % des ménages.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, L'élevage est pratiqué par `r pct_elev_m` % des ménages.
+:::
+:::
+
 ```{r}
 #| label: tbl-elevage-pratique
 #| tbl-cap: "Taux de pratique de l'élevage"
@@ -1182,6 +1402,20 @@ dl_tbl_variants("tbl_elevage_pratique", "08", function(d) {
 ```
 
 ### Espèces élevées
+
+Le choix des espèces reflète les conditions agro-écologiques, les traditions locales et les opportunités de marché.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, L'espèce la plus élevée est le `r top_espece_a`.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, L'espèce la plus élevée est le `r top_espece_m`.
+:::
+:::
 
 ```{r}
 #| label: fig-especes-elevage
@@ -1228,6 +1462,8 @@ dl_fig_variants("fig_especes_elevage", "08", function(d) {
 
 ### Objectifs de l'élevage
 
+L'élevage répond à trois objectifs principaux : l'épargne/assurance (constitution d'un capital mobilisable en cas de choc), l'autoconsommation (lait, œufs, viande) et la vente. La hiérarchie de ces objectifs varie selon l'espèce.
+
 ```{r}
 #| label: fig-objectifs-elevage
 #| fig-cap: "Objectifs de l'élevage par espèce (% des ménages éleveurs)"
@@ -1272,6 +1508,8 @@ dl_fig_variants("fig_objectifs_elevage", "08", function(d) {
 ```
 
 ### Ventes et pertes d'animaux
+
+La dynamique du cheptel dépend des entrées (naissances, achats) et des sorties (ventes, pertes, abattages). Les pertes d'animaux, liées aux maladies, au vol ou aux catastrophes naturelles, représentent un risque économique majeur pour les éleveurs.
 
 ```{r}
 #| label: tbl-ventes-elevage
@@ -1356,6 +1594,8 @@ dl_fig_variants("fig_pertes_elevage", "08", function(d) {
 
 ### Produits de l'élevage
 
+Outre la vente d'animaux sur pied, l'élevage génère des produits dérivés (lait, œufs, miel, fumier) qui contribuent à l'alimentation et aux revenus du ménage.
+
 ```{r}
 #| label: tbl-produits-elevage
 #| tbl-cap: "Produits de l'élevage : nombre de ménages producteurs"
@@ -1366,7 +1606,7 @@ res_pe |>
   distinct(j5, Observatory, Produit) |>
   count(Observatory, Produit) |>
   pivot_wider(names_from = Observatory, values_from = n, values_fill = 0) |>
-  mutate(Total = Alaotra + Marovoay) |>
+  mutate(Total = rowSums(pick(any_of(c("Alaotra", "Marovoay"))))) |>
   arrange(desc(Total)) |>
   gt() |>
   tab_header(title = "Produits de l'élevage déclarés par les ménages")
@@ -1386,6 +1626,20 @@ dl_tbl_variants("tbl_produits_elevage", "08", function(d) {
 ```
 
 ## Chasse et pêche {#sec-chasse-peche}
+
+La chasse et la pêche constituent des activités complémentaires, souvent saisonnières, qui contribuent à la diversification alimentaire et au revenu, en particulier dans les zones proches des plans d'eau.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, Ces activités sont pratiquées par `r pct_chpe_a` % des ménages.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, Ces activités sont pratiquées par `r pct_chpe_m` % des ménages.
+:::
+:::
 
 ```{r}
 #| label: tbl-chasse-peche-pratique
@@ -1488,6 +1742,8 @@ dl_fig_variants("fig_chasse_raison", "08", function(d) {
 
 ### Fréquence et saisonnalité
 
+La fréquence de pêche et son calendrier saisonnier dépendent du régime hydrologique local. Les périodes de hautes eaux correspondent généralement à une activité de pêche plus intense.
+
 ```{r}
 #| label: fig-frequence-peche
 #| fig-cap: "Fréquence de la chasse/pêche"
@@ -1583,6 +1839,20 @@ if (length(chph6_cols) > 0) {
 
 ### Emploi de main d'oeuvre
 
+L'ampleur du recours à la main d'œuvre extérieure dépend de la superficie cultivée, du type de culture et de la disponibilité de main d'œuvre familiale.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, Le recours à la main d'œuvre extérieure (salariée ou par entraide) concerne `r pct_mo_a` % des ménages.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, Le recours à la main d'œuvre extérieure (salariée ou par entraide) concerne `r pct_mo_m` % des ménages.
+:::
+:::
+
 ```{r}
 #| label: tbl-main-oeuvre-pratique
 #| tbl-cap: "Recours à la main d'oeuvre agricole"
@@ -1621,6 +1891,8 @@ dl_tbl_variants("tbl_main_oeuvre_pratique", "08", function(d) {
 ```
 
 ### Opérations nécessitant de la main d'oeuvre salariée
+
+Les trois opérations rizicoles principales (travail du sol, sarclage, moisson) mobilisent des volumes de main d'œuvre différents. Le salaire journalier et le recours à l'entraide varient sensiblement selon l'opération et l'observatoire.
 
 ```{r}
 #| label: tbl-operations-mo
@@ -1673,6 +1945,8 @@ dl_tbl_variants("tbl_operations_mo", "08", function(d) {
 ```
 
 ### Main d'oeuvre permanente
+
+Le recours à la main d'œuvre permanente (salariés employés à l'année) reste minoritaire et concerne principalement les exploitations les plus grandes. Les conditions d'emploi (salaire, logement, nourriture) reflètent le marché du travail agricole local.
 
 ```{r}
 #| label: tbl-main-oeuvre-perm
@@ -1986,6 +2260,11 @@ if ("pct_elevage" %in% names(agro_trends)) {
 }
 ```
 
+Les séries longues mettent en évidence des tendances structurelles : évolution de la production rizicole par ménage, variation des rendements en lien avec les aléas climatiques et l'intensification des pratiques, et évolution du taux de pratique de l'élevage. La rupture de série entre 2015 et 2025 (représentée en pointillés) invite à la prudence dans l'interprétation.
+
+::: {.content-visible when-profile="consolidated"}
+::: {.obs-technical}
+
 ## Pistes d'analyse complémentaires {#sec-pistes-agro}
 
 Les données collectées offrent des possibilités d'analyse supplémentaires qui n'ont pas été développées dans ce chapitre, faute de certitude sur leur pertinence ou par manque de recul sur la qualité des variables concernées. On peut notamment mentionner :
@@ -1995,3 +2274,5 @@ Les données collectées offrent des possibilités d'analyse supplémentaires qu
 -   **Coûts détaillés de la main d'œuvre par opération rizicole** (`res_mor`, `mor12`) : le salaire total par opération (Asa tany, Mijinja, Manetsa) pourrait être présenté sous forme de tableau comparatif, mais les valeurs présentent une forte dispersion.
 -   **Pratiques de nourriture de la main d'oeuvre** (`res_mor`, `mor3`) : la variable indique si les salariés ou l'entraide sont nourris pendant le travail.
 -   **Effectifs et variations du cheptel** (`res_ele`) : les variables `ele1` (effectif début), `ele2` (naissances), `ele3` (achats), `ele_i1` (ventes), `ele_p3` (pertes) permettraient de reconstituer un bilan démographique du cheptel par espèce (difficile à exploiter à première vue).
+
+:::

@@ -25,7 +25,7 @@ source("utils/sites.R")
 source("utils/downloadable_output.R")
 
 # --- Données de base ---
-res_deb <- read_dta("data/res_deb.dta") |>
+res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   mutate(
     j5 = as.character(j5),
     j0 = as.character(j0),
@@ -35,7 +35,8 @@ res_deb <- read_dta("data/res_deb.dta") |>
       TRUE       ~ j0
     )
   ) |>
-  assign_site()
+  assign_site() |>
+  filter_for_profile()
 
 add_obs <- function(df) {
   df |>
@@ -53,10 +54,10 @@ safe_to_char <- function(x) {
 }
 
 # --- Données foncières ---
-res_fr30  <- read_dta("data/res_fr30.dta")  |> add_obs()
-res_fr30a <- read_dta("data/res_fr30a.dta") |> add_obs()
-res_fr33  <- read_dta("data/res_fr33.dta")  |> add_obs()
-res_fr34  <- read_dta("data/res_fr34.dta")  |> add_obs()
+res_fr30  <- read_dta("data/ROS_MDG_microdata/2025/res_fr30.dta")  |> add_obs()
+res_fr30a <- read_dta("data/ROS_MDG_microdata/2025/res_fr30a.dta") |> add_obs()
+res_fr33  <- read_dta("data/ROS_MDG_microdata/2025/res_fr33.dta")  |> add_obs()
+res_fr34  <- read_dta("data/ROS_MDG_microdata/2025/res_fr34.dta")  |> add_obs()
 
 # Labels communs
 type_labs <- c(
@@ -79,6 +80,155 @@ fv_labs <- c(
   "1" = "Prêt", "2" = "Location", "3" = "Métayage",
   "4" = "Mise en gage", "9" = "Autre"
 )
+
+# --- Labels used by stats chunk (moved up so stats run cleanly) ---
+acq_labs <- c(
+  "11" = "Achat", "13" = "Don", "15" = "Mise en valeur",
+  "21" = "Héritage (partage définitif)", "22" = "Héritage (partage non définitif)",
+  "23" = "Héritage tournant"
+)
+
+prop_labs <- c(
+  "0" = "Tous les membres", "1" = "Chef de ménage", "2" = "Conjoint",
+  "3" = "Chef et conjoint", "41" = "Parents du chef", "42" = "Parents du conjoint",
+  "81" = "Indivision (chef)", "82" = "Indivision (conjoint)", "99" = "Autre"
+)
+
+# Satisfaction labels for tenure/satisfaction variables
+satis_labs <- c("1" = "Très insuffisante", "2" = "Insuffisante", "3" = "Suffisante")
+```
+
+
+```{r stats_foncier}
+#| include: false
+
+# ---- Statistiques pour le texte narratif ----
+
+# Working dataset for parcel-level analysis
+fr30_data <- res_fr30 |> filter(!is.na(fr30c))
+
+# Patrimoine – nombre de parcelles
+n_men_a <- res_deb |> filter(Observatory == "Alaotra") |> nrow()
+n_men_m <- res_deb |> filter(Observatory == "Marovoay") |> nrow()
+
+n_sans_parcelle_a <- sum(res_fr30a$fr30a[res_fr30a$Observatory == "Alaotra"] == 0, na.rm = TRUE)
+n_sans_parcelle_m <- sum(res_fr30a$fr30a[res_fr30a$Observatory == "Marovoay"] == 0, na.rm = TRUE)
+pct_sans_parcelle_a <- round(n_sans_parcelle_a / n_men_a * 100, 1)
+pct_sans_parcelle_m <- round(n_sans_parcelle_m / n_men_m * 100, 1)
+pct_proprietaires_a <- round((n_men_a - n_sans_parcelle_a) / n_men_a * 100, 1)
+pct_proprietaires_m <- round((n_men_m - n_sans_parcelle_m) / n_men_m * 100, 1)
+
+nb_parc_stats <- res_fr30a |> filter(fr30a > 0) |>
+  summarise(moy = round(mean(fr30a, na.rm = TRUE), 1),
+            med = median(fr30a, na.rm = TRUE), .by = Observatory)
+nb_parc_moy_a <- nb_parc_stats |> filter(Observatory == "Alaotra") |> pull(moy)
+nb_parc_moy_m <- nb_parc_stats |> filter(Observatory == "Marovoay") |> pull(moy)
+
+# Patrimoine – superficies
+sup_parc_moy <- fr30_data |> filter(!is.na(fr30d)) |>
+  summarise(moy = round(mean(fr30d, na.rm = TRUE), 1),
+            med = round(median(fr30d, na.rm = TRUE), 1), .by = Observatory)
+sup_men_stats <- fr30_data |>
+  summarise(sup = sum(fr30d, na.rm = TRUE), .by = c(j5, Observatory)) |>
+  summarise(moy = round(mean(sup), 1), med = round(median(sup), 1), .by = Observatory)
+sup_parc_moy_a <- sup_parc_moy |> filter(Observatory == "Alaotra") |> pull(moy)
+sup_parc_moy_m <- sup_parc_moy |> filter(Observatory == "Marovoay") |> pull(moy)
+sup_men_moy_a <- sup_men_stats |> filter(Observatory == "Alaotra") |> pull(moy)
+sup_men_moy_m <- sup_men_stats |> filter(Observatory == "Marovoay") |> pull(moy)
+
+# Patrimoine – types
+type_stats <- fr30_data |>
+  mutate(Type = factor(as.character(fr30c), levels = names(type_labs), labels = type_labs)) |>
+  count(Observatory, Type) |> mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+pct_riziere_a <- type_stats |> filter(Observatory == "Alaotra", Type == "Rizière") |> pull(pct)
+pct_riziere_m <- type_stats |> filter(Observatory == "Marovoay", Type == "Rizière") |> pull(pct)
+pct_champs_a <- type_stats |> filter(Observatory == "Alaotra", Type == "Champs") |> pull(pct)
+pct_champs_m <- type_stats |> filter(Observatory == "Marovoay", Type == "Champs") |> pull(pct)
+
+# Patrimoine – localisation
+loc_stats <- fr30_data |> filter(!is.na(fr30e)) |>
+  mutate(Loc = factor(as.character(fr30e), levels = names(loc_labs), labels = loc_labs)) |>
+  count(Observatory, Loc) |> mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+top_loc_a <- loc_stats |> filter(Observatory == "Alaotra") |> slice_max(pct, n = 1)
+top_loc_m <- loc_stats |> filter(Observatory == "Marovoay") |> slice_max(pct, n = 1)
+
+# Patrimoine – irrigation
+irrig_stats <- fr30_data |> filter(!is.na(fr30f)) |>
+  mutate(Irrig = factor(as.character(fr30f), levels = names(irrig_labs), labels = irrig_labs)) |>
+  count(Observatory, Irrig) |> mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+
+# Patrimoine – acquisition
+acq_stats <- fr30_data |> filter(!is.na(fr30h)) |>
+  mutate(Acq = factor(as.character(fr30h), levels = names(acq_labs), labels = acq_labs)) |>
+  count(Observatory, Acq) |> mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+pct_heritage_a <- acq_stats |> filter(Observatory == "Alaotra", str_detect(Acq, "Héritage")) |>
+  summarise(pct = sum(pct)) |> pull(pct)
+pct_heritage_m <- acq_stats |> filter(Observatory == "Marovoay", str_detect(Acq, "Héritage")) |>
+  summarise(pct = sum(pct)) |> pull(pct)
+pct_achat_a <- acq_stats |> filter(Observatory == "Alaotra", Acq == "Achat") |> pull(pct)
+pct_achat_m <- acq_stats |> filter(Observatory == "Marovoay", Acq == "Achat") |> pull(pct)
+pct_mev_a <- acq_stats |> filter(Observatory == "Alaotra", Acq == "Mise en valeur") |> pull(pct)
+pct_mev_m <- acq_stats |> filter(Observatory == "Marovoay", Acq == "Mise en valeur") |> pull(pct)
+
+# Patrimoine – propriétaire dans le ménage
+prop_stats <- fr30_data |> filter(!is.na(fr30i)) |>
+  mutate(fr30i_chr = as.character(fr30i),
+         Prop = if_else(fr30i_chr %in% names(prop_labs), prop_labs[fr30i_chr], "Autre")) |>
+  count(Observatory, Prop) |> mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+pct_cm_prop_a <- prop_stats |> filter(Observatory == "Alaotra", Prop == "Chef de ménage") |> pull(pct)
+pct_cm_prop_m <- prop_stats |> filter(Observatory == "Marovoay", Prop == "Chef de ménage") |> pull(pct)
+pct_conjoint_a <- prop_stats |> filter(Observatory == "Alaotra", Prop == "Conjoint") |> pull(pct)
+pct_conjoint_m <- prop_stats |> filter(Observatory == "Marovoay", Prop == "Conjoint") |> pull(pct)
+
+# Sécurisation foncière
+sec_data_calc <- fr30_data |> mutate(
+  Titre = if_else(fr30j == 1, "Oui", "Non"),
+  Certificat = if_else(fr30l == 1, "Oui", "Non")
+)
+titre_pct_stats <- sec_data_calc |> filter(!is.na(Titre)) |>
+  count(Observatory, Titre) |> mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+pct_titre_a <- titre_pct_stats |> filter(Observatory == "Alaotra", Titre == "Oui") |> pull(pct)
+pct_titre_m <- titre_pct_stats |> filter(Observatory == "Marovoay", Titre == "Oui") |> pull(pct)
+cert_pct_stats <- sec_data_calc |> filter(!is.na(Certificat)) |>
+  count(Observatory, Certificat) |> mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+pct_cert_a <- cert_pct_stats |> filter(Observatory == "Alaotra", Certificat == "Oui") |> pull(pct)
+pct_cert_m <- cert_pct_stats |> filter(Observatory == "Marovoay", Certificat == "Oui") |> pull(pct)
+pct_aucun_doc <- fr30_data |> filter(!is.na(fr30n)) |>
+  mutate(doc = as.character(fr30n)) |>
+  summarise(pct = round(sum(doc == "1") / n() * 100, 1))  |> pull(pct)
+
+# Cessions
+ced_pct_stats <- res_fr30a |> filter(!is.na(fr33a)) |>
+  summarise(pct = round(sum(fr33a == 1, na.rm = TRUE) / n() * 100, 1), .by = Observatory)
+pct_ced_a <- ced_pct_stats |> filter(Observatory == "Alaotra") |> pull(pct)
+pct_ced_m <- ced_pct_stats |> filter(Observatory == "Marovoay") |> pull(pct)
+n_parc_cedees <- nrow(res_fr33 |> filter(!is.na(fr33gc)))
+
+# Exploitées d'autrui
+expl_pct_stats <- res_fr30a |> filter(!is.na(fr34a)) |>
+  summarise(pct = round(sum(fr34a == 1, na.rm = TRUE) / n() * 100, 1), .by = Observatory)
+pct_expl_a <- expl_pct_stats |> filter(Observatory == "Alaotra") |> pull(pct)
+pct_expl_m <- expl_pct_stats |> filter(Observatory == "Marovoay") |> pull(pct)
+n_parc_exploitees <- nrow(res_fr34 |> filter(!is.na(fr30c1)))
+
+# Abandon
+aband_pct_stats <- res_fr30a |> filter(!is.na(fr30p)) |>
+  summarise(pct = round(sum(fr30p == 1, na.rm = TRUE) / n() * 100, 1), .by = Observatory)
+pct_aband_a <- aband_pct_stats |> filter(Observatory == "Alaotra") |> pull(pct)
+pct_aband_m <- aband_pct_stats |> filter(Observatory == "Marovoay") |> pull(pct)
+
+# Satisfaction
+satis_stats <- res_fr30a |> filter(!is.na(fr30o)) |>
+  mutate(Satis = factor(as.character(fr30o), levels = names(satis_labs), labels = satis_labs)) |>
+  count(Observatory, Satis) |> mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+pct_insuf_a <- satis_stats |>
+  filter(Observatory == "Alaotra", Satis %in% c("Très insuffisante", "Insuffisante")) |>
+  summarise(pct = sum(pct)) |> pull(pct)
+pct_insuf_m <- satis_stats |>
+  filter(Observatory == "Marovoay", Satis %in% c("Très insuffisante", "Insuffisante")) |>
+  summarise(pct = sum(pct)) |> pull(pct)
+pct_suf_a <- satis_stats |> filter(Observatory == "Alaotra", Satis == "Suffisante") |> pull(pct)
+pct_suf_m <- satis_stats |> filter(Observatory == "Marovoay", Satis == "Suffisante") |> pull(pct)
 ```
 
 
@@ -86,7 +236,17 @@ fv_labs <- c(
 
 ### Nombre de parcelles possédées
 
-Sur les `r n_men` ménages enquêtés, `r sum(res_fr30a$fr30a == 0, na.rm = TRUE)` ne possèdent aucune parcelle. Les ménages propriétaires possèdent en moyenne un peu plus de deux parcelles.
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** Sur les `r n_men_a` ménages enquêtés, `r n_sans_parcelle_a` (`r pct_sans_parcelle_a` %) ne possèdent aucune parcelle. La très grande majorité des ménages (`r pct_proprietaires_a` %) sont donc propriétaires d'au moins une parcelle (@fig-nb-parcelles). Les ménages propriétaires possèdent en moyenne `r nb_parc_moy_a` parcelles.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** Sur les `r n_men_m` ménages enquêtés, `r n_sans_parcelle_m` (`r pct_sans_parcelle_m` %) ne possèdent aucune parcelle. La très grande majorité des ménages (`r pct_proprietaires_m` %) sont donc propriétaires d'au moins une parcelle (@fig-nb-parcelles). Les ménages propriétaires possèdent en moyenne `r nb_parc_moy_m` parcelles.
+:::
+:::
 
 ```{r}
 #| label: fig-nb-parcelles
@@ -184,7 +344,35 @@ dl_tbl_variants("tbl_parcelles_stats", "07", function(d) {
 }, res_fr30)
 ```
 
+Le @tbl-parcelles-stats résume les principales caractéristiques du patrimoine foncier possédé.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** La superficie moyenne par parcelle est de `r sup_parc_moy_a` ares, et la surface totale possédée par ménage atteint en moyenne `r sup_men_moy_a` ares.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** La superficie moyenne par parcelle est de `r sup_parc_moy_m` ares, et la surface totale possédée par ménage atteint en moyenne `r sup_men_moy_m` ares.
+:::
+:::
+
 ### Type et localisation des parcelles possédées
+
+Le patrimoine foncier des ménages se compose principalement de rizières et de champs de cultures pluviales (@fig-type-parcelle).
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** Les rizières représentent `r pct_riziere_a` % des parcelles possédées et les champs `r pct_champs_a` %.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** Les rizières représentent `r pct_riziere_m` % des parcelles possédées et les champs `r pct_champs_m` %.
+:::
+:::
 
 ```{r}
 #| label: fig-type-parcelle
@@ -220,6 +408,20 @@ dl_fig_variants("fig_type_parcelle", "07", function(d) {
     theme(legend.position = "top")
 }, res_fr30 |> filter(!is.na(fr30c)))
 ```
+
+La localisation des parcelles reflète les spécificités agro-écologiques de chaque site (@fig-localisation-parcelle).
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** Les parcelles se concentrent principalement en `r tolower(top_loc_a$Loc)` (`r top_loc_a$pct` %).
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** La localisation la plus fréquente est la `r tolower(top_loc_m$Loc)` (`r top_loc_m$pct` %).
+:::
+:::
 
 ```{r}
 #| label: fig-localisation-parcelle
@@ -260,6 +462,8 @@ dl_fig_variants("fig_localisation_parcelle", "07", function(d) {
 
 ### Irrigation des parcelles possédées
 
+L'accès à l'irrigation est un facteur déterminant de la productivité rizicole. La @fig-irrigation-possedee présente les modes d'irrigation des parcelles possédées par les ménages dans les deux observatoires. Les différences entre Alaotra et Marovoay reflètent les investissements hydrauliques historiques de chaque périmètre.
+
 ```{r}
 #| label: fig-irrigation-possedee
 #| fig-cap: "Mode d'irrigation des parcelles possédées"
@@ -298,6 +502,20 @@ dl_fig_variants("fig_irrigation_possedee", "07", function(d) {
 ```
 
 ### Mode d'acquisition et ancienneté
+
+Le mode d'acquisition des parcelles renseigne sur la dynamique du marché foncier et le poids des transmissions familiales (@fig-acquisition). L'héritage domine largement dans les deux observatoires.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** L'héritage concerne `r pct_heritage_a` % des parcelles, l'achat `r pct_achat_a` % et la mise en valeur `r pct_mev_a` %.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** L'héritage concerne `r pct_heritage_m` % des parcelles, l'achat `r pct_achat_m` % et la mise en valeur `r pct_mev_m` %.
+:::
+:::
 
 ```{r}
 #| label: fig-acquisition
@@ -342,6 +560,8 @@ dl_fig_variants("fig_acquisition", "07", function(d) {
 }, fr30_data)
 ```
 
+L'ancienneté de possession témoigne de l'enracinement des ménages sur leurs terres (@fig-anciennete). Une part importante des parcelles est détenue depuis plusieurs décennies, reflétant la continuité de l'occupation foncière dans les deux zones. Les acquisitions récentes (années 2010 et au-delà) sont toutefois observables, signe que le marché foncier reste actif.
+
 ```{r}
 #| label: fig-anciennete
 #| fig-cap: "Ancienneté de possession des parcelles"
@@ -384,6 +604,20 @@ dl_fig_variants("fig_anciennete", "07", function(d) {
 ```
 
 ### Propriétaire dans le ménage
+
+La question de l'identité du propriétaire au sein du ménage soulève des enjeux de genre importants (@fig-proprietaire). Dans les deux observatoires, c'est le chef de ménage qui est déclaré propriétaire de la majorité des parcelles, ce qui illustre les inégalités d'accès au foncier.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** Le chef de ménage est propriétaire de `r pct_cm_prop_a` % des parcelles ; le ou la conjoint(e) n'apparaît que dans `r pct_conjoint_a` % des cas.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** Le chef de ménage est propriétaire de `r pct_cm_prop_m` % des parcelles ; le ou la conjoint(e) n'apparaît que dans `r pct_conjoint_m` % des cas.
+:::
+:::
 
 ```{r}
 #| label: fig-proprietaire
@@ -447,7 +681,19 @@ dl_fig_variants("fig_proprietaire", "07", function(d) {
 
 ## Sécurisation foncière {#sec-securisation}
 
-La sécurisation foncière est un enjeu majeur à Madagascar. Les ménages peuvent détenir un titre foncier, un certificat foncier (délivré par le guichet foncier communal), ou divers documents informels.
+La sécurisation foncière est un enjeu majeur à Madagascar. Les ménages peuvent détenir un titre foncier, un certificat foncier (délivré par le guichet foncier communal), ou divers documents informels. Les résultats de l'enquête révèlent un niveau de sécurisation formelle encore très faible (@tbl-securisation).
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** Seules `r pct_titre_a` % des parcelles disposent d'un titre foncier. Les certificats fonciers ne couvrent que `r pct_cert_a` % des parcelles.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** Seules `r pct_titre_m` % des parcelles disposent d'un titre foncier. Les certificats fonciers ne couvrent que `r pct_cert_m` % des parcelles.
+:::
+:::
 
 ```{r}
 #| label: tbl-securisation
@@ -480,7 +726,7 @@ cert_pct <- sec_data |>
 bind_rows(titre_pct, cert_pct) |>
   gt() |>
   tab_header(title = "% des parcelles disposant d'un document de sécurisation") |>
-  cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
+  safe_cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
 ```
 
 ```{r dl_tbl_securisation}
@@ -505,6 +751,8 @@ dl_tbl_variants("tbl_securisation", "07", function(d) {
   ) |> rename(Site = Observatory)
 }, fr30_data)
 ```
+
+En l'absence de titre ou de certificat, les ménages s'appuient sur des documents informels de nature très variable (@fig-papiers). Cependant, `r pct_aucun_doc` % des parcelles ne sont accompagnées d'aucun document justificatif, ce qui expose ces ménages à un risque élevé d'insécurité foncière en cas de litige.
 
 ```{r}
 #| label: fig-papiers
@@ -552,7 +800,19 @@ dl_fig_variants("fig_papiers", "07", function(d) {
 
 ## Parcelles cédées à des tiers {#sec-cessions}
 
-Les ménages propriétaires peuvent céder certaines de leurs parcelles à d'autres exploitants, sous forme de prêt, location, métayage ou mise en gage.
+Les ménages propriétaires peuvent céder certaines de leurs parcelles à d'autres exploitants, sous forme de prêt, location, métayage ou mise en gage (@tbl-cession-pratique), pour un total de `r n_parc_cedees` parcelles cédées.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** Cette pratique concerne `r pct_ced_a` % des ménages.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** Cette pratique concerne `r pct_ced_m` % des ménages.
+:::
+:::
 
 ```{r}
 #| label: tbl-cession-pratique
@@ -585,6 +845,8 @@ dl_tbl_variants("tbl_cession_pratique", "07", function(d) {
     rename(Site = Observatory)
 }, res_fr30a)
 ```
+
+Parmi les parcelles cédées, les modes de faire-valoir varient sensiblement d'un observatoire à l'autre (@fig-mode-cession). Le prêt et le métayage sont les formes les plus courantes de cession, le métayage occupant une place particulièrement importante dans les zones rizicoles.
 
 ```{r}
 #| label: fig-mode-cession
@@ -622,6 +884,8 @@ dl_fig_variants("fig_mode_cession", "07", function(d) {
     theme(legend.position = "top")
 }, fr33_data)
 ```
+
+Les motivations de la cession reflètent des stratégies économiques diversifiées (@fig-motif-cession). Pour certains ménages, céder une parcelle répond à un besoin de liquidités ou à l'impossibilité de cultiver l'ensemble de leur patrimoine ; pour d'autres, il s'agit de maintenir un lien social avec la parenté ou le voisinage.
 
 ```{r}
 #| label: fig-motif-cession
@@ -661,6 +925,8 @@ dl_fig_variants("fig_motif_cession", "07", function(d) {
     theme(legend.position = "top")
 }, fr33_data)
 ```
+
+Les bénéficiaires des cessions sont principalement des membres de la famille ou des voisins (@fig-cedee-a-qui), ce qui confirme le caractère en grande partie familial et communautaire du marché foncier local.
 
 ```{r}
 #| label: fig-cedee-a-qui
@@ -704,7 +970,19 @@ dl_fig_variants("fig_cedee_a_qui", "07", function(d) {
 
 ## Parcelles exploitées non possédées {#sec-exploitees}
 
-En plus de leurs propres parcelles, de nombreux ménages exploitent des terres appartenant à d'autres propriétaires.
+En plus de leurs propres parcelles, de nombreux ménages exploitent des terres appartenant à d'autres propriétaires (@tbl-exploitation-autres), pour un total de `r n_parc_exploitees` parcelles. Le recours à l'exploitation de terres d'autrui traduit soit une insuffisance du patrimoine propre, soit une stratégie de diversification de l'assiette foncière cultivée.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** Cette pratique concerne `r pct_expl_a` % des ménages.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** Cette pratique concerne `r pct_expl_m` % des ménages.
+:::
+:::
 
 ```{r}
 #| label: tbl-exploitation-autres
@@ -737,6 +1015,8 @@ dl_tbl_variants("tbl_exploitation_autres", "07", function(d) {
     rename(Site = Observatory)
 }, res_fr30a)
 ```
+
+Les parcelles exploitées sans en être propriétaire sont, comme les parcelles possédées, majoritairement des rizières (@fig-type-exploitee), reflétant la place centrale de la riziculture dans les stratégies des ménages.
 
 ```{r}
 #| label: fig-type-exploitee
@@ -775,6 +1055,8 @@ dl_fig_variants("fig_type_exploitee", "07", function(d) {
 }, fr34_data)
 ```
 
+Le mode de faire-valoir des parcelles exploitées révèle l'équilibre local entre prêt, location et métayage (@fig-fv-exploitee). Le métayage, qui consiste à partager la récolte avec le propriétaire, reste une forme d'accès au foncier particulièrement répandue.
+
 ```{r}
 #| label: fig-fv-exploitee
 #| fig-cap: "Mode de faire-valoir des parcelles exploitées"
@@ -811,6 +1093,8 @@ dl_fig_variants("fig_fv_exploitee", "07", function(d) {
     theme(legend.position = "top")
 }, fr34_data)
 ```
+
+Les parcelles exploitées appartiennent le plus souvent à des membres de la famille ou à des voisins (@fig-proprietaire-exploitee), ce qui témoigne du rôle des réseaux de proximité dans l'accès au foncier.
 
 ```{r}
 #| label: fig-proprietaire-exploitee
@@ -851,6 +1135,8 @@ dl_fig_variants("fig_proprietaire_exploitee", "07", function(d) {
 }, fr34_data)
 ```
 
+Le mode d'irrigation des parcelles exploitées diffère-t-il de celui des parcelles possédées ? La @fig-irrigation-exploitee permet d'examiner si les ménages qui exploitent des terres d'autrui accèdent à des parcelles de même qualité irriguée.
+
 ```{r}
 #| label: fig-irrigation-exploitee
 #| fig-cap: "Mode d'irrigation des parcelles exploitées"
@@ -887,6 +1173,8 @@ dl_fig_variants("fig_irrigation_exploitee", "07", function(d) {
     theme(legend.position = "top")
 }, fr34_data)
 ```
+
+Le coût de l'exploitation de terres d'autrui varie selon le mode de faire-valoir (@tbl-rente-exploitee). Les ménages locataires versent une rente en argent ou en nature, tandis que les métayers cèdent une part de la récolte au propriétaire, généralement comprise entre un quart et la moitié de la production.
 
 ```{r}
 #| label: tbl-rente-exploitee
@@ -931,6 +1219,20 @@ dl_tbl_variants("tbl_rente_exploitee", "07", function(d) {
 
 ## Abandon de parcelles {#sec-abandon}
 
+L'abandon de la culture de certaines parcelles peut révéler des difficultés structurelles (dégradation des sols, problèmes d'irrigation, insécurité) ou conjoncturelles (manque de main-d'œuvre, coût des intrants) (@tbl-abandon).
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** Cette pratique touche `r pct_aband_a` % des ménages.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** Cette pratique touche `r pct_aband_m` % des ménages.
+:::
+:::
+
 ```{r}
 #| label: tbl-abandon
 #| tbl-cap: "Ménages ayant abandonné la culture de parcelles"
@@ -965,6 +1267,20 @@ dl_tbl_variants("tbl_abandon", "07", function(d) {
 
 
 ## Satisfaction à l'égard de la surface possédée {#sec-satisfaction}
+
+Le jugement des ménages sur la suffisance de leur dotation foncière synthétise l'ensemble des contraintes analysées précédemment (@fig-satisfaction). Ce sentiment d'insuffisance foncière constitue un enjeu majeur pour les politiques de développement rural.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** `r pct_insuf_a` % des ménages jugent leur surface insuffisante ou très insuffisante. Seuls `r pct_suf_a` % estiment leur dotation suffisante.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** `r pct_insuf_m` % des ménages jugent leur surface insuffisante ou très insuffisante. Seuls `r pct_suf_m` % estiment leur dotation suffisante.
+:::
+:::
 
 ```{r}
 #| label: fig-satisfaction
@@ -1003,7 +1319,8 @@ dl_fig_variants("fig_satisfaction", "07", function(d) {
 }, res_fr30a)
 ```
 
-
+::: {.content-visible when-profile="consolidated"}
+::: {.obs-technical}
 ## Pistes d'analyse complémentaires {#sec-pistes-foncier}
 
 Les données foncières offrent d'autres possibilités d'analyse qui n'ont pas été développées ici :
@@ -1013,4 +1330,5 @@ Les données foncières offrent d'autres possibilités d'analyse qui n'ont pas �
 - **Superficie possédée vs. superficie exploitée** : reconstituer la surface effectivement cultivée par le ménage en combinant `res_fr30` et `res_fr34`.
 - **Rentes perçues sur les parcelles cédées** (`fr33m1`, `fr33m2`, `fr33n`) : montants moyens des loyers et parts de métayage perçus.
 - **Nom sur le titre/certificat** (`fr30k`, `fr30m`) : la correspondance entre le titulaire du document et le propriétaire déclaré mériterait une analyse genrée.
-
+:::
+:::

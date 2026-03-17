@@ -26,7 +26,7 @@ source("utils/sites.R")
 source("utils/downloadable_output.R")
 
 # --- Données de base ---
-res_deb <- read_dta("data/res_deb.dta") |>
+res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   mutate(
     j5 = as.character(j5),
     j0 = as.character(j0),
@@ -38,6 +38,7 @@ res_deb <- read_dta("data/res_deb.dta") |>
   )
 
 res_deb <- assign_site(res_deb)
+res_deb <- res_deb |> filter_for_profile()
 
 add_obs <- function(df) {
   df |>
@@ -55,11 +56,11 @@ safe_to_char <- function(x) {
 }
 
 # --- Données insertion sociale ---
-res_respg  <- read_dta("data/res_respg.dta")  |> add_obs()
-res_respg0 <- read_dta("data/res_respg0.dta") |> add_obs()
+res_respg  <- read_dta("data/ROS_MDG_microdata/2025/res_respg.dta")  |> add_obs()
+res_respg0 <- read_dta("data/ROS_MDG_microdata/2025/res_respg0.dta") |> add_obs()
 
 # --- Données projets ---
-res_pro <- read_dta("data/res_pro.dta") |> add_obs()
+res_pro <- read_dta("data/ROS_MDG_microdata/2025/res_pro.dta") |> add_obs()
 
 # Labels types d'organisation
 org_labs <- c(
@@ -90,6 +91,19 @@ role_labs <- c(
   "2" = "Membre actif",
   "3" = "Membre occasionnel"
 )
+```
+
+```{r stats_insertion}
+#| include: false
+# --- Statistiques clés ---
+pct_membre_a <- res_respg0 |> filter(Observatory == "Alaotra") |>
+  summarise(pct = round(mean(respga == 1, na.rm = TRUE) * 100, 1)) |> pull(pct)
+pct_membre_m <- res_respg0 |> filter(Observatory == "Marovoay") |>
+  summarise(pct = round(mean(respga == 1, na.rm = TRUE) * 100, 1)) |> pull(pct)
+pct_benef_a <- res_respg0 |> filter(Observatory == "Alaotra", pro1 %in% c(1, 2)) |>
+  summarise(pct = round(mean(pro1 == 1) * 100, 1)) |> pull(pct)
+pct_benef_m <- res_respg0 |> filter(Observatory == "Marovoay", pro1 %in% c(1, 2)) |>
+  summarise(pct = round(mean(pro1 == 1) * 100, 1)) |> pull(pct)
 ```
 
 
@@ -316,6 +330,20 @@ Le questionnaire demande aux ménages s'ils ont bénéficié de projets ou de fo
 
 ### Bénéficiaires de projets
 
+L'accès aux projets de développement reste inégal entre les deux sites.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, `r pct_benef_a` % des ménages déclarent avoir bénéficié d'au moins un projet ou d'une formation.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, `r pct_benef_m` % des ménages déclarent avoir bénéficié d'au moins un projet ou d'une formation.
+:::
+:::
+
 ```{r}
 #| label: tbl-pro1
 #| tbl-cap: "Ménages bénéficiaires de projets ou formations"
@@ -332,7 +360,7 @@ res_respg0 |>
   pivot_wider(names_from = Observatory, values_from = pct) |>
   gt() |>
   tab_header(title = "Le ménage a-t-il bénéficié d'un projet ou d'une formation ?") |>
-  cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
+  safe_cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
 ```
 
 ```{r dl_tbl_pro1}
@@ -416,11 +444,11 @@ pro_clean |>
     .by = c(Observatory, pro_lib_clean)
   ) |>
   pivot_wider(names_from = Observatory, values_from = pct) |>
-  arrange(desc(Alaotra)) |>
+  arrange(desc(rowSums(pick(any_of(c("Alaotra", "Marovoay")))))) |>
   rename(`Type de projet` = pro_lib_clean) |>
   gt() |>
   tab_header(title = "% de ménages bénéficiaires par type de projet") |>
-  cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
+  safe_cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
 ```
 
 ```{r dl_tbl_benef_type}
@@ -535,7 +563,19 @@ dl_tbl_variants("tbl_source_global", "12", function(d) {
 
 ## Croisement insertion sociale et accès aux projets {#sec-croisement}
 
-Les ménages membres d'une organisation sont-ils davantage bénéficiaires de projets ?
+Les ménages membres d'une organisation sont-ils davantage bénéficiaires de projets ? Ce croisement permet de tester l'hypothèse selon laquelle le capital social facilite l'accès aux interventions de développement.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, `r pct_membre_a` % des ménages sont membres d'une organisation.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+A Marovoay, `r pct_membre_m` % des ménages sont membres d'une organisation.
+:::
+:::
 
 ```{r}
 #| label: tbl-croisement
@@ -581,10 +621,13 @@ dl_tbl_variants("tbl_croisement", "12", function(d) {
 }, res_respg0)
 ```
 
-
+::: {.content-visible when-profile="consolidated"}
+::: {.obs-technical}
 ## Pistes d'analyse complémentaires {#sec-pistes-insertion}
 
 - **Lien organisation–type de projet** : les ménages membres d'organisations de producteurs bénéficient-ils davantage de projets agricoles ?
 - **Codes ONG/Projet** (`pro4`) : les valeurs numériques (10–15, 24, etc.) semblent correspondre à des identifiants de projets spécifiques dont la correspondance avec des noms de projets reste à documenter.
 - **Multi-adhésion et capital social** : croiser le nombre d'organisations par ménage avec les indicateurs de bien-être (habitat, sécurité alimentaire) pour tester l'effet du capital social.
 - **Analyse genrée** : les associations de femmes (code 17, liées au 8 mars) sont très présentes à Marovoay ; une analyse genrée de l'insertion sociale serait pertinente.
+:::
+:::

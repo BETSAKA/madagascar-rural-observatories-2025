@@ -1,0 +1,189 @@
+library(tidyverse) # A series of packages for data manipulation
+library(haven) # Required for reading STATA files (.dta)
+library(labelled) # To work with labelled data from STATA
+library(writexl) # Write data frames to Excel format
+library(readxl)
+
+ros_data_loc <- "data/"
+
+# Function to extract variable info for a given file_path and file
+extract_variable_info <- function(file_path, file) {
+  if (!file.exists(file_path)) {
+    return(tibble())
+  }
+
+  data <- read_dta(file_path, n_max = 0)
+
+  tibble(
+    file_name = file,
+    variable_name = names(data),
+    variable_label = var_label(data) %>% as.character()
+  )
+}
+
+# Liste directement tous les fichiers .dta dans le dossier
+files <- list.files(ros_data_loc, pattern = "\\.dta$", full.names = FALSE)
+# full.names = FALSE will return only filenames without the directory path
+
+if (length(files) == 0) {
+  stop("No .dta files found in ", ros_data_loc)
+}
+#to ensure that at least some .dta files were found, or add an informative message if no files are found
+
+# Use the tidyverse approach to map files
+all_vars <- map_df(
+  files,
+  ~ {
+    file_path <- file.path(ros_data_loc, .x)
+    extract_variable_info(file_path, .x)
+  }
+) %>%
+  mutate(across(
+    where(is.character),
+    ~ iconv(.x, from = "latin1", to = "UTF-8", sub = NA)
+  ))
+
+# Convert any NULL values in variable_label to "NA"
+all_vars$variable_label[is.na(all_vars$variable_label)] <- "NA"
+
+
+#Verify the data files completude
+if (length(unique_files) == length(files)) {
+  message(
+    "✅ Tous les fichiers ont été chargés (",
+    length(unique_files),
+    " sur ",
+    length(files),
+    ")."
+  )
+} else {
+  message(
+    "⚠️ Attention : ",
+    length(unique_files),
+    " fichiers uniques chargés, mais ",
+    length(files),
+    " attendus."
+  )
+}
+
+# retreive the file labels
+file_labels <- read_excel("documentation/File_labels.xlsx") %>%
+  select(file_name = filename, file_label = title_en) %>%
+  # Fix encoding issues for display, without silently dropping characters
+  mutate(across(
+    where(is.character),
+    ~ iconv(.x, from = "latin1", to = "UTF-8", sub = NA)
+  ))
+
+# Verifying presence of NA value in file_labels
+file_labels %>%
+  summarise(across(
+    everything(),
+    ~ sum(is.na(.x)),
+    .names = "missing_{.col}"
+  )) %>%
+  pivot_longer(everything(), names_to = "colonne", values_to = "nb_missing") %>%
+  mutate(
+    message = if_else(
+      nb_missing == 0,
+      paste0("✅ La colonne ", colonne, " n'a pas de valeurs manquantes."),
+      paste0(
+        "⚠️ La colonne ",
+        colonne,
+        " contient ",
+        nb_missing,
+        " valeurs manquantes."
+      )
+    )
+  ) %>%
+  pull(message) %>%
+  cat(sep = "\n")
+
+# Consolidate the information using the tidyverse approach
+variable_dictionary <- all_vars %>%
+  group_by(file_name, variable_name) %>%
+  summarise(
+    variable_label = first(variable_label[variable_label != "NA"] %||% "NA"),
+    .groups = "drop"
+  ) %>%
+  # adding validation after the join to check for NA file_labels and either log a warning or provide a default label for unmatched files
+  left_join(file_labels, by = "file_name", .before) %>%
+  relocate(file_label, .after = file_name) %>%
+  arrange(
+    case_when(
+      file_name == "res_deb.dta" ~ as.integer(1),
+      file_name == "res_m_a.dta" ~ as.integer(2),
+      file_name == "res_h.dta" ~ as.integer(3),
+      TRUE ~ as.integer(4)
+    )
+  ) # starts with hh ID and housing
+
+all_NA <- variable_dictionary %>%
+  summarise(across(everything(), ~ sum(is.na(.))))
+View(all_NA)
+
+# Verifying presence of NA value in variable_dictionary
+variable_dictionary %>%
+  summarise(across(
+    everything(),
+    ~ sum(is.na(.x)),
+    .names = "missing_{.col}"
+  )) %>%
+  pivot_longer(everything(), names_to = "colonne", values_to = "nb_missing") %>%
+  mutate(
+    message = if_else(
+      nb_missing == 0,
+      paste0("✅ La colonne ,", colonne, " ,n'a pas de valeurs manquantes."),
+      paste0(
+        "⚠️ La colonne, ",
+        colonne,
+        " ,contient ",
+        nb_missing,
+        " valeurs manquantes."
+      )
+    )
+  ) %>%
+  pull(message) %>%
+  cat(sep = "\n")
+
+# Count NA value
+na_dictionary_counts <- variable_dictionary %>%
+  filter(is.na(file_label)) %>% # Keep only the rows where file_label is NA
+  count(file_name, sort = TRUE) # Count the occurrences by file_name
+
+# Add a total ligne to na_dictionary_counts
+na_dictionary_counts <- na_dictionary_counts %>%
+  bind_rows(
+    tibble(
+      file_name = "Total",
+      n = sum(na_dictionary_counts$n)
+    )
+  )
+
+# Target the files whose file_label is missing
+na_file_names <- variable_dictionary %>%
+  filter(is.na(file_label)) %>% # Keep only the rows where file_label is NA
+  distinct(file_name) # Extract the unique file_name values
+
+#### IMPORTER UN NOUVEAU FICHIER "FILE_LABELS" AVEC TOUS LES NOUVEAUX FICHIERS DE 2025 => PUIS L'INCLURE DANS "Variable_dictionary" pour ne plus avoir les valeurs manquantes dans "file_label" (@Bezaka) #######
+
+#Convert all text-type columns to UTF‑8
+variable_dictionary <- variable_dictionary %>%
+  mutate(across(
+    where(is.character),
+    ~ iconv(.x, from = "latin1", to = "UTF-8", sub = NA)
+  ))
+
+
+# Write the variable dictionary to an Excel file
+write_xlsx(variable_dictionary, "output/ROS_Variable_Dictionary.xlsx")
+# Requires prior creation of the output folder
+
+# # Display in interactive format
+# DT::datatable(
+#   variable_dictionary,
+#   options = list(
+#     pageLength = 25,
+#     scrollX = TRUE
+#   )
+# )
