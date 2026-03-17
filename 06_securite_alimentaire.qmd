@@ -52,6 +52,8 @@ source("utils/downloadable_output.R")
 res_deb <- assign_site(res_deb)
 res_deb <- res_deb %>% filter_for_profile()
 
+res_deb_site <- res_deb |> expand_sites_for_profile()
+
 # Pre-joined datasets for site-level downloads
 sa_full  <- res_sa  %>% left_join(res_deb %>% select(j5, Observatory, Site), by = "j5")
 ssa_full <- res_ssa %>% left_join(res_deb %>% select(j5, Observatory, Site), by = "j5")
@@ -232,14 +234,17 @@ dl_tbl_variants("t2_soudure_hameau", "09", function(d) {
 # G1 : Histogramme de la distribution du nombre de mois de soudure
 res_sa %>%
   left_join(res_deb, by = "j5") %>%
+  expand_sites_for_profile() %>%
   filter(!is.na(sal2d)) %>%
-  ggplot(aes(x = factor(sal2d))) +
-  geom_bar(fill = "#1f77b4") +
+  count(Observatory, sal2d) %>%
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) %>%
+  ggplot(aes(x = factor(sal2d), y = pct)) +
+  geom_col(fill = "#1f77b4") +
   facet_wrap(~Observatory) +
   labs(
     title = "Distribution du nombre de mois de soudure par observatoire",
     x = "Nombre de mois de soudure",
-    y = "Nombre de ménages"
+    y = "% des ménages"
   ) +
   theme_minimal() +
   theme(plot.title = element_text(face = "bold", size = 12))
@@ -321,12 +326,12 @@ dl_tbl_variants("t3_calendrier_soudure", "09", function(d) {
 ```{r g2_calendrier_soudure}
 # G2 : Graphique du calendrier de la soudure
 ggplot(calendrier_soudure, aes(x = Mois, y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~Observatory) +
   labs(
     title = "Calendrier de la soudure par observatoire",
     x = "Mois",
-    y = "% de ménages en soudure",
-    fill = "Observatoire"
+    y = "% de ménages en soudure"
   ) +
   theme_minimal() +
   theme(
@@ -796,9 +801,9 @@ transition %>%
   cols_label(
     Hors_soudure = "Hors soudure",
     Pendant_soudure = "Pendant soudure",
-    n = "Effectif",
     pct = "%"
   ) %>%
+  cols_hide(n) %>%
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
@@ -1038,11 +1043,11 @@ sources_dette <- res_ssa %>%
   )
 
 sources_dette %>%
-  select(Observatory, Source, n_oui, pct) %>%
+  select(Observatory, Source, pct) %>%
   pivot_wider(
     names_from = Observatory,
-    values_from = c(n_oui, pct),
-    names_glue = "{Observatory}_{.value}"
+    values_from = pct,
+    names_glue = "{Observatory}_pct"
   ) %>%
   gt() %>%
   tab_header(
@@ -1053,8 +1058,8 @@ sources_dette %>%
   safe_tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
   safe_cols_label(
     Source = "Source",
-    Alaotra_n_oui = "N", Alaotra_pct = "%",
-    Marovoay_n_oui = "N", Marovoay_pct = "%"
+    Alaotra_pct = "%",
+    Marovoay_pct = "%"
   ) %>%
   tab_style(
     style = cell_text(weight = "bold"),
@@ -1116,11 +1121,11 @@ sources_emprunt <- res_ssa %>%
   )
 
 sources_emprunt %>%
-  select(Observatory, Source, n_oui, pct) %>%
+  select(Observatory, Source, pct) %>%
   pivot_wider(
     names_from = Observatory,
-    values_from = c(n_oui, pct),
-    names_glue = "{Observatory}_{.value}"
+    values_from = pct,
+    names_glue = "{Observatory}_pct"
   ) %>%
   gt() %>%
   tab_header(
@@ -1131,8 +1136,8 @@ sources_emprunt %>%
   safe_tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
   safe_cols_label(
     Source = "Source",
-    Alaotra_n_oui = "N", Alaotra_pct = "%",
-    Marovoay_n_oui = "N", Marovoay_pct = "%"
+    Alaotra_pct = "%",
+    Marovoay_pct = "%"
   ) %>%
   tab_style(
     style = cell_text(weight = "bold"),
@@ -1170,14 +1175,14 @@ top5 <- strat_resume %>%
   pivot_longer(cols = any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
 
 ggplot(top5, aes(x = reorder(Stratégie, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  geom_col(show.legend = FALSE) +
   coord_flip() +
+  facet_wrap(~Observatory) +
   labs(
     title = "Top 5 des stratégies d'adaptation les plus fréquentes",
     subtitle = "% « Quelquefois » ou « Souvent »",
     x = NULL,
-    y = "% de ménages",
-    fill = "Observatoire"
+    y = "% de ménages"
   ) +
   theme_minimal() +
   theme(

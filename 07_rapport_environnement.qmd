@@ -38,6 +38,8 @@ res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
 res_deb <- assign_site(res_deb)
 res_deb <- res_deb |> filter_for_profile()
 
+res_deb_site <- res_deb |> expand_sites_for_profile()
+
 # --- Données environnement ---
 res_ap_def     <- read_dta("data/ROS_MDG_microdata/2025/res_ap_def.dta")
 res_biodiv     <- read_dta("data/ROS_MDG_microdata/2025/res_biodiv.dta")
@@ -257,12 +259,13 @@ appart <- rm3_items |>
 
 ggplot(appart,
        aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
-  geom_col(position = "dodge") +
+  geom_col(show.legend = FALSE) +
   geom_text(aes(label = paste0(pct, "%")),
-            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+            hjust = -0.1, size = 3) +
   coord_flip() +
+  facet_wrap(~Groupe) +
   scale_y_continuous(limits = c(0, 100)) +
-  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  labs(x = NULL, y = "% de ménages") +
   theme_minimal()
 ```
 
@@ -409,12 +412,13 @@ repr <- rm5_items |>
 
 ggplot(repr,
        aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
-  geom_col(position = "dodge") +
+  geom_col(show.legend = FALSE) +
   geom_text(aes(label = paste0(pct, "%")),
-            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+            hjust = -0.1, size = 3) +
   coord_flip() +
+  facet_wrap(~Groupe) +
   scale_y_continuous(limits = c(0, 100)) +
-  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  labs(x = NULL, y = "% de ménages") +
   theme_minimal()
 ```
 
@@ -472,10 +476,11 @@ ef_pct <- ef_men |>
   mutate(pct = round(n / n_tot * 100, 1))
 
 ggplot(ef_pct, aes(x = Produit, y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  geom_col(show.legend = FALSE) +
   geom_text(aes(label = paste0(round(pct, 0), "%")),
-            position = position_dodge(width = 0.9), vjust = -0.3, size = 3) +
-  labs(x = NULL, y = "% des ménages", fill = "Observatoire") +
+            vjust = -0.3, size = 3) +
+  facet_wrap(~Observatory) +
+  labs(x = NULL, y = "% des ménages") +
   theme_minimal()
 ```
 
@@ -753,12 +758,13 @@ non_freq <- non_items |>
 
 ggplot(non_freq,
        aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
-  geom_col(position = "dodge") +
+  geom_col(show.legend = FALSE) +
   geom_text(aes(label = paste0(pct, "%")),
-            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+            hjust = -0.1, size = 3) +
   coord_flip() +
+  facet_wrap(~Groupe) +
   scale_y_continuous(limits = c(0, 100)) +
-  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  labs(x = NULL, y = "% de ménages") +
   theme_minimal()
 ```
 
@@ -821,12 +827,13 @@ usages <- res_um2 |>
   mutate(pct = round(n / n_usagers * 100, 0))
 
 ggplot(usages, aes(x = fct_reorder(Raison, pct, .fun = max), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  geom_col(show.legend = FALSE) +
   geom_text(aes(label = paste0(pct, "%")),
-            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+            hjust = -0.1, size = 3) +
   coord_flip() +
+  facet_wrap(~Observatory) +
   scale_y_continuous(limits = c(0, 110)) +
-  labs(x = NULL, y = "% des usagers de l'AP", fill = "Observatoire") +
+  labs(x = NULL, y = "% des usagers de l'AP") +
   theme_minimal()
 ```
 
@@ -1015,12 +1022,13 @@ feu_raisons <- feu_items |>
 
 ggplot(feu_raisons,
        aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
-  geom_col(position = "dodge") +
+  geom_col(show.legend = FALSE) +
   geom_text(aes(label = paste0(pct, "%")),
-            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+            hjust = -0.1, size = 3) +
   coord_flip() +
+  facet_wrap(~Groupe) +
   scale_y_continuous(limits = c(0, 100)) +
-  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  labs(x = NULL, y = "% de ménages") +
   theme_minimal()
 ```
 
@@ -1202,10 +1210,11 @@ evol_feux <- res_feubrousse |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
 ggplot(evol_feux, aes(x = Évolution, y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  geom_col(show.legend = FALSE) +
   geom_text(aes(label = paste0(round(pct, 0), "%")),
-            position = position_dodge(width = 0.9), vjust = -0.3, size = 3) +
-  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+            vjust = -0.3, size = 3) +
+  facet_wrap(~Observatory) +
+  labs(x = NULL, y = "% de ménages") +
   theme_minimal()
 ```
 
@@ -1249,10 +1258,11 @@ prob_feux <- res_feubrousse |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
 ggplot(prob_feux, aes(x = Importance, y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  geom_col(show.legend = FALSE) +
   geom_text(aes(label = paste0(round(pct, 0), "%")),
-            position = position_dodge(width = 0.9), vjust = -0.3, size = 3) +
-  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+            vjust = -0.3, size = 3) +
+  facet_wrap(~Observatory) +
+  labs(x = NULL, y = "% de ménages") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 15, hjust = 1))
 ```
@@ -1299,10 +1309,11 @@ regl_feux <- res_feubrousse |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
 ggplot(regl_feux, aes(x = Avis, y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  geom_col(show.legend = FALSE) +
   geom_text(aes(label = paste0(round(pct, 0), "%")),
-            position = position_dodge(width = 0.9), vjust = -0.3, size = 3) +
-  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+            vjust = -0.3, size = 3) +
+  facet_wrap(~Observatory) +
+  labs(x = NULL, y = "% de ménages") +
   theme_minimal()
 ```
 
@@ -1471,12 +1482,13 @@ gest <- res_ap |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
 ggplot(gest, aes(x = fct_reorder(Gestionnaire, pct, .fun = max), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  geom_col(show.legend = FALSE) +
   geom_text(aes(label = paste0(round(pct, 0), "%")),
-            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+            hjust = -0.1, size = 3) +
   coord_flip() +
+  facet_wrap(~Observatory) +
   scale_y_continuous(limits = c(0, 80)) +
-  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  labs(x = NULL, y = "% de ménages") +
   theme_minimal()
 ```
 
@@ -1531,12 +1543,13 @@ mesures <- ap5b_items |>
 
 ggplot(mesures,
        aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
-  geom_col(position = "dodge") +
+  geom_col(show.legend = FALSE) +
   geom_text(aes(label = paste0(pct, "%")),
-            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+            hjust = -0.1, size = 3) +
   coord_flip() +
+  facet_wrap(~Groupe) +
   scale_y_continuous(limits = c(0, 100)) +
-  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  labs(x = NULL, y = "% de ménages") +
   theme_minimal()
 ```
 
@@ -1593,12 +1606,13 @@ priorite <- res_ap |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
 ggplot(priorite, aes(x = fct_reorder(Priorité, pct, .fun = max), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  geom_col(show.legend = FALSE) +
   geom_text(aes(label = paste0(round(pct, 0), "%")),
-            position = position_dodge(width = 0.9), hjust = -0.1, size = 3) +
+            hjust = -0.1, size = 3) +
   coord_flip() +
+  facet_wrap(~Observatory) +
   scale_y_continuous(limits = c(0, 60)) +
-  labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
+  labs(x = NULL, y = "% de ménages") +
   theme_minimal()
 ```
 

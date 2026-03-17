@@ -47,8 +47,12 @@ res_deb <- res_deb |>
 res_deb <- assign_site(res_deb)
 res_deb <- res_deb |> filter_for_profile()
 
+res_deb_site <- res_deb |> expand_sites_for_profile()
+
 res_remq <- res_remq |>
   left_join(res_deb |> select(j5, Observatory, Site), by = "j5")
+
+res_remq_site <- res_remq |> expand_sites_for_profile()
 ```
 
 ## Qualité de l'enquête (évaluation par l'enquêteur, page de couverture)
@@ -61,7 +65,7 @@ La variable `j11` — *« Qualité de l'enquête »* — est renseignée par l'e
 #| fig-height: 4
 #| label: fig-qualite
 
-qual <- res_deb |>
+qual <- res_deb_site |>
   mutate(
     Qualité = case_when(
       j11 == 1 ~ "Bonne",
@@ -74,13 +78,10 @@ qual <- res_deb |>
   count(Observatory, Qualité)
 
 ggplot(qual, aes(x = Qualité, y = n, fill = Observatory)) +
-  geom_col(position = "dodge") +
-  geom_text(
-    aes(label = n),
-    position = position_dodge(width = 0.9),
-    vjust = -0.3, size = 3
-  ) +
-  labs(x = NULL, y = "Nombre d'entretiens", fill = "Observatoire") +
+  geom_col(show.legend = FALSE) +
+  geom_text(aes(label = n), vjust = -0.3, size = 3) +
+  labs(x = NULL, y = "Nombre d'entretiens") +
+  facet_wrap(~Observatory) +
   theme_minimal()
 ```
 
@@ -154,7 +155,7 @@ La variable `qual1aa` — *« Qualité de la réponse en générale »* — est 
 #| fig-height: 4
 #| label: fig-qual-reponse
 
-qual_rep <- res_remq |>
+qual_rep <- res_remq_site |>
   filter(!is.na(qual1aa), qual1aa %in% c(1, 2)) |>
   mutate(
     Qualité = case_when(
@@ -163,16 +164,14 @@ qual_rep <- res_remq |>
     ),
     Qualité = factor(Qualité, levels = c("Bonne", "Mauvaise"))
   ) |>
-  count(Observatory, Qualité)
+  count(Observatory, Qualité) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
-ggplot(qual_rep, aes(x = Qualité, y = n, fill = Observatory)) +
-  geom_col(position = "dodge") +
-  geom_text(
-    aes(label = n),
-    position = position_dodge(width = 0.9),
-    vjust = -0.3, size = 3
-  ) +
-  labs(x = NULL, y = "Nombre de ménages", fill = "Observatoire") +
+ggplot(qual_rep, aes(x = Qualité, y = pct, fill = Observatory)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(aes(label = paste0(pct, "%")), vjust = -0.3, size = 3) +
+  labs(x = NULL, y = "%") +
+  facet_wrap(~Observatory) +
   theme_minimal()
 ```
 
@@ -205,7 +204,7 @@ La variable `qual2aa` — *« Réaction du répondant »* — est renseignée pa
 #| fig-height: 4
 #| label: fig-reaction
 
-reaction <- res_remq |>
+reaction <- res_remq_site |>
   filter(!is.na(qual2aa), qual2aa %in% c(1, 2, 3)) |>
   mutate(
     Réaction = case_when(
@@ -215,16 +214,14 @@ reaction <- res_remq |>
     ),
     Réaction = factor(Réaction, levels = c("Ouvert (à l'aise)", "Neutre", "Méfiant"))
   ) |>
-  count(Observatory, Réaction)
+  count(Observatory, Réaction) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
-ggplot(reaction, aes(x = Réaction, y = n, fill = Observatory)) +
-  geom_col(position = "dodge") +
-  geom_text(
-    aes(label = n),
-    position = position_dodge(width = 0.9),
-    vjust = -0.3, size = 3
-  ) +
-  labs(x = NULL, y = "Nombre de ménages", fill = "Observatoire") +
+ggplot(reaction, aes(x = Réaction, y = pct, fill = Observatory)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(aes(label = paste0(pct, "%")), vjust = -0.3, size = 3) +
+  labs(x = NULL, y = "%") +
+  facet_wrap(~Observatory) +
   theme_minimal()
 ```
 

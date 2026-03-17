@@ -40,6 +40,8 @@ res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
 res_deb <- assign_site(res_deb)
 res_deb <- res_deb |> filter_for_profile()
 
+res_deb_site <- res_deb |> expand_sites_for_profile()
+
 add_obs <- function(df) {
   df |>
     mutate(j5 = as.character(j5)) |>
@@ -156,11 +158,13 @@ res_respg |>
   filter(!is.na(respgc)) |>
   count(j5, Observatory, name = "nb_org") |>
   count(Observatory, nb_org, name = "n_men") |>
-  ggplot(aes(x = factor(nb_org), y = n_men, fill = Observatory)) +
-  geom_col(position = "dodge") +
-  labs(x = "Nombre d'organisations", y = "Nombre de ménages", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  expand_sites_for_profile() |>
+  mutate(pct = round(n_men / sum(n_men) * 100, 1), .by = Observatory) |>
+  ggplot(aes(x = factor(nb_org), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
+  facet_wrap(~Observatory) +
+  labs(x = "Nombre d'organisations", y = "% des ménages") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_nb_org}
@@ -202,12 +206,13 @@ res_respg |>
   count(Observatory, Type) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
   filter(pct >= 1) |>
-  ggplot(aes(x = reorder(Type, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = reorder(Type, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des adhésions", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des adhésions") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_type_org}
@@ -253,12 +258,13 @@ res_respg |>
   )) |>
   count(Observatory, Membre) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Membre, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = reorder(Membre, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des adhésions", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des adhésions") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_qui_membre}
@@ -300,11 +306,12 @@ res_respg |>
   mutate(Role = factor(as.character(respgd), levels = names(role_labs), labels = role_labs)) |>
   count(Observatory, Role) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = Role, y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
-  labs(x = NULL, y = "% des adhésions", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  expand_sites_for_profile() |>
+  ggplot(aes(x = Role, y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
+  facet_wrap(~Observatory) +
+  labs(x = NULL, y = "% des adhésions") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_responsabilite}
@@ -411,12 +418,13 @@ pro_clean |>
     pct = round(mean(pro2 == 1) * 100, 1),
     .by = c(Observatory, pro_lib_clean)
   ) |>
-  ggplot(aes(x = reorder(pro_lib_clean, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = reorder(pro_lib_clean, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% de ménages bénéficiaires", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% de ménages bénéficiaires") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_benef_type}

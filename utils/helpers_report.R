@@ -496,23 +496,21 @@ make_origin_table <- function(data, var_col, classify_fn, var_label, title) {
     )
 
   obs_gt(wide) |>
-    gt::tab_header(title = title, subtitle = "Effectifs et pourcentages") |>
+    gt::tab_header(title = title, subtitle = "Pourcentages") |>
+    gt::cols_hide(c(`Chef N`, `Conjoint N`)) |>
     gt::cols_label(
       Variable = var_label,
-      `Chef N` = "N",
       `Chef %` = "%",
-      `Conjoint N` = "N",
       `Conjoint %` = "%"
     ) |>
     gt::tab_spanner(
       label = "Chefs de ménage",
-      columns = c(`Chef N`, `Chef %`)
+      columns = `Chef %`
     ) |>
     gt::tab_spanner(
       label = "Conjoints",
-      columns = c(`Conjoint N`, `Conjoint %`)
+      columns = `Conjoint %`
     ) |>
-    gt::fmt_number(columns = c(`Chef N`, `Conjoint N`), decimals = 0) |>
     gt::fmt_number(columns = c(`Chef %`, `Conjoint %`), decimals = 1) |>
     gt::sub_missing(missing_text = "< 5") |>
     style_table()
