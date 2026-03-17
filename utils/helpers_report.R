@@ -599,8 +599,12 @@ decode_labelled <- function(x) {
 #' @param data Data frame that already contains an `Observatory` column
 #' @param prefix Character prefix to match (e.g. "h6", "h7")
 #' @return Tibble with Observatory, Type, n, pct
-tabulate_binary_set <- function(data, prefix, exclude_pattern = NULL,
-                                count_mode = FALSE) {
+tabulate_binary_set <- function(
+  data,
+  prefix,
+  exclude_pattern = NULL,
+  count_mode = FALSE
+) {
   vars <- names(data)[grepl(paste0("^", prefix), names(data))]
   if (!is.null(exclude_pattern)) {
     vars <- vars[!grepl(exclude_pattern, vars)]

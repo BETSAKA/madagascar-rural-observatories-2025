@@ -96,28 +96,30 @@ rescue_outputs("docs", "rapport-consolide")
 
 # --- 2/3: Marovoay (PDF + DOCX) ---
 clean_stale_files()
-run_render("2a/3  Marovoay — PDF",
-           "quarto render --profile marovoay --to pdf")
+run_render("2a/3  Marovoay — PDF", "quarto render --profile marovoay --to pdf")
 clean_stale_files()
 clean_stale_rmarkdown()
 rescue_outputs("docs-marovoay", "rapport-marovoay")
 
-run_render("2b/3  Marovoay — DOCX",
-           "quarto render --profile marovoay --to docx --no-clean")
+run_render(
+  "2b/3  Marovoay — DOCX",
+  "quarto render --profile marovoay --to docx --no-clean"
+)
 clean_stale_files()
 clean_stale_rmarkdown()
 rescue_outputs("docs-marovoay", "rapport-marovoay")
 
 # --- 3/3: Alaotra (PDF + DOCX) ---
 clean_stale_files()
-run_render("3a/3  Alaotra — PDF",
-           "quarto render --profile alaotra --to pdf")
+run_render("3a/3  Alaotra — PDF", "quarto render --profile alaotra --to pdf")
 clean_stale_files()
 clean_stale_rmarkdown()
 rescue_outputs("docs-alaotra", "rapport-alaotra")
 
-run_render("3b/3  Alaotra — DOCX",
-           "quarto render --profile alaotra --to docx --no-clean")
+run_render(
+  "3b/3  Alaotra — DOCX",
+  "quarto render --profile alaotra --to docx --no-clean"
+)
 clean_stale_files()
 clean_stale_rmarkdown()
 rescue_outputs("docs-alaotra", "rapport-alaotra")
@@ -164,17 +166,31 @@ missing <- expected[!file.exists(expected)]
 real_errors <- character(0)
 for (e in render_errors) {
   # Consolidated renders (any format)
-  if (grepl("quarto render", e) && !grepl("--profile", e) &&
-      all(file.exists(c("docs/index.html", "docs/rapport-consolide.pdf",
-                         "docs/rapport-consolide.docx")))) {
+  if (
+    grepl("quarto render", e) &&
+      !grepl("--profile", e) &&
+      all(file.exists(c(
+        "docs/index.html",
+        "docs/rapport-consolide.pdf",
+        "docs/rapport-consolide.docx"
+      )))
+  ) {
     cat("  Note:", e, "(outputs exist — cleanup bug only)\n")
-  } else if (grepl("--profile marovoay", e) &&
-             all(file.exists(c("docs-marovoay/rapport-marovoay.pdf",
-                                "docs-marovoay/rapport-marovoay.docx")))) {
+  } else if (
+    grepl("--profile marovoay", e) &&
+      all(file.exists(c(
+        "docs-marovoay/rapport-marovoay.pdf",
+        "docs-marovoay/rapport-marovoay.docx"
+      )))
+  ) {
     cat("  Note:", e, "(outputs exist — cleanup bug only)\n")
-  } else if (grepl("--profile alaotra", e) &&
-             all(file.exists(c("docs-alaotra/rapport-alaotra.pdf",
-                                "docs-alaotra/rapport-alaotra.docx")))) {
+  } else if (
+    grepl("--profile alaotra", e) &&
+      all(file.exists(c(
+        "docs-alaotra/rapport-alaotra.pdf",
+        "docs-alaotra/rapport-alaotra.docx"
+      )))
+  ) {
     cat("  Note:", e, "(outputs exist — cleanup bug only)\n")
   } else {
     real_errors <- c(real_errors, e)
