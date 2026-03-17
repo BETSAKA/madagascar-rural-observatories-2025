@@ -25,18 +25,26 @@ run_render <- function(label, cmd) {
 clean_stale_files <- function() {
   dirs <- list.dirs(path = ".", recursive = FALSE, full.names = TRUE)
   stale <- dirs[grepl("_files$", dirs)]
-  if (length(stale) == 0) return(invisible(NULL))
+  if (length(stale) == 0) {
+    return(invisible(NULL))
+  }
   for (d in stale) {
     # Do not touch anything inside docs/ or docs-*/
-    if (grepl("^\\./docs", d)) next
+    if (grepl("^\\./docs", d)) {
+      next
+    }
     cat("Removing stale artifact directory:", d, "\n")
-    tryCatch({
-      unlink(d, recursive = TRUE, force = TRUE)
-    }, warning = function(w) {
-      cat("Warning removing", d, ":", conditionMessage(w), "\n")
-    }, error = function(e) {
-      cat("Error removing", d, ":", conditionMessage(e), "\n")
-    })
+    tryCatch(
+      {
+        unlink(d, recursive = TRUE, force = TRUE)
+      },
+      warning = function(w) {
+        cat("Warning removing", d, ":", conditionMessage(w), "\n")
+      },
+      error = function(e) {
+        cat("Error removing", d, ":", conditionMessage(e), "\n")
+      }
+    )
   }
   invisible(NULL)
 }
