@@ -38,6 +38,8 @@ res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   assign_site() |>
   filter_for_profile()
 
+res_deb_site <- res_deb |> expand_sites_for_profile()
+
 # Fonction utilitaire : ajout observatoire
 add_obs <- function(df) {
   df |>
@@ -295,12 +297,13 @@ res_r |>
   mutate(Tenure = factor(as.character(r4), levels = names(tenure_labs), labels = tenure_labs)) |>
   count(Observatory, Tenure) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Tenure, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = reorder(Tenure, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_tenure_riz}
@@ -343,12 +346,13 @@ res_r |>
   mutate(Probleme = factor(as.character(r11b), levels = names(eau_labs), labels = eau_labs)) |>
   count(Observatory, Probleme) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Probleme, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = reorder(Probleme, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_eau_riz}
@@ -407,12 +411,13 @@ res_r |>
   mutate(Technique = factor(as.character(r13), levels = names(tech_labs), labels = tech_labs)) |>
   count(Observatory, Technique) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Technique, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = reorder(Technique, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_technique_riz}
@@ -456,12 +461,13 @@ res_r |>
   mutate(Engrais = factor(as.character(r40), levels = names(fert_labs), labels = fert_labs)) |>
   count(Observatory, Engrais) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Engrais, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = reorder(Engrais, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_engrais_riz}
@@ -592,8 +598,10 @@ res_r |>
   filter(!is.na(r23), r23 > 0, !is.na(r1d), r1d > 0) |>
   mutate(rendement_tha = (r23 / r1d) * 100 / 1000) |>
   filter(rendement_tha < quantile(rendement_tha, 0.95, na.rm = TRUE)) |>
+  expand_sites_for_profile() |>
   ggplot(aes(x = Observatory, y = rendement_tha, fill = Observatory)) +
   geom_boxplot(alpha = 0.7) +
+  facet_wrap(~Observatory) +
   labs(x = NULL, y = "Rendement (t/ha)", fill = "Observatoire") +
   theme_minimal(base_size = 12) +
   theme(legend.position = "none")
@@ -623,13 +631,15 @@ dl_fig_variants("fig_rendement_riz_tha", "08", function(d) {
 
 res_r |>
   filter(!is.na(r23), r23 > 0) |>
-  ggplot(aes(x = r23, fill = Observatory)) +
-  geom_histogram(position = "identity", alpha = 0.6, bins = 40) +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = r23)) +
+  geom_histogram(fill = "#2c7bb6", bins = 40) +
+  facet_wrap(~Observatory) +
   scale_x_continuous(
     labels = label_comma(),
     limits = c(0, quantile(res_r[["r23"]][res_r[["r23"]] > 0], 0.95, na.rm = TRUE))
   ) +
-  labs(x = "Production de paddy (kg)", y = "Nombre de parcelles", fill = "Observatoire") +
+  labs(x = "Production de paddy (kg)", y = "Nombre de parcelles") +
   theme_minimal(base_size = 12)
 ```
 
@@ -668,12 +678,13 @@ res_r |>
   mutate(Topographie = factor(as.character(r10x), levels = names(topo_labs), labels = topo_labs)) |>
   count(Observatory, Topographie) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Topographie, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = reorder(Topographie, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_topographie_riz}
@@ -709,11 +720,12 @@ res_r |>
   mutate(Saison = factor(as.character(r42), levels = names(saison_labs), labels = saison_labs)) |>
   count(Observatory, Saison) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = Saison, y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  expand_sites_for_profile() |>
+  ggplot(aes(x = Saison, y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
+  facet_wrap(~Observatory) +
+  labs(x = NULL, y = "% des parcelles") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_saison_riz}
@@ -744,12 +756,13 @@ res_r |>
   mutate(Origine = safe_to_char(r30)) |>
   count(Observatory, Origine) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Origine, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = reorder(Origine, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_origine_semence}
@@ -829,11 +842,12 @@ res_dc21 |>
     pct = n / sum(n) * 100,
     .by = Observatory
   ) |>
-  ggplot(aes(x = Mois_lab, y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
-  labs(x = NULL, y = "% des transactions", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  expand_sites_for_profile() |>
+  ggplot(aes(x = Mois_lab, y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
+  facet_wrap(~Observatory) +
+  labs(x = NULL, y = "% des transactions") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_ventes_riz_mois}
@@ -864,9 +878,11 @@ dl_fig_variants("fig_ventes_riz_mois", "08", function(d) {
 
 res_dc21 |>
   filter(!is.na(dc24), dc24 > 0, dc24 < quantile(dc24, 0.98, na.rm = TRUE)) |>
-  ggplot(aes(x = dc24, fill = Observatory)) +
-  geom_histogram(position = "identity", alpha = 0.6, bins = 30) +
-  labs(x = "Prix du paddy (Ar/kg)", y = "Nombre de transactions", fill = "Observatoire") +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = dc24)) +
+  geom_histogram(fill = "#2c7bb6", bins = 30) +
+  facet_wrap(~Observatory) +
+  labs(x = "Prix du paddy (Ar/kg)", y = "Nombre de transactions") +
   theme_minimal(base_size = 12)
 ```
 
@@ -1010,11 +1026,14 @@ res_c |>
   filter(c0 != "", !is.na(c0)) |>
   distinct(j5, Observatory, c0) |>
   count(j5, Observatory, name = "nb_cultures") |>
-  ggplot(aes(x = nb_cultures, fill = Observatory)) +
-  geom_histogram(position = "dodge", binwidth = 1) +
-  labs(x = "Nombre de cultures pratiquées", y = "Nombre de ménages", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  expand_sites_for_profile() |>
+  count(Observatory, nb_cultures, name = "n_men") |>
+  mutate(pct = round(n_men / sum(n_men) * 100, 1), .by = Observatory) |>
+  ggplot(aes(x = nb_cultures, y = pct)) +
+  geom_col(fill = "#2c7bb6") +
+  facet_wrap(~Observatory) +
+  labs(x = "Nombre de cultures pratiquées", y = "% des ménages") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_diversification}
@@ -1050,12 +1069,19 @@ top_cult <- res_c |>
   filter(dense_rank(-total) <= 15)
 
 top_cult |>
-  ggplot(aes(x = reorder(Culture, total), y = n, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  left_join(
+    res_c |> filter(c0 != "", !is.na(c0)) |> distinct(j5, Observatory) |>
+      expand_sites_for_profile() |> count(Observatory, name = "n_total"),
+    by = "Observatory"
+  ) |>
+  mutate(pct = round(n / n_total * 100, 1)) |>
+  ggplot(aes(x = reorder(Culture, total), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "Nombre de ménages", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des ménages") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_top_cultures}
@@ -1106,12 +1132,13 @@ res_c |>
   mutate(Engrais = factor(as.character(c36), levels = names(fert_c_labs), labels = fert_c_labs)) |>
   count(Observatory, Engrais) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Engrais, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = reorder(Engrais, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_engrais_autres}
@@ -1253,7 +1280,7 @@ dl_tbl_variants("tbl_jardin_pratique", "08", function(d) {
   bind_rows(
     pct_oui(d, "jpa", "Jardin potager"),
     pct_oui(d, "efa", "Exploitation forestière")
-  ) |> rename(Site = Observatory)
+  )
 }, res_jpchphef)
 ```
 
@@ -1274,12 +1301,19 @@ top_jp <- res_jp |>
   filter(dense_rank(-total) <= 15)
 
 top_jp |>
-  ggplot(aes(x = reorder(Produit, total), y = n, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  left_join(
+    res_jp |> filter(jp_lig != "", !is.na(jp_lig)) |> distinct(j5, Observatory) |>
+      expand_sites_for_profile() |> count(Observatory, name = "n_total"),
+    by = "Observatory"
+  ) |>
+  mutate(pct = round(n / n_total * 100, 1)) |>
+  ggplot(aes(x = reorder(Produit, total), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "Nombre de ménages", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des ménages") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_top_jardin}
@@ -1325,12 +1359,19 @@ res_ef |>
   group_by(Produit) |>
   mutate(total = sum(n)) |>
   ungroup() |>
-  ggplot(aes(x = reorder(Produit, total), y = n, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  left_join(
+    res_ef |> filter(ef_lib != "", !is.na(ef_lib)) |> distinct(j5, Observatory) |>
+      expand_sites_for_profile() |> count(Observatory, name = "n_total"),
+    by = "Observatory"
+  ) |>
+  mutate(pct = round(n / n_total * 100, 1)) |>
+  ggplot(aes(x = reorder(Produit, total), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "Nombre de ménages", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des ménages") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_produits_foret}
@@ -1419,7 +1460,7 @@ A Marovoay, L'espèce la plus élevée est le `r top_espece_m`.
 
 ```{r}
 #| label: fig-especes-elevage
-#| fig-cap: "Espèces élevées (nombre de ménages pratiquant)"
+#| fig-cap: "Espèces élevées (% des ménages pratiquant)"
 #| fig-width: 10
 #| fig-height: 6
 
@@ -1431,12 +1472,19 @@ res_ele |>
   group_by(Espece) |>
   mutate(total = sum(n)) |>
   ungroup() |>
-  ggplot(aes(x = reorder(Espece, total), y = n, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  left_join(
+    res_ele |> filter(ele_lig0 != "", !is.na(ele_lig0)) |> distinct(j5, Observatory) |>
+      expand_sites_for_profile() |> count(Observatory, name = "n_total"),
+    by = "Observatory"
+  ) |>
+  mutate(pct = round(n / n_total * 100, 1)) |>
+  ggplot(aes(x = reorder(Espece, total), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "Nombre de ménages", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des ménages") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_especes_elevage}
@@ -1563,12 +1611,13 @@ res_ele |>
   group_by(Espece) |>
   mutate(total = sum(n)) |>
   ungroup() |>
-  ggplot(aes(x = reorder(Espece, total), y = n, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = reorder(Espece, total), y = n)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "Nb ménages ayant subi des pertes", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "Nb ménages ayant subi des pertes") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_pertes_elevage}
@@ -1598,18 +1647,27 @@ Outre la vente d'animaux sur pied, l'élevage génère des produits dérivés (l
 
 ```{r}
 #| label: tbl-produits-elevage
-#| tbl-cap: "Produits de l'élevage : nombre de ménages producteurs"
+#| tbl-cap: "Produits de l'élevage : % des ménages producteurs"
+
+pe_total <- res_pe |>
+  filter(pe_1 != "", !is.na(pe_1)) |>
+  distinct(j5, Observatory) |>
+  count(Observatory, name = "n_total")
 
 res_pe |>
   filter(pe_1 != "", !is.na(pe_1)) |>
   mutate(Produit = str_to_title(pe_1)) |>
   distinct(j5, Observatory, Produit) |>
   count(Observatory, Produit) |>
-  pivot_wider(names_from = Observatory, values_from = n, values_fill = 0) |>
-  mutate(Total = rowSums(pick(any_of(c("Alaotra", "Marovoay"))))) |>
-  arrange(desc(Total)) |>
+  left_join(pe_total, by = "Observatory") |>
+  mutate(pct = round(n / n_total * 100, 1)) |>
+  select(-n, -n_total) |>
+  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0) |>
+  mutate(Moy = round(rowMeans(pick(any_of(c("Alaotra", "Marovoay")))), 1)) |>
+  arrange(desc(Moy)) |>
+  select(-Moy) |>
   gt() |>
-  tab_header(title = "Produits de l'élevage déclarés par les ménages")
+  tab_header(title = "Produits de l'élevage déclarés par les ménages (%)")
 ```
 
 ```{r dl_tbl_produits_elevage}
@@ -1655,8 +1713,7 @@ pct_oui(res_jpchphef, "chapha", "Chasse / Pêche") |>
 #| echo: false
 #| results: asis
 dl_tbl_variants("tbl_chasse_peche_pratique", "08", function(d) {
-  pct_oui(d, "chapha", "Chasse / Pêche") |>
-    rename(Site = Observatory)
+  pct_oui(d, "chapha", "Chasse / Pêche")
 }, res_jpchphef)
 ```
 
@@ -1674,12 +1731,13 @@ res_chph |>
   mutate(total = sum(n)) |>
   ungroup() |>
   filter(dense_rank(-total) <= 15) |>
-  ggplot(aes(x = reorder(Espece, total), y = n, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = reorder(Espece, total), y = n)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "Nombre de mentions", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "Nombre de mentions") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_chasse_especes}
@@ -1714,12 +1772,13 @@ res_chph |>
   mutate(Raison = safe_to_char(chph5)) |>
   count(Observatory, Raison) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Raison, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = reorder(Raison, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des mentions", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des mentions") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_chasse_raison}
@@ -1740,6 +1799,8 @@ dl_fig_variants("fig_chasse_raison", "08", function(d) {
 }, res_chph)
 ```
 
+::: {.content-visible when-profile="consolidated"}
+
 ### Fréquence et saisonnalité
 
 La fréquence de pêche et son calendrier saisonnier dépendent du régime hydrologique local. Les périodes de hautes eaux correspondent généralement à une activité de pêche plus intense.
@@ -1755,12 +1816,13 @@ res_chph |>
   mutate(Frequence = safe_to_char(chph3)) |>
   count(Observatory, Frequence) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Frequence, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() |>
+  ggplot(aes(x = reorder(Frequence, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des mentions", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des mentions") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_frequence_peche}
@@ -1801,11 +1863,12 @@ if (length(chph6_cols) > 0) {
       levels = 1:12, labels = mois_labs
     )) |>
     count(Observatory, Mois) |>
-    ggplot(aes(x = Mois, y = n, fill = Observatory)) +
-    geom_col(position = "dodge") +
-    labs(x = NULL, y = "Nombre de mentions", fill = "Observatoire") +
-    theme_minimal(base_size = 12) +
-    theme(legend.position = "top")
+    expand_sites_for_profile() |>
+    ggplot(aes(x = Mois, y = n)) +
+    geom_col(fill = "#2c7bb6", show.legend = FALSE) +
+    facet_wrap(~Observatory) +
+    labs(x = NULL, y = "Nombre de mentions") +
+    theme_minimal(base_size = 12)
 }
 ```
 
@@ -1834,6 +1897,8 @@ if (length(chph6_cols) > 0) {
   }, res_chph)
 }
 ```
+
+:::
 
 ## Main d'oeuvre agricole {#sec-main-oeuvre}
 
@@ -1881,12 +1946,11 @@ if (!is.na(mp0_col)) {
 dl_tbl_variants("tbl_main_oeuvre_pratique", "08", function(d) {
   mo_np <- pct_oui(d, "mora", "Main d'oeuvre non permanente")
   mp0_col <- intersect(c("mp0", "mp0a"), names(d))[1]
-  out <- if (!is.na(mp0_col)) {
+  if (!is.na(mp0_col)) {
     bind_rows(mo_np, pct_oui(d, mp0_col, "Main d'oeuvre permanente"))
   } else {
     mo_np
   }
-  out |> rename(Site = Observatory)
 }, res_mp0)
 ```
 
@@ -2041,9 +2105,9 @@ crop_family <- function(code) {
 cult_quint <- res_c |>
   filter(!is.na(c1)) |>
   mutate(j5 = as.character(j5), Famille = crop_family(c1)) |>
-  select(-Observatory) |>
-  left_join(quintiles, by = "j5") |>
+  left_join(quintiles |> select(j5, Quintile), by = "j5") |>
   filter(!is.na(Quintile)) |>
+  expand_sites_for_profile() |>
   count(Observatory, Quintile, Famille) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Quintile))
 
@@ -2117,6 +2181,8 @@ dl_tbl_variants("tbl_cultures_quintile", "08", function(d) {
     rename(Site = Observatory)
 }, res_c)
 ```
+
+::: {.content-visible when-profile="consolidated"}
 
 ## Évolution des indicateurs agricoles (1995–2025) {#sec-agro-multiyear}
 
@@ -2261,6 +2327,8 @@ if ("pct_elevage" %in% names(agro_trends)) {
 ```
 
 Les séries longues mettent en évidence des tendances structurelles : évolution de la production rizicole par ménage, variation des rendements en lien avec les aléas climatiques et l'intensification des pratiques, et évolution du taux de pratique de l'élevage. La rupture de série entre 2015 et 2025 (représentée en pointillés) invite à la prudence dans l'interprétation.
+
+:::
 
 ::: {.content-visible when-profile="consolidated"}
 ::: {.obs-technical}

@@ -38,6 +38,8 @@ res_deb <- read_dta("data/ROS_MDG_microdata/2025/res_deb.dta") |>
   assign_site() |>
   filter_for_profile()
 
+res_deb_site <- res_deb |> expand_sites_for_profile()
+
 add_obs <- function(df) {
   df |>
     mutate(j5 = as.character(j5)) |>
@@ -255,12 +257,15 @@ pct_suf_m <- satis_stats |> filter(Observatory == "Marovoay", Satis == "Suffisan
 #| fig-height: 5
 
 res_fr30a |>
+  expand_sites_for_profile() |>
   filter(!is.na(fr30a)) |>
-  ggplot(aes(x = fr30a, fill = Observatory)) +
-  geom_histogram(position = "dodge", binwidth = 1) +
-  labs(x = "Nombre de parcelles possédées", y = "Nombre de ménages", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  count(Observatory, fr30a) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  ggplot(aes(x = fr30a, y = pct)) +
+  geom_col(fill = "#2c7bb6") +
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = "Nombre de parcelles possédées", y = "% des ménages") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_nb_parcelles}
@@ -381,15 +386,16 @@ Le patrimoine foncier des ménages se compose principalement de rizières et de 
 #| fig-height: 5
 
 fr30_data |>
+  expand_sites_for_profile() |>
   mutate(Type = factor(as.character(fr30c), levels = names(type_labs), labels = type_labs)) |>
   count(Observatory, Type) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Type, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  ggplot(aes(x = reorder(Type, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_type_parcelle}
@@ -430,16 +436,17 @@ La localisation des parcelles reflète les spécificités agro-écologiques de c
 #| fig-height: 5
 
 fr30_data |>
+  expand_sites_for_profile() |>
   filter(!is.na(fr30e)) |>
   mutate(Localisation = factor(as.character(fr30e), levels = names(loc_labs), labels = loc_labs)) |>
   count(Observatory, Localisation) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Localisation, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  ggplot(aes(x = reorder(Localisation, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_localisation_parcelle}
@@ -471,16 +478,17 @@ L'accès à l'irrigation est un facteur déterminant de la productivité rizicol
 #| fig-height: 5
 
 fr30_data |>
+  expand_sites_for_profile() |>
   filter(!is.na(fr30f)) |>
   mutate(Irrigation = factor(as.character(fr30f), levels = names(irrig_labs), labels = irrig_labs)) |>
   count(Observatory, Irrigation) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Irrigation, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  ggplot(aes(x = reorder(Irrigation, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_irrigation_possedee}
@@ -530,16 +538,17 @@ acq_labs <- c(
 )
 
 fr30_data |>
+  expand_sites_for_profile() |>
   filter(!is.na(fr30h)) |>
   mutate(Acquisition = factor(as.character(fr30h), levels = names(acq_labs), labels = acq_labs)) |>
   count(Observatory, Acquisition) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Acquisition, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  ggplot(aes(x = reorder(Acquisition, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_acquisition}
@@ -575,15 +584,17 @@ anc_labs <- c(
 )
 
 fr30_data |>
+  expand_sites_for_profile() |>
   filter(!is.na(fr30g)) |>
   mutate(Periode = factor(as.character(fr30g), levels = names(anc_labs), labels = anc_labs)) |>
   count(Observatory, Periode) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = Periode, y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
+  ggplot(aes(x = Periode, y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
+  facet_wrap(~Observatory) +
+  labs(x = NULL, y = "% des parcelles") +
   theme_minimal(base_size = 12) +
-  theme(legend.position = "top", axis.text.x = element_text(angle = 30, hjust = 1))
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
 ```
 
 ```{r dl_fig_anciennete}
@@ -632,6 +643,7 @@ prop_labs <- c(
 )
 
 fr30_data |>
+  expand_sites_for_profile() |>
   filter(!is.na(fr30i)) |>
   mutate(
     fr30i_chr = as.character(fr30i),
@@ -644,12 +656,12 @@ fr30_data |>
   count(Observatory, Proprietaire) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
   filter(pct >= 1) |>
-  ggplot(aes(x = reorder(Proprietaire, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  ggplot(aes(x = reorder(Proprietaire, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_proprietaire}
@@ -767,16 +779,17 @@ papier_labs <- c(
 )
 
 fr30_data |>
+  expand_sites_for_profile() |>
   filter(!is.na(fr30n)) |>
   mutate(Papier = factor(as.character(fr30n), levels = names(papier_labs), labels = papier_labs)) |>
   count(Observatory, Papier) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Papier, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  ggplot(aes(x = reorder(Papier, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_papiers}
@@ -857,15 +870,16 @@ Parmi les parcelles cédées, les modes de faire-valoir varient sensiblement d'u
 fr33_data <- res_fr33 |> filter(!is.na(fr33gc))
 
 fr33_data |>
+  expand_sites_for_profile() |>
   mutate(Mode = factor(as.character(fr33gc), levels = names(fv_labs), labels = fv_labs)) |>
   count(Observatory, Mode) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Mode, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  ggplot(aes(x = reorder(Mode, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles cédées", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles cédées") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_mode_cession}
@@ -894,17 +908,18 @@ Les motivations de la cession reflètent des stratégies économiques diversifi�
 #| fig-height: 6
 
 fr33_data |>
+  expand_sites_for_profile() |>
   filter(!is.na(fr33h)) |>
   mutate(Motif = safe_to_char(fr33h)) |>
   mutate(Motif = str_trunc(Motif, 45)) |>
   count(Observatory, Motif) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Motif, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  ggplot(aes(x = reorder(Motif, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles cédées", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles cédées") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_motif_cession}
@@ -935,17 +950,18 @@ Les bénéficiaires des cessions sont principalement des membres de la famille o
 #| fig-height: 5
 
 fr33_data |>
+  expand_sites_for_profile() |>
   filter(!is.na(fr33k)) |>
   mutate(Destinataire = safe_to_char(fr33k)) |>
   mutate(Destinataire = str_trunc(Destinataire, 40)) |>
   count(Observatory, Destinataire) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Destinataire, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  ggplot(aes(x = reorder(Destinataire, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles cédées", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles cédées") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_cedee_a_qui}
@@ -1027,15 +1043,16 @@ Les parcelles exploitées sans en être propriétaire sont, comme les parcelles 
 fr34_data <- res_fr34 |> filter(!is.na(fr30c1))
 
 fr34_data |>
+  expand_sites_for_profile() |>
   mutate(Type = factor(as.character(fr30c1), levels = names(type_labs), labels = type_labs)) |>
   count(Observatory, Type) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Type, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  ggplot(aes(x = reorder(Type, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_type_exploitee}
@@ -1064,16 +1081,17 @@ Le mode de faire-valoir des parcelles exploitées révèle l'équilibre local en
 #| fig-height: 5
 
 fr34_data |>
+  expand_sites_for_profile() |>
   filter(!is.na(fr34g)) |>
   mutate(Mode = factor(as.character(fr34g), levels = names(fv_labs), labels = fv_labs)) |>
   count(Observatory, Mode) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Mode, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  ggplot(aes(x = reorder(Mode, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles exploitées", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles exploitées") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_fv_exploitee}
@@ -1103,17 +1121,18 @@ Les parcelles exploitées appartiennent le plus souvent à des membres de la fam
 #| fig-height: 6
 
 fr34_data |>
+  expand_sites_for_profile() |>
   filter(!is.na(fr34k)) |>
   mutate(Proprietaire = safe_to_char(fr34k)) |>
   mutate(Proprietaire = str_trunc(Proprietaire, 40)) |>
   count(Observatory, Proprietaire) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Proprietaire, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  ggplot(aes(x = reorder(Proprietaire, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles exploitées", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles exploitées") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_proprietaire_exploitee}
@@ -1144,16 +1163,17 @@ Le mode d'irrigation des parcelles exploitées diffère-t-il de celui des parcel
 #| fig-height: 5
 
 fr34_data |>
+  expand_sites_for_profile() |>
   filter(!is.na(fr34f)) |>
   mutate(Irrigation = factor(as.character(fr34f), levels = names(irrig_labs), labels = irrig_labs)) |>
   count(Observatory, Irrigation) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = reorder(Irrigation, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  ggplot(aes(x = reorder(Irrigation, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des parcelles exploitées", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des parcelles exploitées") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_irrigation_exploitee}
@@ -1291,15 +1311,16 @@ Le jugement des ménages sur la suffisance de leur dotation foncière synthétis
 satis_labs <- c("1" = "Très insuffisante", "2" = "Insuffisante", "3" = "Suffisante")
 
 res_fr30a |>
+  expand_sites_for_profile() |>
   filter(!is.na(fr30o)) |>
   mutate(Satisfaction = factor(as.character(fr30o), levels = names(satis_labs), labels = satis_labs)) |>
   count(Observatory, Satisfaction) |>
   mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  ggplot(aes(x = Satisfaction, y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
-  labs(x = NULL, y = "% des ménages", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  ggplot(aes(x = Satisfaction, y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
+  facet_wrap(~Observatory) +
+  labs(x = NULL, y = "% des ménages") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_satisfaction}

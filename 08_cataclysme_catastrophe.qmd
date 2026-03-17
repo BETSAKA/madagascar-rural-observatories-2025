@@ -56,6 +56,8 @@ res_deb <- res_deb %>%
 res_deb <- assign_site(res_deb)
 res_deb <- res_deb %>% filter_for_profile()
 
+res_deb_site <- res_deb |> expand_sites_for_profile()
+
 # Harmoniser les labels des types de cataclysmes (nettoyage des doublons de saisie)
 res_cc <- res_cc %>%
   mutate(
@@ -243,21 +245,22 @@ prev_type_wide <- prev_type %>%
     names_glue = "{Observatory}_{.value}",
     values_fill = 0
   ) %>%
-  arrange(desc(rowSums(pick(any_of(c("Alaotra_n", "Marovoay_n"))))))
+  arrange(desc(rowSums(pick(any_of(c("Alaotra_pct", "Marovoay_pct"))))))
 
 prev_type_wide %>%
   gt() %>%
   tab_header(
     title = "Prévalence des types de cataclysmes par observatoire",
-    subtitle = "Nombre et % de ménages ayant déclaré l'événement"
+    subtitle = "% de ménages ayant déclaré l'événement"
   ) %>%
   safe_tab_spanner(label = "Alaotra", columns = starts_with("Alaotra")) %>%
   safe_tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
   safe_cols_label(
     Catastrophe = "Type de Catastrophe",
-    Alaotra_n = "N", Alaotra_pct = "%",
-    Marovoay_n = "N", Marovoay_pct = "%"
+    Alaotra_pct = "%",
+    Marovoay_pct = "%"
   ) %>%
+  cols_hide(any_of(c("Alaotra_n", "Marovoay_n"))) %>%
   fmt_number(columns = ends_with("_pct"), decimals = 1) %>%
   tab_style(
     style = cell_text(weight = "bold"),
@@ -294,9 +297,11 @@ La sécheresse est de loin le Catastrophe le plus fréquemment cité, suivi des 
 ```{r g1_prevalence_type}
 # G1 : Barres horizontales — types de cataclysmes les plus fréquents
 prev_type %>%
-  ggplot(aes(x = reorder(Catastrophe, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  expand_sites_for_profile() %>%
+  ggplot(aes(x = reorder(Catastrophe, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
+  facet_wrap(~Observatory, scales = "free_y") +
   labs(
     title = "Types de cataclysmes subis par les ménages",
     subtitle = "% de ménages touchés, par observatoire",
@@ -370,6 +375,7 @@ nb_cata_combined <- nb_cata_hameau %>%
   arrange(Observatory, j4bis == "Ensemble", j4bis)
 
 nb_cata_combined %>%
+  expand_sites_for_profile() %>%
   obs_gt() %>%
   tab_header(
     title = "Nombre moyen de catastrophes subies par ménage",
@@ -467,9 +473,11 @@ degats_logement_resume %>%
   safe_tab_spanner(label = "Marovoay", columns = starts_with("Marovoay")) %>%
   safe_cols_label(
     Catastrophe = "Catastrophe",
-    Alaotra_n_total = "N", Alaotra_n_degats = "Dégâts", Alaotra_pct_degats = "%",
-    Marovoay_n_total = "N", Marovoay_n_degats = "Dégâts", Marovoay_pct_degats = "%"
+    Alaotra_pct_degats = "%",
+    Marovoay_pct_degats = "%"
   ) %>%
+  cols_hide(any_of(c("Alaotra_n_total", "Alaotra_n_degats",
+                      "Marovoay_n_total", "Marovoay_n_degats"))) %>%
   tab_style(
     style = cell_text(weight = "bold"),
     locations = list(cells_column_labels(), cells_column_spanners())
@@ -533,6 +541,7 @@ degats_elevage_display <- events %>%
   arrange(Observatory, desc(Rien))
 
 degats_elevage_display %>%
+  expand_sites_for_profile() %>%
   obs_gt() %>%
   tab_header(
     title = "Gravité des dégâts sur l'élevage par type de Catastrophe",
@@ -595,6 +604,7 @@ degats_personnes <- events %>%
   arrange(Observatory, desc(Aucun))
 
 degats_personnes %>%
+  expand_sites_for_profile() %>%
   obs_gt() %>%
   tab_header(
     title = "Conséquences des cataclysmes sur les personnes du ménage",
@@ -651,7 +661,9 @@ severite_plot <- events %>%
   mutate(pct = round(n / sum(n) * 100, 1)) %>%
   ungroup()
 
-ggplot(severite_plot, aes(x = Catastrophe, y = pct, fill = Niveau)) +
+severite_plot %>%
+  expand_sites_for_profile() %>%
+  ggplot(aes(x = Catastrophe, y = pct, fill = Niveau)) +
   geom_col(position = "stack") +
   facet_wrap(~Observatory) +
   coord_flip() +
@@ -719,6 +731,7 @@ saisonnalite <- events %>%
   arrange(Observatory, desc(n))
 
 saisonnalite %>%
+  expand_sites_for_profile() %>%
   obs_gt() %>%
   tab_header(
     title = "Saisonnalité des cataclysmes",
@@ -773,7 +786,9 @@ saisonnalite_plot <- saisonnalite %>%
     Période = if_else(Période == "pct_hors", "Hors soudure", "Pendant soudure")
   )
 
-ggplot(saisonnalite_plot, aes(x = reorder(Catastrophe, pct), y = pct, fill = Période)) +
+saisonnalite_plot %>%
+  expand_sites_for_profile() %>%
+  ggplot(aes(x = reorder(Catastrophe, pct), y = pct, fill = Période)) +
   geom_col(position = "dodge") +
   facet_wrap(~Observatory) +
   coord_flip() +
@@ -854,12 +869,14 @@ cultures_touchees <- res_cca %>%
   select(-rang)
 
 cultures_touchees %>%
+  expand_sites_for_profile() %>%
   obs_gt() %>%
   tab_header(
     title = "Top 10 des cultures les plus touchées par observatoire",
-    subtitle = "Nombre de ménages déclarant des dégâts sur la culture"
+    subtitle = "% de ménages déclarant des dégâts sur la culture"
   ) %>%
-  cols_label(Culture = "Culture", n = "Nb ménages", pct = "%") %>%
+  cols_label(Culture = "Culture", pct = "%") %>%
+  cols_hide(n) %>%
   fmt_number(columns = pct, decimals = 1) %>%
   tab_style(
     style = cell_text(weight = "bold"),
@@ -935,6 +952,7 @@ riz_champs <- res_cca %>%
   pivot_wider(names_from = Niveau, values_from = pct, values_fill = 0)
 
 riz_champs %>%
+  expand_sites_for_profile() %>%
   obs_gt() %>%
   tab_header(
     title = "Dégâts sur les champs de riz par type de catastrophe",
@@ -1007,6 +1025,7 @@ riz_stocks <- res_cca %>%
   pivot_wider(names_from = Niveau, values_from = pct, values_fill = 0)
 
 riz_stocks %>%
+  expand_sites_for_profile() %>%
   obs_gt() %>%
   tab_header(
     title = "Dégâts sur les stocks de riz par type de catastrophe",
@@ -1085,7 +1104,9 @@ champs_vs_stocks_plot <- champs_vs_stocks %>%
   ) %>%
   mutate(Type = if_else(Type == "pct_champs", "Champs", "Stocks"))
 
-ggplot(champs_vs_stocks_plot, aes(x = Culture, y = pct, fill = Type)) +
+champs_vs_stocks_plot %>%
+  expand_sites_for_profile() %>%
+  ggplot(aes(x = Culture, y = pct, fill = Type)) +
   geom_col(position = "dodge") +
   facet_wrap(~Observatory) +
   labs(
@@ -1132,6 +1153,8 @@ dl_fig_variants("fig_champs_vs_stocks", "11", function(d) {
 ```
 
 Les dégâts sur les champs (cultures en cours) sont systématiquement plus fréquents que les pertes de stocks. Toutefois, les pertes de stocks, même si elles concernent moins de ménages, ont un impact direct sur les réserves alimentaires disponibles.
+
+::: {.content-visible when-profile="consolidated"}
 
 ## Évolution de la prévalence des catastrophes (2003–2025) {#sec-cata-multiyear}
 
@@ -1216,3 +1239,5 @@ ggplot(mapping = aes(x = year, y = pct_cata, colour = Observatory)) +
 ```
 
 L'évolution de la prévalence des catastrophes sur la période 2003--2025 met en évidence des fluctuations interannuelles importantes, avec des pics correspondant aux passages cycloniques majeurs et aux épisodes de sécheresse prolongée. La tendance de long terme, difficile à isoler des aléas ponctuels, mérite d'être mise en regard de l'évolution des pratiques d'adaptation décrites dans les chapitres précédents.
+
+:::

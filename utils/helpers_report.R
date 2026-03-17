@@ -324,13 +324,38 @@ style_table <- function(gt_obj) {
 }
 
 #' Classify education level from s3a code
-classify_education <- function(s3a) {
-  dplyr::case_when(
+classify_education <- function(s3a, s2 = NULL, age = NULL) {
+  niv <- dplyr::case_when(
     (s3a >= 1 & s3a <= 5) | s3a == 99 ~ "Primaire",
     s3a >= 6 & s3a <= 9 ~ "Secondaire 1er cycle",
     s3a >= 10 ~ "Secondaire 2\u00e8me cycle & sup.",
     TRUE ~ NA_character_
   )
+  # When s2 (school attendance) is available, recode NA as "Non scolarisé"
+
+  # for those who never attended school (s2==2) or are too young (age < 3)
+  if (!is.null(s2)) {
+    niv <- dplyr::case_when(
+      !is.na(niv) ~ niv,
+      s2 == 2 ~ "Non scolaris\u00e9",
+      !is.null(age) & !is.na(age) & age < 3 ~ "Non scolaris\u00e9",
+      TRUE ~ NA_character_
+    )
+  }
+  niv
+}
+
+#' Classify literacy level from s1a or s1b code
+#' @param x Numeric vector (1 = Oui, 2 = Avec effort, 3 = Non)
+#' @return Ordered factor with three levels
+classify_literacy <- function(x) {
+  lbl <- dplyr::case_when(
+    x == 1 ~ "Oui",
+    x == 2 ~ "Avec effort",
+    x == 3 ~ "Non",
+    TRUE ~ NA_character_
+  )
+  factor(lbl, levels = c("Oui", "Avec effort", "Non"))
 }
 
 #' Classify marital status from m7 code
@@ -431,11 +456,10 @@ classify_origin <- function(m3) {
 #' Classify settlement reason from mg4a code
 classify_reason <- function(mg4a) {
   dplyr::case_when(
-    mg4a == 1 ~ "Natif",
-    mg4a == 2 ~ "Mariage",
-    mg4a == 3 ~ "Travail agricole",
-    mg4a == 4 ~ "Travail non agricole",
-    mg4a %in% c(5, 6, 7, 8, 9) ~ "Autre raison",
+    mg4a %in% c(1, 2, 4) ~ "Sociale (naissance, mariage, famille)",
+    mg4a %in% c(3, 7) ~ "\u00c9conomique (travail, ressources)",
+    mg4a %in% c(5, 6) ~ "Conjoncturelle (\u00e9cologie, ins\u00e9curit\u00e9)",
+    mg4a %in% c(8, 9) ~ "Autre / NSP",
     TRUE ~ NA_character_
   )
 }
@@ -496,23 +520,21 @@ make_origin_table <- function(data, var_col, classify_fn, var_label, title) {
     )
 
   obs_gt(wide) |>
-    gt::tab_header(title = title, subtitle = "Effectifs et pourcentages") |>
+    gt::tab_header(title = title, subtitle = "Pourcentages") |>
+    gt::cols_hide(c(`Chef N`, `Conjoint N`)) |>
     gt::cols_label(
       Variable = var_label,
-      `Chef N` = "N",
       `Chef %` = "%",
-      `Conjoint N` = "N",
       `Conjoint %` = "%"
     ) |>
     gt::tab_spanner(
       label = "Chefs de ménage",
-      columns = c(`Chef N`, `Chef %`)
+      columns = `Chef %`
     ) |>
     gt::tab_spanner(
       label = "Conjoints",
-      columns = c(`Conjoint N`, `Conjoint %`)
+      columns = `Conjoint %`
     ) |>
-    gt::fmt_number(columns = c(`Chef N`, `Conjoint N`), decimals = 0) |>
     gt::fmt_number(columns = c(`Chef %`, `Conjoint %`), decimals = 1) |>
     gt::sub_missing(missing_text = "< 5") |>
     style_table()
@@ -577,8 +599,16 @@ decode_labelled <- function(x) {
 #' @param data Data frame that already contains an `Observatory` column
 #' @param prefix Character prefix to match (e.g. "h6", "h7")
 #' @return Tibble with Observatory, Type, n, pct
-tabulate_binary_set <- function(data, prefix) {
+tabulate_binary_set <- function(
+  data,
+  prefix,
+  exclude_pattern = NULL,
+  count_mode = FALSE
+) {
   vars <- names(data)[grepl(paste0("^", prefix), names(data))]
+  if (!is.null(exclude_pattern)) {
+    vars <- vars[!grepl(exclude_pattern, vars)]
+  }
   labels_tbl <- tibble::tibble(
     var_name = vars,
     Type = vapply(
@@ -597,17 +627,27 @@ tabulate_binary_set <- function(data, prefix) {
       character(1)
     )
   )
-  data |>
+  n_hh <- data |> dplyr::count(Observatory, name = "N")
+  pivoted <- data |>
     dplyr::mutate(dplyr::across(dplyr::all_of(vars), as.numeric)) |>
     tidyr::pivot_longer(
       dplyr::all_of(vars),
       names_to = "var_name",
       values_to = "value"
-    ) |>
-    dplyr::filter(value == 1) |>
+    )
+  if (count_mode) {
+    # For count variables (0 = none, >=1 = owns at least one)
+    pivoted <- pivoted |> dplyr::filter(value >= 1)
+  } else {
+    # For binary variables (1 = yes, 2 = no)
+    pivoted <- pivoted |> dplyr::filter(value == 1)
+  }
+  pivoted |>
     dplyr::left_join(labels_tbl, by = "var_name") |>
     dplyr::count(Observatory, Type) |>
-    dplyr::mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+    dplyr::left_join(n_hh, by = "Observatory") |>
+    dplyr::mutate(pct = round(n / N * 100, 1)) |>
+    dplyr::select(-N)
 }
 
 #' Standard horizontal bar chart, optionally faceted by Observatory

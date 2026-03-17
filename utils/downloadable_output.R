@@ -69,6 +69,26 @@ prepare_variant_data <- function(data, obs, site) {
   }
 }
 
+#' Expand data with site-level breakdowns for observatory-specific reports
+#'
+#' In consolidated mode the data is returned unchanged (facets show the
+#' two observatories).
+#' In observatory-specific mode (marovoay / alaotra), the data is expanded
+#' so that the Observatory column contains "{Obs} - Tous" (aggregate) plus
+#' one "{Obs} - {Site}" entry per site.
+#' This allows plots that `facet_wrap(~Observatory)` to display per-site
+#' results alongside the observatory total.
+#'
+#' @param data Data frame with Observatory and Site columns
+#' @return Expanded (or unchanged) data frame
+expand_sites_for_profile <- function(data) {
+  mode <- get_report_mode()
+  if (mode$is_consolidated) {
+    return(data)
+  }
+  prepare_variant_data(data, mode$observatory, "Tous")
+}
+
 # ----------------------------------------------------------
 # Variant generators
 # ----------------------------------------------------------
@@ -97,10 +117,8 @@ dl_fig_variants <- function(
   dpi = 150,
   min_cell = 10
 ) {
-  # Skip in consolidated mode (user does not want per-site downloads)
-  # and in non-HTML output (the dropdown is HTML-only)
-  profile <- Sys.getenv("QUARTO_PROFILE", "consolidated")
-  if (profile == "consolidated" || !knitr::is_html_output()) {
+  # Skip in non-HTML output (the dropdown is HTML-only)
+  if (!knitr::is_html_output()) {
     return(invisible(NULL))
   }
 
@@ -167,9 +185,8 @@ dl_fig_variants <- function(
 #' @param data     Data frame with Observatory and Site columns
 #' @param min_cell Minimum cell count for confidentiality (default 5)
 dl_tbl_variants <- function(id, chapter, tbl_fn, data, min_cell = 5) {
-  # Skip in consolidated mode or non-HTML output
-  profile <- Sys.getenv("QUARTO_PROFILE", "consolidated")
-  if (profile == "consolidated" || !knitr::is_html_output()) {
+  # Skip in non-HTML output (the dropdown is HTML-only)
+  if (!knitr::is_html_output()) {
     return(invisible(NULL))
   }
 

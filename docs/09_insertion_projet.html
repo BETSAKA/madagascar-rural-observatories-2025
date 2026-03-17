@@ -363,7 +363,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
 </figcaption>
 <div aria-describedby="tbl-adhesion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="gpdhlhxsmn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="yodcrrbgad" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -400,6 +400,69 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
 </figure>
 </div>
 </div>
+<details class="dl-variants">
+<summary>
+📥 Télécharger par site
+</summary>
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
+<li>
+<a href="downloads/12/tbl_adhesion_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_adhesion_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_adhesion_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_adhesion_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_adhesion_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
+</li>
+</ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/12/tbl_adhesion_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_adhesion_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_adhesion_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_adhesion_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_adhesion_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_adhesion_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_adhesion_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_adhesion_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_adhesion_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
+</li>
+</ul>
+</div>
+</div>
+</details>
 </section>
 <section id="nombre-dorganisations-par-ménage" class="level3" data-number="9.1.2">
 <h3 data-number="9.1.2" class="anchored" data-anchor-id="nombre-dorganisations-par-ménage"><span class="header-section-number">9.1.2</span> Nombre d’organisations par ménage</h3>
@@ -411,11 +474,13 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(respgc)) <span class="sc">|&gt;</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(j5, Observatory, <span class="at">name =</span> <span class="st">"nb_org"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, nb_org, <span class="at">name =</span> <span class="st">"n_men"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(nb_org), <span class="at">y =</span> n_men, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Nombre d'organisations"</span>, <span class="at">y =</span> <span class="st">"Nombre de ménages"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n_men <span class="sc">/</span> <span class="fu">sum</span>(n_men) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(nb_org), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Nombre d'organisations"</span>, <span class="at">y =</span> <span class="st">"% des ménages"</span>) <span class="sc">+</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-nb-org" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -430,6 +495,69 @@ Figure&nbsp;9.1: Nombre d’organisations par ménage membre
 </div>
 </div>
 </div>
+<details class="dl-variants">
+<summary>
+📥 Télécharger par site
+</summary>
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
+<li>
+<a href="downloads/12/fig_nb_org_marovoay_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_nb_org_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_nb_org_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_nb_org_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_nb_org_marovoay_maroala.png" download="">Maroala (PNG)</a>
+</li>
+</ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/12/fig_nb_org_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_nb_org_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_nb_org_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_nb_org_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_nb_org_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_nb_org_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_nb_org_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_nb_org_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_nb_org_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
+</details>
 </section>
 <section id="type-dorganisation" class="level3" data-number="9.1.3">
 <h3 data-number="9.1.3" class="anchored" data-anchor-id="type-dorganisation"><span class="header-section-number">9.1.3</span> Type d’organisation</h3>
@@ -450,12 +578,13 @@ Figure&nbsp;9.1: Nombre d’organisations par ménage membre
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Type) <span class="sc">|&gt;</span></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(pct <span class="sc">&gt;=</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Type, pct), <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des adhésions"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Type, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des adhésions"</span>) <span class="sc">+</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-type-org" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -470,6 +599,69 @@ Figure&nbsp;9.2: Type d’organisation (toutes adhésions)
 </div>
 </div>
 </div>
+<details class="dl-variants">
+<summary>
+📥 Télécharger par site
+</summary>
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
+<li>
+<a href="downloads/12/fig_type_org_marovoay_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_type_org_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_type_org_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_type_org_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_type_org_marovoay_maroala.png" download="">Maroala (PNG)</a>
+</li>
+</ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/12/fig_type_org_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_type_org_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_type_org_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_type_org_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_type_org_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_type_org_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_type_org_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_type_org_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_type_org_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
+</details>
 </section>
 <section id="qui-dans-le-ménage-est-membre" class="level3" data-number="9.1.4">
 <h3 data-number="9.1.4" class="anchored" data-anchor-id="qui-dans-le-ménage-est-membre"><span class="header-section-number">9.1.4</span> Qui dans le ménage est membre</h3>
@@ -490,12 +682,13 @@ Figure&nbsp;9.2: Type d’organisation (toutes adhésions)
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Membre) <span class="sc">|&gt;</span></span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Membre, pct), <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des adhésions"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Membre, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des adhésions"</span>) <span class="sc">+</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-qui-membre" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -510,6 +703,69 @@ Figure&nbsp;9.3: Membre du ménage affilié à l’organisation
 </div>
 </div>
 </div>
+<details class="dl-variants">
+<summary>
+📥 Télécharger par site
+</summary>
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
+<li>
+<a href="downloads/12/fig_qui_membre_marovoay_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_qui_membre_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_qui_membre_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_qui_membre_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_qui_membre_marovoay_maroala.png" download="">Maroala (PNG)</a>
+</li>
+</ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/12/fig_qui_membre_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_qui_membre_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_qui_membre_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_qui_membre_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_qui_membre_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_qui_membre_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_qui_membre_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_qui_membre_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_qui_membre_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
+</details>
 </section>
 <section id="niveau-de-responsabilité" class="level3" data-number="9.1.5">
 <h3 data-number="9.1.5" class="anchored" data-anchor-id="niveau-de-responsabilité"><span class="header-section-number">9.1.5</span> Niveau de responsabilité</h3>
@@ -522,11 +778,12 @@ Figure&nbsp;9.3: Membre du ménage affilié à l’organisation
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Role =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(respgd), <span class="at">levels =</span> <span class="fu">names</span>(role_labs), <span class="at">labels =</span> role_labs)) <span class="sc">|&gt;</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Role) <span class="sc">|&gt;</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Role, <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des adhésions"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Role, <span class="at">y =</span> pct)) <span class="sc">+</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des adhésions"</span>) <span class="sc">+</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-responsabilite" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -541,6 +798,69 @@ Figure&nbsp;9.4: Niveau de responsabilité dans l’organisation
 </div>
 </div>
 </div>
+<details class="dl-variants">
+<summary>
+📥 Télécharger par site
+</summary>
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
+<li>
+<a href="downloads/12/fig_responsabilite_marovoay_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_responsabilite_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_responsabilite_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_responsabilite_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_responsabilite_marovoay_maroala.png" download="">Maroala (PNG)</a>
+</li>
+</ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/12/fig_responsabilite_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_responsabilite_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_responsabilite_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_responsabilite_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_responsabilite_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_responsabilite_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_responsabilite_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_responsabilite_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_responsabilite_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
+</details>
 </section>
 </section>
 <section id="sec-projets" class="level2" data-number="9.2">
@@ -579,7 +899,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
 </figcaption>
 <div aria-describedby="tbl-pro1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="rnogexqvjl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="pmndigtvrq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -618,6 +938,69 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
 </figure>
 </div>
 </div>
+<details class="dl-variants">
+<summary>
+📥 Télécharger par site
+</summary>
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
+<li>
+<a href="downloads/12/tbl_pro1_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_pro1_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_pro1_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_pro1_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_pro1_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
+</li>
+</ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/12/tbl_pro1_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_pro1_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_pro1_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_pro1_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_pro1_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_pro1_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_pro1_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_pro1_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_pro1_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
+</li>
+</ul>
+</div>
+</div>
+</details>
 </section>
 <section id="taux-de-bénéficiaires-par-type-de-projet" class="level3" data-number="9.2.2">
 <h3 data-number="9.2.2" class="anchored" data-anchor-id="taux-de-bénéficiaires-par-type-de-projet"><span class="header-section-number">9.2.2</span> Taux de bénéficiaires par type de projet</h3>
@@ -648,12 +1031,13 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
 <span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct =</span> <span class="fu">round</span>(<span class="fu">mean</span>(pro2 <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
 <span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(Observatory, pro_lib_clean)</span>
 <span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(pro_lib_clean, pct), <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% de ménages bénéficiaires"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(pro_lib_clean, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% de ménages bénéficiaires"</span>) <span class="sc">+</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-benef-type" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -668,6 +1052,69 @@ Figure&nbsp;9.5: Taux de ménages bénéficiaires par type de projet
 </div>
 </div>
 </div>
+<details class="dl-variants">
+<summary>
+📥 Télécharger par site
+</summary>
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
+<li>
+<a href="downloads/12/fig_benef_type_marovoay_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_benef_type_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_benef_type_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_benef_type_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_benef_type_marovoay_maroala.png" download="">Maroala (PNG)</a>
+</li>
+</ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/12/fig_benef_type_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_benef_type_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_benef_type_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_benef_type_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_benef_type_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_benef_type_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_benef_type_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_benef_type_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_benef_type_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
+</details>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -691,7 +1138,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
 </figcaption>
 <div aria-describedby="tbl-benef-type-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="juipohbscf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="gajznbptro" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -755,6 +1202,69 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
 </figure>
 </div>
 </div>
+<details class="dl-variants">
+<summary>
+📥 Télécharger par site
+</summary>
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
+<li>
+<a href="downloads/12/tbl_benef_type_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_benef_type_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_benef_type_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_benef_type_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_benef_type_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
+</li>
+</ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/12/tbl_benef_type_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_benef_type_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_benef_type_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_benef_type_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_benef_type_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_benef_type_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_benef_type_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_benef_type_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_benef_type_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
+</li>
+</ul>
+</div>
+</div>
+</details>
 </section>
 <section id="source-des-projets" class="level3" data-number="9.2.3">
 <h3 data-number="9.2.3" class="anchored" data-anchor-id="source-des-projets"><span class="header-section-number">9.2.3</span> Source des projets</h3>
@@ -802,6 +1312,66 @@ Figure&nbsp;9.6: Source des projets pour les ménages bénéficiaires
 </div>
 </div>
 </div>
+<details class="dl-variants">
+<summary>
+📥 Télécharger par site
+</summary>
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
+<li>
+<a href="downloads/12/fig_source_projet_marovoay_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_source_projet_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_source_projet_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_source_projet_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_source_projet_marovoay_maroala.png" download="">Maroala (PNG)</a>
+</li>
+</ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/12/fig_source_projet_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_source_projet_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_source_projet_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_source_projet_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_source_projet_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_source_projet_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_source_projet_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/12/fig_source_projet_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
+</details>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -825,7 +1395,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
 </figcaption>
 <div aria-describedby="tbl-source-global-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="kmbdfswrvn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="alasyabmna" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -871,6 +1441,69 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
 </figure>
 </div>
 </div>
+<details class="dl-variants">
+<summary>
+📥 Télécharger par site
+</summary>
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
+<li>
+<a href="downloads/12/tbl_source_global_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_source_global_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_source_global_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_source_global_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_source_global_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
+</li>
+</ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/12/tbl_source_global_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_source_global_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_source_global_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_source_global_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_source_global_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_source_global_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_source_global_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_source_global_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_source_global_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
+</li>
+</ul>
+</div>
+</div>
+</details>
 </section>
 </section>
 <section id="sec-croisement" class="level2" data-number="9.3">
@@ -913,7 +1546,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
 </figcaption>
 <div aria-describedby="tbl-croisement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="odxfzlfoit" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="rtqacoajvo" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -953,6 +1586,69 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
 </figure>
 </div>
 </div>
+<details class="dl-variants">
+<summary>
+📥 Télécharger par site
+</summary>
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
+<li>
+<a href="downloads/12/tbl_croisement_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_croisement_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_croisement_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_croisement_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_croisement_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
+</li>
+</ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/12/tbl_croisement_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_croisement_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_croisement_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_croisement_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_croisement_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_croisement_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_croisement_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_croisement_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
+</li>
+<li>
+<a href="downloads/12/tbl_croisement_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
+</li>
+</ul>
+</div>
+</div>
+</details>
 </section>
 <section id="sec-pistes-insertion" class="level2 obs-technical" data-number="9.4">
 <h2 data-number="9.4" class="anchored" data-anchor-id="sec-pistes-insertion"><span class="header-section-number">9.4</span> Pistes d’analyse complémentaires</h2>

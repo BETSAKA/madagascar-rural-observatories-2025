@@ -48,6 +48,8 @@ res_v <- read_dta("data/ROS_MDG_microdata/2025/res_v.dta") |> mutate(j5 = as.cha
 res_e <- read_dta("data/ROS_MDG_microdata/2025/res_E.dta") |> mutate(j5 = as.character(j5))
 
 obs <- res_deb |> select(j5, Observatory, Site)
+res_deb_site <- res_deb |> expand_sites_for_profile()
+obs_site <- res_deb_site |> select(j5, Observatory, Site)
 ```
 
 ```{r stats_habitat}
@@ -118,7 +120,7 @@ A Marovoay, `r pct_statut_m` % des ménages occupent un logement en « `r top_st
 
 ```{r house_status}
 house <- res_h |>
-  left_join(obs, by = "j5") |>
+  left_join(obs_site, by = "j5") |>
   mutate(Statut = decode_labelled(h0)) |>
   count(Observatory, Statut) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
@@ -126,8 +128,8 @@ house <- res_h |>
 house |>
   obs_gt() |>
   tab_header(title = obs_title("Statut d'occupation du logement")) |>
-  cols_label(Statut = "Statut", n = "N", pct = "%") |>
-  fmt_number(columns = n, decimals = 0) |>
+  cols_label(Statut = "Statut", pct = "%") |>
+  cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
 
@@ -169,7 +171,7 @@ A Marovoay, Le type dominant est « `r top_lat_m` » (`r pct_lat_m` % des ménag
 
 ```{r latrine}
 latrine <- res_h |>
-  left_join(obs, by = "j5") |>
+  left_join(obs_site, by = "j5") |>
   mutate(Type = decode_labelled(h5)) |>
   count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
@@ -177,8 +179,8 @@ latrine <- res_h |>
 latrine |>
   obs_gt() |>
   tab_header(title = obs_title("Types de latrine")) |>
-  cols_label(Type = "Type de latrine", n = "N", pct = "%") |>
-  fmt_number(columns = n, decimals = 0) |>
+  cols_label(Type = "Type de latrine", pct = "%") |>
+  cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
 
@@ -220,7 +222,7 @@ A Marovoay, La source principale est « `r top_eau_m` » (`r pct_eau_m` %).
 
 ```{r water}
 water <- res_h |>
-  left_join(obs, by = "j5") |>
+  left_join(obs_site, by = "j5") |>
   mutate(Type = decode_labelled(h4)) |>
   count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
@@ -228,8 +230,8 @@ water <- res_h |>
 water |>
   obs_gt() |>
   tab_header(title = obs_title("Mode d'approvisionnement en eau")) |>
-  cols_label(Type = "Source", n = "N", pct = "%") |>
-  fmt_number(columns = n, decimals = 0) |>
+  cols_label(Type = "Source", pct = "%") |>
+  cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
 
@@ -259,29 +261,49 @@ Le mode d'éclairage reflète le niveau d'accès à l'énergie moderne. Les mén
 
 ```{r lighting}
 light <- res_h |>
-  left_join(obs, by = "j5") |>
-  tabulate_binary_set("h7")
+  left_join(obs_site, by = "j5") |>
+  tabulate_binary_set("h7", exclude_pattern = "h7c[12]|h7i_autre")
 
 light |>
   obs_gt() |>
   tab_header(title = obs_title("Modes d'éclairage des ménages")) |>
-  cols_label(Type = "Type d'eclairage", n = "N", pct = "%") |>
-  fmt_number(columns = n, decimals = 0) |>
+  cols_label(Type = "Type d'eclairage", pct = "%") |>
+  cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
 
 light |> make_bar_obs(title = obs_title("Modes d'éclairage"))
 ```
 
+Parmi les ménages utilisant le solaire, la proportion disposant d'un panneau en état de marche est présentée ci-dessous.
+
+```{r solar_panel_status}
+solar_users <- res_h |>
+  left_join(obs_site, by = "j5") |>
+  filter(h7c == 1, !is.na(h7c1))
+
+solar_status <- solar_users |>
+  count(Observatory, En_marche = if_else(h7c1 == 1, "Oui", "Non")) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  mutate(Valeur = paste0(pct, "%")) |>
+  select(Observatory, En_marche, Valeur) |>
+  pivot_wider(names_from = Observatory, values_from = Valeur, values_fill = "-")
+
+gt(solar_status) |>
+  tab_header(title = "Panneau solaire en état de marche (parmi les utilisateurs du solaire)") |>
+  cols_label(En_marche = "En marche") |>
+  style_table()
+```
+
 ```{r dl_lighting}
 #| echo: false
 #| results: asis
 dl_tbl_variants("tbl_lighting", "05", function(d) {
-  d |> tabulate_binary_set("h7") |>
+  d |> tabulate_binary_set("h7", exclude_pattern = "h7c[12]|h7i_autre") |>
     rename(Site = Observatory, Effectif = n, `%` = pct)
 }, res_h |> left_join(obs, by = "j5"))
 dl_fig_variants("fig_lighting", "05", function(d) {
-  d |> tabulate_binary_set("h7") |>
+  d |> tabulate_binary_set("h7", exclude_pattern = "h7c[12]|h7i_autre") |>
     make_bar_obs(title = "Modes d'eclairage par observatoire")
 }, res_h |> left_join(obs, by = "j5"))
 ```
@@ -292,15 +314,19 @@ La quasi-totalité des ménages ruraux malgaches dépendent de la biomasse pour 
 
 ```{r cooking}
 cooking <- res_h |>
-  left_join(obs, by = "j5") |>
-  tabulate_binary_set("h6") |>
-  mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type))
+  left_join(obs_site, by = "j5") |>
+  tabulate_binary_set("h6", exclude_pattern = "h6a1|h6e_autre") |>
+  mutate(Type = case_when(
+    str_detect(Type, "(?i)r\u00e9sin") ~ "Bois de chauffe",
+    str_detect(Type, "(?i)autre.*pr") ~ "Autre",
+    TRUE ~ Type
+  ))
 
 cooking |>
   obs_gt() |>
   tab_header(title = obs_title("Modes de cuisson des ménages")) |>
-  cols_label(Type = "Source d'energie", n = "N", pct = "%") |>
-  fmt_number(columns = n, decimals = 0) |>
+  cols_label(Type = "Source d'energie", pct = "%") |>
+  cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
 
@@ -311,13 +337,21 @@ cooking |> make_bar_obs(title = obs_title("Modes de cuisson"))
 #| echo: false
 #| results: asis
 dl_tbl_variants("tbl_cooking", "05", function(d) {
-  d |> tabulate_binary_set("h6") |>
-    mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type)) |>
+  d |> tabulate_binary_set("h6", exclude_pattern = "h6a1|h6e_autre") |>
+    mutate(Type = case_when(
+      str_detect(Type, "(?i)r\u00e9sin") ~ "Bois de chauffe",
+      str_detect(Type, "(?i)autre.*pr") ~ "Autre",
+      TRUE ~ Type
+    )) |>
     rename(Site = Observatory, Effectif = n, `%` = pct)
 }, res_h |> left_join(obs, by = "j5"))
 dl_fig_variants("fig_cooking", "05", function(d) {
-  d |> tabulate_binary_set("h6") |>
-    mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type)) |>
+  d |> tabulate_binary_set("h6", exclude_pattern = "h6a1|h6e_autre") |>
+    mutate(Type = case_when(
+      str_detect(Type, "(?i)r\u00e9sin") ~ "Bois de chauffe",
+      str_detect(Type, "(?i)autre.*pr") ~ "Autre",
+      TRUE ~ Type
+    )) |>
     make_bar_obs(title = "Modes de cuisson par observatoire")
 }, res_h |> left_join(obs, by = "j5"))
 ```
@@ -332,15 +366,15 @@ Les biens de confort courant (mobilier, ustensiles, outils) renseignent sur le n
 
 ```{r comfort_goods}
 comfort <- res_v |>
-  left_join(obs, by = "j5") |>
-  tabulate_binary_set("v") |>
+  left_join(obs_site, by = "j5") |>
+  tabulate_binary_set("v", count_mode = TRUE) |>
   mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type))
 
 comfort |>
   obs_gt() |>
   tab_header(title = obs_title("Taux de possession de biens de confort courants")) |>
-  cols_label(Type = "Bien", n = "N", pct = "%") |>
-  fmt_number(columns = n, decimals = 0) |>
+  cols_label(Type = "Bien", pct = "%") |>
+  cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
 
@@ -351,12 +385,12 @@ comfort |> make_bar_obs(title = obs_title("Biens de confort courants"))
 #| echo: false
 #| results: asis
 dl_tbl_variants("tbl_comfort", "05", function(d) {
-  d |> tabulate_binary_set("v") |>
+  d |> tabulate_binary_set("v", count_mode = TRUE) |>
     mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type)) |>
     rename(Site = Observatory, Effectif = n, `%` = pct)
 }, res_v |> left_join(obs, by = "j5"))
 dl_fig_variants("fig_comfort", "05", function(d) {
-  d |> tabulate_binary_set("v") |>
+  d |> tabulate_binary_set("v", count_mode = TRUE) |>
     mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type)) |>
     make_bar_obs(title = "Biens de confort courants par observatoire")
 }, res_v |> left_join(obs, by = "j5"))
@@ -367,15 +401,25 @@ dl_fig_variants("fig_comfort", "05", function(d) {
 L'équipement agricole conditionne la productivité et la capacité d'extension des surfaces cultivées. La possession de matériel mécanisé ou de traction animale constitue un facteur de différenciation important entre les ménages.
 
 ```{r agri_equipment}
+# Keep common hand tools + mechanisation/traction items
+equip_keep <- c(
+  "Angady", "Faucille/Coupe-coupe", "Hache", "Arrosoir/Sceau", "Couteau",
+  "R\u00e2teau, fourche", "Houe", "Pioche",
+  "Charrue", "Herse/Pulv\u00e9riseur/Rotovat", "Sarcleuse",
+  "Charrette attel\u00e9e", "Motoculteur, type Kubota", "Tracteur",
+  "Pulv\u00e9risateur", "Pompe hydraulique"
+)
+
 equip_data <- res_e |>
-  left_join(obs, by = "j5") |>
-  mutate(Equipement = decode_labelled(e11))
+  left_join(obs_site, by = "j5") |>
+  mutate(Equipement = decode_labelled(e11)) |>
+  filter(Equipement != "", str_detect(Equipement, paste(equip_keep, collapse = "|")))
 
 tools <- equip_data |> count(Observatory, Equipement, name = "N_outils")
 households <- equip_data |>
   distinct(j5, Observatory, Equipement) |>
   count(Observatory, Equipement, name = "N_menages")
-total_hh <- obs |> count(Observatory, name = "total_hh")
+total_hh <- obs_site |> count(Observatory, name = "total_hh")
 
 table_equip <- tools |>
   left_join(households, by = c("Observatory", "Equipement")) |>
@@ -388,10 +432,11 @@ table_equip |>
   obs_gt() |>
   tab_header(title = obs_title("Taux de possession d'équipements agricoles")) |>
   cols_label(
-    Equipement = "Equipement", N_menages = "Menages (N)",
-    pct_menages = "Menages (%)", N_outils = "Nb outils"
+    Equipement = "Equipement",
+    pct_menages = "Ménages (%)", N_outils = "Nb outils"
   ) |>
-  fmt_number(columns = c(N_menages, N_outils), decimals = 0) |>
+  cols_hide(N_menages) |>
+  fmt_number(columns = N_outils, decimals = 0) |>
   fmt_number(columns = pct_menages, decimals = 1) |>
   style_table()
 
@@ -414,12 +459,14 @@ p_equip
 #| results: asis
 dl_tbl_variants("tbl_agri_equip", "05", function(d) {
   d |> mutate(Equipement = decode_labelled(e11)) |>
+    filter(Equipement != "", str_detect(Equipement, paste(equip_keep, collapse = "|"))) |>
     count(Observatory, Equipement) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
 }, res_e |> left_join(obs, by = "j5"))
 dl_fig_variants("fig_agri_equip", "05", function(d) {
   equip <- d |> mutate(Equipement = decode_labelled(e11)) |>
+    filter(Equipement != "", str_detect(Equipement, paste(equip_keep, collapse = "|"))) |>
     distinct(j5, Observatory, Equipement) |>
     count(Observatory, Equipement, name = "N_menages") |>
     left_join(d |> distinct(j5, Observatory) |> count(Observatory, name = "total"),
@@ -452,7 +499,7 @@ comm_labels <- tibble(
 
 comm <- res_v |>
   select(j5, all_of(comm_vars)) |>
-  left_join(obs, by = "j5") |>
+  left_join(obs_site, by = "j5") |>
   pivot_longer(all_of(comm_vars), names_to = "v_var", values_to = "value") |>
   filter(value == 1) |>
   left_join(comm_labels, by = "v_var") |>
@@ -462,8 +509,8 @@ comm <- res_v |>
 comm |>
   obs_gt() |>
   tab_header(title = obs_title("Matériels de communication audiovisuelle et télécommunication")) |>
-  cols_label(Type = "Equipement", n = "N", pct = "%") |>
-  fmt_number(columns = n, decimals = 0) |>
+  cols_label(Type = "Equipement", pct = "%") |>
+  cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
 
@@ -537,6 +584,7 @@ res_t2_obs <- res_t2 |>
 #| fig-height: 6
 
 val_par_type <- res_t2_obs |>
+  expand_sites_for_profile() |>
   filter(!is.na(t21d), t21d > 0) |>
   summarise(
     n = n(),
@@ -547,12 +595,12 @@ val_par_type <- res_t2_obs |>
   filter(n >= 5)
 
 val_par_type |>
-  ggplot(aes(x = reorder(Type, val_moy), y = val_moy / 1000, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  ggplot(aes(x = reorder(Type, val_moy), y = val_moy / 1000)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "Valeur moyenne (milliers Ar)", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "Valeur moyenne (milliers Ar)") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_transferts}
@@ -611,6 +659,7 @@ dest_labs <- c(
 )
 
 res_t2_obs |>
+  expand_sites_for_profile() |>
   filter(!is.na(t41)) |>
   mutate(
     Destination = if_else(
@@ -621,12 +670,12 @@ res_t2_obs |>
   ) |>
   count(Observatory, Destination) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  ggplot(aes(x = reorder(Destination, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
+  ggplot(aes(x = reorder(Destination, pct), y = pct)) +
+  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
   coord_flip() +
-  labs(x = NULL, y = "% des transferts", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  facet_wrap(~Observatory, scales = "free_y") +
+  labs(x = NULL, y = "% des transferts") +
+  theme_minimal(base_size = 12)
 ```
 
 ```{r dl_fig_destination}
@@ -902,14 +951,13 @@ Certains menages presentent un revenu courant negatif, principalement en raison 
 ```{r t_rev_negatif}
 inc |>
   summarise(
-    `Nb menages` = n(),
-    `Revenu courant <= 0` = sum(revcou <= 0, na.rm = TRUE),
-    `% <= 0` = round(mean(revcou <= 0, na.rm = TRUE) * 100, 1),
-    `Revenu total <= 0` = sum(revtot <= 0, na.rm = TRUE),
+    `Nb ménages` = n(),
+    `% revenu courant <= 0` = round(mean(revcou <= 0, na.rm = TRUE) * 100, 1),
+    `% revenu total <= 0` = round(mean(revtot <= 0, na.rm = TRUE) * 100, 1),
     .by = Observatory
   ) |>
   gt() |>
-  tab_header(title = "Menages a revenu courant ou total negatif ou nul") |>
+  tab_header(title = "Ménages à revenu courant ou total négatif ou nul") |>
   style_table()
 ```
 

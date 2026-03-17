@@ -50,6 +50,10 @@ members <- res_deb |>
   add_obs() |>
   assign_site() |>
   filter_for_profile()
+
+# Expanded version: observatory aggregate + per-site breakdowns
+# (no-op in consolidated mode, expands in observatory-specific profiles)
+members_site <- members |> expand_sites_for_profile()
 ```
 
 ```{r stats_structure}
@@ -105,7 +109,7 @@ pct_couple_m <- couple_cm |> filter(Observatory == "Marovoay") |> pull(pct)
 
 # Éducation CM
 educ_cm_s <- cm_s |>
-  mutate(Niv = classify_education(s3a)) |> filter(!is.na(Niv)) |>
+  mutate(Niv = classify_education(s3a, s2, m5)) |> filter(!is.na(Niv)) |>
   count(Observatory, Niv) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 top_educ_a <- educ_cm_s |> filter(Observatory == "Alaotra") |>
@@ -117,9 +121,9 @@ top_educ_m <- educ_cm_s |> filter(Observatory == "Marovoay") |>
 pct_top_educ_m <- educ_cm_s |> filter(Observatory == "Marovoay") |>
   slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
 
-# Alphabétisation CM
-alpha_cm <- cm_s |> filter(!is.na(s1a), !is.na(s1b)) |>
-  summarise(pct = round(mean(s1a == 1 & s1b == 1) * 100, 1), .by = Observatory)
+# Alphabétisation CM (% sachant lire aisément)
+alpha_cm <- cm_s |> filter(!is.na(s1a)) |>
+  summarise(pct = round(mean(s1a == 1) * 100, 1), .by = Observatory)
 pct_alpha_a <- alpha_cm |> filter(Observatory == "Alaotra") |> pull(pct)
 pct_alpha_m <- alpha_cm |> filter(Observatory == "Marovoay") |> pull(pct)
 
@@ -192,13 +196,14 @@ A Marovoay, on a recensé `r n_members_m` individus répartis dans `r n_men_m` m
 ```{r tbl-men-obs}
 #| tbl-cap: "Taille moyenne des ménages par observatoire"
 
-hh_size_obs <- members |>
+hh_size_obs <- members_site |>
   summarise(hh_size = n(), .by = c(Observatory, j5)) |>
   summarise(mean_hh_size = mean(hh_size), .by = Observatory)
 
-gt(hh_size_obs) |>
+obs_gt(hh_size_obs) |>
+  tab_header(title = obs_title("Taille moyenne des ménages")) |>
   fmt_number(columns = mean_hh_size, decimals = 2) |>
-  cols_label(mean_hh_size = "Taille moyenne", Observatory = "Observatoire") |>
+  cols_label(mean_hh_size = "Taille moyenne") |>
   style_table()
 ```
 
@@ -252,7 +257,7 @@ A Marovoay, `r pct_moins15_m` % des individus ont moins de 15 ans. La population
 #### Au niveau des observatoires
 
 ```{r age_obs}
-hh_age <- members |>
+hh_age <- members_site |>
   mutate(AgeGroup = classify_age_group(m5)) |>
   filter(!is.na(AgeGroup)) |>
   count(Observatory, AgeGroup, name = "n") |>
@@ -261,7 +266,8 @@ hh_age <- members |>
 obs_gt(hh_age) |>
   tab_header(title = "Répartition des membres du ménage par tranche d'âge") |>
   fmt_number(columns = Percent, decimals = 1) |>
-  cols_label(AgeGroup = "Tranche d'âge", n = "Effectif", Percent = "%") |>
+  cols_label(AgeGroup = "Tranche d'âge", Percent = "%") |>
+  cols_hide(n) |>
   style_table()
 ```
 
@@ -312,7 +318,7 @@ dl_fig_variants("fig_age_obs", "04", function(d) {
 ```{r fig_pyramide}
 #| fig-cap: "Pyramide des âges des membres des ménages enquêtés par observatoire"
 
-hh_age_sex <- members |>
+hh_age_sex <- members_site |>
   mutate(AgeGroup = classify_age_group(m5), Sexe = classify_sex(m4)) |>
   filter(!is.na(Sexe), !is.na(AgeGroup)) |>
   count(Observatory, AgeGroup, Sexe, name = "n") |>
@@ -359,8 +365,8 @@ dl_fig_variants("fig_pyramide", "04", function(d) {
 L'origine géographique des chefs de ménage et de leurs conjoints renseigne sur les dynamiques migratoires et le degré d'ancrage local des familles. La classification distingue les *tompon-tany* (autochtones), les *zana-tany* (nés sur place de parents migrants), les *valivotaka* (migrants installés durablement) et les *mpihavy* (arrivants récents). La répartition de ces catégories diffère sensiblement entre les deux observatoires.
 
 ```{r origine}
-make_origin_table(members, m3, classify_origin, "Origine",
-                  "Origine des chefs de ménage et conjoints par observatoire")
+make_origin_table(members_site, m3, classify_origin, "Origine",
+                  obs_title("Origine des chefs de ménage et conjoints"))
 ```
 
 ```{r dl_tbl_origine}
@@ -379,8 +385,8 @@ dl_tbl_variants("tbl_origine", "04", function(d) {
 ```
 
 ```{r fig_origine}
-make_origin_histogram(members, m3, classify_origin, "Origine",
-                      "Distribution de l'origine des CM et conjoints")
+make_origin_histogram(members_site, m3, classify_origin, "Origine",
+                      obs_title("Distribution de l'origine des CM et conjoints"))
 ```
 
 ```{r dl_fig_origine}
@@ -412,19 +418,19 @@ homeland_tbl <- homeland_labels |>
   count(Observatory, Member_Type, Homeland) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Member_Type)) |>
   tidyr::complete(Observatory, Member_Type, Homeland, fill = list(n = 0, pct = 0)) |>
-  pivot_wider(names_from = Member_Type, values_from = c(n, pct),
-              names_glue = "{Member_Type}_{.value}", values_fill = 0) |>
-  rename(`Chef N` = `Chef de ménage_n`, `Chef %` = `Chef de ménage_pct`,
-         `Conjoint N` = Conjoint_n, `Conjoint %` = Conjoint_pct) |>
-  select(Observatory, Homeland, `Chef N`, `Chef %`, `Conjoint N`, `Conjoint %`)
+  select(-n) |>
+  pivot_wider(names_from = Member_Type, values_from = pct,
+              names_glue = "{Member_Type}_pct", values_fill = 0) |>
+  rename(`Chef %` = `Chef de ménage_pct`,
+         `Conjoint %` = Conjoint_pct) |>
+  select(Observatory, Homeland, `Chef %`, `Conjoint %`)
 
 obs_gt(homeland_tbl) |>
-  tab_header(title = "Région d'origine des CM et conjoints", subtitle = "Effectifs et pourcentages") |>
-  cols_label(Homeland = "Région", `Chef N` = "N", `Chef %` = "%",
-             `Conjoint N` = "N", `Conjoint %` = "%") |>
-  tab_spanner(label = "Chefs de ménage", columns = c(`Chef N`, `Chef %`)) |>
-  tab_spanner(label = "Conjoints", columns = c(`Conjoint N`, `Conjoint %`)) |>
-  fmt_number(columns = c(`Chef N`, `Conjoint N`), decimals = 0) |>
+  tab_header(title = "Région d'origine des CM et conjoints", subtitle = "Pourcentages") |>
+  cols_label(Homeland = "Région", `Chef %` = "%",
+             `Conjoint %` = "%") |>
+  tab_spanner(label = "Chefs de ménage", columns = `Chef %`) |>
+  tab_spanner(label = "Conjoints", columns = `Conjoint %`) |>
   fmt_number(columns = c(`Chef %`, `Conjoint %`), decimals = 1) |>
   style_table()
 ```
@@ -487,8 +493,8 @@ dl_fig_variants("fig_homeland", "04", function(d) {
 Les raisons d'installation des CM et conjoints non originaires du lieu éclairent les motivations migratoires. Elles distinguent notamment les installations liées au mariage de celles motivées par les opportunités économiques (travail agricole ou non agricole).
 
 ```{r raison}
-make_origin_table(members, mg4a, classify_reason, "Raison",
-                  "Raison d'implantation des CM et conjoints par observatoire")
+make_origin_table(members_site, mg4a, classify_reason, "Raison",
+                  obs_title("Raison d'implantation des CM et conjoints"))
 ```
 
 ```{r dl_tbl_raison}
@@ -507,8 +513,8 @@ dl_tbl_variants("tbl_raison", "04", function(d) {
 ```
 
 ```{r fig_raison}
-make_origin_histogram(members, mg4a, classify_reason, "Raison",
-                      "Distribution des raisons d'implantation des CM et conjoints")
+make_origin_histogram(members_site, mg4a, classify_reason, "Raison",
+                      obs_title("Distribution des raisons d'implantation des CM et conjoints"))
 ```
 
 ```{r dl_fig_raison}
@@ -540,13 +546,14 @@ A Marovoay, `r pct_cm_h_m` % des CM sont des hommes, soit `r pct_cm_f_m` % de m�
 
 ```{r cm_chars}
 cm <- members |> filter(m6 == 1)
+cm_site <- members_site |> filter(m6 == 1)
 
 # --- Sexe ---
 sexe_table <- cm |>
   mutate(Sexe = classify_sex(m4)) |>
   count(Observatory, Sexe) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  mutate(Valeur = paste0(n, " (", pct, "%)")) |>
+  mutate(Valeur = paste0(pct, "%")) |>
   select(Observatory, Sexe, Valeur) |>
   pivot_wider(names_from = Observatory, values_from = Valeur, values_fill = "-") |>
   mutate(Caractéristique = "Sexe", .before = Sexe) |>
@@ -645,10 +652,10 @@ A Marovoay, le niveau le plus fréquemment atteint est « `r top_educ_m` » (`r 
 
 ```{r cm_educ}
 cm_educ <- cm |>
-  mutate(Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+  mutate(Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
   count(Observatory, Niv_education) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  mutate(Valeur = paste0(n, " (", pct, "%)")) |>
+  mutate(Valeur = paste0(pct, "%")) |>
   select(Observatory, Niv_education, Valeur) |>
   pivot_wider(names_from = Observatory, values_from = Valeur, values_fill = "-")
 
@@ -663,7 +670,7 @@ gt(cm_educ) |>
 #| results: asis
 dl_tbl_variants("tbl_cm_educ", "04", function(d) {
   d |> filter(m6 == 1) |>
-    mutate(Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+    mutate(Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
     count(Observatory, Niv_education) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
@@ -676,11 +683,11 @@ dl_tbl_variants("tbl_cm_educ", "04", function(d) {
 cm_educ_sex <- cm |>
   mutate(
     Sexe = classify_sex(m4),
-    Niv_education = classify_education(s3a) |> replace_na("Inconnu")
+    Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")
   ) |>
   count(Observatory, Sexe, Niv_education) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
-  mutate(Valeur = paste0(n, " (", pct, "%)")) |>
+  mutate(Valeur = paste0(pct, "%")) |>
   select(Observatory, Sexe, Niv_education, Valeur) |>
   pivot_wider(names_from = c(Observatory, Sexe), values_from = Valeur,
               names_glue = "{Observatory}_{Sexe}", values_fill = "-")
@@ -705,7 +712,7 @@ gt(cm_educ_sex) |>
 dl_tbl_variants("tbl_cm_educ_sex", "04", function(d) {
   d |> filter(m6 == 1) |>
     mutate(Sexe = classify_sex(m4),
-           Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+           Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
     count(Observatory, Sexe, Niv_education) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
@@ -714,189 +721,162 @@ dl_tbl_variants("tbl_cm_educ_sex", "04", function(d) {
 
 ### Alphabétisation des chefs de ménage
 
-L'aptitude à lire et écrire conditionne l'accès à l'information, aux services publics et aux opportunités économiques. Les sections suivantes détaillent les compétences en lecture et en écriture séparément, avec une ventilation par sexe.
+L'aptitude à lire et écrire conditionne l'accès à l'information, aux services publics et aux opportunités économiques. Les sections suivantes détaillent les compétences en lecture et en écriture séparément, en distinguant trois niveaux : lecture/écriture aisée, avec effort, ou absente.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, `r pct_alpha_a` % des CM savent lire et écrire.
+Dans l'Alaotra, `r pct_alpha_a` % des CM savent lire aisément.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, `r pct_alpha_m` % des CM savent lire et écrire.
+A Marovoay, `r pct_alpha_m` % des CM savent lire aisément.
 :::
 :::
 
 ```{r cm_literacy_helpers}
 #| include: false
 
-# Helper: literacy table by observatory
-literacy_table_obs <- function(data, title_text) {
+# Helper: 3-level literacy table by observatory
+literacy_3level <- function(data, var, title_text) {
   data |>
-    count(Observatory, name = "n") |>
+    mutate(Niveau = classify_literacy({{ var }})) |>
+    filter(!is.na(Niveau)) |>
+    count(Observatory, Niveau) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    mutate(Valeur = paste0(pct, "%")) |>
+    select(Observatory, Niveau, Valeur) |>
+    pivot_wider(names_from = Observatory, values_from = Valeur, values_fill = "-") |>
     gt() |>
     tab_header(title = title_text) |>
-    cols_label(Observatory = "Observatoire", n = "Effectif") |>
+    cols_label(Niveau = "Niveau") |>
     style_table()
 }
 
-# Helper: literacy by sex — table only (plots added as separate chunks below)
-literacy_by_sex <- function(data, title_text) {
+# Helper: 3-level literacy table by sex
+literacy_3level_sex <- function(data, var, title_text) {
   sex_data <- data |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe, name = "n") |>
-    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+    mutate(Niveau = classify_literacy({{ var }}),
+           Sexe = classify_sex(m4)) |>
+    filter(!is.na(Niveau), !is.na(Sexe)) |>
+    count(Observatory, Sexe, Niveau) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe))
 
-  # Table
   tbl <- sex_data |>
     obs_gt() |>
     tab_header(title = title_text) |>
-    cols_label(Sexe = "Sexe", n = "Effectif", pct = "%") |>
+    cols_label(Sexe = "Sexe", Niveau = "Niveau", pct = "%") |>
+    cols_hide(n) |>
     fmt_number(columns = pct, decimals = 1) |>
     style_table()
 
   knitr::knit_print(tbl)
 }
 
-# Helper: literacy bar chart by sex
-literacy_bar <- function(data, title_text) {
+# Helper: 3-level literacy bar chart by sex
+literacy_3level_bar <- function(data, var, title_text) {
   sex_data <- data |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe, name = "n") |>
-    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+    mutate(Niveau = classify_literacy({{ var }}),
+           Sexe = classify_sex(m4)) |>
+    filter(!is.na(Niveau), !is.na(Sexe)) |>
+    count(Observatory, Sexe, Niveau) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe))
 
-  ggplot(sex_data, aes(x = Observatory, y = n, fill = Sexe)) +
+  n_obs <- n_distinct(sex_data$Observatory)
+  p <- ggplot(sex_data, aes(x = Niveau, y = pct, fill = Sexe)) +
     geom_col(position = "dodge") +
-    labs(title = paste("Effectifs \u2212", title_text),
-         x = "Observatoire", y = "Effectif") +
+    labs(title = title_text, x = NULL, y = "%", fill = "Sexe") +
     theme_minimal() +
     scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e"))
+  if (n_obs > 1) p <- p + facet_wrap(~Observatory)
+  p
 }
-```
-
-#### Savoir lire et écrire
-
-```{r cm_rw}
-cm_rw <- cm |> filter(s1a == 1, s1b == 1)
-literacy_table_obs(cm_rw, "CM sachant lire et écrire")
-```
-
-```{r dl_tbl_cm_rw}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_cm_rw", "04", function(d) {
-  d |> filter(m6 == 1, s1a == 1, s1b == 1) |>
-    count(Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, members)
-```
-
-```{r cm_rw_sex}
-#| results: asis
-literacy_by_sex(cm_rw, "CM sachant lire et écrire selon le sexe")
-```
-
-```{r fig_cm_rw_sex}
-#| fig-cap: "Effectifs — CM sachant lire et écrire selon le sexe"
-literacy_bar(cm_rw, "CM sachant lire et écrire selon le sexe")
-```
-
-```{r dl_tbl_cm_rw_sex}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_cm_rw_sex", "04", function(d) {
-  d |> filter(m6 == 1, s1a == 1, s1b == 1) |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, members)
 ```
 
 #### Savoir lire
 
-```{r cm_r}
-cm_read <- cm |> filter(s1a == 1)
-literacy_table_obs(cm_read, "CM sachant lire")
+```{r cm_read}
+literacy_3level(cm_site, s1a, "Aptitude à la lecture des chefs de ménage")
 ```
 
-```{r dl_tbl_cm_r}
+```{r dl_tbl_cm_read}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_cm_r", "04", function(d) {
-  d |> filter(m6 == 1, s1a == 1) |>
-    count(Observatory) |>
+dl_tbl_variants("tbl_cm_read", "04", function(d) {
+  d |> filter(m6 == 1) |>
+    mutate(Niveau = classify_literacy(s1a)) |>
+    filter(!is.na(Niveau)) |>
+    count(Observatory, Niveau) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
 
-```{r cm_r_sex}
+```{r cm_read_sex}
 #| results: asis
-literacy_by_sex(cm_read, "CM sachant lire selon le sexe")
+literacy_3level_sex(cm_site, s1a, "Aptitude à la lecture des CM selon le sexe")
 ```
 
-```{r fig_cm_r_sex}
-#| fig-cap: "Effectifs — CM sachant lire selon le sexe"
-literacy_bar(cm_read, "CM sachant lire selon le sexe")
+```{r fig_cm_read_sex}
+#| fig-cap: "Aptitude à la lecture des CM selon le sexe"
+literacy_3level_bar(cm_site, s1a, "Aptitude à la lecture des CM selon le sexe")
 ```
 
-```{r dl_tbl_cm_r_sex}
+```{r dl_tbl_cm_read_sex}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_cm_r_sex", "04", function(d) {
-  d |> filter(m6 == 1, s1a == 1) |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+dl_tbl_variants("tbl_cm_read_sex", "04", function(d) {
+  d |> filter(m6 == 1) |>
+    mutate(Sexe = classify_sex(m4), Niveau = classify_literacy(s1a)) |>
+    filter(!is.na(Sexe), !is.na(Niveau)) |>
+    count(Observatory, Sexe, Niveau) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
 
 #### Savoir écrire
 
-```{r cm_w}
-cm_write <- cm |> filter(s1b == 1)
-literacy_table_obs(cm_write, "CM sachant écrire")
+```{r cm_write}
+literacy_3level(cm_site, s1b, "Aptitude à l'écriture des chefs de ménage")
 ```
 
-```{r dl_tbl_cm_w}
+```{r dl_tbl_cm_write}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_cm_w", "04", function(d) {
-  d |> filter(m6 == 1, s1b == 1) |>
-    count(Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, members)
-```
-
-```{r cm_w_sex}
-#| results: asis
-literacy_by_sex(cm_write, "CM sachant écrire selon le sexe")
-```
-
-```{r fig_cm_w_sex}
-#| fig-cap: "Effectifs — CM sachant écrire selon le sexe"
-literacy_bar(cm_write, "CM sachant écrire selon le sexe")
-```
-
-```{r dl_tbl_cm_w_sex}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_cm_w_sex", "04", function(d) {
-  d |> filter(m6 == 1, s1b == 1) |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe) |>
+dl_tbl_variants("tbl_cm_write", "04", function(d) {
+  d |> filter(m6 == 1) |>
+    mutate(Niveau = classify_literacy(s1b)) |>
+    filter(!is.na(Niveau)) |>
+    count(Observatory, Niveau) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
 
+```{r cm_write_sex}
+#| results: asis
+literacy_3level_sex(cm_site, s1b, "Aptitude à l'écriture des CM selon le sexe")
+```
+
+```{r fig_cm_write_sex}
+#| fig-cap: "Aptitude à l'écriture des CM selon le sexe"
+literacy_3level_bar(cm_site, s1b, "Aptitude à l'écriture des CM selon le sexe")
+```
+
+```{r dl_tbl_cm_write_sex}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cm_write_sex", "04", function(d) {
+  d |> filter(m6 == 1) |>
+    mutate(Sexe = classify_sex(m4), Niveau = classify_literacy(s1b)) |>
+    filter(!is.na(Sexe), !is.na(Niveau)) |>
+    count(Observatory, Sexe, Niveau) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
 ### Activités principales des Chefs de ménage
 
 L'activité économique principale des chefs de ménage traduit la structure productive de chaque observatoire. Les activités sont regroupées en catégories sectorielles inspirées de la CITI Rév. 4 afin de garantir un effectif suffisant dans chaque classe et de préserver la confidentialité statistique.
@@ -914,7 +894,7 @@ A Marovoay, l'activité dominante est « `r top_act_m` » (`r pct_top_act_m` % d
 :::
 
 ```{r cm_act}
-cm_act <- cm |>
+cm_act <- cm_site |>
   mutate(Act_principal = classify_activity(a1)) |>
   filter(!is.na(Act_principal)) |>
   count(Observatory, Act_principal, name = "n") |>
@@ -923,19 +903,21 @@ cm_act <- cm |>
 
 obs_gt(cm_act) |>
   tab_header(title = obs_title("Activités principales du chef de ménage")) |>
-  cols_label(Act_principal = "Activité", n = "Effectif", Percent = "%") |>
+  cols_label(Act_principal = "Activité", Percent = "%") |>
+  cols_hide(n) |>
   fmt_number(columns = Percent, decimals = 1) |>
   style_table()
 
 # Bar chart (better suited to >5 categories than a pie chart)
-ggplot(cm_act, aes(x = reorder(Act_principal, Percent), y = Percent,
-                   fill = Observatory)) +
-  geom_col(position = "dodge") +
+ggplot(cm_act, aes(x = reorder(Act_principal, Percent), y = Percent)) +
+  geom_col(show.legend = FALSE) +
   coord_flip() +
-  labs(title = "Activités principales des CM (%)",
-       x = NULL, y = "%", fill = "Observatoire") +
+  facet_wrap(~Observatory) +
+  labs(title = obs_title("Activités principales des CM (%)"),
+       x = NULL, y = "%") +
   theme_minimal() +
-  theme(plot.title = element_text(face = "bold"))
+  theme(plot.title = element_text(face = "bold"),
+        strip.text = element_text(face = "bold"))
 ```
 
 ```{r dl_tbl_cm_act}
@@ -974,7 +956,7 @@ dl_fig_variants("fig_cm_act", "04", function(d) {
 #### Activités principales des CM par sexe
 
 ```{r cm_act_sex}
-cm_act_sex <- cm |>
+cm_act_sex <- cm_site |>
   mutate(
     Act_principal = classify_activity(a1),
     Sexe = classify_sex(m4)
@@ -991,17 +973,18 @@ cm_act_sex_plt <- suppress_in_plot_data(cm_act_sex)
 
 # Wide table
 cm_act_wide <- cm_act_sex_tbl |>
-  pivot_wider(names_from = Sexe, values_from = c(n, Percent),
-              names_glue = "{Sexe}_{.value}")
+  select(-n) |>
+  pivot_wider(names_from = Sexe, values_from = Percent,
+              names_glue = "{Sexe}_%")
 
 obs_gt(cm_act_wide) |>
   tab_header(title = obs_title("Activités principales des CM par sexe")) |>
   cols_label(Act_principal = "Activité",
-             Homme_n = "N", Homme_Percent = "%",
-             Femme_n = "N", Femme_Percent = "%") |>
-  tab_spanner(label = "Homme", columns = c(Homme_n, Homme_Percent)) |>
-  tab_spanner(label = "Femme", columns = c(Femme_n, Femme_Percent)) |>
-  fmt_number(columns = c(Homme_Percent, Femme_Percent), decimals = 1) |>
+             `Homme_%` = "%",
+             `Femme_%` = "%") |>
+  tab_spanner(label = "Homme", columns = `Homme_%`) |>
+  tab_spanner(label = "Femme", columns = `Femme_%`) |>
+  fmt_number(columns = c(`Homme_%`, `Femme_%`), decimals = 1) |>
   sub_missing(missing_text = "< 5") |>
   style_table()
 
@@ -1063,13 +1046,14 @@ Les autres membres du ménage (conjoints, enfants, dépendants) constituent la m
 
 ```{r other_chars}
 others <- members |> filter(m6 != 1)
+others_site <- members_site |> filter(m6 != 1)
 
 # --- Sexe ---
 sexe_table2 <- others |>
   mutate(Sexe = classify_sex(m4)) |>
   count(Observatory, Sexe) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  mutate(Valeur = paste0(n, " (", pct, "%)")) |>
+  mutate(Valeur = paste0(pct, "%")) |>
   select(Observatory, Sexe, Valeur) |>
   pivot_wider(names_from = Observatory, values_from = Valeur, values_fill = "-") |>
   mutate(Caractéristique = "Sexe", .before = Sexe) |>
@@ -1114,7 +1098,7 @@ gt(hh_combined2, groupname_col = "Caractéristique") |>
   tab_header(title = "Caractéristiques des autres membres de ménage") |>
   safe_cols_label(Catégorie = "Catégorie", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
   tab_footnote(
-    footnote = "Sexe et Statut matrimonial : effectifs et pourcentages. Âge : statistiques descriptives.",
+    footnote = "Sexe et Statut matrimonial : pourcentages. Âge : statistiques descriptives.",
     locations = cells_title(groups = "title")
   ) |>
   style_table()
@@ -1158,10 +1142,10 @@ Le niveau d'éducation des autres membres de ménage complète le portrait éduc
 
 ```{r other_educ}
 other_educ <- others |>
-  mutate(Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+  mutate(Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
   count(Observatory, Niv_education) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  mutate(Valeur = paste0(n, " (", pct, "%)")) |>
+  mutate(Valeur = paste0(pct, "%")) |>
   select(Observatory, Niv_education, Valeur) |>
   pivot_wider(names_from = Observatory, values_from = Valeur, values_fill = "-")
 
@@ -1176,7 +1160,7 @@ gt(other_educ) |>
 #| results: asis
 dl_tbl_variants("tbl_other_educ", "04", function(d) {
   d |> filter(m6 != 1) |>
-    mutate(Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+    mutate(Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
     count(Observatory, Niv_education) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
@@ -1189,12 +1173,12 @@ dl_tbl_variants("tbl_other_educ", "04", function(d) {
 other_educ_sex <- others |>
   mutate(
     Sexe = classify_sex(m4),
-    Niv_education = classify_education(s3a) |> replace_na("Inconnu")
+    Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")
   ) |>
   filter(!is.na(Sexe)) |>
   count(Observatory, Sexe, Niv_education) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
-  mutate(Valeur = paste0(n, " (", pct, "%)")) |>
+  mutate(Valeur = paste0(pct, "%")) |>
   select(Observatory, Sexe, Niv_education, Valeur) |>
   pivot_wider(names_from = c(Observatory, Sexe), values_from = Valeur,
               names_glue = "{Observatory}_{Sexe}", values_fill = "-")
@@ -1215,7 +1199,7 @@ gt(other_educ_sex) |>
 dl_tbl_variants("tbl_other_educ_sex", "04", function(d) {
   d |> filter(m6 != 1) |>
     mutate(Sexe = classify_sex(m4),
-           Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+           Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
     count(Observatory, Sexe, Niv_education) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
@@ -1224,126 +1208,89 @@ dl_tbl_variants("tbl_other_educ_sex", "04", function(d) {
 
 #### Alphabétisation des autres membres
 
-##### Savoir lire et écrire
-
-```{r other_rw}
-other_rw <- others |> filter(s1a == 1, s1b == 1)
-literacy_table_obs(other_rw, "Autres membres sachant lire et écrire")
-```
-
-```{r dl_tbl_other_rw}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_other_rw", "04", function(d) {
-  d |> filter(m6 != 1, s1a == 1, s1b == 1) |>
-    count(Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, members)
-```
-
-```{r other_rw_sex}
-#| results: asis
-literacy_by_sex(other_rw, "Autres membres sachant lire et écrire selon le sexe")
-```
-
-```{r fig_other_rw_sex}
-#| fig-cap: "Effectifs — Autres membres sachant lire et écrire selon le sexe"
-literacy_bar(other_rw, "Autres membres sachant lire et écrire selon le sexe")
-```
-
-```{r dl_tbl_other_rw_sex}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_other_rw_sex", "04", function(d) {
-  d |> filter(m6 != 1, s1a == 1, s1b == 1) |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, members)
-```
-
 ##### Savoir lire
 
-```{r other_r}
-other_read <- others |> filter(s1a == 1)
-literacy_table_obs(other_read, "Autres membres sachant lire")
+```{r other_read}
+literacy_3level(others_site, s1a, "Aptitude à la lecture des autres membres")
 ```
 
-```{r dl_tbl_other_r}
+```{r dl_tbl_other_read}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_other_r", "04", function(d) {
-  d |> filter(m6 != 1, s1a == 1) |>
-    count(Observatory) |>
+dl_tbl_variants("tbl_other_read", "04", function(d) {
+  d |> filter(m6 != 1) |>
+    mutate(Niveau = classify_literacy(s1a)) |>
+    filter(!is.na(Niveau)) |>
+    count(Observatory, Niveau) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
 
-```{r other_r_sex}
+```{r other_read_sex}
 #| results: asis
-literacy_by_sex(other_read, "Autres membres sachant lire selon le sexe")
+literacy_3level_sex(others_site, s1a, "Aptitude à la lecture des autres membres selon le sexe")
 ```
 
-```{r fig_other_r_sex}
-#| fig-cap: "Effectifs — Autres membres sachant lire selon le sexe"
-literacy_bar(other_read, "Autres membres sachant lire selon le sexe")
+```{r fig_other_read_sex}
+#| fig-cap: "Aptitude à la lecture des autres membres selon le sexe"
+literacy_3level_bar(others_site, s1a, "Aptitude à la lecture des autres membres selon le sexe")
 ```
 
-```{r dl_tbl_other_r_sex}
+```{r dl_tbl_other_read_sex}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_other_r_sex", "04", function(d) {
-  d |> filter(m6 != 1, s1a == 1) |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+dl_tbl_variants("tbl_other_read_sex", "04", function(d) {
+  d |> filter(m6 != 1) |>
+    mutate(Sexe = classify_sex(m4), Niveau = classify_literacy(s1a)) |>
+    filter(!is.na(Sexe), !is.na(Niveau)) |>
+    count(Observatory, Sexe, Niveau) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
 
 ##### Savoir écrire
 
-```{r other_w}
-other_write <- others |> filter(s1b == 1)
-literacy_table_obs(other_write, "Autres membres sachant écrire")
+```{r other_write}
+literacy_3level(others_site, s1b, "Aptitude à l'écriture des autres membres")
 ```
 
-```{r dl_tbl_other_w}
+```{r dl_tbl_other_write}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_other_w", "04", function(d) {
-  d |> filter(m6 != 1, s1b == 1) |>
-    count(Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, members)
-```
-
-```{r other_w_sex}
-#| results: asis
-literacy_by_sex(other_write, "Autres membres sachant écrire selon le sexe")
-```
-
-```{r fig_other_w_sex}
-#| fig-cap: "Effectifs — Autres membres sachant écrire selon le sexe"
-literacy_bar(other_write, "Autres membres sachant écrire selon le sexe")
-```
-
-```{r dl_tbl_other_w_sex}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_other_w_sex", "04", function(d) {
-  d |> filter(m6 != 1, s1b == 1) |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe) |>
+dl_tbl_variants("tbl_other_write", "04", function(d) {
+  d |> filter(m6 != 1) |>
+    mutate(Niveau = classify_literacy(s1b)) |>
+    filter(!is.na(Niveau)) |>
+    count(Observatory, Niveau) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
 
+```{r other_write_sex}
+#| results: asis
+literacy_3level_sex(others_site, s1b, "Aptitude à l'écriture des autres membres selon le sexe")
+```
+
+```{r fig_other_write_sex}
+#| fig-cap: "Aptitude à l'écriture des autres membres selon le sexe"
+literacy_3level_bar(others_site, s1b, "Aptitude à l'écriture des autres membres selon le sexe")
+```
+
+```{r dl_tbl_other_write_sex}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_other_write_sex", "04", function(d) {
+  d |> filter(m6 != 1) |>
+    mutate(Sexe = classify_sex(m4), Niveau = classify_literacy(s1b)) |>
+    filter(!is.na(Sexe), !is.na(Niveau)) |>
+    count(Observatory, Sexe, Niveau) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
 ### Scolarisation
 
 Le taux de scolarisation des enfants de 6 à 14 ans constitue un indicateur clé du développement humain et de l'investissement des ménages dans l'éducation.
@@ -1363,19 +1310,19 @@ Dans Marovoay, le taux de scolarisation s'élève à `r taux_scol_m` %.
 #### Taux de scolarisation des enfants de 6 à 14 ans
 
 ```{r schooling}
-school_rate <- members |>
+school_rate <- members_site |>
   filter(m5 >= 6, m5 <= 14, s2 %in% c(1, 2)) |>
   mutate(Scolarise = if_else(s2 == 1, "Oui", "Non")) |>
   count(Observatory, Scolarise, name = "n") |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  pivot_wider(names_from = Scolarise, values_from = c(n, pct),
-              names_glue = "{Scolarise}_{.value}")
+  select(-n) |>
+  pivot_wider(names_from = Scolarise, values_from = pct,
+              names_glue = "{Scolarise}_pct")
 
-gt(school_rate) |>
-  tab_header(title = "Taux de scolarisation des enfants de 6 à 14 ans") |>
-  cols_label(Observatory = "Observatoire",
-             Oui_n = "Scolarisés (N)", Oui_pct = "Scolarisés (%)",
-             Non_n = "Non scolarisés (N)", Non_pct = "Non scolarisés (%)") |>
+obs_gt(school_rate) |>
+  tab_header(title = obs_title("Taux de scolarisation des enfants de 6 à 14 ans")) |>
+  cols_label(Oui_pct = "Scolarisés (%)",
+             Non_pct = "Non scolarisés (%)") |>
   fmt_number(columns = c(Oui_pct, Non_pct), decimals = 1) |>
   style_table()
 ```
@@ -1393,10 +1340,12 @@ dl_tbl_variants("tbl_schooling", "04", function(d) {
 }, members)
 ```
 
+::: {.content-visible when-profile="consolidated"}
+
 #### Classe suivie 2024-2025
 
 ```{r class_attended}
-class_data <- members |>
+class_data <- members_site |>
   filter(m5 >= 3, m5 <= 25, s2 == 1, !is.na(s3a)) |>
   mutate(
     Cat_age = case_when(
@@ -1437,6 +1386,8 @@ dl_tbl_variants("tbl_class", "04", function(d) {
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
+
+:::
 
 #### Raisons de non fréquentation de l'école pour les 6 à 15 ans
 
@@ -1550,7 +1501,7 @@ dl_tbl_variants("tbl_raisons_non_scol", "04", function(d) {
 La répartition sectorielle des activités des autres membres de ménage reflète la diversification économique au sein des familles et le rôle des conjoints et enfants dans l'économie du ménage. Les activités sont regroupées selon la même nomenclature sectorielle que pour les CM.
 
 ```{r other_act_grouped}
-other_act <- others |>
+other_act <- others_site |>
   mutate(Act_principal = classify_activity(a1)) |>
   filter(!is.na(Act_principal)) |>
   count(Observatory, Act_principal, name = "n") |>
@@ -1559,18 +1510,20 @@ other_act <- others |>
 
 obs_gt(other_act) |>
   tab_header(title = obs_title("Activités principales des autres membres")) |>
-  cols_label(Act_principal = "Activité", n = "Effectif", Percent = "%") |>
+  cols_label(Act_principal = "Activité", Percent = "%") |>
+  cols_hide(n) |>
   fmt_number(columns = Percent, decimals = 1) |>
   style_table()
 
-ggplot(other_act, aes(x = reorder(Act_principal, Percent), y = Percent,
-                      fill = Observatory)) +
-  geom_col(position = "dodge") +
+ggplot(other_act, aes(x = reorder(Act_principal, Percent), y = Percent)) +
+  geom_col(show.legend = FALSE) +
   coord_flip() +
-  labs(title = "Activités principales des autres membres (%)",
-       x = NULL, y = "%", fill = "Observatoire") +
+  facet_wrap(~Observatory) +
+  labs(title = obs_title("Activités principales des autres membres (%)"),
+       x = NULL, y = "%") +
   theme_minimal() +
-  theme(plot.title = element_text(face = "bold"))
+  theme(plot.title = element_text(face = "bold"),
+        strip.text = element_text(face = "bold"))
 ```
 
 ```{r dl_tbl_other_act}
@@ -1609,7 +1562,7 @@ dl_fig_variants("fig_other_act", "04", function(d) {
 #### Activités principales des autres membres par sexe
 
 ```{r other_act_sex}
-other_act_sex <- others |>
+other_act_sex <- others_site |>
   mutate(
     Act_principal = classify_activity(a1),
     Sexe = classify_sex(m4)
@@ -1625,17 +1578,18 @@ other_act_sex_plt <- suppress_in_plot_data(other_act_sex)
 
 # Wide table
 other_act_wide <- other_act_sex_tbl |>
-  pivot_wider(names_from = Sexe, values_from = c(n, Percent),
-              names_glue = "{Sexe}_{.value}")
+  select(-n) |>
+  pivot_wider(names_from = Sexe, values_from = Percent,
+              names_glue = "{Sexe}_%")
 
 obs_gt(other_act_wide) |>
   tab_header(title = obs_title("Activités principales des autres membres par sexe")) |>
   cols_label(Act_principal = "Activité",
-             Homme_n = "N", Homme_Percent = "%",
-             Femme_n = "N", Femme_Percent = "%") |>
-  tab_spanner(label = "Homme", columns = c(Homme_n, Homme_Percent)) |>
-  tab_spanner(label = "Femme", columns = c(Femme_n, Femme_Percent)) |>
-  fmt_number(columns = c(Homme_Percent, Femme_Percent), decimals = 1) |>
+             `Homme_%` = "%",
+             `Femme_%` = "%") |>
+  tab_spanner(label = "Homme", columns = `Homme_%`) |>
+  tab_spanner(label = "Femme", columns = `Femme_%`) |>
+  fmt_number(columns = c(`Homme_%`, `Femme_%`), decimals = 1) |>
   sub_missing(missing_text = "< 5") |>
   style_table()
 
@@ -1688,6 +1642,8 @@ dl_fig_variants("fig_other_act_sex", "04", function(d) {
           strip.text = element_text(face = "bold"))
 }, members)
 ```
+
+::: {.content-visible when-profile="consolidated"}
 
 ## Évolution des indicateurs démographiques (1996-2025) {#sec-demog-multiyear}
 
@@ -1831,3 +1787,5 @@ if ("age_cm_moy" %in% names(demog_trends)) {
     theme_minimal()
 }
 ```
+
+:::
