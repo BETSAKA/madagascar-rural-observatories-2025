@@ -15,19 +15,19 @@ Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de 
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay.** À Marovoay, la structure des ménages est marquée par l'hétérogénéité des  stratégies économiques et des structures familiales. La proximité de la ville de Marovoay et de la route nationale RN4 reliant Antananarivo à Mahajanga facilite les échanges et influence les activités non agricoles des ménages.
+À Marovoay, la structure des ménages est marquée par l'hétérogénéité des  stratégies économiques et des structures familiales. La proximité de la ville de Marovoay et de la route nationale RN4 reliant Antananarivo à Mahajanga facilite les échanges et influence les activités non agricoles des ménages.
 :::
 :::
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** Dans l'Alaotra, la riziculture irriguée constitue le socle de l'économie domestique, et la taille des exploitations rizicoles influence directement la structure et les revenus des ménages. Les fokontany proches des périmètres irrigués (Avaradrano, Feramanga Atsimo) présentent des profils économiques distincts de ceux situés en périphérie de la cuvette (Analamiranga, Maritampona), où la dépendance au riz pluvial et à l'élevage est plus marquée.
+Dans l'Alaotra, la riziculture irriguée constitue le socle de l'économie domestique, et la taille des exploitations rizicoles influence directement la structure et les revenus des ménages. Les fokontany proches des périmètres irrigués (Avaradrano, Feramanga Atsimo) présentent des profils économiques distincts de ceux situés en périphérie de la cuvette (Analamiranga, Maritampona), où la dépendance au riz pluvial et à l'élevage est plus marquée.
 :::
 :::
 
 ::: {.content-visible when-profile="consolidated"}
 ::: {.obs-technical}
-*Note technique.* Les indicateurs démographiques présentés dans cette section sont calculés à partir du fichier ménage (`res_deb`) et du fichier des membres (`res_m_a`). La classification des activités principales s'appuie sur une nomenclature sectorielle inspirée de la CITI Rév. 4. Les effectifs inférieurs à cinq sont masqués par souci de confidentialité statistique. Les comparaisons entre les deux observatoires doivent tenir compte de la différence de taille des échantillons et de la structure spatiale des zones enquêtées.
+Les indicateurs démographiques présentés dans cette section sont calculés à partir du fichier ménage (`res_deb`) et du fichier des membres (`res_m_a`). La classification des activités principales s'appuie sur une nomenclature sectorielle inspirée de la CITI Rév. 4. Les effectifs inférieurs à cinq sont masqués par souci de confidentialité statistique. Les comparaisons entre les deux observatoires doivent tenir compte de la différence de taille des échantillons et de la structure spatiale des zones enquêtées.
 :::
 :::
 
@@ -56,7 +56,11 @@ members <- res_deb |>
 #| include: false
 # --- Statistiques clés pour le texte narratif ---
 n_members <- nrow(members)
+n_members_m <- members |> filter(Observatory == "Marovoay") |> nrow()
+n_members_a <- members |> filter(Observatory == "Alaotra") |> nrow()
 n_men <- n_distinct(members$j5)
+n_men_m <- members |> filter(Observatory == "Marovoay") |> pull(j5) |> n_distinct()
+n_men_a <- members |> filter(Observatory == "Alaotra") |> pull(j5) |> n_distinct()
 cm_s <- members |> filter(m6 == 1)
 
 # Taille des ménages
@@ -166,17 +170,20 @@ pct_top_raison_m <- non_scol_s |> filter(Observatory == "Marovoay") |>
 
 ## Description des ménages
 
+::: {.content-visible when-profile="consolidated"}
+::: {.obs-technical}
 L'enquête a permis de recenser `r n_members` individus répartis dans `r n_men` ménages au sein des deux observatoires.
-
+:::
+:::
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** La taille moyenne des ménages s'établit à `r taille_moy_a` personnes.
+A Alaotra, on a recensé `r n_members_a` individus répartis dans `r n_men_a` ménages. La taille moyenne des ménages s'établit à `r taille_moy_a` personnes.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay.** La taille moyenne des ménages s'établit à `r taille_moy_m` personnes.
+A Marovoay, on a recensé `r n_members_m` individus répartis dans `r n_men_m` ménages. La taille moyenne des ménages s'établit à `r taille_moy_m` personnes.
 :::
 :::
 
@@ -232,13 +239,13 @@ La structure démographique des ménages enquêtés révèle une population jeun
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** `r pct_moins15_a` % des individus ont moins de 15 ans. La population en âge de travailler (15–64 ans) représente `r pct_15_64_a` %, tandis que les personnes de 65 ans et plus ne constituent que `r pct_65plus_a` %.
+A Alaotra, `r pct_moins15_a` % des individus ont moins de 15 ans. La population en âge de travailler (15–64 ans) représente `r pct_15_64_a` %, tandis que les personnes de 65 ans et plus ne constituent que `r pct_65plus_a` %.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay.** `r pct_moins15_m` % des individus ont moins de 15 ans. La population en âge de travailler (15–64 ans) représente `r pct_15_64_m` %, tandis que les personnes de 65 ans et plus ne constituent que `r pct_65plus_m` %.
+A Marovoay, `r pct_moins15_m` % des individus ont moins de 15 ans. La population en âge de travailler (15–64 ans) représente `r pct_15_64_m` %, tandis que les personnes de 65 ans et plus ne constituent que `r pct_65plus_m` %.
 :::
 :::
 
@@ -513,13 +520,13 @@ Le profil des chefs de ménage (CM) est décrit ci-dessous.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** `r pct_cm_h_a` % des CM sont des hommes, soit `r pct_cm_f_a` % de ménages dirigés par des femmes. L'âge moyen des CM est de `r age_cm_a` ans. Sur le plan conjugal, `r pct_couple_a` % des CM vivent en couple (mariés ou en concubinage).
+Dans l'Alaotra, `r pct_cm_h_a` % des CM sont des hommes, soit `r pct_cm_f_a` % de ménages dirigés par des femmes. L'âge moyen des CM est de `r age_cm_a` ans. Sur le plan conjugal, `r pct_couple_a` % des CM vivent en couple (mariés ou en concubinage).
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay.** `r pct_cm_h_m` % des CM sont des hommes, soit `r pct_cm_f_m` % de ménages dirigés par des femmes. L'âge moyen des CM est de `r age_cm_m` ans. Sur le plan conjugal, `r pct_couple_m` % des CM vivent en couple (mariés ou en concubinage).
+A Marovoay, `r pct_cm_h_m` % des CM sont des hommes, soit `r pct_cm_f_m` % de ménages dirigés par des femmes. L'âge moyen des CM est de `r age_cm_m` ans. Sur le plan conjugal, `r pct_couple_m` % des CM vivent en couple (mariés ou en concubinage).
 :::
 :::
 
@@ -618,13 +625,13 @@ Le niveau d'éducation des chefs de ménage constitue un déterminant majeur de 
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** Le niveau le plus fréquemment atteint est « `r top_educ_a` » (`r pct_top_educ_a` % des CM).
+Dans l'Alaotra, le niveau le plus fréquemment atteint est « `r top_educ_a` » (`r pct_top_educ_a` % des CM).
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay.** Le niveau le plus fréquemment atteint est « `r top_educ_m` » (`r pct_top_educ_m` % des CM).
+A Marovoay, le niveau le plus fréquemment atteint est « `r top_educ_m` » (`r pct_top_educ_m` % des CM).
 :::
 :::
 
@@ -705,13 +712,13 @@ L'aptitude à lire et écrire conditionne l'accès à l'information, aux service
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** `r pct_alpha_a` % des CM savent lire et écrire.
+Dans l'Alaotra, `r pct_alpha_a` % des CM savent lire et écrire.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay.** `r pct_alpha_m` % des CM savent lire et écrire.
+A Marovoay, `r pct_alpha_m` % des CM savent lire et écrire.
 :::
 :::
 
@@ -890,13 +897,13 @@ L'activité économique principale des chefs de ménage traduit la structure pro
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** L'activité dominante est « `r top_act_a` » (`r pct_top_act_a` % des CM).
+Dans l'Alaotra, l'activité dominante est « `r top_act_a` » (`r pct_top_act_a` % des CM).
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay.** L'activité dominante est « `r top_act_m` » (`r pct_top_act_m` % des CM).
+A Marovoay, l'activité dominante est « `r top_act_m` » (`r pct_top_act_m` % des CM).
 :::
 :::
 
@@ -1337,13 +1344,13 @@ Le taux de scolarisation des enfants de 6 à 14 ans constitue un indicateur clé
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** Le taux de scolarisation s'élève à `r taux_scol_a` %.
+Dans l'Alaotra, le taux de scolarisation s'élève à `r taux_scol_a` %.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay.** Le taux de scolarisation s'élève à `r taux_scol_m` %.
+Dans Marovoay, le taux de scolarisation s'élève à `r taux_scol_m` %.
 :::
 :::
 
@@ -1431,13 +1438,13 @@ La @fig-raisons-non-scol et le @tbl-raisons-non-scol détaillent l'ensemble des 
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** Parmi les enfants de 6 à 15 ans non scolarisés, la première raison invoquée est « `r top_raison_a` » (`r pct_top_raison_a` %).
+Dans l'Alaotra, parmi les enfants de 6 à 15 ans non scolarisés, la première raison invoquée est « `r top_raison_a` » (`r pct_top_raison_a` %).
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay.** Parmi les enfants de 6 à 15 ans non scolarisés, la première raison invoquée est « `r top_raison_m` » (`r pct_top_raison_m` %).
+A Marovoay, parmi les enfants de 6 à 15 ans non scolarisés, la première raison invoquée est « `r top_raison_m` » (`r pct_top_raison_m` %).
 :::
 :::
 
@@ -1678,7 +1685,7 @@ dl_fig_variants("fig_other_act_sex", "04", function(d) {
 
 ## Évolution des indicateurs démographiques (1996-2025) {#sec-demog-multiyear}
 
-Les observatoires d'Alaotra et de Marovoay disposent de données démographiques depuis 1996. Cette section retrace l'évolution de quatre indicateurs clés : la taille moyenne des ménages, la proportion de chefs de ménage femmes, le taux de scolarisation des 6-14 ans et l'âge moyen du chef de ménage.
+Les observatoires disposent de données démographiques depuis les années 1990. Cette section retrace l'évolution de quatre indicateurs clés : la taille moyenne des ménages, la proportion de chefs de ménage femmes, le taux de scolarisation des 6-14 ans et l'âge moyen du chef de ménage.
 
 ::: {.callout-caution}
 ## Interprétation : effet du panel et de l'échantillonnage
