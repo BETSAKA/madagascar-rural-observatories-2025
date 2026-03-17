@@ -353,6 +353,26 @@ bind_rows(
   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 ```
 
+```{r fig_menaces}
+#| fig-cap: "Menaces perçues et responsables identifiés (% de Oui)"
+#| fig-height: 8
+
+menaces_long <- bind_rows(
+  menaces |> mutate(Section = "Menaces"),
+  resps |> mutate(Section = "Responsables")
+) |>
+  pivot_longer(cols = any_of(c("Alaotra", "Marovoay")),
+               names_to = "Observatory", values_to = "pct") |>
+  filter(!is.na(pct))
+
+ggplot(menaces_long, aes(x = reorder(Item, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  facet_wrap(~Section, scales = "free_y", ncol = 1) +
+  labs(x = NULL, y = "%", fill = "Observatoire") +
+  theme_minimal()
+```
+
 ```{r dl_tbl_menaces}
 #| echo: false
 #| results: asis
@@ -600,6 +620,8 @@ dl_fig_variants("fig_ef_saison", "10", function(d) {
 }, res_ef)
 ```
 
+::: {.content-visible when-profile="consolidated"}
+
 ### Commercialisation des produits forestiers
 
 Une partie des produits forestiers collectés (charbon, bois de chauffe, bois d'œuvre) fait l'objet d'une commercialisation. La proportion de ménages qui vendent et les montants moyens de vente donnent une indication de l'importance économique de cette activité.
@@ -658,6 +680,7 @@ dl_tbl_variants("tbl_ef_vente", "10", function(d) {
 }, res_ef)
 ```
 
+:::
 
 ### Fréquentation de l'Aire protégée
 
@@ -1114,6 +1137,22 @@ bind_rows(
   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 ```
 
+```{r fig_feux}
+#| fig-cap: "Pratique et perception des feux (% de Oui)"
+
+feu_long <- feu_tbl |>
+  bind_rows(maitr, echap) |>
+  pivot_longer(cols = any_of(c("Alaotra", "Marovoay")),
+               names_to = "Observatory", values_to = "pct") |>
+  filter(!is.na(pct))
+
+ggplot(feu_long, aes(x = reorder(Item, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "%", fill = "Observatoire") +
+  theme_minimal()
+```
+
 ```{r dl_tbl_feux}
 #| echo: false
 #| results: asis
@@ -1363,6 +1402,21 @@ ap_items |>
     locations = cells_column_labels(columns = everything())
   ) |>
   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+```
+
+```{r fig_connaissance_ap}
+#| fig-cap: "Connaissance de l'Aire protégée et demande de protection (% de Oui)"
+
+ap_long <- ap_items |>
+  pivot_longer(cols = any_of(c("Alaotra", "Marovoay")),
+               names_to = "Observatory", values_to = "pct") |>
+  filter(!is.na(pct))
+
+ggplot(ap_long, aes(x = reorder(Item, pct), y = pct, fill = Observatory)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(x = NULL, y = "%", fill = "Observatoire") +
+  theme_minimal()
 ```
 
 ```{r dl_tbl_connaissance_ap}

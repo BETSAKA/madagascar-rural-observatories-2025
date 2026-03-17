@@ -109,7 +109,7 @@ pct_couple_m <- couple_cm |> filter(Observatory == "Marovoay") |> pull(pct)
 
 # Éducation CM
 educ_cm_s <- cm_s |>
-  mutate(Niv = classify_education(s3a)) |> filter(!is.na(Niv)) |>
+  mutate(Niv = classify_education(s3a, s2, m5)) |> filter(!is.na(Niv)) |>
   count(Observatory, Niv) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 top_educ_a <- educ_cm_s |> filter(Observatory == "Alaotra") |>
@@ -121,9 +121,9 @@ top_educ_m <- educ_cm_s |> filter(Observatory == "Marovoay") |>
 pct_top_educ_m <- educ_cm_s |> filter(Observatory == "Marovoay") |>
   slice_max(pct, n = 1, with_ties = FALSE) |> pull(pct)
 
-# Alphabétisation CM
-alpha_cm <- cm_s |> filter(!is.na(s1a), !is.na(s1b)) |>
-  summarise(pct = round(mean(s1a == 1 & s1b == 1) * 100, 1), .by = Observatory)
+# Alphabétisation CM (% sachant lire aisément)
+alpha_cm <- cm_s |> filter(!is.na(s1a)) |>
+  summarise(pct = round(mean(s1a == 1) * 100, 1), .by = Observatory)
 pct_alpha_a <- alpha_cm |> filter(Observatory == "Alaotra") |> pull(pct)
 pct_alpha_m <- alpha_cm |> filter(Observatory == "Marovoay") |> pull(pct)
 
@@ -652,7 +652,7 @@ A Marovoay, le niveau le plus fréquemment atteint est « `r top_educ_m` » (`r 
 
 ```{r cm_educ}
 cm_educ <- cm |>
-  mutate(Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+  mutate(Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
   count(Observatory, Niv_education) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
   mutate(Valeur = paste0(pct, "%")) |>
@@ -670,7 +670,7 @@ gt(cm_educ) |>
 #| results: asis
 dl_tbl_variants("tbl_cm_educ", "04", function(d) {
   d |> filter(m6 == 1) |>
-    mutate(Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+    mutate(Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
     count(Observatory, Niv_education) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
@@ -683,7 +683,7 @@ dl_tbl_variants("tbl_cm_educ", "04", function(d) {
 cm_educ_sex <- cm |>
   mutate(
     Sexe = classify_sex(m4),
-    Niv_education = classify_education(s3a) |> replace_na("Inconnu")
+    Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")
   ) |>
   count(Observatory, Sexe, Niv_education) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
@@ -712,7 +712,7 @@ gt(cm_educ_sex) |>
 dl_tbl_variants("tbl_cm_educ_sex", "04", function(d) {
   d |> filter(m6 == 1) |>
     mutate(Sexe = classify_sex(m4),
-           Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+           Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
     count(Observatory, Sexe, Niv_education) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
@@ -721,49 +721,52 @@ dl_tbl_variants("tbl_cm_educ_sex", "04", function(d) {
 
 ### Alphabétisation des chefs de ménage
 
-L'aptitude à lire et écrire conditionne l'accès à l'information, aux services publics et aux opportunités économiques. Les sections suivantes détaillent les compétences en lecture et en écriture séparément, avec une ventilation par sexe.
+L'aptitude à lire et écrire conditionne l'accès à l'information, aux services publics et aux opportunités économiques. Les sections suivantes détaillent les compétences en lecture et en écriture séparément, en distinguant trois niveaux : lecture/écriture aisée, avec effort, ou absente.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, `r pct_alpha_a` % des CM savent lire et écrire.
+Dans l'Alaotra, `r pct_alpha_a` % des CM savent lire aisément.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, `r pct_alpha_m` % des CM savent lire et écrire.
+A Marovoay, `r pct_alpha_m` % des CM savent lire aisément.
 :::
 :::
 
 ```{r cm_literacy_helpers}
 #| include: false
 
-# Helper: literacy table by observatory
-literacy_table_obs <- function(data, title_text) {
+# Helper: 3-level literacy table by observatory
+literacy_3level <- function(data, var, title_text) {
   data |>
-    count(Observatory, name = "n") |>
-    mutate(pct = round(n / sum(n) * 100, 1)) |>
+    mutate(Niveau = classify_literacy({{ var }})) |>
+    filter(!is.na(Niveau)) |>
+    count(Observatory, Niveau) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    mutate(Valeur = paste0(pct, "%")) |>
+    select(Observatory, Niveau, Valeur) |>
+    pivot_wider(names_from = Observatory, values_from = Valeur, values_fill = "-") |>
     gt() |>
     tab_header(title = title_text) |>
-    cols_label(Observatory = "Observatoire", pct = "%") |>
-    cols_hide(n) |>
-    fmt_number(columns = pct, decimals = 1) |>
+    cols_label(Niveau = "Niveau") |>
     style_table()
 }
 
-# Helper: literacy by sex — table only (plots added as separate chunks below)
-literacy_by_sex <- function(data, title_text) {
+# Helper: 3-level literacy table by sex
+literacy_3level_sex <- function(data, var, title_text) {
   sex_data <- data |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe, name = "n") |>
-    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+    mutate(Niveau = classify_literacy({{ var }}),
+           Sexe = classify_sex(m4)) |>
+    filter(!is.na(Niveau), !is.na(Sexe)) |>
+    count(Observatory, Sexe, Niveau) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe))
 
-  # Table
   tbl <- sex_data |>
     obs_gt() |>
     tab_header(title = title_text) |>
-    cols_label(Sexe = "Sexe", pct = "%") |>
+    cols_label(Sexe = "Sexe", Niveau = "Niveau", pct = "%") |>
     cols_hide(n) |>
     fmt_number(columns = pct, decimals = 1) |>
     style_table()
@@ -771,19 +774,19 @@ literacy_by_sex <- function(data, title_text) {
   knitr::knit_print(tbl)
 }
 
-# Helper: literacy bar chart by sex
-literacy_bar <- function(data, title_text) {
+# Helper: 3-level literacy bar chart by sex
+literacy_3level_bar <- function(data, var, title_text) {
   sex_data <- data |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe, name = "n") |>
-    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+    mutate(Niveau = classify_literacy({{ var }}),
+           Sexe = classify_sex(m4)) |>
+    filter(!is.na(Niveau), !is.na(Sexe)) |>
+    count(Observatory, Sexe, Niveau) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe))
 
   n_obs <- n_distinct(sex_data$Observatory)
-  p <- ggplot(sex_data, aes(x = Sexe, y = pct, fill = Sexe)) +
-    geom_col(show.legend = FALSE) +
-    labs(title = paste("% \u2212", title_text),
-         x = NULL, y = "%") +
+  p <- ggplot(sex_data, aes(x = Niveau, y = pct, fill = Sexe)) +
+    geom_col(position = "dodge") +
+    labs(title = title_text, x = NULL, y = "%", fill = "Sexe") +
     theme_minimal() +
     scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e"))
   if (n_obs > 1) p <- p + facet_wrap(~Observatory)
@@ -791,126 +794,89 @@ literacy_bar <- function(data, title_text) {
 }
 ```
 
-#### Savoir lire et écrire
-
-```{r cm_rw}
-cm_rw <- cm_site |> filter(s1a == 1, s1b == 1)
-literacy_table_obs(cm_rw, "CM sachant lire et écrire")
-```
-
-```{r dl_tbl_cm_rw}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_cm_rw", "04", function(d) {
-  d |> filter(m6 == 1, s1a == 1, s1b == 1) |>
-    count(Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, members)
-```
-
-```{r cm_rw_sex}
-#| results: asis
-literacy_by_sex(cm_rw, "CM sachant lire et écrire selon le sexe")
-```
-
-```{r fig_cm_rw_sex}
-#| fig-cap: "Pourcentages — CM sachant lire et écrire selon le sexe"
-literacy_bar(cm_rw, "CM sachant lire et écrire selon le sexe")
-```
-
-```{r dl_tbl_cm_rw_sex}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_cm_rw_sex", "04", function(d) {
-  d |> filter(m6 == 1, s1a == 1, s1b == 1) |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, members)
-```
-
 #### Savoir lire
 
-```{r cm_r}
-cm_read <- cm_site |> filter(s1a == 1)
-literacy_table_obs(cm_read, "CM sachant lire")
+```{r cm_read}
+literacy_3level(cm_site, s1a, "Aptitude à la lecture des chefs de ménage")
 ```
 
-```{r dl_tbl_cm_r}
+```{r dl_tbl_cm_read}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_cm_r", "04", function(d) {
-  d |> filter(m6 == 1, s1a == 1) |>
-    count(Observatory) |>
+dl_tbl_variants("tbl_cm_read", "04", function(d) {
+  d |> filter(m6 == 1) |>
+    mutate(Niveau = classify_literacy(s1a)) |>
+    filter(!is.na(Niveau)) |>
+    count(Observatory, Niveau) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
 
-```{r cm_r_sex}
+```{r cm_read_sex}
 #| results: asis
-literacy_by_sex(cm_read, "CM sachant lire selon le sexe")
+literacy_3level_sex(cm_site, s1a, "Aptitude à la lecture des CM selon le sexe")
 ```
 
-```{r fig_cm_r_sex}
-#| fig-cap: "Pourcentages — CM sachant lire selon le sexe"
-literacy_bar(cm_read, "CM sachant lire selon le sexe")
+```{r fig_cm_read_sex}
+#| fig-cap: "Aptitude à la lecture des CM selon le sexe"
+literacy_3level_bar(cm_site, s1a, "Aptitude à la lecture des CM selon le sexe")
 ```
 
-```{r dl_tbl_cm_r_sex}
+```{r dl_tbl_cm_read_sex}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_cm_r_sex", "04", function(d) {
-  d |> filter(m6 == 1, s1a == 1) |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+dl_tbl_variants("tbl_cm_read_sex", "04", function(d) {
+  d |> filter(m6 == 1) |>
+    mutate(Sexe = classify_sex(m4), Niveau = classify_literacy(s1a)) |>
+    filter(!is.na(Sexe), !is.na(Niveau)) |>
+    count(Observatory, Sexe, Niveau) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
 
 #### Savoir écrire
 
-```{r cm_w}
-cm_write <- cm_site |> filter(s1b == 1)
-literacy_table_obs(cm_write, "CM sachant écrire")
+```{r cm_write}
+literacy_3level(cm_site, s1b, "Aptitude à l'écriture des chefs de ménage")
 ```
 
-```{r dl_tbl_cm_w}
+```{r dl_tbl_cm_write}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_cm_w", "04", function(d) {
-  d |> filter(m6 == 1, s1b == 1) |>
-    count(Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, members)
-```
-
-```{r cm_w_sex}
-#| results: asis
-literacy_by_sex(cm_write, "CM sachant écrire selon le sexe")
-```
-
-```{r fig_cm_w_sex}
-#| fig-cap: "Pourcentages — CM sachant écrire selon le sexe"
-literacy_bar(cm_write, "CM sachant écrire selon le sexe")
-```
-
-```{r dl_tbl_cm_w_sex}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_cm_w_sex", "04", function(d) {
-  d |> filter(m6 == 1, s1b == 1) |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe) |>
+dl_tbl_variants("tbl_cm_write", "04", function(d) {
+  d |> filter(m6 == 1) |>
+    mutate(Niveau = classify_literacy(s1b)) |>
+    filter(!is.na(Niveau)) |>
+    count(Observatory, Niveau) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
 
+```{r cm_write_sex}
+#| results: asis
+literacy_3level_sex(cm_site, s1b, "Aptitude à l'écriture des CM selon le sexe")
+```
+
+```{r fig_cm_write_sex}
+#| fig-cap: "Aptitude à l'écriture des CM selon le sexe"
+literacy_3level_bar(cm_site, s1b, "Aptitude à l'écriture des CM selon le sexe")
+```
+
+```{r dl_tbl_cm_write_sex}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_cm_write_sex", "04", function(d) {
+  d |> filter(m6 == 1) |>
+    mutate(Sexe = classify_sex(m4), Niveau = classify_literacy(s1b)) |>
+    filter(!is.na(Sexe), !is.na(Niveau)) |>
+    count(Observatory, Sexe, Niveau) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
 ### Activités principales des Chefs de ménage
 
 L'activité économique principale des chefs de ménage traduit la structure productive de chaque observatoire. Les activités sont regroupées en catégories sectorielles inspirées de la CITI Rév. 4 afin de garantir un effectif suffisant dans chaque classe et de préserver la confidentialité statistique.
@@ -1176,7 +1142,7 @@ Le niveau d'éducation des autres membres de ménage complète le portrait éduc
 
 ```{r other_educ}
 other_educ <- others |>
-  mutate(Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+  mutate(Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
   count(Observatory, Niv_education) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
   mutate(Valeur = paste0(pct, "%")) |>
@@ -1194,7 +1160,7 @@ gt(other_educ) |>
 #| results: asis
 dl_tbl_variants("tbl_other_educ", "04", function(d) {
   d |> filter(m6 != 1) |>
-    mutate(Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+    mutate(Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
     count(Observatory, Niv_education) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
@@ -1207,7 +1173,7 @@ dl_tbl_variants("tbl_other_educ", "04", function(d) {
 other_educ_sex <- others |>
   mutate(
     Sexe = classify_sex(m4),
-    Niv_education = classify_education(s3a) |> replace_na("Inconnu")
+    Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")
   ) |>
   filter(!is.na(Sexe)) |>
   count(Observatory, Sexe, Niv_education) |>
@@ -1233,7 +1199,7 @@ gt(other_educ_sex) |>
 dl_tbl_variants("tbl_other_educ_sex", "04", function(d) {
   d |> filter(m6 != 1) |>
     mutate(Sexe = classify_sex(m4),
-           Niv_education = classify_education(s3a) |> replace_na("Inconnu")) |>
+           Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
     count(Observatory, Sexe, Niv_education) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
@@ -1242,126 +1208,89 @@ dl_tbl_variants("tbl_other_educ_sex", "04", function(d) {
 
 #### Alphabétisation des autres membres
 
-##### Savoir lire et écrire
-
-```{r other_rw}
-other_rw <- others_site |> filter(s1a == 1, s1b == 1)
-literacy_table_obs(other_rw, "Autres membres sachant lire et écrire")
-```
-
-```{r dl_tbl_other_rw}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_other_rw", "04", function(d) {
-  d |> filter(m6 != 1, s1a == 1, s1b == 1) |>
-    count(Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, members)
-```
-
-```{r other_rw_sex}
-#| results: asis
-literacy_by_sex(other_rw, "Autres membres sachant lire et écrire selon le sexe")
-```
-
-```{r fig_other_rw_sex}
-#| fig-cap: "Pourcentages — Autres membres sachant lire et écrire selon le sexe"
-literacy_bar(other_rw, "Autres membres sachant lire et écrire selon le sexe")
-```
-
-```{r dl_tbl_other_rw_sex}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_other_rw_sex", "04", function(d) {
-  d |> filter(m6 != 1, s1a == 1, s1b == 1) |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, members)
-```
-
 ##### Savoir lire
 
-```{r other_r}
-other_read <- others_site |> filter(s1a == 1)
-literacy_table_obs(other_read, "Autres membres sachant lire")
+```{r other_read}
+literacy_3level(others_site, s1a, "Aptitude à la lecture des autres membres")
 ```
 
-```{r dl_tbl_other_r}
+```{r dl_tbl_other_read}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_other_r", "04", function(d) {
-  d |> filter(m6 != 1, s1a == 1) |>
-    count(Observatory) |>
+dl_tbl_variants("tbl_other_read", "04", function(d) {
+  d |> filter(m6 != 1) |>
+    mutate(Niveau = classify_literacy(s1a)) |>
+    filter(!is.na(Niveau)) |>
+    count(Observatory, Niveau) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
 
-```{r other_r_sex}
+```{r other_read_sex}
 #| results: asis
-literacy_by_sex(other_read, "Autres membres sachant lire selon le sexe")
+literacy_3level_sex(others_site, s1a, "Aptitude à la lecture des autres membres selon le sexe")
 ```
 
-```{r fig_other_r_sex}
-#| fig-cap: "Pourcentages — Autres membres sachant lire selon le sexe"
-literacy_bar(other_read, "Autres membres sachant lire selon le sexe")
+```{r fig_other_read_sex}
+#| fig-cap: "Aptitude à la lecture des autres membres selon le sexe"
+literacy_3level_bar(others_site, s1a, "Aptitude à la lecture des autres membres selon le sexe")
 ```
 
-```{r dl_tbl_other_r_sex}
+```{r dl_tbl_other_read_sex}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_other_r_sex", "04", function(d) {
-  d |> filter(m6 != 1, s1a == 1) |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+dl_tbl_variants("tbl_other_read_sex", "04", function(d) {
+  d |> filter(m6 != 1) |>
+    mutate(Sexe = classify_sex(m4), Niveau = classify_literacy(s1a)) |>
+    filter(!is.na(Sexe), !is.na(Niveau)) |>
+    count(Observatory, Sexe, Niveau) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
 
 ##### Savoir écrire
 
-```{r other_w}
-other_write <- others_site |> filter(s1b == 1)
-literacy_table_obs(other_write, "Autres membres sachant écrire")
+```{r other_write}
+literacy_3level(others_site, s1b, "Aptitude à l'écriture des autres membres")
 ```
 
-```{r dl_tbl_other_w}
+```{r dl_tbl_other_write}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_other_w", "04", function(d) {
-  d |> filter(m6 != 1, s1b == 1) |>
-    count(Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, members)
-```
-
-```{r other_w_sex}
-#| results: asis
-literacy_by_sex(other_write, "Autres membres sachant écrire selon le sexe")
-```
-
-```{r fig_other_w_sex}
-#| fig-cap: "Pourcentages — Autres membres sachant écrire selon le sexe"
-literacy_bar(other_write, "Autres membres sachant écrire selon le sexe")
-```
-
-```{r dl_tbl_other_w_sex}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_other_w_sex", "04", function(d) {
-  d |> filter(m6 != 1, s1b == 1) |>
-    mutate(Sexe = classify_sex(m4)) |>
-    filter(!is.na(Sexe)) |>
-    count(Observatory, Sexe) |>
+dl_tbl_variants("tbl_other_write", "04", function(d) {
+  d |> filter(m6 != 1) |>
+    mutate(Niveau = classify_literacy(s1b)) |>
+    filter(!is.na(Niveau)) |>
+    count(Observatory, Niveau) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
 
+```{r other_write_sex}
+#| results: asis
+literacy_3level_sex(others_site, s1b, "Aptitude à l'écriture des autres membres selon le sexe")
+```
+
+```{r fig_other_write_sex}
+#| fig-cap: "Aptitude à l'écriture des autres membres selon le sexe"
+literacy_3level_bar(others_site, s1b, "Aptitude à l'écriture des autres membres selon le sexe")
+```
+
+```{r dl_tbl_other_write_sex}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_other_write_sex", "04", function(d) {
+  d |> filter(m6 != 1) |>
+    mutate(Sexe = classify_sex(m4), Niveau = classify_literacy(s1b)) |>
+    filter(!is.na(Sexe), !is.na(Niveau)) |>
+    count(Observatory, Sexe, Niveau) |>
+    mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
+    rename(Site = Observatory, Effectif = n)
+}, members)
+```
 ### Scolarisation
 
 Le taux de scolarisation des enfants de 6 à 14 ans constitue un indicateur clé du développement humain et de l'investissement des ménages dans l'éducation.
@@ -1411,6 +1340,8 @@ dl_tbl_variants("tbl_schooling", "04", function(d) {
 }, members)
 ```
 
+::: {.content-visible when-profile="consolidated"}
+
 #### Classe suivie 2024-2025
 
 ```{r class_attended}
@@ -1455,6 +1386,8 @@ dl_tbl_variants("tbl_class", "04", function(d) {
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
+
+:::
 
 #### Raisons de non fréquentation de l'école pour les 6 à 15 ans
 
@@ -1710,6 +1643,8 @@ dl_fig_variants("fig_other_act_sex", "04", function(d) {
 }, members)
 ```
 
+::: {.content-visible when-profile="consolidated"}
+
 ## Évolution des indicateurs démographiques (1996-2025) {#sec-demog-multiyear}
 
 Les observatoires disposent de données démographiques depuis les années 1990. Cette section retrace l'évolution de quatre indicateurs clés : la taille moyenne des ménages, la proportion de chefs de ménage femmes, le taux de scolarisation des 6-14 ans et l'âge moyen du chef de ménage.
@@ -1852,3 +1787,5 @@ if ("age_cm_moy" %in% names(demog_trends)) {
     theme_minimal()
 }
 ```
+
+:::

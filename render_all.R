@@ -49,17 +49,78 @@ clean_stale_files <- function() {
   invisible(NULL)
 }
 
-clean_stale_files()
+## Rescue output files that Quarto leaves at the project root instead of
+## placing in the output-dir (happens when the cleanup step fails on Windows).
+rescue_outputs <- function(output_dir, output_stem) {
+  for (ext in c(".pdf", ".docx")) {
+    root_file <- paste0(output_stem, ext)
+    if (file.exists(root_file)) {
+      dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+      dest <- file.path(output_dir, root_file)
+      file.copy(root_file, dest, overwrite = TRUE)
+      file.remove(root_file)
+      cat("  Rescued:", root_file, "->", dest, "\n")
+    }
+  }
+}
 
-run_render("1/3  Rendering consolidated (HTML + PDF + DOCX)", "quarto render")
-run_render(
-  "2/3  Rendering Marovoay (PDF + DOCX)",
-  "quarto render --profile marovoay"
-)
-run_render(
-  "3/3  Rendering Alaotra (PDF + DOCX)",
-  "quarto render --profile alaotra"
-)
+## Also remove stale .rmarkdown files left at root by knitr
+clean_stale_rmarkdown <- function() {
+  rmd <- list.files(".", pattern = "\\.rmarkdown$", full.names = TRUE)
+  if (length(rmd) > 0) {
+    file.remove(rmd)
+    cat("Removed stale .rmarkdown files:", paste(rmd, collapse = ", "), "\n")
+  }
+}
+
+# --- 1/3: Consolidated (HTML + PDF + DOCX) ---
+# Render HTML first (fast, no xelatex cleanup issues).
+# First render cleans output-dir; subsequent passes use --no-clean
+# so they don't wipe previously rendered formats.
+clean_stale_files()
+run_render("1a/3  Consolidated — HTML", "quarto render --to html")
+clean_stale_files()
+clean_stale_rmarkdown()
+
+# Render PDF separately so a cleanup failure doesn't block DOCX
+run_render("1b/3  Consolidated — PDF", "quarto render --to pdf --no-clean")
+clean_stale_files()
+clean_stale_rmarkdown()
+rescue_outputs("docs", "rapport-consolide")
+
+# Render DOCX separately
+run_render("1c/3  Consolidated — DOCX", "quarto render --to docx --no-clean")
+clean_stale_files()
+clean_stale_rmarkdown()
+rescue_outputs("docs", "rapport-consolide")
+
+# --- 2/3: Marovoay (PDF + DOCX) ---
+clean_stale_files()
+run_render("2a/3  Marovoay — PDF",
+           "quarto render --profile marovoay --to pdf")
+clean_stale_files()
+clean_stale_rmarkdown()
+rescue_outputs("docs-marovoay", "rapport-marovoay")
+
+run_render("2b/3  Marovoay — DOCX",
+           "quarto render --profile marovoay --to docx --no-clean")
+clean_stale_files()
+clean_stale_rmarkdown()
+rescue_outputs("docs-marovoay", "rapport-marovoay")
+
+# --- 3/3: Alaotra (PDF + DOCX) ---
+clean_stale_files()
+run_render("3a/3  Alaotra — PDF",
+           "quarto render --profile alaotra --to pdf")
+clean_stale_files()
+clean_stale_rmarkdown()
+rescue_outputs("docs-alaotra", "rapport-alaotra")
+
+run_render("3b/3  Alaotra — DOCX",
+           "quarto render --profile alaotra --to docx --no-clean")
+clean_stale_files()
+clean_stale_rmarkdown()
+rescue_outputs("docs-alaotra", "rapport-alaotra")
 
 # Copy per-observatory outputs into docs/downloads/ so the HTML links work
 cat("\n=== Assembling download files ===\n")
@@ -82,6 +143,9 @@ for (f in files_to_copy) {
 }
 
 # --- Verify expected outputs ---
+# Note: render_errors may include "FAILED" entries due to Quarto's
+# safeRemoveDirSync bug on Windows, even though the outputs were produced.
+# We check actual file existence rather than relying solely on exit codes.
 cat("\n=== Checking expected outputs ===\n")
 expected <- c(
   "docs/index.html",
@@ -95,15 +159,37 @@ expected <- c(
 
 missing <- expected[!file.exists(expected)]
 
-if (length(missing) == 0 && length(render_errors) == 0) {
+# Filter render_errors: if a render "failed" but all its outputs exist,
+# it was likely just the cleanup bug
+real_errors <- character(0)
+for (e in render_errors) {
+  # Consolidated renders (any format)
+  if (grepl("quarto render", e) && !grepl("--profile", e) &&
+      all(file.exists(c("docs/index.html", "docs/rapport-consolide.pdf",
+                         "docs/rapport-consolide.docx")))) {
+    cat("  Note:", e, "(outputs exist — cleanup bug only)\n")
+  } else if (grepl("--profile marovoay", e) &&
+             all(file.exists(c("docs-marovoay/rapport-marovoay.pdf",
+                                "docs-marovoay/rapport-marovoay.docx")))) {
+    cat("  Note:", e, "(outputs exist — cleanup bug only)\n")
+  } else if (grepl("--profile alaotra", e) &&
+             all(file.exists(c("docs-alaotra/rapport-alaotra.pdf",
+                                "docs-alaotra/rapport-alaotra.docx")))) {
+    cat("  Note:", e, "(outputs exist — cleanup bug only)\n")
+  } else {
+    real_errors <- c(real_errors, e)
+  }
+}
+
+if (length(missing) == 0 && length(real_errors) == 0) {
   cat("\nAll 7 outputs produced successfully:\n")
   for (f in expected) {
     cat("  OK:", f, "\n")
   }
 } else {
-  if (length(render_errors) > 0) {
+  if (length(real_errors) > 0) {
     cat("\nRender errors:\n")
-    for (e in render_errors) {
+    for (e in real_errors) {
       cat("  ", e, "\n")
     }
   }

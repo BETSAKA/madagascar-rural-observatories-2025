@@ -262,7 +262,7 @@ Le mode d'éclairage reflète le niveau d'accès à l'énergie moderne. Les mén
 ```{r lighting}
 light <- res_h |>
   left_join(obs_site, by = "j5") |>
-  tabulate_binary_set("h7")
+  tabulate_binary_set("h7", exclude_pattern = "h7c[12]|h7i_autre")
 
 light |>
   obs_gt() |>
@@ -275,15 +275,35 @@ light |>
 light |> make_bar_obs(title = obs_title("Modes d'éclairage"))
 ```
 
+Parmi les ménages utilisant le solaire, la proportion disposant d'un panneau en état de marche est présentée ci-dessous.
+
+```{r solar_panel_status}
+solar_users <- res_h |>
+  left_join(obs_site, by = "j5") |>
+  filter(h7c == 1, !is.na(h7c1))
+
+solar_status <- solar_users |>
+  count(Observatory, En_marche = if_else(h7c1 == 1, "Oui", "Non")) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  mutate(Valeur = paste0(pct, "%")) |>
+  select(Observatory, En_marche, Valeur) |>
+  pivot_wider(names_from = Observatory, values_from = Valeur, values_fill = "-")
+
+gt(solar_status) |>
+  tab_header(title = "Panneau solaire en état de marche (parmi les utilisateurs du solaire)") |>
+  cols_label(En_marche = "En marche") |>
+  style_table()
+```
+
 ```{r dl_lighting}
 #| echo: false
 #| results: asis
 dl_tbl_variants("tbl_lighting", "05", function(d) {
-  d |> tabulate_binary_set("h7") |>
+  d |> tabulate_binary_set("h7", exclude_pattern = "h7c[12]|h7i_autre") |>
     rename(Site = Observatory, Effectif = n, `%` = pct)
 }, res_h |> left_join(obs, by = "j5"))
 dl_fig_variants("fig_lighting", "05", function(d) {
-  d |> tabulate_binary_set("h7") |>
+  d |> tabulate_binary_set("h7", exclude_pattern = "h7c[12]|h7i_autre") |>
     make_bar_obs(title = "Modes d'eclairage par observatoire")
 }, res_h |> left_join(obs, by = "j5"))
 ```
@@ -295,8 +315,12 @@ La quasi-totalité des ménages ruraux malgaches dépendent de la biomasse pour 
 ```{r cooking}
 cooking <- res_h |>
   left_join(obs_site, by = "j5") |>
-  tabulate_binary_set("h6") |>
-  mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type))
+  tabulate_binary_set("h6", exclude_pattern = "h6a1|h6e_autre") |>
+  mutate(Type = case_when(
+    str_detect(Type, "(?i)r\u00e9sin") ~ "Bois de chauffe",
+    str_detect(Type, "(?i)autre.*pr") ~ "Autre",
+    TRUE ~ Type
+  ))
 
 cooking |>
   obs_gt() |>
@@ -313,13 +337,21 @@ cooking |> make_bar_obs(title = obs_title("Modes de cuisson"))
 #| echo: false
 #| results: asis
 dl_tbl_variants("tbl_cooking", "05", function(d) {
-  d |> tabulate_binary_set("h6") |>
-    mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type)) |>
+  d |> tabulate_binary_set("h6", exclude_pattern = "h6a1|h6e_autre") |>
+    mutate(Type = case_when(
+      str_detect(Type, "(?i)r\u00e9sin") ~ "Bois de chauffe",
+      str_detect(Type, "(?i)autre.*pr") ~ "Autre",
+      TRUE ~ Type
+    )) |>
     rename(Site = Observatory, Effectif = n, `%` = pct)
 }, res_h |> left_join(obs, by = "j5"))
 dl_fig_variants("fig_cooking", "05", function(d) {
-  d |> tabulate_binary_set("h6") |>
-    mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type)) |>
+  d |> tabulate_binary_set("h6", exclude_pattern = "h6a1|h6e_autre") |>
+    mutate(Type = case_when(
+      str_detect(Type, "(?i)r\u00e9sin") ~ "Bois de chauffe",
+      str_detect(Type, "(?i)autre.*pr") ~ "Autre",
+      TRUE ~ Type
+    )) |>
     make_bar_obs(title = "Modes de cuisson par observatoire")
 }, res_h |> left_join(obs, by = "j5"))
 ```
@@ -335,7 +367,7 @@ Les biens de confort courant (mobilier, ustensiles, outils) renseignent sur le n
 ```{r comfort_goods}
 comfort <- res_v |>
   left_join(obs_site, by = "j5") |>
-  tabulate_binary_set("v") |>
+  tabulate_binary_set("v", count_mode = TRUE) |>
   mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type))
 
 comfort |>
@@ -353,12 +385,12 @@ comfort |> make_bar_obs(title = obs_title("Biens de confort courants"))
 #| echo: false
 #| results: asis
 dl_tbl_variants("tbl_comfort", "05", function(d) {
-  d |> tabulate_binary_set("v") |>
+  d |> tabulate_binary_set("v", count_mode = TRUE) |>
     mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type)) |>
     rename(Site = Observatory, Effectif = n, `%` = pct)
 }, res_v |> left_join(obs, by = "j5"))
 dl_fig_variants("fig_comfort", "05", function(d) {
-  d |> tabulate_binary_set("v") |>
+  d |> tabulate_binary_set("v", count_mode = TRUE) |>
     mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type)) |>
     make_bar_obs(title = "Biens de confort courants par observatoire")
 }, res_v |> left_join(obs, by = "j5"))
@@ -369,9 +401,19 @@ dl_fig_variants("fig_comfort", "05", function(d) {
 L'équipement agricole conditionne la productivité et la capacité d'extension des surfaces cultivées. La possession de matériel mécanisé ou de traction animale constitue un facteur de différenciation important entre les ménages.
 
 ```{r agri_equipment}
+# Keep common hand tools + mechanisation/traction items
+equip_keep <- c(
+  "Angady", "Faucille/Coupe-coupe", "Hache", "Arrosoir/Sceau", "Couteau",
+  "R\u00e2teau, fourche", "Houe", "Pioche",
+  "Charrue", "Herse/Pulv\u00e9riseur/Rotovat", "Sarcleuse",
+  "Charrette attel\u00e9e", "Motoculteur, type Kubota", "Tracteur",
+  "Pulv\u00e9risateur", "Pompe hydraulique"
+)
+
 equip_data <- res_e |>
   left_join(obs_site, by = "j5") |>
-  mutate(Equipement = decode_labelled(e11))
+  mutate(Equipement = decode_labelled(e11)) |>
+  filter(Equipement != "", str_detect(Equipement, paste(equip_keep, collapse = "|")))
 
 tools <- equip_data |> count(Observatory, Equipement, name = "N_outils")
 households <- equip_data |>
@@ -417,12 +459,14 @@ p_equip
 #| results: asis
 dl_tbl_variants("tbl_agri_equip", "05", function(d) {
   d |> mutate(Equipement = decode_labelled(e11)) |>
+    filter(Equipement != "", str_detect(Equipement, paste(equip_keep, collapse = "|"))) |>
     count(Observatory, Equipement) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
 }, res_e |> left_join(obs, by = "j5"))
 dl_fig_variants("fig_agri_equip", "05", function(d) {
   equip <- d |> mutate(Equipement = decode_labelled(e11)) |>
+    filter(Equipement != "", str_detect(Equipement, paste(equip_keep, collapse = "|"))) |>
     distinct(j5, Observatory, Equipement) |>
     count(Observatory, Equipement, name = "N_menages") |>
     left_join(d |> distinct(j5, Observatory) |> count(Observatory, name = "total"),

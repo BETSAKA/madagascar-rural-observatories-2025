@@ -329,13 +329,9 @@ Ces comparaisons doivent donc être lues comme des **ordres de grandeur**, non c
 ```{r load_rgph}
 #| include: false
 
-# RGPH evaluation disabled — loading the 579 MB SPSS files is too slow
-# for routine renders. Set to TRUE to re-enable RGPH comparison sections.
-rgph_available <- FALSE
-
-# rgph_men_path <- "data/RGPH_2018_Madagascar/data/INSTAT_BD_SPSS_MENAGES_10pc_RGPH-3_2018.sav"
-# rgph_res_path <- "data/RGPH_2018_Madagascar/data/INSTAT_BD_SPSS_RESIDENTS_10pc_RGPH-3_2018.sav"
-# rgph_available <- file.exists(rgph_men_path) && file.exists(rgph_res_path)
+rgph_men_path <- "data/RGPH_2018_Madagascar/data/INSTAT_BD_SPSS_MENAGES_10pc_RGPH-3_2018.sav"
+rgph_res_path <- "data/RGPH_2018_Madagascar/data/INSTAT_BD_SPSS_RESIDENTS_10pc_RGPH-3_2018.sav"
+rgph_available <- file.exists(rgph_men_path) && file.exists(rgph_res_path)
 ```
 
 ```{r rgph_comparison}
@@ -632,58 +628,38 @@ rgph_water <- rgph_res_or |>
 #| eval: !expr rgph_available
 #| tbl-cap: "Indicateurs socio-économiques complémentaires — OR 2025 vs. RGPH 2018"
 
-# Fonction utilitaire pour extraire une valeur
-get_v <- function(df, obs, col) {
-  val <- df[[col]][df$Observatory == obs]
-  if (length(val) == 0 || is.null(val)) NA_real_ else val
+# Build comparison table via row-binding (avoids c() length issues across
+# different knitr/format contexts).
+get_row <- function(label, or_df, or_col, rgph_df, rgph_col) {
+  safe_val <- function(df, obs, col) {
+    if (!col %in% names(df)) return(NA_real_)
+    v <- df[[col]][df$Observatory == obs]
+    if (length(v) == 0) NA_real_ else as.double(v[1L])
+  }
+  tibble(
+    Indicateur   = label,
+    Alaotra_OR   = safe_val(or_df,   "Alaotra",  or_col),
+    Alaotra_RGPH = safe_val(rgph_df, "Alaotra",  rgph_col),
+    Marovoay_OR  = safe_val(or_df,   "Marovoay", or_col),
+    Marovoay_RGPH = safe_val(rgph_df, "Marovoay", rgph_col)
+  )
 }
 
-ext_comp <- tibble(
-  Indicateur = c(
-    "Alphabétisation (≥15 ans, %)",
-    "Jamais scolarisé (≥6 ans, %)",
-    "CM marié(e)/en union (%)",
-    "CM veuf/divorcé (%)",
-    "Murs en dur (%)",
-    "Murs en terre/pisé (%)",
-    "Eau améliorée (%)"
-  ),
-  Alaotra_OR = c(
-    get_v(or_lit, "Alaotra", "pct_lit_OR"),
-    get_v(or_educ, "Alaotra", "pct_jamais_OR"),
-    get_v(or_marital, "Alaotra", "OR_marie"),
-    get_v(or_marital, "Alaotra", "OR_veuf_div"),
-    get_v(or_wall, "Alaotra", "OR_Dur"),
-    get_v(or_wall, "Alaotra", "OR_Terre/pisé"),
-    get_v(or_water, "Alaotra", "OR_Amélioré")
-  ),
-  Alaotra_RGPH = c(
-    get_v(rgph_lit, "Alaotra", "pct_lit_RGPH"),
-    get_v(rgph_educ, "Alaotra", "pct_jamais_RGPH"),
-    get_v(rgph_marital, "Alaotra", "RGPH_marie"),
-    get_v(rgph_marital, "Alaotra", "RGPH_veuf_div"),
-    get_v(rgph_wall, "Alaotra", "RGPH_Dur"),
-    get_v(rgph_wall, "Alaotra", "RGPH_Terre/pisé"),
-    get_v(rgph_water, "Alaotra", "RGPH_Amélioré")
-  ),
-  Marovoay_OR = c(
-    get_v(or_lit, "Marovoay", "pct_lit_OR"),
-    get_v(or_educ, "Marovoay", "pct_jamais_OR"),
-    get_v(or_marital, "Marovoay", "OR_marie"),
-    get_v(or_marital, "Marovoay", "OR_veuf_div"),
-    get_v(or_wall, "Marovoay", "OR_Dur"),
-    get_v(or_wall, "Marovoay", "OR_Terre/pisé"),
-    get_v(or_water, "Marovoay", "OR_Amélioré")
-  ),
-  Marovoay_RGPH = c(
-    get_v(rgph_lit, "Marovoay", "pct_lit_RGPH"),
-    get_v(rgph_educ, "Marovoay", "pct_jamais_RGPH"),
-    get_v(rgph_marital, "Marovoay", "RGPH_marie"),
-    get_v(rgph_marital, "Marovoay", "RGPH_veuf_div"),
-    get_v(rgph_wall, "Marovoay", "RGPH_Dur"),
-    get_v(rgph_wall, "Marovoay", "RGPH_Terre/pisé"),
-    get_v(rgph_water, "Marovoay", "RGPH_Amélioré")
-  )
+ext_comp <- bind_rows(
+  get_row("Alphabétisation (≥15 ans, %)",
+          or_lit, "pct_lit_OR", rgph_lit, "pct_lit_RGPH"),
+  get_row("Jamais scolarisé (≥6 ans, %)",
+          or_educ, "pct_jamais_OR", rgph_educ, "pct_jamais_RGPH"),
+  get_row("CM marié(e)/en union (%)",
+          or_marital, "OR_marie", rgph_marital, "RGPH_marie"),
+  get_row("CM veuf/divorcé (%)",
+          or_marital, "OR_veuf_div", rgph_marital, "RGPH_veuf_div"),
+  get_row("Murs en dur (%)",
+          or_wall, "OR_Dur", rgph_wall, "RGPH_Dur"),
+  get_row("Murs en terre/pisé (%)",
+          or_wall, "OR_Terre/pisé", rgph_wall, "RGPH_Terre/pisé"),
+  get_row("Eau améliorée (%)",
+          or_water, "OR_Amélioré", rgph_water, "RGPH_Amélioré")
 )
 
 ext_comp |>

@@ -244,6 +244,8 @@ dl_fig_variants("fig_reaction", "13", function(d) {
 }, res_remq, width = 8, height = 4)
 ```
 
+::: {.content-visible when-profile="consolidated"}
+
 ## Codes aberrants à signaler pour l'apurement {#sec-codes-aberrants}
 
 ::: {.callout-warning}
@@ -369,3 +371,5 @@ dl_tbl_variants("tbl_synthese_qualite", "13", function(d) {
 ## Remarques générales
 
 Le champ `rmq_gle` recueille les remarques libres de l'enquêteur en fin d'entretien. Sur les `r nrow(res_remq)` ménages, `r res_remq |> filter(rmq_gle != "" & !str_detect(str_to_upper(rmq_gle), "^R\\.?A\\.?S\\.?$")) |> nrow()` comportent une remarque substantielle (hors « RAS »). Ces remarques, rédigées en malgache, signalent notamment des difficultés rencontrées lors de l'entretien (répondant pressé, absences répétées, méfiance) ou apportent des précisions sur la situation du ménage.
+
+:::

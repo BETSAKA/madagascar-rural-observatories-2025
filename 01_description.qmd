@@ -397,7 +397,7 @@ gt(tab_ham, groupname_col = "Observatory") |>
 
 ### Période de collecte
 
-Les entretiens se sont déroulés entre début octobre et mi-novembre 2025. Un entretien isolé a été réalisé à Marovoay le 3 septembre ; il est exclu du chronogramme ci-dessous qui ne retient que les dates à partir du 1^er^ octobre 2025. Le @fig-chronogramme présente l'évolution cumulée du nombre d'entretiens réalisés.
+Les entretiens se sont déroulés entre début octobre et mi-novembre 2025. Un entretien isolé a été réalisé à Marovoay le 3 septembre. Le @fig-chronogramme présente l'évolution cumulée du nombre d'entretiens réalisés à partir du 1^er^ octobre 2025.
 
 ```{r}
 #| fig-cap: "Fréquences cumulées des entretiens par observatoire (à partir du 1er octobre 2025)"
@@ -410,7 +410,7 @@ chrono <- res_deb |>
     j14_str = sprintf("%08d", as.integer(j14)),
     date_interview = dmy(j14_str)
   ) |>
-  filter(!is.na(date_interview), date_interview >= as.Date("2025-10-01")) |>
+  filter(!is.na(date_interview)) |>
   count(Observatory, date_interview) |>
   arrange(Observatory, date_interview) |>
   mutate(cumul = cumsum(n), .by = Observatory)
@@ -418,6 +418,7 @@ chrono <- res_deb |>
 ggplot(chrono, aes(x = date_interview, y = cumul, color = Observatory)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 1.5) +
+  coord_cartesian(xlim = c(as.Date("2025-10-01"), NA)) +
   scale_x_date(
     date_breaks = "1 week", date_labels = "%d %b",
     expand = expansion(mult = c(0.01, 0.01))
@@ -436,7 +437,7 @@ res_deb |>
     j14_str = sprintf("%08d", as.integer(j14)),
     date_interview = dmy(j14_str)
   ) |>
-  filter(date_interview >= as.Date("2025-10-01")) |>
+  filter(!is.na(date_interview)) |>
   group_by(Observatory) |>
   summarise(
     Début = min(date_interview, na.rm = TRUE),
