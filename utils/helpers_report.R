@@ -685,7 +685,8 @@ make_bar_obs <- function(data, x = Type, y = pct, title = "") {
   if (n_obs > 1) {
     # Use 2 columns when many facets to avoid vertical cramming
     ncol_facet <- if (n_obs > 3) 2L else 1L
-    p <- p + ggplot2::facet_wrap(~Observatory, ncol = ncol_facet, scales = "free_y")
+    p <- p +
+      ggplot2::facet_wrap(~Observatory, ncol = ncol_facet, scales = "free_y")
   }
   p
 }
