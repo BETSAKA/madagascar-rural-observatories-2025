@@ -26,6 +26,7 @@ format:
     lang: fr
     toc: true
     echo: false
+    fig-cap-location: top
     geometry:
       - margin=2.2cm
     include-in-header:
@@ -34,7 +35,17 @@ format:
           \usepackage{caption}
           \captionsetup{font=small,labelfont=bf}
           \captionsetup[table]{skip=6pt}
+    include-before-body:
+      - text: |
+          \thispagestyle{empty}
+          \begin{center}
+          \vspace*{2cm}
+          \includegraphics[width=0.85\textwidth]{images/cover.jpg}
+          \end{center}
+          \clearpage
   docx:
     toc: true
     lang: fr
     echo: false
+    reference-doc: images/Modele_format_rapport.docx
+    fig-cap-location: top
