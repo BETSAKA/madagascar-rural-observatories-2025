@@ -23,3 +23,15 @@ registerS3method(
   knit_print.gt_tbl,
   envir = asNamespace("knitr")
 )
+
+# --- Figure height scaling for observatory profiles ---
+# Observatory reports show per-site facets (5 for Marovoay, 9 for Alaotra)
+# instead of 2 observatory facets. Scale fig.height proportionally so
+# individual panels remain readable in PDF/DOCX output.
+if (!REPORT_MODE$is_consolidated) {
+  .obs_fig_h_scale <- if (REPORT_MODE$observatory == "Marovoay") 1.5 else 2.0
+  knitr::opts_hooks$set(fig.height = function(options) {
+    options$fig.height <- min(options$fig.height * .obs_fig_h_scale, 20)
+    options
+  })
+}

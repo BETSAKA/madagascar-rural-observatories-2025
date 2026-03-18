@@ -659,6 +659,9 @@ tabulate_binary_set <- function(
 #' @param title Plot title
 make_bar_obs <- function(data, x = Type, y = pct, title = "") {
   n_obs <- dplyr::n_distinct(data$Observatory)
+  # Adaptive sizes: reduce text when many facets (observatory profiles)
+  base_sz <- if (n_obs > 3) 10 else 13
+  label_sz <- if (n_obs > 3) 2.5 else 3.5
   p <- ggplot2::ggplot(
     data,
     ggplot2::aes(
@@ -672,15 +675,17 @@ make_bar_obs <- function(data, x = Type, y = pct, title = "") {
     ggplot2::geom_text(
       ggplot2::aes(label = paste0({{ y }}, "%")),
       hjust = -0.1,
-      size = 3.5
+      size = label_sz
     ) +
     ggplot2::scale_y_continuous(
       expand = ggplot2::expansion(mult = c(0, 0.15))
     ) +
     ggplot2::labs(title = title, x = NULL, y = NULL) +
-    ggplot2::theme_minimal(base_size = 13)
+    ggplot2::theme_minimal(base_size = base_sz)
   if (n_obs > 1) {
-    p <- p + ggplot2::facet_wrap(~Observatory, ncol = 1, scales = "free_y")
+    # Use 2 columns when many facets to avoid vertical cramming
+    ncol_facet <- if (n_obs > 3) 2L else 1L
+    p <- p + ggplot2::facet_wrap(~Observatory, ncol = ncol_facet, scales = "free_y")
   }
   p
 }
