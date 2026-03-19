@@ -71,8 +71,10 @@ prepare_variant_data <- function(data, obs, site) {
   }
   # Order Observatory: sites alphabetically, "Tous" last
   site_levels <- sort(unique(result$Observatory[result$Observatory != "Tous"]))
-  result$Observatory <- factor(result$Observatory,
-                               levels = c(site_levels, "Tous"))
+  result$Observatory <- factor(
+    result$Observatory,
+    levels = c(site_levels, "Tous")
+  )
   result
 }
 
@@ -135,7 +137,9 @@ dl_fig_variants <- function(
 
   for (obs in obs_list) {
     variant <- prepare_variant_data(data, obs, "Tous")
-    if (nrow(variant) == 0) next
+    if (nrow(variant) == 0) {
+      next
+    }
 
     fname <- make_dl_filename(id, obs, "tous", "png")
     disk_path <- file.path(disk_dir, fname)
@@ -145,11 +149,18 @@ dl_fig_variants <- function(
       {
         p <- plot_fn(variant)
         ggplot2::ggsave(
-          disk_path, p,
-          width = width, height = height, dpi = dpi, bg = "white"
+          disk_path,
+          p,
+          width = width,
+          height = height,
+          dpi = dpi,
+          bg = "white"
         )
         links[[length(links) + 1]] <- list(
-          label = obs, obs = obs, href = web_path, ext = "png"
+          label = obs,
+          obs = obs,
+          href = web_path,
+          ext = "png"
         )
       },
       error = function(e) NULL
@@ -183,7 +194,9 @@ dl_tbl_variants <- function(id, chapter, tbl_fn, data, min_cell = 5) {
 
   for (obs in obs_list) {
     variant <- prepare_variant_data(data, obs, "Tous")
-    if (nrow(variant) == 0) next
+    if (nrow(variant) == 0) {
+      next
+    }
 
     fname <- make_dl_filename(id, obs, "tous", "xlsx")
     disk_path <- file.path(disk_dir, fname)
@@ -195,7 +208,10 @@ dl_tbl_variants <- function(id, chapter, tbl_fn, data, min_cell = 5) {
         tbl_df <- suppress_for_export(tbl_df, threshold = min_cell)
         writexl::write_xlsx(tbl_df, disk_path)
         links[[length(links) + 1]] <- list(
-          label = obs, obs = obs, href = web_path, ext = "xlsx"
+          label = obs,
+          obs = obs,
+          href = web_path,
+          ext = "xlsx"
         )
       },
       error = function(e) NULL
@@ -218,13 +234,19 @@ emit_download_links <- function(links) {
     return(invisible(NULL))
   }
 
-  parts <- vapply(links, function(item) {
-    ext_lbl <- toupper(item$ext)
-    sprintf(
-      '<a href="%s" download class="dl-link">\U{1F4E5} %s (%s)</a>',
-      item$href, item$label, ext_lbl
-    )
-  }, character(1))
+  parts <- vapply(
+    links,
+    function(item) {
+      ext_lbl <- toupper(item$ext)
+      sprintf(
+        '<a href="%s" download class="dl-link">\U{1F4E5} %s (%s)</a>',
+        item$href,
+        item$label,
+        ext_lbl
+      )
+    },
+    character(1)
+  )
 
   html <- paste0(
     '<div class="dl-downloads">\n',
