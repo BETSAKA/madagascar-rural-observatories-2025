@@ -391,16 +391,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Disponibilité)) <span class="sc">|&gt;</span></span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Ressource, Disponibilité) <span class="sc">|&gt;</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Ressource))</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Ressource))</span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dispo, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Ressource, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Disponibilité)) <span class="sc">+</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"fill"</span>) <span class="sc">+</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span>percent) <span class="sc">+</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Abondant"</span> <span class="ot">=</span> <span class="st">"#2ca02c"</span>, <span class="st">"Normal"</span> <span class="ot">=</span> <span class="st">"#ffbf00"</span>, <span class="st">"Peu ou pas"</span> <span class="ot">=</span> <span class="st">"#d62728"</span>)) <span class="sc">+</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">fill =</span> <span class="st">"Disponibilité"</span>) <span class="sc">+</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>dispo <span class="sc">|&gt;</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_stacked</span>(</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Ressource, <span class="at">y =</span> pct, <span class="at">fill =</span> Disponibilité,</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">direction =</span> <span class="st">"horizontal"</span>,</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">"Abondant"</span> <span class="ot">=</span> <span class="st">"#2ca02c"</span>, <span class="st">"Normal"</span> <span class="ot">=</span> <span class="st">"#ffbf00"</span>, <span class="st">"Peu ou pas"</span> <span class="ot">=</span> <span class="st">"#d62728"</span>)</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-ressources-dispo" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -415,69 +413,9 @@ Figure&nbsp;7.1: Disponibilité perçue des ressources naturelles dans la zone p
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_ressources_dispo_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ressources_dispo_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ressources_dispo_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ressources_dispo_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ressources_dispo_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_ressources_dispo_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_ressources_dispo_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_ressources_dispo_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ressources_dispo_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ressources_dispo_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ressources_dispo_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ressources_dispo_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ressources_dispo_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ressources_dispo_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ressources_dispo_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ressources_dispo_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="évolution-perçue-des-ressources" class="level3" data-number="7.1.2">
 <h3 data-number="7.1.2" class="anchored" data-anchor-id="évolution-perçue-des-ressources"><span class="header-section-number">7.1.2</span> Évolution perçue des ressources</h3>
@@ -498,16 +436,14 @@ Alaotra
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Évolution)) <span class="sc">|&gt;</span></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Ressource, Évolution) <span class="sc">|&gt;</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Ressource))</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Ressource))</span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(evol, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Ressource, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Évolution)) <span class="sc">+</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"fill"</span>) <span class="sc">+</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span>percent) <span class="sc">+</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"En augmentation"</span> <span class="ot">=</span> <span class="st">"#2ca02c"</span>, <span class="st">"Stable"</span> <span class="ot">=</span> <span class="st">"#ffbf00"</span>, <span class="st">"En diminution"</span> <span class="ot">=</span> <span class="st">"#d62728"</span>)) <span class="sc">+</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">fill =</span> <span class="st">"Évolution (3 ans)"</span>) <span class="sc">+</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>evol <span class="sc">|&gt;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_stacked</span>(</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Ressource, <span class="at">y =</span> pct, <span class="at">fill =</span> Évolution,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">direction =</span> <span class="st">"horizontal"</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">"En augmentation"</span> <span class="ot">=</span> <span class="st">"#2ca02c"</span>, <span class="st">"Stable"</span> <span class="ot">=</span> <span class="st">"#ffbf00"</span>, <span class="st">"En diminution"</span> <span class="ot">=</span> <span class="st">"#d62728"</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-evolution-ressources" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -522,69 +458,9 @@ Figure&nbsp;7.2: Évolution perçue des ressources naturelles au cours des 3 der
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_evolution_ressources_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evolution_ressources_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evolution_ressources_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evolution_ressources_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evolution_ressources_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_evolution_ressources_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_evolution_ressources_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_evolution_ressources_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evolution_ressources_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evolution_ressources_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evolution_ressources_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evolution_ressources_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evolution_ressources_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evolution_ressources_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evolution_ressources_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evolution_ressources_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="appartenance-perçue-de-la-zone" class="level3" data-number="7.1.3">
 <h3 data-number="7.1.3" class="anchored" data-anchor-id="appartenance-perçue-de-la-zone"><span class="header-section-number">7.1.3</span> Appartenance perçue de la zone</h3>
@@ -606,18 +482,10 @@ Alaotra
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) {</span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pct_oui</span>(res_op_env, var, label)</span>
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  }) <span class="sc">|&gt;</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"Alaotra"</span>, <span class="st">"Marovoay"</span>)), <span class="at">names_to =</span> <span class="st">"Groupe"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"Alaotra"</span>, <span class="st">"Marovoay"</span>)), <span class="at">names_to =</span> <span class="st">"Observatory"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(appart,</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Item, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Groupe)) <span class="sc">+</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(pct, <span class="st">"%"</span>)),</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.1</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Groupe) <span class="sc">+</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">100</span>)) <span class="sc">+</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% de ménages"</span>) <span class="sc">+</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>appart <span class="sc">|&gt;</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar</span>(<span class="at">x =</span> Item, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-appartenance" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -632,69 +500,9 @@ Figure&nbsp;7.3: À qui appartient la zone protégée ? (% de Oui, réponses mul
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_appartenance_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_appartenance_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_appartenance_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_appartenance_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_appartenance_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_appartenance_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_appartenance_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_appartenance_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_appartenance_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_appartenance_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_appartenance_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_appartenance_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_appartenance_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_appartenance_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_appartenance_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_appartenance_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="menaces-perçues-et-responsables" class="level3" data-number="7.1.4">
 <h3 data-number="7.1.4" class="anchored" data-anchor-id="menaces-perçues-et-responsables"><span class="header-section-number">7.1.4</span> Menaces perçues et responsables</h3>
@@ -763,7 +571,7 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
 </figcaption>
 <div aria-describedby="tbl-menaces-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="qybjefagbe" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="ihmwnuyfxy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -899,12 +707,13 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"Observatory"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(pct))</span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(menaces_long, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Item, pct), <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Section, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">ncol =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"%"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>menaces_long <span class="sc">|&gt;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Item =</span> <span class="fu">reorder</span>(Item, pct)) <span class="sc">|&gt;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_grouped</span>(</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Item, <span class="at">fill =</span> Observatory,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">y_label =</span> <span class="st">"%"</span>, <span class="at">direction =</span> <span class="st">"horizontal"</span>, <span class="at">facet =</span> <span class="cn">FALSE</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Section, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">ncol =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -915,69 +724,9 @@ Table&nbsp;7.1: Menaces perçues sur l’environnement et responsables identifi�
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/tbl_menaces_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_menaces_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_menaces_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_menaces_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_menaces_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/tbl_menaces_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/10/tbl_menaces_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/tbl_menaces_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_menaces_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_menaces_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_menaces_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_menaces_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_menaces_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_menaces_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_menaces_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_menaces_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="ce-que-représente-la-zone-pour-les-ménages" class="level3" data-number="7.1.5">
 <h3 data-number="7.1.5" class="anchored" data-anchor-id="ce-que-représente-la-zone-pour-les-ménages"><span class="header-section-number">7.1.5</span> Ce que représente la zone pour les ménages</h3>
@@ -1003,18 +752,10 @@ Alaotra
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>repr <span class="ot">&lt;-</span> rm5_items <span class="sc">|&gt;</span></span>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui</span>(res_op_env, var, label)) <span class="sc">|&gt;</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"Alaotra"</span>, <span class="st">"Marovoay"</span>)), <span class="at">names_to =</span> <span class="st">"Groupe"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"Alaotra"</span>, <span class="st">"Marovoay"</span>)), <span class="at">names_to =</span> <span class="st">"Observatory"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(repr,</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Item, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Groupe)) <span class="sc">+</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(pct, <span class="st">"%"</span>)),</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.1</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Groupe) <span class="sc">+</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">100</span>)) <span class="sc">+</span></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% de ménages"</span>) <span class="sc">+</span></span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>repr <span class="sc">|&gt;</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar</span>(<span class="at">x =</span> Item, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-representation" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1029,69 +770,9 @@ Figure&nbsp;7.4: Que représente la zone protégée pour les ménages ? (% de Ou
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_representation_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_representation_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_representation_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_representation_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_representation_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_representation_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_representation_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_representation_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_representation_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_representation_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_representation_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_representation_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_representation_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_representation_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_representation_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_representation_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 </section>
 <section id="sec-exploitation" class="level2" data-number="7.2">
@@ -1119,13 +800,8 @@ Alaotra
 <span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(res_deb <span class="sc">|&gt;</span> <span class="fu">count</span>(Observatory, <span class="at">name =</span> <span class="st">"n_tot"</span>), <span class="at">by =</span> <span class="st">"Observatory"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> n_tot <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>))</span>
 <span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ef_pct, <span class="fu">aes</span>(<span class="at">x =</span> Produit, <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(pct, <span class="dv">0</span>), <span class="st">"%"</span>)),</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>            <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.3</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des ménages"</span>) <span class="sc">+</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>ef_pct <span class="sc">|&gt;</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Produit, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% des ménages"</span>, <span class="at">show_pct =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-ef-produits" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1140,69 +816,9 @@ Figure&nbsp;7.5: Pourcentage de ménages pratiquant la collecte de produits fore
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_ef_produits_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_produits_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_produits_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_produits_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_produits_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_ef_produits_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_ef_produits_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_ef_produits_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_produits_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_produits_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_produits_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_produits_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_produits_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_produits_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_produits_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_produits_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1216,14 +832,14 @@ Alaotra
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Produit, Origine) <span class="sc">|&gt;</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Produit))</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Produit))</span>
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ef_orig, <span class="fu">aes</span>(<span class="at">x =</span> Produit, <span class="at">y =</span> pct, <span class="at">fill =</span> Origine)) <span class="sc">+</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"stack"</span>) <span class="sc">+</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Dans l'AP"</span> <span class="ot">=</span> <span class="st">"#d62728"</span>, <span class="st">"Hors AP"</span> <span class="ot">=</span> <span class="st">"#2ca02c"</span>)) <span class="sc">+</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des activités de collecte"</span>, <span class="at">fill =</span> <span class="st">"Origine"</span>) <span class="sc">+</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>ef_orig <span class="sc">|&gt;</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_stacked</span>(</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Produit, <span class="at">y =</span> pct, <span class="at">fill =</span> Origine,</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">proportion =</span> <span class="cn">FALSE</span>, <span class="at">direction =</span> <span class="st">"vertical"</span>,</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">"Dans l'AP"</span> <span class="ot">=</span> <span class="st">"#d62728"</span>, <span class="st">"Hors AP"</span> <span class="ot">=</span> <span class="st">"#2ca02c"</span>)</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-ef-origine" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1238,69 +854,9 @@ Figure&nbsp;7.6: Origine des produits forestiers collectés (dans ou hors Aire P
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_ef_origine_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_origine_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_origine_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_origine_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_origine_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_ef_origine_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_ef_origine_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_ef_origine_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_origine_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_origine_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_origine_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_origine_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_origine_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_origine_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_origine_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_origine_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="saisonnalité-de-la-collecte-forestière" class="level3" data-number="7.2.2">
 <h3 data-number="7.2.2" class="anchored" data-anchor-id="saisonnalité-de-la-collecte-forestière"><span class="header-section-number">7.2.2</span> Saisonnalité de la collecte forestière</h3>
@@ -1320,14 +876,14 @@ Alaotra
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">actif =</span> <span class="fu">if_else</span>(actif <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="at">missing =</span> <span class="dv">0</span>)</span>
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_actif =</span> <span class="fu">sum</span>(actif), <span class="at">n_total =</span> <span class="fu">n</span>(), <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Produit, Mois)) <span class="sc">|&gt;</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n_actif <span class="sc">/</span> n_total <span class="sc">*</span> <span class="dv">100</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n_actif <span class="sc">/</span> n_total <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>))</span>
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ef_saison, <span class="fu">aes</span>(<span class="at">x =</span> Mois, <span class="at">y =</span> pct, <span class="at">color =</span> Produit, <span class="at">group =</span> Produit)) <span class="sc">+</span></span>
 <span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
 <span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
 <span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
 <span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% actifs"</span>, <span class="at">color =</span> <span class="st">"Produit"</span>) <span class="sc">+</span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_ror</span>() <span class="sc">+</span></span>
 <span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
@@ -1343,69 +899,9 @@ Figure&nbsp;7.7: Saisonnalité de la collecte de produits forestiers (% de ména
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_ef_saison_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_saison_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_saison_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_saison_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_saison_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_ef_saison_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_ef_saison_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_ef_saison_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_saison_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_saison_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_saison_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_saison_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_saison_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_saison_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_saison_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_ef_saison_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="commercialisation-des-produits-forestiers" class="level3" data-number="7.2.3">
 <h3 data-number="7.2.3" class="anchored" data-anchor-id="commercialisation-des-produits-forestiers"><span class="header-section-number">7.2.3</span> Commercialisation des produits forestiers</h3>
@@ -1450,7 +946,7 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
 </figcaption>
 <div aria-describedby="tbl-ef-vente-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="flmozhqdzj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="wfklrxelga" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1519,69 +1015,9 @@ Table&nbsp;7.2: Part des ménages vendant les produits forestiers et montant moy
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/tbl_ef_vente_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_ef_vente_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_ef_vente_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_ef_vente_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_ef_vente_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/tbl_ef_vente_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/10/tbl_ef_vente_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/tbl_ef_vente_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_ef_vente_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_ef_vente_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_ef_vente_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_ef_vente_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_ef_vente_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_ef_vente_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_ef_vente_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_ef_vente_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="fréquentation-de-laire-protégée" class="level3" data-number="7.2.4">
 <h3 data-number="7.2.4" class="anchored" data-anchor-id="fréquentation-de-laire-protégée"><span class="header-section-number">7.2.4</span> Fréquentation de l’Aire protégée</h3>
@@ -1638,7 +1074,7 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
 </figcaption>
 <div aria-describedby="tbl-frequentation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="ainxkyungk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="msdswjbxbo" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1701,69 +1137,9 @@ Table&nbsp;7.3: Fréquentation et connaissance de l’Aire protégée
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/tbl_frequentation_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_frequentation_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_frequentation_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_frequentation_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_frequentation_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/tbl_frequentation_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/10/tbl_frequentation_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/tbl_frequentation_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_frequentation_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_frequentation_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_frequentation_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_frequentation_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_frequentation_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_frequentation_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_frequentation_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_frequentation_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="raisons-de-non-fréquentation" class="level3" data-number="7.2.5">
 <h3 data-number="7.2.5" class="anchored" data-anchor-id="raisons-de-non-fréquentation"><span class="header-section-number">7.2.5</span> Raisons de non-fréquentation</h3>
@@ -1784,18 +1160,10 @@ Alaotra
 <span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>non_freq <span class="ot">&lt;-</span> non_items <span class="sc">|&gt;</span></span>
 <span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui</span>(um1_non, var, label)) <span class="sc">|&gt;</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"Alaotra"</span>, <span class="st">"Marovoay"</span>)), <span class="at">names_to =</span> <span class="st">"Groupe"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"Alaotra"</span>, <span class="st">"Marovoay"</span>)), <span class="at">names_to =</span> <span class="st">"Observatory"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
 <span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(non_freq,</span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Item, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Groupe)) <span class="sc">+</span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(pct, <span class="st">"%"</span>)),</span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.1</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Groupe) <span class="sc">+</span></span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">100</span>)) <span class="sc">+</span></span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% de ménages"</span>) <span class="sc">+</span></span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>non_freq <span class="sc">|&gt;</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar</span>(<span class="at">x =</span> Item, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-non-freq" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1810,69 +1178,9 @@ Figure&nbsp;7.8: Raisons de ne pas se rendre dans l’Aire protégée (% de Oui 
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_non_freq_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_non_freq_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_non_freq_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_non_freq_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_non_freq_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_non_freq_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_non_freq_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_non_freq_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_non_freq_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_non_freq_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_non_freq_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_non_freq_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_non_freq_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_non_freq_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_non_freq_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_non_freq_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="usages-de-laire-protégée" class="level3" data-number="7.2.6">
 <h3 data-number="7.2.6" class="anchored" data-anchor-id="usages-de-laire-protégée"><span class="header-section-number">7.2.6</span> Usages de l’Aire protégée</h3>
@@ -1906,15 +1214,8 @@ Alaotra
 <span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> n_usagers <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">0</span>))</span>
 <span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(usages, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Raison, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(pct, <span class="st">"%"</span>)),</span>
-<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.1</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">110</span>)) <span class="sc">+</span></span>
-<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des usagers de l'AP"</span>) <span class="sc">+</span></span>
-<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>usages <span class="sc">|&gt;</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar</span>(<span class="at">x =</span> Raison, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% des usagers de l'AP"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-usages-ap" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1929,69 +1230,9 @@ Figure&nbsp;7.9: Raisons de se rendre dans l’Aire protégée (% de Oui parmi l
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_usages_ap_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_usages_ap_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_usages_ap_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_usages_ap_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_usages_ap_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_usages_ap_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_usages_ap_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_usages_ap_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_usages_ap_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_usages_ap_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_usages_ap_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_usages_ap_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_usages_ap_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_usages_ap_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_usages_ap_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_usages_ap_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2010,16 +1251,15 @@ Alaotra
 <span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>freq_pct <span class="ot">&lt;-</span> freq_usage <span class="sc">|&gt;</span></span>
 <span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Raison, Fréquence) <span class="sc">|&gt;</span></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Raison))</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Raison))</span>
 <span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(freq_pct, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Raison, n, <span class="at">.fun =</span> sum), <span class="at">y =</span> pct, <span class="at">fill =</span> Fréquence)) <span class="sc">+</span></span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"fill"</span>) <span class="sc">+</span></span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span>percent) <span class="sc">+</span></span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"YlOrRd"</span>, <span class="at">direction =</span> <span class="sc">-</span><span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">fill =</span> <span class="st">"Fréquence"</span>) <span class="sc">+</span></span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>freq_pct <span class="sc">|&gt;</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Raison =</span> <span class="fu">fct_reorder</span>(Raison, n, <span class="at">.fun =</span> sum)) <span class="sc">|&gt;</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_stacked</span>(</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Raison, <span class="at">y =</span> pct, <span class="at">fill =</span> Fréquence,</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">direction =</span> <span class="st">"horizontal"</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"YlOrRd"</span>, <span class="at">direction =</span> <span class="sc">-</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-freq-usages" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2034,69 +1274,9 @@ Figure&nbsp;7.10: Fréquence des déplacements dans l’AP selon l’usage, par 
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_freq_usages_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_freq_usages_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_freq_usages_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_freq_usages_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_freq_usages_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_freq_usages_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_freq_usages_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_freq_usages_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_freq_usages_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_freq_usages_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_freq_usages_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_freq_usages_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_freq_usages_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_freq_usages_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_freq_usages_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_freq_usages_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="saisonnalité-de-la-fréquentation-de-lap" class="level3" data-number="7.2.7">
 <h3 data-number="7.2.7" class="anchored" data-anchor-id="saisonnalité-de-la-fréquentation-de-lap"><span class="header-section-number">7.2.7</span> Saisonnalité de la fréquentation de l’AP</h3>
@@ -2122,14 +1302,14 @@ Alaotra
 <span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">actif =</span> <span class="fu">if_else</span>(actif <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="at">missing =</span> <span class="dv">0</span>)</span>
 <span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_actif =</span> <span class="fu">sum</span>(actif), <span class="at">n_total =</span> <span class="fu">n</span>(), <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Raison, Mois)) <span class="sc">|&gt;</span></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n_actif <span class="sc">/</span> n_total <span class="sc">*</span> <span class="dv">100</span>)</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n_actif <span class="sc">/</span> n_total <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>))</span>
 <span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ap_saison, <span class="fu">aes</span>(<span class="at">x =</span> Mois, <span class="at">y =</span> pct, <span class="at">color =</span> Raison, <span class="at">group =</span> Raison)) <span class="sc">+</span></span>
 <span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
 <span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
 <span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
 <span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% actifs"</span>, <span class="at">color =</span> <span class="st">"Raison"</span>) <span class="sc">+</span></span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_ror</span>() <span class="sc">+</span></span>
 <span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
@@ -2145,69 +1325,9 @@ Figure&nbsp;7.11: Saisonnalité des usages de l’AP (% d’usagers actifs par m
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_saison_ap_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_ap_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_ap_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_ap_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_ap_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_saison_ap_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_saison_ap_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_saison_ap_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_ap_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_ap_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_ap_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_ap_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_ap_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_ap_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_ap_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_ap_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 </section>
 <section id="sec-feu" class="level2" data-number="7.3">
@@ -2234,18 +1354,10 @@ Alaotra
 <span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>feu_raisons <span class="ot">&lt;-</span> feu_items <span class="sc">|&gt;</span></span>
 <span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui</span>(res_feubrousse, var, label)) <span class="sc">|&gt;</span></span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"Alaotra"</span>, <span class="st">"Marovoay"</span>)), <span class="at">names_to =</span> <span class="st">"Groupe"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"Alaotra"</span>, <span class="st">"Marovoay"</span>)), <span class="at">names_to =</span> <span class="st">"Observatory"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
 <span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(feu_raisons,</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Item, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Groupe)) <span class="sc">+</span></span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(pct, <span class="st">"%"</span>)),</span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.1</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Groupe) <span class="sc">+</span></span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">100</span>)) <span class="sc">+</span></span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% de ménages"</span>) <span class="sc">+</span></span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>feu_raisons <span class="sc">|&gt;</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar</span>(<span class="at">x =</span> Item, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-raisons-feux" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2260,69 +1372,9 @@ Figure&nbsp;7.12: Raisons perçues de faire des feux (% de Oui)
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_raisons_feux_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_raisons_feux_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_raisons_feux_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_raisons_feux_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_raisons_feux_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_raisons_feux_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_raisons_feux_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_raisons_feux_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_raisons_feux_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_raisons_feux_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_raisons_feux_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_raisons_feux_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_raisons_feux_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_raisons_feux_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_raisons_feux_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_raisons_feux_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="pratique-du-feu" class="level3" data-number="7.3.2">
 <h3 data-number="7.3.2" class="anchored" data-anchor-id="pratique-du-feu"><span class="header-section-number">7.3.2</span> Pratique du feu</h3>
@@ -2386,7 +1438,7 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
 </figcaption>
 <div aria-describedby="tbl-feux-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="nvoyvzrkqf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="txnbnzoeya" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -2473,11 +1525,12 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"Observatory"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(pct))</span>
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(feu_long, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Item, pct), <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"%"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>feu_long <span class="sc">|&gt;</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Item =</span> <span class="fu">reorder</span>(Item, pct)) <span class="sc">|&gt;</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_grouped</span>(</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Item, <span class="at">fill =</span> Observatory,</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">y_label =</span> <span class="st">"%"</span>, <span class="at">direction =</span> <span class="st">"horizontal"</span>, <span class="at">facet =</span> <span class="cn">FALSE</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -2488,69 +1541,9 @@ Table&nbsp;7.4: Pratique et perception des feux par observatoire
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/tbl_feux_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_feux_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_feux_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_feux_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_feux_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/tbl_feux_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/10/tbl_feux_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/tbl_feux_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_feux_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_feux_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_feux_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_feux_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_feux_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_feux_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_feux_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_feux_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="saisonnalité-des-feux" class="level3" data-number="7.3.3">
 <h3 data-number="7.3.3" class="anchored" data-anchor-id="saisonnalité-des-feux"><span class="header-section-number">7.3.3</span> Saisonnalité des feux</h3>
@@ -2569,13 +1562,13 @@ Alaotra
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">actif =</span> <span class="fu">if_else</span>(actif <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="at">missing =</span> <span class="dv">0</span>)</span>
 <span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_actif =</span> <span class="fu">sum</span>(actif), <span class="at">n_total =</span> <span class="fu">n</span>(), <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Mois)) <span class="sc">|&gt;</span></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n_actif <span class="sc">/</span> n_total <span class="sc">*</span> <span class="dv">100</span>)</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n_actif <span class="sc">/</span> n_total <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>))</span>
 <span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(feu_saison, <span class="fu">aes</span>(<span class="at">x =</span> Mois, <span class="at">y =</span> pct, <span class="at">color =</span> Observatory, <span class="at">group =</span> Observatory)) <span class="sc">+</span></span>
 <span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">0.8</span>) <span class="sc">+</span></span>
 <span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
 <span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des ménages ayant fait du feu"</span>, <span class="at">color =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_ror</span>() <span class="sc">+</span></span>
 <span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
@@ -2591,69 +1584,9 @@ Figure&nbsp;7.13: Saisonnalité des feux de brousse pratiqués (% de ménages ac
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_saison_feux_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_feux_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_feux_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_feux_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_feux_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_saison_feux_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_saison_feux_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_saison_feux_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_feux_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_feux_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_feux_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_feux_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_feux_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_feux_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_feux_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_saison_feux_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="avis-sur-les-feux" class="level3" data-number="7.3.4">
 <h3 data-number="7.3.4" class="anchored" data-anchor-id="avis-sur-les-feux"><span class="header-section-number">7.3.4</span> Avis sur les feux</h3>
@@ -2674,13 +1607,8 @@ Alaotra
 <span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Évolution) <span class="sc">|&gt;</span></span>
 <span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory)</span>
 <span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(evol_feux, <span class="fu">aes</span>(<span class="at">x =</span> Évolution, <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(pct, <span class="dv">0</span>), <span class="st">"%"</span>)),</span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.3</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% de ménages"</span>) <span class="sc">+</span></span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>evol_feux <span class="sc">|&gt;</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Évolution, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>, <span class="at">show_pct =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-evol-feux" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2695,69 +1623,9 @@ Figure&nbsp;7.14: Évolution perçue des feux depuis 3 ans, par observatoire
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_evol_feux_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evol_feux_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evol_feux_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evol_feux_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evol_feux_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_evol_feux_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_evol_feux_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_evol_feux_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evol_feux_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evol_feux_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evol_feux_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evol_feux_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evol_feux_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evol_feux_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evol_feux_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_evol_feux_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2776,14 +1644,8 @@ Alaotra
 <span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Importance) <span class="sc">|&gt;</span></span>
 <span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory)</span>
 <span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(prob_feux, <span class="fu">aes</span>(<span class="at">x =</span> Importance, <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(pct, <span class="dv">0</span>), <span class="st">"%"</span>)),</span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.3</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% de ménages"</span>) <span class="sc">+</span></span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">15</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>prob_feux <span class="sc">|&gt;</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Importance, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>, <span class="at">show_pct =</span> <span class="cn">TRUE</span>, <span class="at">x_angle =</span> <span class="dv">15</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-probleme-feux" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2798,69 +1660,9 @@ Figure&nbsp;7.15: Les feux sont-ils un problème dans la région ? (par observat
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_probleme_feux_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_probleme_feux_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_probleme_feux_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_probleme_feux_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_probleme_feux_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_probleme_feux_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_probleme_feux_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_probleme_feux_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_probleme_feux_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_probleme_feux_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_probleme_feux_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_probleme_feux_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_probleme_feux_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_probleme_feux_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_probleme_feux_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_probleme_feux_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2877,13 +1679,8 @@ Alaotra
 <span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Avis) <span class="sc">|&gt;</span></span>
 <span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory)</span>
 <span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(regl_feux, <span class="fu">aes</span>(<span class="at">x =</span> Avis, <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(pct, <span class="dv">0</span>), <span class="st">"%"</span>)),</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.3</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% de ménages"</span>) <span class="sc">+</span></span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>regl_feux <span class="sc">|&gt;</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Avis, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>, <span class="at">show_pct =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-reglementation-feux" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2898,69 +1695,9 @@ Figure&nbsp;7.16: La pratique du feu devrait être… (par observatoire)
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_reglementation_feux_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_reglementation_feux_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_reglementation_feux_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_reglementation_feux_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_reglementation_feux_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_reglementation_feux_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_reglementation_feux_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_reglementation_feux_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_reglementation_feux_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_reglementation_feux_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_reglementation_feux_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_reglementation_feux_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_reglementation_feux_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_reglementation_feux_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_reglementation_feux_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_reglementation_feux_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 </section>
 <section id="sec-protection" class="level2" data-number="7.4">
@@ -2996,7 +1733,7 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
 </figcaption>
 <div aria-describedby="tbl-connaissance-ap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="enaijhcrfk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="mtrgffhbpw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -3055,11 +1792,12 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"Observatory"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(pct))</span>
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ap_long, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Item, pct), <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"%"</span>, <span class="at">fill =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>ap_long <span class="sc">|&gt;</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Item =</span> <span class="fu">reorder</span>(Item, pct)) <span class="sc">|&gt;</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_grouped</span>(</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Item, <span class="at">fill =</span> Observatory,</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">y_label =</span> <span class="st">"%"</span>, <span class="at">direction =</span> <span class="st">"horizontal"</span>, <span class="at">facet =</span> <span class="cn">FALSE</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -3070,69 +1808,9 @@ Table&nbsp;7.5: Connaissance de l’Aire protégée et demande de protection
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/tbl_connaissance_ap_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_connaissance_ap_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_connaissance_ap_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_connaissance_ap_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_connaissance_ap_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/tbl_connaissance_ap_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/10/tbl_connaissance_ap_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/tbl_connaissance_ap_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_connaissance_ap_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_connaissance_ap_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_connaissance_ap_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_connaissance_ap_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_connaissance_ap_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_connaissance_ap_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_connaissance_ap_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/10/tbl_connaissance_ap_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="impact-perçu-des-actions-de-lap" class="level3" data-number="7.4.2">
 <h3 data-number="7.4.2" class="anchored" data-anchor-id="impact-perçu-des-actions-de-lap"><span class="header-section-number">7.4.2</span> Impact perçu des actions de l’AP</h3>
@@ -3162,19 +1840,18 @@ Alaotra
 <span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">Jugement =</span> <span class="fu">factor</span>(ap3_labels[<span class="fu">as.character</span>(Valeur)], <span class="at">levels =</span> ap3_labels)</span>
 <span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Dimension, Jugement) <span class="sc">|&gt;</span></span>
-<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Dimension))</span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Dimension))</span>
 <span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ap3_data, <span class="fu">aes</span>(<span class="at">x =</span> Dimension, <span class="at">y =</span> pct, <span class="at">fill =</span> Jugement)) <span class="sc">+</span></span>
-<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"fill"</span>) <span class="sc">+</span></span>
-<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels =</span> scales<span class="sc">::</span>percent) <span class="sc">+</span></span>
-<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(</span>
-<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Très positif"</span> <span class="ot">=</span> <span class="st">"#2ca02c"</span>, <span class="st">"Plutôt positif"</span> <span class="ot">=</span> <span class="st">"#98df8a"</span>,</span>
-<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Plutôt négatif"</span> <span class="ot">=</span> <span class="st">"#ff9896"</span>, <span class="st">"Très négatif"</span> <span class="ot">=</span> <span class="st">"#d62728"</span>,</span>
-<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Ne connaît pas"</span> <span class="ot">=</span> <span class="st">"#cccccc"</span></span>
-<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
-<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>, <span class="at">fill =</span> <span class="st">"Jugement"</span>) <span class="sc">+</span></span>
-<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>ap3_data <span class="sc">|&gt;</span></span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_stacked</span>(</span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Dimension, <span class="at">y =</span> pct, <span class="at">fill =</span> Jugement,</span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">direction =</span> <span class="st">"horizontal"</span>,</span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette =</span> <span class="fu">c</span>(</span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Très positif"</span> <span class="ot">=</span> <span class="st">"#2ca02c"</span>, <span class="st">"Plutôt positif"</span> <span class="ot">=</span> <span class="st">"#98df8a"</span>,</span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Plutôt négatif"</span> <span class="ot">=</span> <span class="st">"#ff9896"</span>, <span class="st">"Très négatif"</span> <span class="ot">=</span> <span class="st">"#d62728"</span>,</span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Ne connaît pas"</span> <span class="ot">=</span> <span class="st">"#cccccc"</span></span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-jugement-ap" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -3189,69 +1866,9 @@ Figure&nbsp;7.17: Jugement des actions de l’AP sur la situation économique, s
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_jugement_ap_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_jugement_ap_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_jugement_ap_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_jugement_ap_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_jugement_ap_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_jugement_ap_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_jugement_ap_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_jugement_ap_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_jugement_ap_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_jugement_ap_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_jugement_ap_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_jugement_ap_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_jugement_ap_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_jugement_ap_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_jugement_ap_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_jugement_ap_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="gestionnaire-souhaité" class="level3" data-number="7.4.3">
 <h3 data-number="7.4.3" class="anchored" data-anchor-id="gestionnaire-souhaité"><span class="header-section-number">7.4.3</span> Gestionnaire souhaité</h3>
@@ -3275,15 +1892,8 @@ Alaotra
 <span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Gestionnaire) <span class="sc">|&gt;</span></span>
 <span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory)</span>
 <span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(gest, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Gestionnaire, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(pct, <span class="dv">0</span>), <span class="st">"%"</span>)),</span>
-<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.1</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">80</span>)) <span class="sc">+</span></span>
-<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% de ménages"</span>) <span class="sc">+</span></span>
-<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>gest <span class="sc">|&gt;</span></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar</span>(<span class="at">x =</span> Gestionnaire, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-gestionnaire" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -3298,69 +1908,9 @@ Figure&nbsp;7.18: Qui devrait gérer l’AP ? (parmi ceux favorables à la prote
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_gestionnaire_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_gestionnaire_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_gestionnaire_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_gestionnaire_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_gestionnaire_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_gestionnaire_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_gestionnaire_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_gestionnaire_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_gestionnaire_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_gestionnaire_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_gestionnaire_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_gestionnaire_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_gestionnaire_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_gestionnaire_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_gestionnaire_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_gestionnaire_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="mesures-de-protection-souhaitées" class="level3" data-number="7.4.4">
 <h3 data-number="7.4.4" class="anchored" data-anchor-id="mesures-de-protection-souhaitées"><span class="header-section-number">7.4.4</span> Mesures de protection souhaitées</h3>
@@ -3389,18 +1939,10 @@ Alaotra
 <span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>mesures <span class="ot">&lt;-</span> ap5b_items <span class="sc">|&gt;</span></span>
 <span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui</span>(ap_favorable, var, label)) <span class="sc">|&gt;</span></span>
-<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"Alaotra"</span>, <span class="st">"Marovoay"</span>)), <span class="at">names_to =</span> <span class="st">"Groupe"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"Alaotra"</span>, <span class="st">"Marovoay"</span>)), <span class="at">names_to =</span> <span class="st">"Observatory"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>)</span>
 <span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(mesures,</span>
-<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Item, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Groupe)) <span class="sc">+</span></span>
-<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(pct, <span class="st">"%"</span>)),</span>
-<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.1</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Groupe) <span class="sc">+</span></span>
-<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">100</span>)) <span class="sc">+</span></span>
-<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% de ménages"</span>) <span class="sc">+</span></span>
-<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>mesures <span class="sc">|&gt;</span></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar</span>(<span class="at">x =</span> Item, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-mesures-protection" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -3415,69 +1957,9 @@ Figure&nbsp;7.19: Mesures souhaitées pour protéger l’AP (% de Oui, parmi ceu
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_mesures_protection_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_mesures_protection_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_mesures_protection_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_mesures_protection_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_mesures_protection_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_mesures_protection_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_mesures_protection_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_mesures_protection_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_mesures_protection_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_mesures_protection_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_mesures_protection_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_mesures_protection_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_mesures_protection_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_mesures_protection_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_mesures_protection_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_mesures_protection_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="pauvreté-vs.-environnement-quelle-priorité" class="level3" data-number="7.4.5">
 <h3 data-number="7.4.5" class="anchored" data-anchor-id="pauvreté-vs.-environnement-quelle-priorité"><span class="header-section-number">7.4.5</span> Pauvreté vs.&nbsp;environnement : quelle priorité ?</h3>
@@ -3500,15 +1982,8 @@ Alaotra
 <span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Priorité) <span class="sc">|&gt;</span></span>
 <span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory)</span>
 <span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(priorite, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Priorité, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(pct, <span class="dv">0</span>), <span class="st">"%"</span>)),</span>
-<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.1</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">60</span>)) <span class="sc">+</span></span>
-<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% de ménages"</span>) <span class="sc">+</span></span>
-<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>priorite <span class="sc">|&gt;</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar</span>(<span class="at">x =</span> Priorité, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-priorite" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -3523,69 +1998,9 @@ Figure&nbsp;7.20: Pauvreté vs.&nbsp;protection de l’environnement : quelle pr
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_priorite_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_priorite_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_priorite_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_priorite_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_priorite_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_priorite_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_priorite_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_priorite_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_priorite_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_priorite_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_priorite_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_priorite_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_priorite_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_priorite_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_priorite_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_priorite_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="connaissance-des-actions-de-protection" class="level3" data-number="7.4.6">
 <h3 data-number="7.4.6" class="anchored" data-anchor-id="connaissance-des-actions-de-protection"><span class="header-section-number">7.4.6</span> Connaissance des actions de protection</h3>
@@ -3618,16 +2033,13 @@ Alaotra
 <span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">c</span>(<span class="st">`</span><span class="at">Informé</span><span class="st">`</span>, <span class="st">`</span><span class="at">Consulté</span><span class="st">`</span>, <span class="st">`</span><span class="at">Bénéficié</span><span class="st">`</span>), <span class="at">names_to =</span> <span class="st">"Indicateur"</span>, <span class="at">values_to =</span> <span class="st">"pct"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Indicateur =</span> <span class="fu">factor</span>(Indicateur, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Informé"</span>, <span class="st">"Consulté"</span>, <span class="st">"Bénéficié"</span>)))</span>
 <span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ap2_data, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Action, pct, <span class="at">.fun =</span> max), <span class="at">y =</span> pct, <span class="at">fill =</span> Indicateur)) <span class="sc">+</span></span>
-<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(pct, <span class="st">"%"</span>)),</span>
-<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>            <span class="at">position =</span> <span class="fu">position_dodge</span>(<span class="at">width =</span> <span class="fl">0.9</span>), <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.1</span>, <span class="at">size =</span> <span class="fl">2.5</span>) <span class="sc">+</span></span>
-<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">80</span>)) <span class="sc">+</span></span>
-<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"Set2"</span>) <span class="sc">+</span></span>
-<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% de ménages"</span>, <span class="at">fill =</span> <span class="cn">NULL</span>) <span class="sc">+</span></span>
-<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>ap2_data <span class="sc">|&gt;</span></span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Action =</span> <span class="fu">fct_reorder</span>(Action, pct, <span class="at">.fun =</span> max)) <span class="sc">|&gt;</span></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_grouped</span>(</span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Action, <span class="at">fill =</span> Indicateur,</span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">y_label =</span> <span class="st">"% de ménages"</span>, <span class="at">direction =</span> <span class="st">"horizontal"</span></span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"Set2"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-actions-ap" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -3642,69 +2054,9 @@ Figure&nbsp;7.21: Information, consultation et bénéfice des actions de l’AP 
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_actions_ap_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_actions_ap_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_actions_ap_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_actions_ap_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_actions_ap_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/10/fig_actions_ap_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/10/fig_actions_ap_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/10/fig_actions_ap_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_actions_ap_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_actions_ap_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_actions_ap_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_actions_ap_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_actions_ap_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_actions_ap_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_actions_ap_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/10/fig_actions_ap_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 
 
 </section>

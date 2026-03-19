@@ -424,7 +424,7 @@ ggplot(chrono, aes(x = date_interview, y = cumul, color = Observatory)) +
     expand = expansion(mult = c(0.01, 0.01))
   ) +
   labs(x = NULL, y = "Nombre cumulé d'entretiens", color = "Observatoire") +
-  theme_minimal() +
+  theme_ror() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
@@ -473,13 +473,8 @@ enq <- res_deb |>
   mutate(Enquêteur = paste0("E", sprintf("%02d", j1))) |>
   count(Observatory, Enquêteur)
 
-ggplot(enq, aes(x = fct_reorder(Enquêteur, n), y = n, fill = Observatory)) +
-  geom_col() +
-  coord_flip() +
-  facet_wrap(~Observatory, scales = "free_y") +
-  labs(x = NULL, y = "Questionnaires réalisés", fill = "Observatoire") +
-  theme_minimal() +
-  theme(legend.position = "none")
+enq |>
+  ror_bar(x = Enquêteur, y = n, y_label = "Questionnaires réalisés", show_pct = FALSE)
 ```
 
 ```{r}

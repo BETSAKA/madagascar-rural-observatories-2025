@@ -4,6 +4,8 @@
 
 # --- Report mode (profile-aware filtering) ---
 source("utils/report_variant.R")
+source("utils/sites.R")
+source("utils/plot_theme.R")
 REPORT_MODE <- get_report_mode()
 
 # --- gt LaTeX accent fix (simple version; helpers_report.R has comprehensive) ---
@@ -29,7 +31,7 @@ registerS3method(
 # instead of 2 observatory facets. Scale fig.height proportionally so
 # individual panels remain readable in PDF/DOCX output.
 if (!REPORT_MODE$is_consolidated) {
-  .obs_fig_h_scale <- if (REPORT_MODE$observatory == "Marovoay") 1.5 else 2.0
+  .obs_fig_h_scale <- if (REPORT_MODE$observatory == "Marovoay") 2.0 else 2.5
   knitr::opts_hooks$set(fig.height = function(options) {
     options$fig.height <- min(options$fig.height * .obs_fig_h_scale, 20)
     options

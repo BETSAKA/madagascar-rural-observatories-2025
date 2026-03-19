@@ -287,13 +287,7 @@ dl_tbl_variants("tbl_age_obs", "04", function(d) {
 ```{r fig_age_obs}
 #| fig-cap: "Répartition des membres des ménages par tranche d'âge selon les observatoires"
 
-ggplot(hh_age, aes(x = AgeGroup, y = Percent)) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~Observatory) +
-  labs(x = "Tranche d'âge", y = "%") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        strip.text = element_text(face = "bold"))
+hh_age |> ror_bar_v(x = AgeGroup, y = Percent, y_label = "%", x_angle = 45)
 ```
 
 ```{r dl_fig_age_obs}
@@ -305,13 +299,7 @@ dl_fig_variants("fig_age_obs", "04", function(d) {
     filter(!is.na(AgeGroup)) |>
     count(Observatory, AgeGroup, name = "n") |>
     mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory)
-  ggplot(agg, aes(x = AgeGroup, y = Percent)) +
-    geom_col(show.legend = FALSE) +
-    facet_wrap(~Observatory) +
-    labs(x = "Tranche d'âge", y = "%") +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1),
-          strip.text = element_text(face = "bold"))
+  agg |> ror_bar_v(x = AgeGroup, y = Percent, y_label = "%", x_angle = 45)
 }, members)
 ```
 
@@ -328,13 +316,7 @@ hh_age_sex <- members_site |>
     .by = c(Observatory, Sexe)
   )
 
-ggplot(hh_age_sex, aes(x = AgeGroup, y = Percent, fill = Sexe)) +
-  geom_col() +
-  coord_flip() +
-  facet_wrap(~Observatory) +
-  labs(x = "Tranche d'âge", y = "Pourcentage (%)") +
-  scale_y_continuous(labels = abs) +
-  theme_minimal()
+hh_age_sex |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent)
 ```
 
 ```{r dl_fig_pyramide}
@@ -350,13 +332,7 @@ dl_fig_variants("fig_pyramide", "04", function(d) {
       Percent = if_else(Sexe == "Homme", -Percent, Percent),
       .by = c(Observatory, Sexe)
     )
-  ggplot(agg, aes(x = AgeGroup, y = Percent, fill = Sexe)) +
-    geom_col() +
-    coord_flip() +
-    facet_wrap(~Observatory) +
-    labs(x = "Tranche d'âge", y = "Pourcentage (%)") +
-    scale_y_continuous(labels = abs) +
-    theme_minimal()
+  agg |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent)
 }, members)
 ```
 
@@ -454,14 +430,9 @@ homeland_labels |>
   mutate(Member_Type = if_else(m6 == 1, "Chef de ménage", "Conjoint")) |>
   count(Observatory, Member_Type, Homeland) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Member_Type)) |>
-  ggplot(aes(x = reorder(Homeland, pct), y = pct, fill = Member_Type)) +
-  geom_col(position = "dodge") +
-  coord_flip() +
-  facet_wrap(~Observatory) +
-  labs(title = "Région d'origine des CM et conjoints",
-       x = "Région", y = "%", fill = NULL) +
-  theme_minimal() +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+  ror_bar_grouped(x = Homeland, fill = Member_Type, y = pct,
+                  title = "Région d'origine des CM et conjoints",
+                  y_label = "%", direction = "horizontal")
 ```
 
 ```{r dl_fig_homeland}
@@ -474,14 +445,9 @@ dl_fig_variants("fig_homeland", "04", function(d) {
            Homeland = iconv(as.character(labelled::to_factor(m3a)), from = "latin1", to = "UTF-8")) |>
     count(Observatory, Member_Type, Homeland) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Member_Type)) |>
-    ggplot(aes(x = reorder(Homeland, pct), y = pct, fill = Member_Type)) +
-    geom_col(position = "dodge") +
-    coord_flip() +
-    facet_wrap(~Observatory) +
-    labs(title = "Région d'origine des CM et conjoints",
-         x = "Région", y = "%", fill = NULL) +
-    theme_minimal() +
-    theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+    ror_bar_grouped(x = Homeland, fill = Member_Type, y = pct,
+                    title = "Région d'origine des CM et conjoints",
+                    y_label = "%", direction = "horizontal")
 }, members)
 ```
 
@@ -783,14 +749,9 @@ literacy_3level_bar <- function(data, var, title_text) {
     count(Observatory, Sexe, Niveau) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe))
 
-  n_obs <- n_distinct(sex_data$Observatory)
-  p <- ggplot(sex_data, aes(x = Niveau, y = pct, fill = Sexe)) +
-    geom_col(position = "dodge") +
-    labs(title = title_text, x = NULL, y = "%", fill = "Sexe") +
-    theme_minimal() +
-    scale_fill_manual(values = c("Homme" = "#1f77b4", "Femme" = "#ff7f0e"))
-  if (n_obs > 1) p <- p + facet_wrap(~Observatory)
-  p
+  sex_data |> ror_bar_grouped(x = Niveau, fill = Sexe, y = pct,
+                              title = title_text, y_label = "%",
+                              direction = "vertical")
 }
 ```
 
@@ -909,15 +870,9 @@ obs_gt(cm_act) |>
   style_table()
 
 # Bar chart (better suited to >5 categories than a pie chart)
-ggplot(cm_act, aes(x = reorder(Act_principal, Percent), y = Percent)) +
-  geom_col(show.legend = FALSE) +
-  coord_flip() +
-  facet_wrap(~Observatory) +
-  labs(title = obs_title("Activités principales des CM (%)"),
-       x = NULL, y = "%") +
-  theme_minimal() +
-  theme(plot.title = element_text(face = "bold"),
-        strip.text = element_text(face = "bold"))
+cm_act |> ror_bar(x = Act_principal, y = Percent,
+                  title = obs_title("Activités principales des CM (%)"),
+                  y_label = "%")
 ```
 
 ```{r dl_tbl_cm_act}
@@ -942,14 +897,9 @@ dl_fig_variants("fig_cm_act", "04", function(d) {
     filter(!is.na(Act_principal)) |>
     count(Observatory, Act_principal, name = "n") |>
     mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory)
-  ggplot(act, aes(x = reorder(Act_principal, Percent), y = Percent,
-                   fill = Observatory)) +
-    geom_col(position = "dodge") +
-    coord_flip() +
-    labs(title = "Activités principales des CM (%)",
-         x = NULL, y = "%", fill = "Observatoire") +
-    theme_minimal() +
-    theme(plot.title = element_text(face = "bold"))
+  act |> ror_bar_grouped(x = Act_principal, fill = Observatory, y = Percent,
+                         title = "Activités principales des CM (%)",
+                         y_label = "%", direction = "horizontal", facet = FALSE)
 }, members)
 ```
 
@@ -989,16 +939,9 @@ obs_gt(cm_act_wide) |>
   style_table()
 
 # Bar chart by sex (small cells removed)
-ggplot(cm_act_sex_plt, aes(x = reorder(Act_principal, Percent), y = Percent,
-                       fill = Sexe)) +
-  geom_col(position = "dodge") +
-  coord_flip() +
-  facet_wrap(~Observatory) +
-  labs(title = "Activités principales des CM par observatoire et sexe (%)",
-       x = NULL, y = "%", fill = "Sexe") +
-  theme_minimal() +
-  theme(plot.title = element_text(face = "bold"),
-        strip.text = element_text(face = "bold"))
+cm_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
+                                  title = "Activités principales des CM par observatoire et sexe (%)",
+                                  y_label = "%", direction = "horizontal")
 ```
 
 ```{r dl_tbl_cm_act_sex}
@@ -1025,16 +968,9 @@ dl_fig_variants("fig_cm_act_sex", "04", function(d) {
     filter(!is.na(Act_principal), !is.na(Sexe)) |>
     count(Observatory, Sexe, Act_principal, name = "n") |>
     mutate(Percent = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe))
-  ggplot(act, aes(x = reorder(Act_principal, Percent), y = Percent,
-                   fill = Sexe)) +
-    geom_col(position = "dodge") +
-    coord_flip() +
-    facet_wrap(~Observatory) +
-    labs(title = "Activités principales des CM par observatoire et sexe (%)",
-         x = NULL, y = "%", fill = "Sexe") +
-    theme_minimal() +
-    theme(plot.title = element_text(face = "bold"),
-          strip.text = element_text(face = "bold"))
+  act |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
+                         title = "Activités principales des CM par observatoire et sexe (%)",
+                         y_label = "%", direction = "horizontal")
 }, members)
 ```
 
@@ -1442,12 +1378,9 @@ non_scol <- members |>
 
 non_scol |>
   filter(pct >= 2) |>
-  ggplot(aes(x = reorder(Raison, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
-  coord_flip() +
-  labs(x = NULL, y = "% des enfants non scolarisés", fill = "Observatoire") +
-  theme_minimal(base_size = 12) +
-  theme(legend.position = "top")
+  ror_bar_grouped(x = Raison, fill = Observatory, y = pct,
+                  y_label = "% des enfants non scolarisés",
+                  direction = "horizontal", facet = FALSE)
 ```
 
 ```{r dl_fig_raisons_non_scol}
@@ -1462,10 +1395,9 @@ dl_fig_variants("fig_raisons_non_scol", "04", function(d) {
     count(Observatory, Raison) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
   ns |> filter(pct >= 2) |>
-    ggplot(aes(x = reorder(Raison, pct), y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") + coord_flip() +
-    labs(x = NULL, y = "% des enfants non scolarisés", fill = "Site") +
-    theme_minimal(base_size = 12) + theme(legend.position = "top")
+    ror_bar_grouped(x = Raison, fill = Observatory, y = pct,
+                    y_label = "% des enfants non scolarisés",
+                    direction = "horizontal", facet = FALSE)
 }, members)
 ```
 
@@ -1515,15 +1447,9 @@ obs_gt(other_act) |>
   fmt_number(columns = Percent, decimals = 1) |>
   style_table()
 
-ggplot(other_act, aes(x = reorder(Act_principal, Percent), y = Percent)) +
-  geom_col(show.legend = FALSE) +
-  coord_flip() +
-  facet_wrap(~Observatory) +
-  labs(title = obs_title("Activités principales des autres membres (%)"),
-       x = NULL, y = "%") +
-  theme_minimal() +
-  theme(plot.title = element_text(face = "bold"),
-        strip.text = element_text(face = "bold"))
+other_act |> ror_bar(x = Act_principal, y = Percent,
+                     title = obs_title("Activités principales des autres membres (%)"),
+                     y_label = "%")
 ```
 
 ```{r dl_tbl_other_act}
@@ -1548,14 +1474,9 @@ dl_fig_variants("fig_other_act", "04", function(d) {
     filter(!is.na(Act_principal)) |>
     count(Observatory, Act_principal, name = "n") |>
     mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory)
-  ggplot(act, aes(x = reorder(Act_principal, Percent), y = Percent,
-                  fill = Observatory)) +
-    geom_col(position = "dodge") +
-    coord_flip() +
-    labs(title = "Activités principales des autres membres (%)",
-         x = NULL, y = "%", fill = "Observatoire") +
-    theme_minimal() +
-    theme(plot.title = element_text(face = "bold"))
+  act |> ror_bar_grouped(x = Act_principal, fill = Observatory, y = Percent,
+                         title = "Activités principales des autres membres (%)",
+                         y_label = "%", direction = "horizontal", facet = FALSE)
 }, members)
 ```
 
@@ -1594,16 +1515,9 @@ obs_gt(other_act_wide) |>
   style_table()
 
 # Bar chart by sex (small cells removed)
-ggplot(other_act_sex_plt, aes(x = reorder(Act_principal, Percent), y = Percent,
-                              fill = Sexe)) +
-  geom_col(position = "dodge") +
-  coord_flip() +
-  facet_wrap(~Observatory) +
-  labs(title = "Activités des autres membres par observatoire et sexe (%)",
-       x = NULL, y = "%", fill = "Sexe") +
-  theme_minimal() +
-  theme(plot.title = element_text(face = "bold", hjust = 0.5),
-        strip.text = element_text(face = "bold"))
+other_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
+                                     title = "Activités des autres membres par observatoire et sexe (%)",
+                                     y_label = "%", direction = "horizontal")
 ```
 
 ```{r dl_tbl_other_act_sex}
@@ -1630,16 +1544,9 @@ dl_fig_variants("fig_other_act_sex", "04", function(d) {
     filter(!is.na(Act_principal), !is.na(Sexe)) |>
     count(Observatory, Sexe, Act_principal, name = "n") |>
     mutate(Percent = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe))
-  ggplot(act, aes(x = reorder(Act_principal, Percent), y = Percent,
-                  fill = Sexe)) +
-    geom_col(position = "dodge") +
-    coord_flip() +
-    facet_wrap(~Observatory) +
-    labs(title = "Activités des autres membres par observatoire et sexe (%)",
-         x = NULL, y = "%", fill = "Sexe") +
-    theme_minimal() +
-    theme(plot.title = element_text(face = "bold", hjust = 0.5),
-          strip.text = element_text(face = "bold"))
+  act |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
+                         title = "Activités des autres membres par observatoire et sexe (%)",
+                         y_label = "%", direction = "horizontal")
 }, members)
 ```
 
@@ -1730,13 +1637,9 @@ demog_gap   <- demog_trends |> filter(year %in% c(2015, 2025))
 #| fig-width: 9
 #| fig-height: 5
 
-ggplot(mapping = aes(x = year, y = taille_moy, colour = Observatory)) +
-  geom_line(data = demog_solid, linewidth = 0.8) +
-  geom_line(data = demog_gap, linewidth = 0.8, linetype = "31") +
-  geom_point(data = demog_trends, size = 2) +
-  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-  labs(x = NULL, y = "Taille moyenne du ménage", colour = "Observatoire") +
-  theme_minimal()
+demog_trends |> ror_trend(y_var = taille_moy,
+                          y_label = "Taille moyenne du ménage",
+                          gap_year = 2015)
 ```
 
 ```{r fig_demog_fem_cm}
@@ -1745,13 +1648,10 @@ ggplot(mapping = aes(x = year, y = taille_moy, colour = Observatory)) +
 #| fig-height: 5
 
 if ("pct_fem_cm" %in% names(demog_trends)) {
-  ggplot(mapping = aes(x = year, y = pct_fem_cm, colour = Observatory)) +
-    geom_line(data = demog_solid |> filter(!is.na(pct_fem_cm)), linewidth = 0.8) +
-    geom_line(data = demog_gap |> filter(!is.na(pct_fem_cm)), linewidth = 0.8, linetype = "31") +
-    geom_point(data = demog_trends |> filter(!is.na(pct_fem_cm)), size = 2) +
-    scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-    labs(x = NULL, y = "% de chefs de ménage femmes", colour = "Observatoire") +
-    theme_minimal()
+  demog_trends |> filter(!is.na(pct_fem_cm)) |>
+    ror_trend(y_var = pct_fem_cm,
+              y_label = "% de chefs de ménage femmes",
+              gap_year = 2015)
 }
 ```
 
@@ -1761,14 +1661,10 @@ if ("pct_fem_cm" %in% names(demog_trends)) {
 #| fig-height: 5
 
 if ("taux_scol" %in% names(demog_trends)) {
-  ggplot(mapping = aes(x = year, y = taux_scol, colour = Observatory)) +
-    geom_line(data = demog_solid |> filter(!is.na(taux_scol)), linewidth = 0.8) +
-    geom_line(data = demog_gap |> filter(!is.na(taux_scol)), linewidth = 0.8, linetype = "31") +
-    geom_point(data = demog_trends |> filter(!is.na(taux_scol)), size = 2) +
-    scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-    scale_y_continuous(limits = c(0, 100)) +
-    labs(x = NULL, y = "Taux de scolarisation 6-14 ans (%)", colour = "Observatoire") +
-    theme_minimal()
+  demog_trends |> filter(!is.na(taux_scol)) |>
+    ror_trend(y_var = taux_scol,
+              y_label = "Taux de scolarisation 6-14 ans (%)",
+              gap_year = 2015)
 }
 ```
 
@@ -1778,13 +1674,10 @@ if ("taux_scol" %in% names(demog_trends)) {
 #| fig-height: 5
 
 if ("age_cm_moy" %in% names(demog_trends)) {
-  ggplot(mapping = aes(x = year, y = age_cm_moy, colour = Observatory)) +
-    geom_line(data = demog_solid |> filter(!is.na(age_cm_moy)), linewidth = 0.8) +
-    geom_line(data = demog_gap |> filter(!is.na(age_cm_moy)), linewidth = 0.8, linetype = "31") +
-    geom_point(data = demog_trends |> filter(!is.na(age_cm_moy)), size = 2) +
-    scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-    labs(x = NULL, y = "Âge moyen du chef de ménage", colour = "Observatoire") +
-    theme_minimal()
+  demog_trends |> filter(!is.na(age_cm_moy)) |>
+    ror_trend(y_var = age_cm_moy,
+              y_label = "Âge moyen du chef de ménage",
+              gap_year = 2015)
 }
 ```
 

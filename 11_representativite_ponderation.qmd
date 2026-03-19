@@ -197,16 +197,13 @@ sampling |>
 
 sampling |>
   filter(!is.na(taux_sondage)) |>
-  ggplot(aes(x = reorder(Site, taux_sondage), y = taux_sondage,
-             fill = Observatory)) +
-  geom_col() +
-  coord_flip() +
-  facet_wrap(~Observatory, scales = "free_y") +
-  labs(x = NULL, y = "Taux de sondage (%)", fill = "Observatoire",
-       title = "Taux de sondage par site") +
-  theme_minimal() +
-  theme(plot.title = element_text(face = "bold"),
-        legend.position = "none")
+  ror_bar(
+    x = Site,
+    y = taux_sondage,
+    title = "Taux de sondage par site",
+    y_label = "Taux de sondage (%)",
+    show_pct = FALSE
+  )
 ```
 
 ### Estimations pondérées vs. non pondérées
@@ -747,7 +744,7 @@ ggplot(pyramid_combined, aes(x = Tranche, y = pct)) +
   labs(title = "Comparaison des pyramides des âges",
        subtitle = "Barres pleines : OR 2025 — Contours noirs : RGPH 2018",
        x = NULL, y = "% de la population") +
-  theme_minimal() +
+  theme_ror() +
   theme(plot.title = element_text(face = "bold"),
         plot.subtitle = element_text(color = "grey40"),
         strip.text = element_text(face = "bold"))
@@ -1329,33 +1326,16 @@ Un panel de ménages vieillit mécaniquement : si les mêmes ménages sont suivi
 
 hist_summary |>
   filter(!is.na(age_moy_cm)) |>
-  ggplot(aes(x = year, y = age_moy_cm, color = Observatory)) +
-  geom_line(linewidth = 0.8) +
-  geom_point(size = 2) +
-  # Rupture 2014-2025
-  geom_segment(
-    data = hist_summary |>
-      filter(year %in% c(2014, 2025)) |>
-      arrange(Observatory, year) |>
-      reframe(
-        x = year[1], xend = year[2],
-        y = age_moy_cm[1], yend = age_moy_cm[2],
-        .by = Observatory
-      ),
-    aes(x = x, xend = xend, y = y, yend = yend, color = Observatory),
-    linetype = "dashed", linewidth = 0.5, show.legend = FALSE
+  ror_trend(
+    y_var = age_moy_cm,
+    y_label = "Âge moyen du CM",
+    gap_year = 2014,
+    title = "Dérive du panel : vieillissement des chefs de ménage"
   ) +
   annotate("rect", xmin = 2014.5, xmax = 2024.5, ymin = -Inf, ymax = Inf,
            fill = "grey90", alpha = 0.5) +
   annotate("text", x = 2019.5, y = 50, label = "Interruption\n(2015–2024)",
-           size = 3, color = "grey50") +
-  scale_x_continuous(breaks = c(seq(1995, 2015, 5), 2025)) +
-  labs(x = "Année", y = "Âge moyen du CM",
-       title = "Dérive du panel : vieillissement des chefs de ménage",
-       color = "Observatoire") +
-  theme_minimal() +
-  theme(plot.title = element_text(face = "bold"),
-        legend.position = "bottom")
+           size = 3, color = "grey50")
 ```
 
 La @fig-panel-drift montre que l'âge moyen du chef de ménage a augmenté d'environ 3 ans entre 1999 et 2014, passant de ~45 à ~48 ans pour les deux observatoires. Le renouvellement de 2025 ramène l'âge moyen autour de 45–46 ans, plus proche de la structure de la population.

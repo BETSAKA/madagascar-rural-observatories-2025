@@ -7,6 +7,8 @@
 # so that every chapter that sources helpers_report.R gets them automatically.
 
 source("utils/report_variant.R")
+source("utils/plot_theme.R")
+source("utils/ror_plots.R")
 REPORT_MODE <- get_report_mode()
 
 # --- Profile-aware display helpers -----------------------------------------
@@ -20,10 +22,10 @@ REPORT_MODE <- get_report_mode()
 #' @param data Data frame (should contain an Observatory column)
 #' @param ... Additional arguments passed to gt::gt()
 obs_gt <- function(data, ...) {
-  n_obs <- dplyr::n_distinct(data$Observatory)
-  if (n_obs <= 1 && "Observatory" %in% names(data)) {
+  n_groups <- dplyr::n_distinct(data$Observatory)
+  if (n_groups <= 1) {
     data |>
-      dplyr::select(-Observatory) |>
+      dplyr::select(-dplyr::any_of("Observatory")) |>
       gt::gt(...)
   } else {
     gt::gt(data, groupname_col = "Observatory", ...)
@@ -41,7 +43,7 @@ obs_title <- function(base_title) {
   if (mode$is_consolidated) {
     paste(base_title, "par observatoire")
   } else {
-    paste0(base_title, " \u2014 ", mode$observatory)
+    base_title
   }
 }
 
@@ -51,8 +53,8 @@ obs_title <- function(base_title) {
 #' @param data The data used in the plot (to check n observatories)
 #' @param ... Additional arguments passed to facet_wrap
 obs_facet <- function(data, ...) {
-  n_obs <- dplyr::n_distinct(data$Observatory)
-  if (n_obs > 1) {
+  n_fct <- dplyr::n_distinct(data$Observatory)
+  if (n_fct > 1) {
     ggplot2::facet_wrap(~Observatory, ...)
   } else {
     NULL
@@ -564,23 +566,15 @@ make_origin_histogram <- function(
     ) |>
     suppress_in_plot_data()
 
-  n_obs <- dplyr::n_distinct(base$Observatory)
-
-  p <- ggplot2::ggplot(
-    base,
-    ggplot2::aes(x = Variable, y = pct, fill = Member_Type)
-  ) +
-    ggplot2::geom_col(position = "dodge") +
-    ggplot2::labs(title = title, x = var_label, y = "%", fill = NULL) +
-    ggplot2::theme_minimal() +
-    ggplot2::theme(
-      axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
-      plot.title = ggplot2::element_text(hjust = 0.5, face = "bold")
+  base |>
+    ror_bar_grouped(
+      x = Variable,
+      fill = Member_Type,
+      title = title,
+      y_label = "%",
+      direction = "vertical",
+      x_angle = 45
     )
-  if (n_obs > 1) {
-    p <- p + ggplot2::facet_wrap(~Observatory)
-  }
-  p
 }
 
 # ----------------------------------------------------------
@@ -652,67 +646,22 @@ tabulate_binary_set <- function(
 
 #' Standard horizontal bar chart, optionally faceted by Observatory
 #'
-#' When data contains a single observatory, no faceting is applied.
+#' Backward-compatible wrapper around `ror_bar()`.
 #' @param data Tibble with Observatory, a label column, and a percentage column
 #' @param x Unquoted column for labels (default: Type)
 #' @param y Unquoted column for values  (default: pct)
 #' @param title Plot title
 make_bar_obs <- function(data, x = Type, y = pct, title = "") {
-  n_obs <- dplyr::n_distinct(data$Observatory)
-  # Adaptive sizes: reduce text when many facets (observatory profiles)
-  base_sz <- if (n_obs > 3) 10 else 13
-  label_sz <- if (n_obs > 3) 2.5 else 3.5
-  p <- ggplot2::ggplot(
-    data,
-    ggplot2::aes(
-      x = stats::reorder({{ x }}, {{ y }}),
-      y = {{ y }},
-      fill = Observatory
-    )
-  ) +
-    ggplot2::geom_col(show.legend = FALSE) +
-    ggplot2::coord_flip() +
-    ggplot2::geom_text(
-      ggplot2::aes(label = paste0({{ y }}, "%")),
-      hjust = -0.1,
-      size = label_sz
-    ) +
-    ggplot2::scale_y_continuous(
-      expand = ggplot2::expansion(mult = c(0, 0.15))
-    ) +
-    ggplot2::labs(title = title, x = NULL, y = NULL) +
-    ggplot2::theme_minimal(base_size = base_sz)
-  if (n_obs > 1) {
-    # Use 2 columns when many facets to avoid vertical cramming
-    ncol_facet <- if (n_obs > 3) 2L else 1L
-    p <- p +
-      ggplot2::facet_wrap(~Observatory, ncol = ncol_facet, scales = "free_y")
-  }
-  p
+  ror_bar(data, x = {{ x }}, y = {{ y }}, title = title)
 }
 
 #' Standard multi-year trend plot with solid/gap line style
 #'
+#' Backward-compatible wrapper around `ror_trend()`.
 #' @param data Full trends data
 #' @param y_var Unquoted y variable
 #' @param y_label Y-axis label
 #' @param gap_year Year marking the start of the data gap (default 2014)
 make_trend_plot <- function(data, y_var, y_label, gap_year = 2014) {
-  solid <- data |> dplyr::filter(year <= gap_year)
-  gap <- data |> dplyr::filter(year >= gap_year)
-  ggplot2::ggplot(
-    mapping = ggplot2::aes(x = year, y = {{ y_var }}, colour = Observatory)
-  ) +
-    ggplot2::geom_line(data = solid, linewidth = 0.8) +
-    ggplot2::geom_line(data = gap, linewidth = 0.8, linetype = "31") +
-    ggplot2::geom_point(data = data, size = 2) +
-    ggplot2::scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-    ggplot2::scale_y_continuous(labels = scales::label_comma()) +
-    ggplot2::labs(
-      x = NULL,
-      y = y_label,
-      colour = "Observatoire",
-      linetype = NULL
-    ) +
-    ggplot2::theme_minimal()
+  ror_trend(data, y_var = {{ y_var }}, y_label = y_label, gap_year = gap_year)
 }

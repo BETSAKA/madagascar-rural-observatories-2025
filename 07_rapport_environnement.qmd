@@ -126,16 +126,14 @@ dispo <- res_ap_def |>
   ) |>
   filter(!is.na(Disponibilité)) |>
   count(Observatory, Ressource, Disponibilité) |>
-  mutate(pct = n / sum(n) * 100, .by = c(Observatory, Ressource))
+  mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Ressource))
 
-ggplot(dispo, aes(x = fct_reorder(Ressource, pct, .fun = max), y = pct, fill = Disponibilité)) +
-  geom_col(position = "fill") +
-  scale_y_continuous(labels = scales::percent) +
-  scale_fill_manual(values = c("Abondant" = "#2ca02c", "Normal" = "#ffbf00", "Peu ou pas" = "#d62728")) +
-  coord_flip() +
-  facet_wrap(~Observatory) +
-  labs(x = NULL, y = NULL, fill = "Disponibilité") +
-  theme_minimal()
+dispo |>
+  ror_bar_stacked(
+    x = Ressource, y = pct, fill = Disponibilité,
+    direction = "horizontal",
+    palette = c("Abondant" = "#2ca02c", "Normal" = "#ffbf00", "Peu ou pas" = "#d62728")
+  )
 ```
 
 ```{r dl_fig_ressources_dispo}
@@ -157,13 +155,13 @@ dl_fig_variants("fig_ressources_dispo", "10", function(d) {
     ) |>
     filter(!is.na(Dispo)) |>
     count(Observatory, Ressource, Dispo) |>
-    mutate(pct = n / sum(n) * 100, .by = c(Observatory, Ressource))
+    mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Ressource))
   ggplot(dispo, aes(x = fct_reorder(Ressource, pct, .fun = max), y = pct, fill = Dispo)) +
     geom_col(position = "fill") +
     scale_y_continuous(labels = scales::percent) +
     scale_fill_manual(values = c("Abondant" = "#2ca02c", "Normal" = "#ffbf00", "Peu ou pas" = "#d62728")) +
     coord_flip() + facet_wrap(~Observatory) +
-    labs(x = NULL, y = NULL, fill = "Disponibilité") + theme_minimal()
+    labs(x = NULL, y = NULL, fill = "Disponibilité") + theme_ror()
 }, res_ap_def)
 ```
 
@@ -190,16 +188,14 @@ evol <- res_ap_def |>
   ) |>
   filter(!is.na(Évolution)) |>
   count(Observatory, Ressource, Évolution) |>
-  mutate(pct = n / sum(n) * 100, .by = c(Observatory, Ressource))
+  mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Ressource))
 
-ggplot(evol, aes(x = fct_reorder(Ressource, pct, .fun = max), y = pct, fill = Évolution)) +
-  geom_col(position = "fill") +
-  scale_y_continuous(labels = scales::percent) +
-  scale_fill_manual(values = c("En augmentation" = "#2ca02c", "Stable" = "#ffbf00", "En diminution" = "#d62728")) +
-  coord_flip() +
-  facet_wrap(~Observatory) +
-  labs(x = NULL, y = NULL, fill = "Évolution (3 ans)") +
-  theme_minimal()
+evol |>
+  ror_bar_stacked(
+    x = Ressource, y = pct, fill = Évolution,
+    direction = "horizontal",
+    palette = c("En augmentation" = "#2ca02c", "Stable" = "#ffbf00", "En diminution" = "#d62728")
+  )
 ```
 
 ```{r dl_fig_evolution_ressources}
@@ -221,13 +217,13 @@ dl_fig_variants("fig_evolution_ressources", "10", function(d) {
     ) |>
     filter(!is.na(Evol)) |>
     count(Observatory, Ressource, Evol) |>
-    mutate(pct = n / sum(n) * 100, .by = c(Observatory, Ressource))
+    mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Ressource))
   ggplot(evol, aes(x = fct_reorder(Ressource, pct, .fun = max), y = pct, fill = Evol)) +
     geom_col(position = "fill") +
     scale_y_continuous(labels = scales::percent) +
     scale_fill_manual(values = c("En augmentation" = "#2ca02c", "Stable" = "#ffbf00", "En diminution" = "#d62728")) +
     coord_flip() + facet_wrap(~Observatory) +
-    labs(x = NULL, y = NULL, fill = "Évolution (3 ans)") + theme_minimal()
+    labs(x = NULL, y = NULL, fill = "Évolution (3 ans)") + theme_ror()
 }, res_ap_def)
 ```
 
@@ -255,18 +251,10 @@ appart <- rm3_items |>
   pmap_dfr(\(var, label) {
     pct_oui(res_op_env, var, label)
   }) |>
-  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Groupe", values_to = "pct")
+  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
 
-ggplot(appart,
-       aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = paste0(pct, "%")),
-            hjust = -0.1, size = 3) +
-  coord_flip() +
-  facet_wrap(~Groupe) +
-  scale_y_continuous(limits = c(0, 100)) +
-  labs(x = NULL, y = "% de ménages") +
-  theme_minimal()
+appart |>
+  ror_bar(x = Item, y = pct, y_label = "% de ménages")
 ```
 
 ```{r dl_fig_appartenance}
@@ -283,10 +271,12 @@ dl_fig_variants("fig_appartenance", "10", function(d) {
     df |> summarise(pct = round(sum(!!var_sym == 1, na.rm = TRUE) / sum(!is.na(!!var_sym)) * 100, 0), .by = Observatory) |> mutate(Item = label)
   }
   result <- rm3_items |> pmap_dfr(\(var, label) pct_v(d, var, label))
-  ggplot(result, aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") + coord_flip() +
-    scale_y_continuous(limits = c(0, 100)) +
-    labs(x = NULL, y = "% de ménages", fill = "Observatoire") + theme_minimal()
+  result |>
+    mutate(Item = fct_reorder(Item, pct, .fun = max)) |>
+    ror_bar_grouped(
+      x = Item, fill = Observatory,
+      y_label = "% de ménages", direction = "horizontal", facet = FALSE
+    )
 }, res_op_env)
 ```
 
@@ -365,12 +355,13 @@ menaces_long <- bind_rows(
                names_to = "Observatory", values_to = "pct") |>
   filter(!is.na(pct))
 
-ggplot(menaces_long, aes(x = reorder(Item, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
-  coord_flip() +
-  facet_wrap(~Section, scales = "free_y", ncol = 1) +
-  labs(x = NULL, y = "%", fill = "Observatoire") +
-  theme_minimal()
+menaces_long |>
+  mutate(Item = reorder(Item, pct)) |>
+  ror_bar_grouped(
+    x = Item, fill = Observatory,
+    y_label = "%", direction = "horizontal", facet = FALSE
+  ) +
+  facet_wrap(~Section, scales = "free_y", ncol = 1)
 ```
 
 ```{r dl_tbl_menaces}
@@ -428,18 +419,10 @@ rm5_items <- tribble(
 
 repr <- rm5_items |>
   pmap_dfr(\(var, label) pct_oui(res_op_env, var, label)) |>
-  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Groupe", values_to = "pct")
+  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
 
-ggplot(repr,
-       aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = paste0(pct, "%")),
-            hjust = -0.1, size = 3) +
-  coord_flip() +
-  facet_wrap(~Groupe) +
-  scale_y_continuous(limits = c(0, 100)) +
-  labs(x = NULL, y = "% de ménages") +
-  theme_minimal()
+repr |>
+  ror_bar(x = Item, y = pct, y_label = "% de ménages")
 ```
 
 ```{r dl_fig_representation}
@@ -458,10 +441,12 @@ dl_fig_variants("fig_representation", "10", function(d) {
     df |> summarise(pct = round(sum(!!var_sym == 1, na.rm = TRUE) / sum(!is.na(!!var_sym)) * 100, 0), .by = Observatory) |> mutate(Item = label)
   }
   result <- rm5_items |> pmap_dfr(\(var, label) pct_v(d, var, label))
-  ggplot(result, aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") + coord_flip() +
-    scale_y_continuous(limits = c(0, 100)) +
-    labs(x = NULL, y = "% de ménages", fill = "Observatoire") + theme_minimal()
+  result |>
+    mutate(Item = fct_reorder(Item, pct, .fun = max)) |>
+    ror_bar_grouped(
+      x = Item, fill = Observatory,
+      y_label = "% de ménages", direction = "horizontal", facet = FALSE
+    )
 }, res_op_env)
 ```
 
@@ -495,13 +480,8 @@ ef_pct <- ef_men |>
   left_join(res_deb |> count(Observatory, name = "n_tot"), by = "Observatory") |>
   mutate(pct = round(n / n_tot * 100, 1))
 
-ggplot(ef_pct, aes(x = Produit, y = pct, fill = Observatory)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = paste0(round(pct, 0), "%")),
-            vjust = -0.3, size = 3) +
-  facet_wrap(~Observatory) +
-  labs(x = NULL, y = "% des ménages") +
-  theme_minimal()
+ef_pct |>
+  ror_bar_v(x = Produit, y = pct, y_label = "% des ménages", show_pct = TRUE)
 ```
 
 ```{r dl_fig_ef_produits}
@@ -513,9 +493,11 @@ dl_fig_variants("fig_ef_produits", "10", function(d) {
   n_tot <- d |> distinct(j5, Observatory) |> count(Observatory, name = "n_tot")
   ef_pct <- ef_men |> count(Observatory, Produit) |> left_join(n_tot, by = "Observatory") |>
     mutate(pct = round(n / n_tot * 100, 1))
-  ggplot(ef_pct, aes(x = Produit, y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") +
-    labs(x = NULL, y = "% des ménages", fill = "Observatoire") + theme_minimal()
+  ef_pct |>
+    ror_bar_grouped(
+      x = Produit, fill = Observatory,
+      y_label = "% des ménages", direction = "vertical", facet = FALSE
+    )
 }, res_ef)
 ```
 
@@ -535,14 +517,14 @@ ef_orig <- res_ef |>
     )
   ) |>
   count(Observatory, Produit, Origine) |>
-  mutate(pct = n / sum(n) * 100, .by = c(Observatory, Produit))
+  mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Produit))
 
-ggplot(ef_orig, aes(x = Produit, y = pct, fill = Origine)) +
-  geom_col(position = "stack") +
-  facet_wrap(~Observatory) +
-  scale_fill_manual(values = c("Dans l'AP" = "#d62728", "Hors AP" = "#2ca02c")) +
-  labs(x = NULL, y = "% des activités de collecte", fill = "Origine") +
-  theme_minimal()
+ef_orig |>
+  ror_bar_stacked(
+    x = Produit, y = pct, fill = Origine,
+    proportion = FALSE, direction = "vertical",
+    palette = c("Dans l'AP" = "#d62728", "Hors AP" = "#2ca02c")
+  )
 ```
 
 ```{r dl_fig_ef_origine}
@@ -555,11 +537,11 @@ dl_fig_variants("fig_ef_origine", "10", function(d) {
     left_join(ef_labels, by = "ef_lig") |>
     mutate(Origine = case_when(efb == 1 ~ "Dans l'AP", efb == 2 ~ "Hors AP")) |>
     count(Observatory, Produit, Origine) |>
-    mutate(pct = n / sum(n) * 100, .by = c(Observatory, Produit))
+    mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Produit))
   ggplot(ef_orig, aes(x = Produit, y = pct, fill = Origine)) +
     geom_col(position = "stack") + facet_wrap(~Observatory) +
     scale_fill_manual(values = c("Dans l'AP" = "#d62728", "Hors AP" = "#2ca02c")) +
-    labs(x = NULL, y = "% des activités", fill = "Origine") + theme_minimal()
+    labs(x = NULL, y = "% des activités", fill = "Origine") + theme_ror()
 }, res_ef)
 ```
 
@@ -585,14 +567,14 @@ ef_saison <- res_ef |>
     actif = if_else(actif == 1, 1, 0, missing = 0)
   ) |>
   summarise(n_actif = sum(actif), n_total = n(), .by = c(Observatory, Produit, Mois)) |>
-  mutate(pct = n_actif / n_total * 100)
+  mutate(pct = round(n_actif / n_total * 100, 1))
 
 ggplot(ef_saison, aes(x = Mois, y = pct, color = Produit, group = Produit)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 1.5) +
   facet_wrap(~Observatory) +
   labs(x = NULL, y = "% actifs", color = "Produit") +
-  theme_minimal() +
+  theme_ror() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
@@ -611,12 +593,12 @@ dl_fig_variants("fig_ef_saison", "10", function(d) {
            Mois = factor(mois_labs[mois_num], levels = mois_labs),
            actif = if_else(actif == 1, 1, 0, missing = 0)) |>
     summarise(n_actif = sum(actif), n_total = n(), .by = c(Observatory, Produit, Mois)) |>
-    mutate(pct = n_actif / n_total * 100)
+    mutate(pct = round(n_actif / n_total * 100, 1))
   ggplot(ef_s, aes(x = Mois, y = pct, color = Produit, group = Produit)) +
     geom_line(linewidth = 0.8) + geom_point(size = 1.5) +
     facet_wrap(~Observatory) +
     labs(x = NULL, y = "% actifs", color = "Produit") +
-    theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    theme_ror() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 }, res_ef)
 ```
 
@@ -777,18 +759,10 @@ non_items <- tribble(
 
 non_freq <- non_items |>
   pmap_dfr(\(var, label) pct_oui(um1_non, var, label)) |>
-  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Groupe", values_to = "pct")
+  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
 
-ggplot(non_freq,
-       aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = paste0(pct, "%")),
-            hjust = -0.1, size = 3) +
-  coord_flip() +
-  facet_wrap(~Groupe) +
-  scale_y_continuous(limits = c(0, 100)) +
-  labs(x = NULL, y = "% de ménages") +
-  theme_minimal()
+non_freq |>
+  ror_bar(x = Item, y = pct, y_label = "% de ménages")
 ```
 
 ```{r dl_fig_non_freq}
@@ -806,10 +780,12 @@ dl_fig_variants("fig_non_freq", "10", function(d) {
   }
   um1_non <- d |> filter(um1 == 2)
   result <- non_items |> pmap_dfr(\(var, label) pct_v(um1_non, var, label))
-  ggplot(result, aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") + coord_flip() +
-    scale_y_continuous(limits = c(0, 100)) +
-    labs(x = NULL, y = "% de ménages", fill = "Observatoire") + theme_minimal()
+  result |>
+    mutate(Item = fct_reorder(Item, pct, .fun = max)) |>
+    ror_bar_grouped(
+      x = Item, fill = Observatory,
+      y_label = "% de ménages", direction = "horizontal", facet = FALSE
+    )
 }, res_um1)
 ```
 
@@ -849,15 +825,8 @@ usages <- res_um2 |>
   ) |>
   mutate(pct = round(n / n_usagers * 100, 0))
 
-ggplot(usages, aes(x = fct_reorder(Raison, pct, .fun = max), y = pct, fill = Observatory)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = paste0(pct, "%")),
-            hjust = -0.1, size = 3) +
-  coord_flip() +
-  facet_wrap(~Observatory) +
-  scale_y_continuous(limits = c(0, 110)) +
-  labs(x = NULL, y = "% des usagers de l'AP") +
-  theme_minimal()
+usages |>
+  ror_bar(x = Raison, y = pct, y_label = "% des usagers de l'AP")
 ```
 
 ```{r dl_fig_usages_ap}
@@ -876,9 +845,12 @@ dl_fig_variants("fig_usages_ap", "10", function(d) {
   n_usagers <- d |> filter(um2_lig == 1) |> distinct(j5, Observatory) |> count(Observatory, name = "n_us")
   usage_pct <- usagers |> left_join(n_usagers, by = "Observatory") |>
     mutate(pct = round(n / n_us * 100, 0))
-  ggplot(usage_pct, aes(x = fct_reorder(Raison, pct, .fun = max), y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") + coord_flip() +
-    labs(x = NULL, y = "% des usagers", fill = "Observatoire") + theme_minimal()
+  usage_pct |>
+    mutate(Raison = fct_reorder(Raison, pct, .fun = max)) |>
+    ror_bar_grouped(
+      x = Raison, fill = Observatory,
+      y_label = "% des usagers", direction = "horizontal", facet = FALSE
+    )
 }, res_um2)
 ```
 
@@ -903,16 +875,15 @@ freq_usage <- res_um2 |>
 
 freq_pct <- freq_usage |>
   count(Observatory, Raison, Fréquence) |>
-  mutate(pct = n / sum(n) * 100, .by = c(Observatory, Raison))
+  mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Raison))
 
-ggplot(freq_pct, aes(x = fct_reorder(Raison, n, .fun = sum), y = pct, fill = Fréquence)) +
-  geom_col(position = "fill") +
-  scale_y_continuous(labels = scales::percent) +
-  scale_fill_brewer(palette = "YlOrRd", direction = -1) +
-  coord_flip() +
-  facet_wrap(~Observatory) +
-  labs(x = NULL, y = NULL, fill = "Fréquence") +
-  theme_minimal()
+freq_pct |>
+  mutate(Raison = fct_reorder(Raison, n, .fun = sum)) |>
+  ror_bar_stacked(
+    x = Raison, y = pct, fill = Fréquence,
+    direction = "horizontal"
+  ) +
+  scale_fill_brewer(palette = "YlOrRd", direction = -1)
 ```
 
 ```{r dl_fig_freq_usages}
@@ -932,13 +903,13 @@ dl_fig_variants("fig_freq_usages", "10", function(d) {
     left_join(um2_labels, by = "um2_lig") |>
     mutate(Fréquence = factor(freq_labels[as.character(um2_b)], levels = rev(freq_labels))) |>
     count(Observatory, Raison, Fréquence) |>
-    mutate(pct = n / sum(n) * 100, .by = c(Observatory, Raison))
+    mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Raison))
   ggplot(freq_pct, aes(x = fct_reorder(Raison, n, .fun = sum), y = pct, fill = Fréquence)) +
     geom_col(position = "fill") +
     scale_y_continuous(labels = scales::percent) +
     scale_fill_brewer(palette = "YlOrRd", direction = -1) +
     coord_flip() + facet_wrap(~Observatory) +
-    labs(x = NULL, y = NULL, fill = "Fréquence") + theme_minimal()
+    labs(x = NULL, y = NULL, fill = "Fréquence") + theme_ror()
 }, res_um2)
 ```
 
@@ -970,14 +941,14 @@ ap_saison <- res_um2 |>
     actif = if_else(actif == 1, 1, 0, missing = 0)
   ) |>
   summarise(n_actif = sum(actif), n_total = n(), .by = c(Observatory, Raison, Mois)) |>
-  mutate(pct = n_actif / n_total * 100)
+  mutate(pct = round(n_actif / n_total * 100, 1))
 
 ggplot(ap_saison, aes(x = Mois, y = pct, color = Raison, group = Raison)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 1.5) +
   facet_wrap(~Observatory) +
   labs(x = NULL, y = "% actifs", color = "Raison") +
-  theme_minimal() +
+  theme_ror() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
@@ -1003,12 +974,12 @@ dl_fig_variants("fig_saison_ap", "10", function(d) {
            Mois = factor(mois_labs[mois_num], levels = mois_labs),
            actif = if_else(actif == 1, 1, 0, missing = 0)) |>
     summarise(n_actif = sum(actif), n_total = n(), .by = c(Observatory, Raison, Mois)) |>
-    mutate(pct = n_actif / n_total * 100)
+    mutate(pct = round(n_actif / n_total * 100, 1))
   ggplot(ap_s, aes(x = Mois, y = pct, color = Raison, group = Raison)) +
     geom_line(linewidth = 0.8) + geom_point(size = 1.5) +
     facet_wrap(~Observatory) +
     labs(x = NULL, y = "% actifs", color = "Raison") +
-    theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    theme_ror() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 }, res_um2)
 ```
 
@@ -1041,18 +1012,10 @@ feu_items <- tribble(
 
 feu_raisons <- feu_items |>
   pmap_dfr(\(var, label) pct_oui(res_feubrousse, var, label)) |>
-  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Groupe", values_to = "pct")
+  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
 
-ggplot(feu_raisons,
-       aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = paste0(pct, "%")),
-            hjust = -0.1, size = 3) +
-  coord_flip() +
-  facet_wrap(~Groupe) +
-  scale_y_continuous(limits = c(0, 100)) +
-  labs(x = NULL, y = "% de ménages") +
-  theme_minimal()
+feu_raisons |>
+  ror_bar(x = Item, y = pct, y_label = "% de ménages")
 ```
 
 ```{r dl_fig_raisons_feux}
@@ -1072,10 +1035,12 @@ dl_fig_variants("fig_raisons_feux", "10", function(d) {
     df |> summarise(pct = round(sum(!!var_sym == 1, na.rm = TRUE) / sum(!is.na(!!var_sym)) * 100, 0), .by = Observatory) |> mutate(Item = label)
   }
   result <- feu_items |> pmap_dfr(\(var, label) pct_v(d, var, label))
-  ggplot(result, aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") + coord_flip() +
-    scale_y_continuous(limits = c(0, 100)) +
-    labs(x = NULL, y = "% de ménages", fill = "Observatoire") + theme_minimal()
+  result |>
+    mutate(Item = fct_reorder(Item, pct, .fun = max)) |>
+    ror_bar_grouped(
+      x = Item, fill = Observatory,
+      y_label = "% de ménages", direction = "horizontal", facet = FALSE
+    )
 }, res_feubrousse)
 ```
 
@@ -1146,11 +1111,12 @@ feu_long <- feu_tbl |>
                names_to = "Observatory", values_to = "pct") |>
   filter(!is.na(pct))
 
-ggplot(feu_long, aes(x = reorder(Item, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
-  coord_flip() +
-  labs(x = NULL, y = "%", fill = "Observatoire") +
-  theme_minimal()
+feu_long |>
+  mutate(Item = reorder(Item, pct)) |>
+  ror_bar_grouped(
+    x = Item, fill = Observatory,
+    y_label = "%", direction = "horizontal", facet = FALSE
+  )
 ```
 
 ```{r dl_tbl_feux}
@@ -1194,13 +1160,13 @@ feu_saison <- res_feubrousse |>
     actif = if_else(actif == 1, 1, 0, missing = 0)
   ) |>
   summarise(n_actif = sum(actif), n_total = n(), .by = c(Observatory, Mois)) |>
-  mutate(pct = n_actif / n_total * 100)
+  mutate(pct = round(n_actif / n_total * 100, 1))
 
 ggplot(feu_saison, aes(x = Mois, y = pct, color = Observatory, group = Observatory)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 2) +
   labs(x = NULL, y = "% des ménages ayant fait du feu", color = "Observatoire") +
-  theme_minimal() +
+  theme_ror() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
@@ -1217,11 +1183,11 @@ dl_fig_variants("fig_saison_feux", "10", function(d) {
            Mois = factor(mois_labs[mois_num], levels = mois_labs),
            actif = if_else(actif == 1, 1, 0, missing = 0)) |>
     summarise(n_actif = sum(actif), n_total = n(), .by = c(Observatory, Mois)) |>
-    mutate(pct = n_actif / n_total * 100)
+    mutate(pct = round(n_actif / n_total * 100, 1))
   ggplot(feu_s, aes(x = Mois, y = pct, color = Observatory, group = Observatory)) +
     geom_line(linewidth = 0.8) + geom_point(size = 2) +
     labs(x = NULL, y = "% des ménages ayant fait du feu", color = "Observatoire") +
-    theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    theme_ror() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 }, res_feubrousse)
 ```
 
@@ -1248,13 +1214,8 @@ evol_feux <- res_feubrousse |>
   count(Observatory, Évolution) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
-ggplot(evol_feux, aes(x = Évolution, y = pct, fill = Observatory)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = paste0(round(pct, 0), "%")),
-            vjust = -0.3, size = 3) +
-  facet_wrap(~Observatory) +
-  labs(x = NULL, y = "% de ménages") +
-  theme_minimal()
+evol_feux |>
+  ror_bar_v(x = Évolution, y = pct, y_label = "% de ménages", show_pct = TRUE)
 ```
 
 ```{r dl_fig_evol_feux}
@@ -1269,9 +1230,11 @@ dl_fig_variants("fig_evol_feux", "10", function(d) {
     ) |>
     count(Observatory, Evol) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
-  ggplot(evol, aes(x = Evol, y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") +
-    labs(x = NULL, y = "% de ménages", fill = "Observatoire") + theme_minimal()
+  evol |>
+    ror_bar_grouped(
+      x = Evol, fill = Observatory,
+      y_label = "% de ménages", direction = "vertical", facet = FALSE
+    )
 }, res_feubrousse)
 ```
 
@@ -1296,14 +1259,8 @@ prob_feux <- res_feubrousse |>
   count(Observatory, Importance) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
-ggplot(prob_feux, aes(x = Importance, y = pct, fill = Observatory)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = paste0(round(pct, 0), "%")),
-            vjust = -0.3, size = 3) +
-  facet_wrap(~Observatory) +
-  labs(x = NULL, y = "% de ménages") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 15, hjust = 1))
+prob_feux |>
+  ror_bar_v(x = Importance, y = pct, y_label = "% de ménages", show_pct = TRUE, x_angle = 15)
 ```
 
 ```{r dl_fig_probleme_feux}
@@ -1321,10 +1278,11 @@ dl_fig_variants("fig_probleme_feux", "10", function(d) {
     ) |>
     count(Observatory, Importance) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
-  ggplot(prob, aes(x = Importance, y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") +
-    labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
-    theme_minimal() + theme(axis.text.x = element_text(angle = 15, hjust = 1))
+  prob |>
+    ror_bar_grouped(
+      x = Importance, fill = Observatory,
+      y_label = "% de ménages", direction = "vertical", x_angle = 15, facet = FALSE
+    )
 }, res_feubrousse)
 ```
 
@@ -1347,13 +1305,8 @@ regl_feux <- res_feubrousse |>
   count(Observatory, Avis) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
-ggplot(regl_feux, aes(x = Avis, y = pct, fill = Observatory)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = paste0(round(pct, 0), "%")),
-            vjust = -0.3, size = 3) +
-  facet_wrap(~Observatory) +
-  labs(x = NULL, y = "% de ménages") +
-  theme_minimal()
+regl_feux |>
+  ror_bar_v(x = Avis, y = pct, y_label = "% de ménages", show_pct = TRUE)
 ```
 
 ```{r dl_fig_reglementation_feux}
@@ -1368,9 +1321,11 @@ dl_fig_variants("fig_reglementation_feux", "10", function(d) {
     ) |>
     count(Observatory, Avis) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
-  ggplot(regl, aes(x = Avis, y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") +
-    labs(x = NULL, y = "% de ménages", fill = "Observatoire") + theme_minimal()
+  regl |>
+    ror_bar_grouped(
+      x = Avis, fill = Observatory,
+      y_label = "% de ménages", direction = "vertical", facet = FALSE
+    )
 }, res_feubrousse)
 ```
 
@@ -1412,11 +1367,12 @@ ap_long <- ap_items |>
                names_to = "Observatory", values_to = "pct") |>
   filter(!is.na(pct))
 
-ggplot(ap_long, aes(x = reorder(Item, pct), y = pct, fill = Observatory)) +
-  geom_col(position = "dodge") +
-  coord_flip() +
-  labs(x = NULL, y = "%", fill = "Observatoire") +
-  theme_minimal()
+ap_long |>
+  mutate(Item = reorder(Item, pct)) |>
+  ror_bar_grouped(
+    x = Item, fill = Observatory,
+    y_label = "%", direction = "horizontal", facet = FALSE
+  )
 ```
 
 ```{r dl_tbl_connaissance_ap}
@@ -1469,19 +1425,18 @@ ap3_data <- res_ap |>
     Jugement = factor(ap3_labels[as.character(Valeur)], levels = ap3_labels)
   ) |>
   count(Observatory, Dimension, Jugement) |>
-  mutate(pct = n / sum(n) * 100, .by = c(Observatory, Dimension))
+  mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Dimension))
 
-ggplot(ap3_data, aes(x = Dimension, y = pct, fill = Jugement)) +
-  geom_col(position = "fill") +
-  scale_y_continuous(labels = scales::percent) +
-  scale_fill_manual(values = c(
-    "Très positif" = "#2ca02c", "Plutôt positif" = "#98df8a",
-    "Plutôt négatif" = "#ff9896", "Très négatif" = "#d62728",
-    "Ne connaît pas" = "#cccccc"
-  )) +
-  facet_wrap(~Observatory) +
-  labs(x = NULL, y = NULL, fill = "Jugement") +
-  theme_minimal()
+ap3_data |>
+  ror_bar_stacked(
+    x = Dimension, y = pct, fill = Jugement,
+    direction = "horizontal",
+    palette = c(
+      "Très positif" = "#2ca02c", "Plutôt positif" = "#98df8a",
+      "Plutôt négatif" = "#ff9896", "Très négatif" = "#d62728",
+      "Ne connaît pas" = "#cccccc"
+    )
+  )
 ```
 
 ```{r dl_fig_jugement_ap}
@@ -1499,13 +1454,13 @@ dl_fig_variants("fig_jugement_ap", "10", function(d) {
       Jugement = factor(ap3_labels[as.character(Valeur)], levels = ap3_labels)
     ) |>
     count(Observatory, Dimension, Jugement) |>
-    mutate(pct = n / sum(n) * 100, .by = c(Observatory, Dimension))
+    mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Dimension))
   ggplot(ap3_data, aes(x = Dimension, y = pct, fill = Jugement)) +
     geom_col(position = "fill") +
     scale_y_continuous(labels = scales::percent) +
     scale_fill_manual(values = c("Très positif" = "#2ca02c", "Plutôt positif" = "#98df8a", "Plutôt négatif" = "#ff9896", "Très négatif" = "#d62728", "Ne connaît pas" = "#cccccc")) +
     facet_wrap(~Observatory) +
-    labs(x = NULL, y = NULL, fill = "Jugement") + theme_minimal()
+    labs(x = NULL, y = NULL, fill = "Jugement") + theme_ror()
 }, res_ap)
 ```
 
@@ -1535,15 +1490,8 @@ gest <- res_ap |>
   count(Observatory, Gestionnaire) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
-ggplot(gest, aes(x = fct_reorder(Gestionnaire, pct, .fun = max), y = pct, fill = Observatory)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = paste0(round(pct, 0), "%")),
-            hjust = -0.1, size = 3) +
-  coord_flip() +
-  facet_wrap(~Observatory) +
-  scale_y_continuous(limits = c(0, 80)) +
-  labs(x = NULL, y = "% de ménages") +
-  theme_minimal()
+gest |>
+  ror_bar(x = Gestionnaire, y = pct, y_label = "% de ménages")
 ```
 
 ```{r dl_fig_gestionnaire}
@@ -1556,9 +1504,12 @@ dl_fig_variants("fig_gestionnaire", "10", function(d) {
     mutate(Gestionnaire = factor(gest_labels[as.character(ap5a)], levels = gest_labels)) |>
     count(Observatory, Gestionnaire) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
-  ggplot(gest, aes(x = fct_reorder(Gestionnaire, pct, .fun = max), y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") + coord_flip() +
-    labs(x = NULL, y = "% de ménages", fill = "Observatoire") + theme_minimal()
+  gest |>
+    mutate(Gestionnaire = fct_reorder(Gestionnaire, pct, .fun = max)) |>
+    ror_bar_grouped(
+      x = Gestionnaire, fill = Observatory,
+      y_label = "% de ménages", direction = "horizontal", facet = FALSE
+    )
 }, res_ap)
 ```
 
@@ -1593,18 +1544,10 @@ ap_favorable <- res_ap |> filter(ap5 == 1)
 
 mesures <- ap5b_items |>
   pmap_dfr(\(var, label) pct_oui(ap_favorable, var, label)) |>
-  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Groupe", values_to = "pct")
+  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
 
-ggplot(mesures,
-       aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Groupe)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = paste0(pct, "%")),
-            hjust = -0.1, size = 3) +
-  coord_flip() +
-  facet_wrap(~Groupe) +
-  scale_y_continuous(limits = c(0, 100)) +
-  labs(x = NULL, y = "% de ménages") +
-  theme_minimal()
+mesures |>
+  ror_bar(x = Item, y = pct, y_label = "% de ménages")
 ```
 
 ```{r dl_fig_mesures_protection}
@@ -1627,10 +1570,12 @@ dl_fig_variants("fig_mesures_protection", "10", function(d) {
   }
   ap_fav <- d |> filter(ap5 == 1)
   result <- ap5b_items |> pmap_dfr(\(var, label) pct_v(ap_fav, var, label))
-  ggplot(result, aes(x = fct_reorder(Item, pct, .fun = max), y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") + coord_flip() +
-    scale_y_continuous(limits = c(0, 100)) +
-    labs(x = NULL, y = "% de ménages", fill = "Observatoire") + theme_minimal()
+  result |>
+    mutate(Item = fct_reorder(Item, pct, .fun = max)) |>
+    ror_bar_grouped(
+      x = Item, fill = Observatory,
+      y_label = "% de ménages", direction = "horizontal", facet = FALSE
+    )
 }, res_ap)
 ```
 
@@ -1659,15 +1604,8 @@ priorite <- res_ap |>
   count(Observatory, Priorité) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
-ggplot(priorite, aes(x = fct_reorder(Priorité, pct, .fun = max), y = pct, fill = Observatory)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = paste0(round(pct, 0), "%")),
-            hjust = -0.1, size = 3) +
-  coord_flip() +
-  facet_wrap(~Observatory) +
-  scale_y_continuous(limits = c(0, 60)) +
-  labs(x = NULL, y = "% de ménages") +
-  theme_minimal()
+priorite |>
+  ror_bar(x = Priorité, y = pct, y_label = "% de ménages")
 ```
 
 ```{r dl_fig_priorite}
@@ -1680,9 +1618,12 @@ dl_fig_variants("fig_priorite", "10", function(d) {
     mutate(Priorité = factor(ap8_labels[as.character(ap8)], levels = ap8_labels)) |>
     count(Observatory, Priorité) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
-  ggplot(prio, aes(x = fct_reorder(Priorité, pct, .fun = max), y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") + coord_flip() +
-    labs(x = NULL, y = "% de ménages", fill = "Observatoire") + theme_minimal()
+  prio |>
+    mutate(Priorité = fct_reorder(Priorité, pct, .fun = max)) |>
+    ror_bar_grouped(
+      x = Priorité, fill = Observatory,
+      y_label = "% de ménages", direction = "horizontal", facet = FALSE
+    )
 }, res_ap)
 ```
 
@@ -1721,16 +1662,13 @@ ap2_data <- res_ap2 |>
   pivot_longer(c(`Informé`, `Consulté`, `Bénéficié`), names_to = "Indicateur", values_to = "pct") |>
   mutate(Indicateur = factor(Indicateur, levels = c("Informé", "Consulté", "Bénéficié")))
 
-ggplot(ap2_data, aes(x = fct_reorder(Action, pct, .fun = max), y = pct, fill = Indicateur)) +
-  geom_col(position = "dodge") +
-  geom_text(aes(label = paste0(pct, "%")),
-            position = position_dodge(width = 0.9), hjust = -0.1, size = 2.5) +
-  coord_flip() +
-  scale_y_continuous(limits = c(0, 80)) +
-  scale_fill_brewer(palette = "Set2") +
-  facet_wrap(~Observatory) +
-  labs(x = NULL, y = "% de ménages", fill = NULL) +
-  theme_minimal()
+ap2_data |>
+  mutate(Action = fct_reorder(Action, pct, .fun = max)) |>
+  ror_bar_grouped(
+    x = Action, fill = Indicateur,
+    y_label = "% de ménages", direction = "horizontal"
+  ) +
+  scale_fill_brewer(palette = "Set2")
 ```
 
 ```{r dl_fig_actions_ap}
@@ -1754,11 +1692,13 @@ dl_fig_variants("fig_actions_ap", "10", function(d) {
     ) |>
     pivot_longer(c(Informé, Consulté, Bénéficié), names_to = "Indicateur", values_to = "pct") |>
     mutate(Indicateur = factor(Indicateur, levels = c("Informé", "Consulté", "Bénéficié")))
-  ggplot(ap2_data, aes(x = fct_reorder(Action, pct, .fun = max), y = pct, fill = Indicateur)) +
-    geom_col(position = "dodge") + coord_flip() +
-    facet_wrap(~Observatory) +
-    scale_fill_brewer(palette = "Set2") +
-    labs(x = NULL, y = "% de ménages", fill = NULL) + theme_minimal()
+  ap2_data |>
+    mutate(Action = fct_reorder(Action, pct, .fun = max)) |>
+    ror_bar_grouped(
+      x = Action, fill = Indicateur,
+      y_label = "% de ménages", direction = "horizontal", facet = FALSE
+    ) +
+    scale_fill_brewer(palette = "Set2")
 }, res_ap2)
 ```
  
