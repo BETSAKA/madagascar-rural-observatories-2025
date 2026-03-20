@@ -354,11 +354,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30a)) <span class="sc">|&gt;</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, fr30a) <span class="sc">|&gt;</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> fr30a, <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>) <span class="sc">+</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Nombre de parcelles possédées"</span>, <span class="at">y =</span> <span class="st">"% des ménages"</span>) <span class="sc">+</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> fr30a, <span class="at">y_label =</span> <span class="st">"% des ménages"</span>) <span class="sc">+</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Nombre de parcelles possédées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-nb-parcelles" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -373,69 +370,9 @@ Figure&nbsp;4.1: Distribution du nombre de parcelles possédées par ménage
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_nb_parcelles_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_nb_parcelles_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_nb_parcelles_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_nb_parcelles_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_nb_parcelles_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/fig_nb_parcelles_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/07/fig_nb_parcelles_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_nb_parcelles_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_nb_parcelles_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_nb_parcelles_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_nb_parcelles_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_nb_parcelles_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_nb_parcelles_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_nb_parcelles_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_nb_parcelles_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_nb_parcelles_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -485,7 +422,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
 </figcaption>
 <div aria-describedby="tbl-parcelles-stats-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="vyabkmvbbp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="uaayvobadb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -546,69 +483,9 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/tbl_parcelles_stats_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_parcelles_stats_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_parcelles_stats_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_parcelles_stats_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_parcelles_stats_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/tbl_parcelles_stats_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/07/tbl_parcelles_stats_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/tbl_parcelles_stats_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_parcelles_stats_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_parcelles_stats_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_parcelles_stats_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_parcelles_stats_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_parcelles_stats_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_parcelles_stats_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_parcelles_stats_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_parcelles_stats_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <p>Le <a href="#tbl-parcelles-stats" class="quarto-xref">Table&nbsp;<span>4.1</span></a> résume les principales caractéristiques du patrimoine foncier possédé.</p>
 <div class="obs-alaotra">
 <p><strong>Alaotra.</strong> La superficie moyenne par parcelle est de 51.6 ares, et la surface totale possédée par ménage atteint en moyenne 117.4 ares.</p>
@@ -633,13 +510,8 @@ Alaotra
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30c), <span class="at">levels =</span> <span class="fu">names</span>(type_labs), <span class="at">labels =</span> type_labs)) <span class="sc">|&gt;</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Type) <span class="sc">|&gt;</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Type, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>) <span class="sc">+</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Type, <span class="at">y_label =</span> <span class="st">"% des parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-type-parcelle" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -654,69 +526,9 @@ Figure&nbsp;4.2: Type des parcelles possédées
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_type_parcelle_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_parcelle_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_parcelle_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_parcelle_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_parcelle_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/fig_type_parcelle_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/07/fig_type_parcelle_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_type_parcelle_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_parcelle_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_parcelle_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_parcelle_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_parcelle_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_parcelle_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_parcelle_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_parcelle_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_parcelle_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <p>La localisation des parcelles reflète les spécificités agro-écologiques de chaque site (<a href="#fig-localisation-parcelle" class="quarto-xref">Figure&nbsp;<span>4.3</span></a>).</p>
 <div class="obs-alaotra">
 <p><strong>Alaotra.</strong> Les parcelles se concentrent principalement en plaine (45.3 %).</p>
@@ -732,13 +544,8 @@ Alaotra
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30e)) <span class="sc">|&gt;</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Localisation =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30e), <span class="at">levels =</span> <span class="fu">names</span>(loc_labs), <span class="at">labels =</span> loc_labs)) <span class="sc">|&gt;</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Localisation) <span class="sc">|&gt;</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Localisation, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>) <span class="sc">+</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Localisation, <span class="at">y_label =</span> <span class="st">"% des parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-localisation-parcelle" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -753,69 +560,9 @@ Figure&nbsp;4.3: Localisation des parcelles possédées
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_localisation_parcelle_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_localisation_parcelle_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_localisation_parcelle_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_localisation_parcelle_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_localisation_parcelle_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/fig_localisation_parcelle_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/07/fig_localisation_parcelle_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_localisation_parcelle_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_localisation_parcelle_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_localisation_parcelle_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_localisation_parcelle_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_localisation_parcelle_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_localisation_parcelle_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_localisation_parcelle_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_localisation_parcelle_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_localisation_parcelle_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="irrigation-des-parcelles-possédées" class="level3" data-number="4.1.3">
 <h3 data-number="4.1.3" class="anchored" data-anchor-id="irrigation-des-parcelles-possédées"><span class="header-section-number">4.1.3</span> Irrigation des parcelles possédées</h3>
@@ -828,13 +575,8 @@ Alaotra
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30f)) <span class="sc">|&gt;</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Irrigation =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30f), <span class="at">levels =</span> <span class="fu">names</span>(irrig_labs), <span class="at">labels =</span> irrig_labs)) <span class="sc">|&gt;</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Irrigation) <span class="sc">|&gt;</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Irrigation, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>) <span class="sc">+</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Irrigation, <span class="at">y_label =</span> <span class="st">"% des parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-irrigation-possedee" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -849,69 +591,9 @@ Figure&nbsp;4.4: Mode d’irrigation des parcelles possédées
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_irrigation_possedee_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_possedee_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_possedee_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_possedee_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_possedee_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/fig_irrigation_possedee_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/07/fig_irrigation_possedee_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_irrigation_possedee_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_possedee_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_possedee_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_possedee_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_possedee_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_possedee_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_possedee_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_possedee_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_possedee_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="mode-dacquisition-et-ancienneté" class="level3" data-number="4.1.4">
 <h3 data-number="4.1.4" class="anchored" data-anchor-id="mode-dacquisition-et-ancienneté"><span class="header-section-number">4.1.4</span> Mode d’acquisition et ancienneté</h3>
@@ -925,24 +607,13 @@ Alaotra
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>acq_labs <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"11"</span> <span class="ot">=</span> <span class="st">"Achat"</span>, <span class="st">"13"</span> <span class="ot">=</span> <span class="st">"Don"</span>, <span class="st">"15"</span> <span class="ot">=</span> <span class="st">"Mise en valeur"</span>,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"21"</span> <span class="ot">=</span> <span class="st">"Héritage (partage définitif)"</span>, <span class="st">"22"</span> <span class="ot">=</span> <span class="st">"Héritage (partage non définitif)"</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"23"</span> <span class="ot">=</span> <span class="st">"Héritage tournant"</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="sc">|&gt;</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30h)) <span class="sc">|&gt;</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Acquisition =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30h), <span class="at">levels =</span> <span class="fu">names</span>(acq_labs), <span class="at">labels =</span> acq_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Acquisition) <span class="sc">|&gt;</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Acquisition, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>) <span class="sc">+</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30h)) <span class="sc">|&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Acquisition =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30h), <span class="at">levels =</span> <span class="fu">names</span>(acq_labs), <span class="at">labels =</span> acq_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Acquisition) <span class="sc">|&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Acquisition, <span class="at">y_label =</span> <span class="st">"% des parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-acquisition" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -957,69 +628,9 @@ Figure&nbsp;4.5: Mode d’acquisition des parcelles possédées
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_acquisition_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_acquisition_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_acquisition_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_acquisition_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_acquisition_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/fig_acquisition_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/07/fig_acquisition_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_acquisition_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_acquisition_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_acquisition_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_acquisition_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_acquisition_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_acquisition_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_acquisition_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_acquisition_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_acquisition_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <p>L’ancienneté de possession témoigne de l’enracinement des ménages sur leurs terres (<a href="#fig-anciennete" class="quarto-xref">Figure&nbsp;<span>4.6</span></a>). Une part importante des parcelles est détenue depuis plusieurs décennies, reflétant la continuité de l’occupation foncière dans les deux zones. Les acquisitions récentes (années 2010 et au-delà) sont toutefois observables, signe que le marché foncier reste actif.</p>
 <div class="cell">
 <details class="code-fold">
@@ -1035,13 +646,8 @@ Alaotra
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30g)) <span class="sc">|&gt;</span></span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Periode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30g), <span class="at">levels =</span> <span class="fu">names</span>(anc_labs), <span class="at">labels =</span> anc_labs)) <span class="sc">|&gt;</span></span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Periode) <span class="sc">|&gt;</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Periode, <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>) <span class="sc">+</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">30</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Periode, <span class="at">y_label =</span> <span class="st">"% des parcelles"</span>, <span class="at">x_angle =</span> <span class="dv">30</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-anciennete" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1056,69 +662,9 @@ Figure&nbsp;4.6: Ancienneté de possession des parcelles
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_anciennete_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_anciennete_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_anciennete_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_anciennete_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_anciennete_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/fig_anciennete_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/07/fig_anciennete_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_anciennete_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_anciennete_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_anciennete_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_anciennete_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_anciennete_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_anciennete_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_anciennete_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_anciennete_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_anciennete_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="propriétaire-dans-le-ménage" class="level3" data-number="4.1.5">
 <h3 data-number="4.1.5" class="anchored" data-anchor-id="propriétaire-dans-le-ménage"><span class="header-section-number">4.1.5</span> Propriétaire dans le ménage</h3>
@@ -1132,32 +678,21 @@ Alaotra
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>prop_labs <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"0"</span> <span class="ot">=</span> <span class="st">"Tous les membres"</span>, <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"Chef de ménage"</span>, <span class="st">"2"</span> <span class="ot">=</span> <span class="st">"Conjoint"</span>,</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"3"</span> <span class="ot">=</span> <span class="st">"Chef et conjoint"</span>, <span class="st">"41"</span> <span class="ot">=</span> <span class="st">"Parents du chef"</span>, <span class="st">"42"</span> <span class="ot">=</span> <span class="st">"Parents du conjoint"</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"81"</span> <span class="ot">=</span> <span class="st">"Indivision (chef)"</span>, <span class="st">"82"</span> <span class="ot">=</span> <span class="st">"Indivision (conjoint)"</span>, <span class="st">"99"</span> <span class="ot">=</span> <span class="st">"Autre"</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="sc">|&gt;</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30i)) <span class="sc">|&gt;</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">fr30i_chr =</span> <span class="fu">as.character</span>(fr30i),</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Proprietaire =</span> <span class="fu">if_else</span>(</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>      fr30i_chr <span class="sc">%in%</span> <span class="fu">names</span>(prop_labs),</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>      prop_labs[fr30i_chr],</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Autre"</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Proprietaire) <span class="sc">|&gt;</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(pct <span class="sc">&gt;=</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Proprietaire, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>) <span class="sc">+</span></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="sc">|&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30i)) <span class="sc">|&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">fr30i_chr =</span> <span class="fu">as.character</span>(fr30i),</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">Proprietaire =</span> <span class="fu">if_else</span>(</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>      fr30i_chr <span class="sc">%in%</span> <span class="fu">names</span>(prop_labs),</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>      prop_labs[fr30i_chr],</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Autre"</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Proprietaire) <span class="sc">|&gt;</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(pct <span class="sc">&gt;=</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Proprietaire, <span class="at">y_label =</span> <span class="st">"% des parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-proprietaire" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1172,69 +707,9 @@ Figure&nbsp;4.7: Qui dans le ménage est propriétaire de la parcelle
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_proprietaire_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/fig_proprietaire_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/07/fig_proprietaire_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_proprietaire_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 </section>
 <section id="sec-securisation" class="level2" data-number="4.2">
@@ -1285,7 +760,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
 </figcaption>
 <div aria-describedby="tbl-securisation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="nudeiaofni" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="ihfimrdyqw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1319,91 +794,20 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/tbl_securisation_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_securisation_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_securisation_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_securisation_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_securisation_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/tbl_securisation_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/07/tbl_securisation_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/tbl_securisation_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_securisation_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_securisation_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_securisation_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_securisation_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_securisation_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_securisation_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_securisation_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_securisation_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <p>En l’absence de titre ou de certificat, les ménages s’appuient sur des documents informels de nature très variable (<a href="#fig-papiers" class="quarto-xref">Figure&nbsp;<span>4.8</span></a>). Cependant, 34.5 % des parcelles ne sont accompagnées d’aucun document justificatif, ce qui expose ces ménages à un risque élevé d’insécurité foncière en cas de litige.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>papier_labs <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1"</span> <span class="ot">=</span> <span class="st">"Aucun document"</span>, <span class="st">"2"</span> <span class="ot">=</span> <span class="st">"Taratasy non visé"</span>,</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"3"</span> <span class="ot">=</span> <span class="st">"Bokimpianakaviana"</span>, <span class="st">"4"</span> <span class="ot">=</span> <span class="st">"Taratasy visa Fokontany"</span>,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"5"</span> <span class="ot">=</span> <span class="st">"Visa Mairie"</span>, <span class="st">"6"</span> <span class="ot">=</span> <span class="st">"Visa Arrondissement"</span>, <span class="st">"9"</span> <span class="ot">=</span> <span class="st">"Autre"</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="sc">|&gt;</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30n)) <span class="sc">|&gt;</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Papier =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30n), <span class="at">levels =</span> <span class="fu">names</span>(papier_labs), <span class="at">labels =</span> papier_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Papier) <span class="sc">|&gt;</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Papier, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>) <span class="sc">+</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30n)) <span class="sc">|&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Papier =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30n), <span class="at">levels =</span> <span class="fu">names</span>(papier_labs), <span class="at">labels =</span> papier_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Papier) <span class="sc">|&gt;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Papier, <span class="at">y_label =</span> <span class="st">"% des parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-papiers" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1418,69 +822,9 @@ Figure&nbsp;4.8: Autres documents prouvant la possession
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_papiers_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_papiers_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_papiers_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_papiers_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_papiers_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/fig_papiers_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/07/fig_papiers_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_papiers_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_papiers_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_papiers_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_papiers_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_papiers_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_papiers_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_papiers_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_papiers_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_papiers_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="sec-cessions" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="sec-cessions"><span class="header-section-number">4.3</span> Parcelles cédées à des tiers</h2>
@@ -1512,7 +856,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
 </figcaption>
 <div aria-describedby="tbl-cession-pratique-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="kitfsasnqj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="gzeadajnpg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1549,86 +893,19 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/tbl_cession_pratique_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_cession_pratique_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_cession_pratique_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_cession_pratique_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_cession_pratique_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/tbl_cession_pratique_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/07/tbl_cession_pratique_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/tbl_cession_pratique_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_cession_pratique_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_cession_pratique_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_cession_pratique_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_cession_pratique_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_cession_pratique_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_cession_pratique_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_cession_pratique_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_cession_pratique_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <p>Parmi les parcelles cédées, les modes de faire-valoir varient sensiblement d’un observatoire à l’autre (<a href="#fig-mode-cession" class="quarto-xref">Figure&nbsp;<span>4.9</span></a>). Le prêt et le métayage sont les formes les plus courantes de cession, le métayage occupant une place particulièrement importante dans les zones rizicoles.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fr33_data <span class="ot">&lt;-</span> res_fr33 <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr33gc))</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>fr33_data <span class="sc">|&gt;</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr33gc), <span class="at">levels =</span> <span class="fu">names</span>(fv_labs), <span class="at">labels =</span> fv_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Mode) <span class="sc">|&gt;</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Mode, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles cédées"</span>) <span class="sc">+</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fr33_data <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr33gc), <span class="at">levels =</span> <span class="fu">names</span>(fv_labs), <span class="at">labels =</span> fv_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Mode) <span class="sc">|&gt;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Mode, <span class="at">y_label =</span> <span class="st">"% des parcelles cédées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-mode-cession" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1643,65 +920,15 @@ Figure&nbsp;4.9: Mode de faire-valoir des parcelles cédées
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_mode_cession_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_mode_cession_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_mode_cession_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_mode_cession_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/fig_mode_cession_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/07/fig_mode_cession_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_mode_cession_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_mode_cession_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_mode_cession_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <p>Les motivations de la cession reflètent des stratégies économiques diversifiées (<a href="#fig-motif-cession" class="quarto-xref">Figure&nbsp;<span>4.10</span></a>). Pour certains ménages, céder une parcelle répond à un besoin de liquidités ou à l’impossibilité de cultiver l’ensemble de leur patrimoine ; pour d’autres, il s’agit de maintenir un lien social avec la parenté ou le voisinage.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fr33_data <span class="sc">|&gt;</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr33h)) <span class="sc">|&gt;</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Motif =</span> <span class="fu">safe_to_char</span>(fr33h)) <span class="sc">|&gt;</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Motif =</span> <span class="fu">str_trunc</span>(Motif, <span class="dv">45</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Motif) <span class="sc">|&gt;</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Motif, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles cédées"</span>) <span class="sc">+</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>motif_cession <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Motif, <span class="at">y_label =</span> <span class="st">"% des parcelles cédées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-motif-cession" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1716,65 +943,15 @@ Figure&nbsp;4.10: Motif de la cession de parcelles
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_motif_cession_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_motif_cession_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_motif_cession_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_motif_cession_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/fig_motif_cession_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/07/fig_motif_cession_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_motif_cession_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_motif_cession_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_motif_cession_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <p>Les bénéficiaires des cessions sont principalement des membres de la famille ou des voisins (<a href="#fig-cedee-a-qui" class="quarto-xref">Figure&nbsp;<span>4.11</span></a>), ce qui confirme le caractère en grande partie familial et communautaire du marché foncier local.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>fr33_data <span class="sc">|&gt;</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr33k)) <span class="sc">|&gt;</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Destinataire =</span> <span class="fu">safe_to_char</span>(fr33k)) <span class="sc">|&gt;</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Destinataire =</span> <span class="fu">str_trunc</span>(Destinataire, <span class="dv">40</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Destinataire) <span class="sc">|&gt;</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Destinataire, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles cédées"</span>) <span class="sc">+</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>cedee_qui <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Destinataire, <span class="at">y_label =</span> <span class="st">"% des parcelles cédées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-cedee-a-qui" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1789,48 +966,9 @@ Figure&nbsp;4.11: À qui la parcelle est-elle cédée
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_cedee_a_qui_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_cedee_a_qui_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_cedee_a_qui_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_cedee_a_qui_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/fig_cedee_a_qui_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/07/fig_cedee_a_qui_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_cedee_a_qui_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_cedee_a_qui_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_cedee_a_qui_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="sec-exploitees" class="level2" data-number="4.4">
 <h2 data-number="4.4" class="anchored" data-anchor-id="sec-exploitees"><span class="header-section-number">4.4</span> Parcelles exploitées non possédées</h2>
@@ -1862,7 +1000,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
 </figcaption>
 <div aria-describedby="tbl-exploitation-autres-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="ktuucxtfgb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="ocvthiddsf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1899,87 +1037,36 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/tbl_exploitation_autres_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_exploitation_autres_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_exploitation_autres_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_exploitation_autres_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_exploitation_autres_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/tbl_exploitation_autres_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/07/tbl_exploitation_autres_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/tbl_exploitation_autres_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_exploitation_autres_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_exploitation_autres_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_exploitation_autres_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_exploitation_autres_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_exploitation_autres_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_exploitation_autres_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_exploitation_autres_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_exploitation_autres_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <p>Les parcelles exploitées sans en être propriétaire sont, comme les parcelles possédées, majoritairement des rizières (<a href="#fig-type-exploitee" class="quarto-xref">Figure&nbsp;<span>4.12</span></a>), reflétant la place centrale de la riziculture dans les stratégies des ménages.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="ot">&lt;-</span> res_fr34 <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30c1))</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30c1), <span class="at">levels =</span> <span class="fu">names</span>(type_labs), <span class="at">labels =</span> type_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Type) <span class="sc">|&gt;</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Type, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles"</span>) <span class="sc">+</span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30c1), <span class="at">levels =</span> <span class="fu">names</span>(type_labs), <span class="at">labels =</span> type_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Type) <span class="sc">|&gt;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Type, <span class="at">y_label =</span> <span class="st">"% des parcelles"</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co">#| results: asis</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="fu">dl_fig_variants</span>(<span class="st">"fig_type_exploitee"</span>, <span class="st">"07"</span>, <span class="cf">function</span>(d) {</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  d <span class="sc">|&gt;</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30c1), <span class="at">levels =</span> <span class="fu">names</span>(type_labs), <span class="at">labels =</span> type_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(Observatory, Type) <span class="sc">|&gt;</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ror_bar_grouped</span>(<span class="at">x =</span> Type, <span class="at">fill =</span> Observatory,</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>                    <span class="at">y_label =</span> <span class="st">"% des parcelles"</span>, <span class="at">direction =</span> <span class="st">"horizontal"</span>,</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>                    <span class="at">facet =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>}, fr34_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;div class="dl-downloads"&gt;
+&lt;a href="downloads/07/fig_type_exploitee_marovoay_tous.png" download class="dl-link"&gt;📥 Marovoay (PNG)&lt;/a&gt; &amp;nbsp; &lt;a href="downloads/07/fig_type_exploitee_alaotra_tous.png" download class="dl-link"&gt;📥 Alaotra (PNG)&lt;/a&gt;
+&lt;/div&gt;</code></pre>
+</div>
 <div class="cell-output-display">
 <div id="fig-type-exploitee" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -1993,85 +1080,17 @@ Figure&nbsp;4.12: Type des parcelles exploitées (non possédées)
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_type_exploitee_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_exploitee_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_exploitee_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_exploitee_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_exploitee_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
-</div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_type_exploitee_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_exploitee_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_exploitee_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_exploitee_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_exploitee_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_exploitee_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_exploitee_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_exploitee_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_type_exploitee_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <p>Le mode de faire-valoir des parcelles exploitées révèle l’équilibre local entre prêt, location et métayage (<a href="#fig-fv-exploitee" class="quarto-xref">Figure&nbsp;<span>4.13</span></a>). Le métayage, qui consiste à partager la récolte avec le propriétaire, reste une forme d’accès au foncier particulièrement répandue.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34g)) <span class="sc">|&gt;</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34g), <span class="at">levels =</span> <span class="fu">names</span>(fv_labs), <span class="at">labels =</span> fv_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Mode) <span class="sc">|&gt;</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Mode, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles exploitées"</span>) <span class="sc">+</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34g)) <span class="sc">|&gt;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34g), <span class="at">levels =</span> <span class="fu">names</span>(fv_labs), <span class="at">labels =</span> fv_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Mode) <span class="sc">|&gt;</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Mode, <span class="at">y_label =</span> <span class="st">"% des parcelles exploitées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-fv-exploitee" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2086,86 +1105,15 @@ Figure&nbsp;4.13: Mode de faire-valoir des parcelles exploitées
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_fv_exploitee_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_fv_exploitee_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_fv_exploitee_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_fv_exploitee_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_fv_exploitee_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/fig_fv_exploitee_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/07/fig_fv_exploitee_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_fv_exploitee_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_fv_exploitee_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_fv_exploitee_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_fv_exploitee_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_fv_exploitee_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_fv_exploitee_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_fv_exploitee_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_fv_exploitee_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_fv_exploitee_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <p>Les parcelles exploitées appartiennent le plus souvent à des membres de la famille ou à des voisins (<a href="#fig-proprietaire-exploitee" class="quarto-xref">Figure&nbsp;<span>4.14</span></a>), ce qui témoigne du rôle des réseaux de proximité dans l’accès au foncier.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34k)) <span class="sc">|&gt;</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Proprietaire =</span> <span class="fu">safe_to_char</span>(fr34k)) <span class="sc">|&gt;</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Proprietaire =</span> <span class="fu">str_trunc</span>(Proprietaire, <span class="dv">40</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Proprietaire) <span class="sc">|&gt;</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Proprietaire, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles exploitées"</span>) <span class="sc">+</span></span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>prop_exploitee <span class="sc">|&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Proprietaire, <span class="at">y_label =</span> <span class="st">"% des parcelles exploitées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-proprietaire-exploitee" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2180,85 +1128,20 @@ Figure&nbsp;4.14: Propriétaire des parcelles exploitées
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_proprietaire_exploitee_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_exploitee_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_exploitee_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_exploitee_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_exploitee_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/fig_proprietaire_exploitee_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/07/fig_proprietaire_exploitee_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_proprietaire_exploitee_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_exploitee_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_exploitee_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_exploitee_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_exploitee_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_exploitee_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_exploitee_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_exploitee_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_proprietaire_exploitee_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <p>Le mode d’irrigation des parcelles exploitées diffère-t-il de celui des parcelles possédées ? La <a href="#fig-irrigation-exploitee" class="quarto-xref">Figure&nbsp;<span>4.15</span></a> permet d’examiner si les ménages qui exploitent des terres d’autrui accèdent à des parcelles de même qualité irriguée.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34f)) <span class="sc">|&gt;</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Irrigation =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34f), <span class="at">levels =</span> <span class="fu">names</span>(irrig_labs), <span class="at">labels =</span> irrig_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Irrigation) <span class="sc">|&gt;</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Irrigation, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des parcelles exploitées"</span>) <span class="sc">+</span></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34f)) <span class="sc">|&gt;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Irrigation =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34f), <span class="at">levels =</span> <span class="fu">names</span>(irrig_labs), <span class="at">labels =</span> irrig_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Irrigation) <span class="sc">|&gt;</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Irrigation, <span class="at">y_label =</span> <span class="st">"% des parcelles exploitées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-irrigation-exploitee" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2273,88 +1156,28 @@ Figure&nbsp;4.15: Mode d’irrigation des parcelles exploitées
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_irrigation_exploitee_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_exploitee_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_exploitee_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_exploitee_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_exploitee_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/fig_irrigation_exploitee_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/07/fig_irrigation_exploitee_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_irrigation_exploitee_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_exploitee_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_exploitee_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_exploitee_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_exploitee_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_exploitee_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_exploitee_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_exploitee_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_irrigation_exploitee_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <p>Le coût de l’exploitation de terres d’autrui varie selon le mode de faire-valoir (<a href="#tbl-rente-exploitee" class="quarto-xref">Table&nbsp;<span>4.5</span></a>). Les ménages locataires versent une rente en argent ou en nature, tandis que les métayers cèdent une part de la récolte au propriétaire, généralement comprise entre un quart et la moitié de la production.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34g)) <span class="sc">|&gt;</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34g), <span class="at">levels =</span> <span class="fu">names</span>(fv_labs), <span class="at">labels =</span> fv_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Nb parcelles</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Rente argent moy. (Ar)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">mean</span>(fr34n, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Rente produit moy. (kg)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">mean</span>(fr34o, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">% métayage moyen</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">mean</span>(fr34p, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="dv">1</span>),</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Mode)</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Observatory, <span class="fu">desc</span>(<span class="st">`</span><span class="at">Nb parcelles</span><span class="st">`</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Conditions des parcelles exploitées par mode de faire-valoir"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">Rente argent moy. (Ar)</span><span class="st">`</span>, <span class="st">`</span><span class="at">Rente produit moy. (kg)</span><span class="st">`</span>),</span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">use_seps =</span> <span class="cn">TRUE</span>, <span class="at">decimals =</span> <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34g)) <span class="sc">|&gt;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34g), <span class="at">levels =</span> <span class="fu">names</span>(fv_labs), <span class="at">labels =</span> fv_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Nb parcelles</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Rente argent moy. (Ar)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">mean</span>(fr34n, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Rente produit moy. (kg)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">mean</span>(fr34o, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">% métayage moyen</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">mean</span>(fr34p, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="dv">1</span>),</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Mode)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Observatory, <span class="fu">desc</span>(<span class="st">`</span><span class="at">Nb parcelles</span><span class="st">`</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Conditions des parcelles exploitées par mode de faire-valoir"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">Rente argent moy. (Ar)</span><span class="st">`</span>, <span class="st">`</span><span class="at">Rente produit moy. (kg)</span><span class="st">`</span>),</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">use_seps =</span> <span class="cn">TRUE</span>, <span class="at">decimals =</span> <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="tbl-rente-exploitee" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -2363,7 +1186,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
 </figcaption>
 <div aria-describedby="tbl-rente-exploitee-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="mlhccaejvd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="qerivctfcq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -2462,69 +1285,9 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/tbl_rente_exploitee_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_rente_exploitee_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_rente_exploitee_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_rente_exploitee_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_rente_exploitee_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/tbl_rente_exploitee_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/07/tbl_rente_exploitee_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/tbl_rente_exploitee_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_rente_exploitee_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_rente_exploitee_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_rente_exploitee_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_rente_exploitee_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_rente_exploitee_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_rente_exploitee_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_rente_exploitee_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_rente_exploitee_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="sec-abandon" class="level2" data-number="4.5">
 <h2 data-number="4.5" class="anchored" data-anchor-id="sec-abandon"><span class="header-section-number">4.5</span> Abandon de parcelles</h2>
@@ -2538,16 +1301,16 @@ Alaotra
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30p)) <span class="sc">|&gt;</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Nb ménages</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Ont abandonné (nb)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(fr30p <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Ont abandonné (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">sum</span>(fr30p <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Observatory</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Abandon de la culture d'une ou plusieurs parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30p)) <span class="sc">|&gt;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Nb ménages</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Ont abandonné (nb)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(fr30p <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Ont abandonné (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">sum</span>(fr30p <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Observatory</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Abandon de la culture d'une ou plusieurs parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="tbl-abandon" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -2556,7 +1319,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
 </figcaption>
 <div aria-describedby="tbl-abandon-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="epejmfsgim" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="srldxpujde" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -2593,69 +1356,9 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/tbl_abandon_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_abandon_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_abandon_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_abandon_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_abandon_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/tbl_abandon_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/07/tbl_abandon_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/tbl_abandon_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_abandon_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_abandon_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_abandon_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_abandon_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_abandon_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_abandon_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_abandon_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/07/tbl_abandon_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="sec-satisfaction" class="level2" data-number="4.6">
 <h2 data-number="4.6" class="anchored" data-anchor-id="sec-satisfaction"><span class="header-section-number">4.6</span> Satisfaction à l’égard de la surface possédée</h2>
@@ -2669,19 +1372,13 @@ Alaotra
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>satis_labs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"1"</span> <span class="ot">=</span> <span class="st">"Très insuffisante"</span>, <span class="st">"2"</span> <span class="ot">=</span> <span class="st">"Insuffisante"</span>, <span class="st">"3"</span> <span class="ot">=</span> <span class="st">"Suffisante"</span>)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30o)) <span class="sc">|&gt;</span></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Satisfaction =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30o), <span class="at">levels =</span> <span class="fu">names</span>(satis_labs), <span class="at">labels =</span> satis_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Satisfaction) <span class="sc">|&gt;</span></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Satisfaction, <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des ménages"</span>) <span class="sc">+</span></span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30o)) <span class="sc">|&gt;</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Satisfaction =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30o), <span class="at">levels =</span> <span class="fu">names</span>(satis_labs), <span class="at">labels =</span> satis_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Satisfaction) <span class="sc">|&gt;</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Satisfaction, <span class="at">y_label =</span> <span class="st">"% des ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-satisfaction" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2696,69 +1393,9 @@ Figure&nbsp;4.16: Satisfaction des ménages par rapport à leur surface foncièr
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_satisfaction_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_satisfaction_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_satisfaction_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_satisfaction_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_satisfaction_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/07/fig_satisfaction_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/07/fig_satisfaction_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/07/fig_satisfaction_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_satisfaction_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_satisfaction_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_satisfaction_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_satisfaction_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_satisfaction_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_satisfaction_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_satisfaction_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/07/fig_satisfaction_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="sec-pistes-foncier" class="level2 obs-technical" data-number="4.7">
 <h2 data-number="4.7" class="anchored" data-anchor-id="sec-pistes-foncier"><span class="header-section-number">4.7</span> Pistes d’analyse complémentaires</h2>

@@ -340,7 +340,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>qual <span class="ot">&lt;-</span> res_deb_site <span class="sc">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>res_deb_site <span class="sc">|&gt;</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    Qualité <span class="ot">=</span> <span class="fu">case_when</span>(</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>      j11 <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Bonne"</span>,</span>
@@ -350,14 +350,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    Qualité <span class="ot">=</span> <span class="fu">factor</span>(Qualité, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Bonne"</span>, <span class="st">"Moyenne"</span>, <span class="st">"Mauvaise"</span>))</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Qualité)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(qual, <span class="fu">aes</span>(<span class="at">x =</span> Qualité, <span class="at">y =</span> n, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> n), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.3</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Nombre d'entretiens"</span>) <span class="sc">+</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Qualité) <span class="sc">|&gt;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Qualité, <span class="at">y =</span> n, <span class="at">y_label =</span> <span class="st">"Nombre d'entretiens"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-qualite" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -372,69 +366,9 @@ Figure&nbsp;10.1: Qualité de l’enquête selon l’enquêteur (j11, page de co
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/13/fig_qualite_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qualite_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qualite_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qualite_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qualite_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/13/fig_qualite_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/13/fig_qualite_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/13/fig_qualite_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qualite_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qualite_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qualite_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qualite_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qualite_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qualite_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qualite_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qualite_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="répondant" class="level2" data-number="10.2">
 <h2 data-number="10.2" class="anchored" data-anchor-id="répondant"><span class="header-section-number">10.2</span> Répondant</h2>
@@ -468,7 +402,7 @@ Table&nbsp;10.1: Qualité du répondant par observatoire
 </figcaption>
 <div aria-describedby="tbl-repondant-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="skzwbtbgox" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="uyzulhizpl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -524,69 +458,9 @@ Table&nbsp;10.1: Qualité du répondant par observatoire
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/13/tbl_repondant_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_repondant_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_repondant_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_repondant_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_repondant_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/13/tbl_repondant_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/13/tbl_repondant_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/13/tbl_repondant_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_repondant_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_repondant_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_repondant_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_repondant_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_repondant_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_repondant_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_repondant_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_repondant_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="qualité-de-la-réponse-évaluation-par-lenquêteur-fin-de-questionnaire" class="level2" data-number="10.3">
 <h2 data-number="10.3" class="anchored" data-anchor-id="qualité-de-la-réponse-évaluation-par-lenquêteur-fin-de-questionnaire"><span class="header-section-number">10.3</span> Qualité de la réponse (évaluation par l’enquêteur, fin de questionnaire)</h2>
@@ -594,7 +468,7 @@ Alaotra
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>qual_rep <span class="ot">&lt;-</span> res_remq_site <span class="sc">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>res_remq_site <span class="sc">|&gt;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(qual1aa), qual1aa <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    Qualité <span class="ot">=</span> <span class="fu">case_when</span>(</span>
@@ -604,14 +478,8 @@ Alaotra
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    Qualité <span class="ot">=</span> <span class="fu">factor</span>(Qualité, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Bonne"</span>, <span class="st">"Mauvaise"</span>))</span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Qualité) <span class="sc">|&gt;</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(qual_rep, <span class="fu">aes</span>(<span class="at">x =</span> Qualité, <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(pct, <span class="st">"%"</span>)), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.3</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"%"</span>) <span class="sc">+</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Qualité, <span class="at">y_label =</span> <span class="st">"% des réponses"</span>, <span class="at">show_pct =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-qual-reponse" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -626,69 +494,9 @@ Figure&nbsp;10.2: Qualité de la réponse selon l’enquêteur (qual1aa, fin de 
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/13/fig_qual_reponse_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qual_reponse_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qual_reponse_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qual_reponse_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qual_reponse_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/13/fig_qual_reponse_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/13/fig_qual_reponse_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/13/fig_qual_reponse_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qual_reponse_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qual_reponse_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qual_reponse_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qual_reponse_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qual_reponse_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qual_reponse_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qual_reponse_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_qual_reponse_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="réaction-du-répondant-évaluation-par-lenquêteur-fin-de-questionnaire" class="level2" data-number="10.4">
 <h2 data-number="10.4" class="anchored" data-anchor-id="réaction-du-répondant-évaluation-par-lenquêteur-fin-de-questionnaire"><span class="header-section-number">10.4</span> Réaction du répondant (évaluation par l’enquêteur, fin de questionnaire)</h2>
@@ -696,7 +504,7 @@ Alaotra
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>reaction <span class="ot">&lt;-</span> res_remq_site <span class="sc">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>res_remq_site <span class="sc">|&gt;</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(qual2aa), qual2aa <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)) <span class="sc">|&gt;</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    Réaction <span class="ot">=</span> <span class="fu">case_when</span>(</span>
@@ -707,14 +515,8 @@ Alaotra
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    Réaction <span class="ot">=</span> <span class="fu">factor</span>(Réaction, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Ouvert (à l'aise)"</span>, <span class="st">"Neutre"</span>, <span class="st">"Méfiant"</span>))</span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Réaction) <span class="sc">|&gt;</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory)</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(reaction, <span class="fu">aes</span>(<span class="at">x =</span> Réaction, <span class="at">y =</span> pct, <span class="at">fill =</span> Observatory)) <span class="sc">+</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(pct, <span class="st">"%"</span>)), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.3</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"%"</span>) <span class="sc">+</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Réaction, <span class="at">y_label =</span> <span class="st">"% des réponses"</span>, <span class="at">show_pct =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-reaction" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -729,69 +531,9 @@ Figure&nbsp;10.3: Réaction du répondant selon l’enquêteur (qual2aa, fin de 
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/13/fig_reaction_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_reaction_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_reaction_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_reaction_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_reaction_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/13/fig_reaction_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/13/fig_reaction_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/13/fig_reaction_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_reaction_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_reaction_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_reaction_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_reaction_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_reaction_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_reaction_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_reaction_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/13/fig_reaction_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="sec-codes-aberrants" class="level2" data-number="10.5">
 <h2 data-number="10.5" class="anchored" data-anchor-id="sec-codes-aberrants"><span class="header-section-number">10.5</span> Codes aberrants à signaler pour l’apurement</h2>
@@ -859,7 +601,7 @@ Table&nbsp;10.2: Observations avec codes aberrants dans qual1aa ou qual2aa (anon
 </figcaption>
 <div aria-describedby="tbl-codes-aberrants-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="migdsheekn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="ocenfoxwur" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1062,69 +804,9 @@ Table&nbsp;10.2: Observations avec codes aberrants dans qual1aa ou qual2aa (anon
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/13/tbl_codes_aberrants_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_codes_aberrants_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_codes_aberrants_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_codes_aberrants_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_codes_aberrants_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/13/tbl_codes_aberrants_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/13/tbl_codes_aberrants_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/13/tbl_codes_aberrants_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_codes_aberrants_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_codes_aberrants_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_codes_aberrants_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_codes_aberrants_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_codes_aberrants_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_codes_aberrants_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_codes_aberrants_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_codes_aberrants_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="synthèse-croisée" class="level2" data-number="10.6">
 <h2 data-number="10.6" class="anchored" data-anchor-id="synthèse-croisée"><span class="header-section-number">10.6</span> Synthèse croisée</h2>
@@ -1160,7 +842,7 @@ Table&nbsp;10.3: Synthèse croisée qualité de la réponse × réaction du rép
 </figcaption>
 <div aria-describedby="tbl-synthese-qualite-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="ozcjlhglor" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="rbcjjigyzk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1223,69 +905,9 @@ Table&nbsp;10.3: Synthèse croisée qualité de la réponse × réaction du rép
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/13/tbl_synthese_qualite_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_synthese_qualite_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_synthese_qualite_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_synthese_qualite_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_synthese_qualite_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/13/tbl_synthese_qualite_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/13/tbl_synthese_qualite_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/13/tbl_synthese_qualite_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_synthese_qualite_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_synthese_qualite_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_synthese_qualite_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_synthese_qualite_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_synthese_qualite_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_synthese_qualite_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_synthese_qualite_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/13/tbl_synthese_qualite_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="remarques-générales" class="level2" data-number="10.7">
 <h2 data-number="10.7" class="anchored" data-anchor-id="remarques-générales"><span class="header-section-number">10.7</span> Remarques générales</h2>

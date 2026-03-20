@@ -159,12 +159,9 @@ res_respg |>
   count(j5, Observatory, name = "nb_org") |>
   count(Observatory, nb_org, name = "n_men") |>
   expand_sites_for_profile() |>
-  mutate(pct = round(n_men / sum(n_men) * 100, 1), .by = Observatory) |>
-  ggplot(aes(x = factor(nb_org), y = pct)) +
-  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
-  facet_wrap(~Observatory) +
-  labs(x = "Nombre d'organisations", y = "% des ménages") +
-  theme_minimal(base_size = 12)
+  mutate(nb_org = factor(nb_org),
+         pct = round(n_men / sum(n_men) * 100, 1), .by = Observatory) |>
+  ror_bar_v(x = nb_org, y_label = "% des ménages")
 ```
 
 ```{r dl_fig_nb_org}
@@ -175,11 +172,10 @@ dl_fig_variants("fig_nb_org", "12", function(d) {
     filter(!is.na(respgc)) |>
     count(j5, Observatory, name = "nb_org") |>
     count(Observatory, nb_org, name = "n_men") |>
-    ggplot(aes(x = factor(nb_org), y = n_men, fill = Observatory)) +
-    geom_col(position = "dodge") +
-    labs(x = "Nombre d'organisations", y = "Nombre de ménages", fill = "Observatoire") +
-    theme_minimal(base_size = 12) +
-    theme(legend.position = "top")
+    mutate(nb_org = factor(nb_org)) |>
+    ror_bar_grouped(x = nb_org, y = n_men, fill = Observatory,
+                    y_label = "Nombre de ménages", direction = "vertical",
+                    facet = FALSE)
 }, res_respg, width = 8, height = 5)
 ```
 
@@ -187,13 +183,8 @@ dl_fig_variants("fig_nb_org", "12", function(d) {
 
 Les associations villageoises d'épargne et de crédit (tontines, *voamamy*) dominent à Marovoay, tandis que les associations religieuses prédominent à Alaotra. Les associations de femmes (liées au 8 mars) et les organisations de producteurs figurent également parmi les types les plus courants.
 
-```{r}
-#| label: fig-type-org
-#| fig-cap: "Type d'organisation (toutes adhésions)"
-#| fig-width: 11
-#| fig-height: 7
-
-res_respg |>
+```{r type_org_data}
+org_type_data <- res_respg |>
   filter(!is.na(respgc)) |>
   mutate(
     respgc_chr = as.character(respgc),
@@ -204,15 +195,18 @@ res_respg |>
     )
   ) |>
   count(Observatory, Type) |>
-  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
   filter(pct >= 1) |>
-  expand_sites_for_profile() |>
-  ggplot(aes(x = reorder(Type, pct), y = pct)) +
-  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
-  coord_flip() +
-  facet_wrap(~Observatory, scales = "free_y") +
-  labs(x = NULL, y = "% des adhésions") +
-  theme_minimal(base_size = 12)
+  expand_sites_for_profile()
+```
+
+```{r}
+#| label: fig-type-org
+#| fig-cap: "Type d'organisation (toutes adhésions)"
+#| fig-width: 11
+#| fig-height: !expr ror_fig_height(org_type_data)
+org_type_data |>
+  make_bar_obs(x = Type, y_label = "% des adhésions")
 ```
 
 ```{r dl_fig_type_org}
@@ -226,12 +220,11 @@ dl_fig_variants("fig_type_org", "12", function(d) {
       Type = if_else(respgc_chr %in% names(org_labs), org_labs[respgc_chr], paste0("Code ", respgc_chr))
     ) |>
     count(Observatory, Type) |>
-    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
     filter(pct >= 1) |>
-    ggplot(aes(x = reorder(Type, pct), y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") + coord_flip() +
-    labs(x = NULL, y = "% des adhésions", fill = "Observatoire") +
-    theme_minimal(base_size = 12) + theme(legend.position = "top")
+    ror_bar_grouped(x = Type, fill = Observatory,
+                    y_label = "% des adhésions", direction = "horizontal",
+                    facet = FALSE)
 }, res_respg, width = 11, height = 7)
 ```
 
@@ -239,13 +232,8 @@ dl_fig_variants("fig_type_org", "12", function(d) {
 
 Le chef de ménage et le ou la conjoint(e) sont les membres les plus fréquemment affiliés, de façon quasi-égale.
 
-```{r}
-#| label: fig-qui-membre
-#| fig-cap: "Membre du ménage affilié à l'organisation"
-#| fig-width: 9
-#| fig-height: 5
-
-res_respg |>
+```{r qui_membre_data}
+membre_data <- res_respg |>
   filter(!is.na(respgc)) |>
   mutate(Membre = case_when(
     respgb == 1 ~ "Chef de ménage",
@@ -257,14 +245,17 @@ res_respg |>
     TRUE ~ "Autre"
   )) |>
   count(Observatory, Membre) |>
-  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-  expand_sites_for_profile() |>
-  ggplot(aes(x = reorder(Membre, pct), y = pct)) +
-  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
-  coord_flip() +
-  facet_wrap(~Observatory, scales = "free_y") +
-  labs(x = NULL, y = "% des adhésions") +
-  theme_minimal(base_size = 12)
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  expand_sites_for_profile()
+```
+
+```{r}
+#| label: fig-qui-membre
+#| fig-cap: "Membre du ménage affilié à l'organisation"
+#| fig-width: 9
+#| fig-height: !expr ror_fig_height(membre_data, "Membre")
+membre_data |>
+  make_bar_obs(x = Membre, y_label = "% des adhésions")
 ```
 
 ```{r dl_fig_qui_membre}
@@ -283,11 +274,10 @@ dl_fig_variants("fig_qui_membre", "12", function(d) {
       TRUE ~ "Autre"
     )) |>
     count(Observatory, Membre) |>
-    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-    ggplot(aes(x = reorder(Membre, pct), y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") + coord_flip() +
-    labs(x = NULL, y = "% des adhésions", fill = "Observatoire") +
-    theme_minimal(base_size = 12) + theme(legend.position = "top")
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    ror_bar_grouped(x = Membre, fill = Observatory,
+                    y_label = "% des adhésions", direction = "horizontal",
+                    facet = FALSE)
 }, res_respg, width = 9, height = 5)
 ```
 
@@ -305,13 +295,9 @@ res_respg |>
   filter(!is.na(respgd), respgd %in% c(1, 2, 3)) |>
   mutate(Role = factor(as.character(respgd), levels = names(role_labs), labels = role_labs)) |>
   count(Observatory, Role) |>
-  mutate(pct = n / sum(n) * 100, .by = Observatory) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
   expand_sites_for_profile() |>
-  ggplot(aes(x = Role, y = pct)) +
-  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
-  facet_wrap(~Observatory) +
-  labs(x = NULL, y = "% des adhésions") +
-  theme_minimal(base_size = 12)
+  ror_bar_v(x = Role, y_label = "% des adhésions")
 ```
 
 ```{r dl_fig_responsabilite}
@@ -322,11 +308,10 @@ dl_fig_variants("fig_responsabilite", "12", function(d) {
     filter(!is.na(respgd), respgd %in% c(1, 2, 3)) |>
     mutate(Role = factor(as.character(respgd), levels = names(role_labs), labels = role_labs)) |>
     count(Observatory, Role) |>
-    mutate(pct = n / sum(n) * 100, .by = Observatory) |>
-    ggplot(aes(x = Role, y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") +
-    labs(x = NULL, y = "% des adhésions", fill = "Observatoire") +
-    theme_minimal(base_size = 12) + theme(legend.position = "top")
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    ror_bar_grouped(x = Role, fill = Observatory,
+                    y_label = "% des adhésions", direction = "vertical",
+                    facet = FALSE)
 }, res_respg, width = 9, height = 5)
 ```
 
@@ -389,12 +374,7 @@ dl_tbl_variants("tbl_pro1", "12", function(d) {
 
 L'éducation et la santé, la nutrition et l'agriculture sont les domaines pour lesquels les ménages bénéficient le plus de projets. Le tourisme reste totalement absent des deux observatoires.
 
-```{r}
-#| label: fig-benef-type
-#| fig-cap: "Taux de ménages bénéficiaires par type de projet"
-#| fig-width: 10
-#| fig-height: 6
-
+```{r benef_type_data}
 pro_clean <- res_pro |>
   mutate(
     pro_lib_txt = safe_to_char(pro_lib),
@@ -412,19 +392,22 @@ pro_clean <- res_pro |>
   ) |>
   filter(pro_lib_clean != "")
 
-pro_clean |>
+benef_type_data <- pro_clean |>
   filter(!is.na(pro2), pro2 %in% c(1, 2)) |>
   summarise(
     pct = round(mean(pro2 == 1) * 100, 1),
     .by = c(Observatory, pro_lib_clean)
   ) |>
-  expand_sites_for_profile() |>
-  ggplot(aes(x = reorder(pro_lib_clean, pct), y = pct)) +
-  geom_col(fill = "#2c7bb6", show.legend = FALSE) +
-  coord_flip() +
-  facet_wrap(~Observatory, scales = "free_y") +
-  labs(x = NULL, y = "% de ménages bénéficiaires") +
-  theme_minimal(base_size = 12)
+  expand_sites_for_profile()
+```
+
+```{r}
+#| label: fig-benef-type
+#| fig-cap: "Taux de ménages bénéficiaires par type de projet"
+#| fig-width: 10
+#| fig-height: !expr ror_fig_height(benef_type_data, "pro_lib_clean")
+benef_type_data |>
+  make_bar_obs(x = pro_lib_clean, y_label = "% de ménages bénéficiaires")
 ```
 
 ```{r dl_fig_benef_type}
@@ -434,10 +417,9 @@ dl_fig_variants("fig_benef_type", "12", function(d) {
   d |>
     filter(!is.na(pro2), pro2 %in% c(1, 2)) |>
     summarise(pct = round(mean(pro2 == 1) * 100, 1), .by = c(Observatory, pro_lib_clean)) |>
-    ggplot(aes(x = reorder(pro_lib_clean, pct), y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") + coord_flip() +
-    labs(x = NULL, y = "% de ménages bénéficiaires", fill = "Observatoire") +
-    theme_minimal(base_size = 12) + theme(legend.position = "top")
+    ror_bar_grouped(x = pro_lib_clean, fill = Observatory,
+                    y_label = "% de ménages bénéficiaires", direction = "horizontal",
+                    facet = FALSE)
 }, pro_clean, width = 10, height = 6)
 ```
 
@@ -503,13 +485,8 @@ pro_source <- pro_benef |>
   mutate(pct = round(nb / n * 100, 1))
 
 pro_source |>
-  ggplot(aes(x = reorder(pro_lib_clean, pct), y = pct, fill = Source)) +
-  geom_col(position = "dodge") +
-  coord_flip() +
-  facet_wrap(~Observatory) +
-  labs(x = NULL, y = "% des bénéficiaires", fill = "Source") +
-  theme_minimal(base_size = 11) +
-  theme(legend.position = "top")
+  ror_bar_grouped(x = pro_lib_clean, fill = Source,
+                  y_label = "% des bénéficiaires", direction = "horizontal")
 ```
 
 ```{r dl_fig_source_projet}
@@ -526,10 +503,8 @@ dl_fig_variants("fig_source_projet", "12", function(d) {
     ) |>
     pivot_longer(cols = c(Etat, `ONG / Projet`, Eglise), names_to = "Source", values_to = "nb") |>
     mutate(pct = round(nb / n * 100, 1))
-  ggplot(ps, aes(x = reorder(pro_lib_clean, pct), y = pct, fill = Source)) +
-    geom_col(position = "dodge") + coord_flip() + facet_wrap(~Observatory) +
-    labs(x = NULL, y = "% des bénéficiaires", fill = "Source") +
-    theme_minimal(base_size = 11) + theme(legend.position = "top")
+  ror_bar_grouped(ps, x = pro_lib_clean, fill = Source,
+                  y_label = "% des bénéficiaires", direction = "horizontal")
 }, pro_benef, width = 10, height = 6)
 ```
 

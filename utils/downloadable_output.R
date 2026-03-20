@@ -36,20 +36,22 @@ make_dl_filename <- function(id, obs, site, ext) {
 
 #' Prepare combined data for a site variant
 #'
-#' Overwrites the Observatory column with site labels so that
+#' Overwrites the Observatory column with **short** site labels so that
 #' existing plot_fn / tbl_fn that group/facet by Observatory produce
-#' the correct output.
+#' the correct output.  Using short names directly avoids the need for
+#' a separate Facet_label column that would be dropped by count() or
+#' summarise().
 #'
-#' For "Tous":  obs aggregate ("{Obs} - Tous") + one slice per site.
-#' For a site:  obs aggregate ("{Obs} - Tous") + that site.
+#' For "Tous":  obs aggregate ("Tous") + one slice per site (site name).
+#' For a site:  obs aggregate ("Tous") + that site (site name).
 #'
 #' @param data Full data with Observatory and Site columns
 #' @param obs  Observatory name (e.g. "Marovoay")
 #' @param site Site name or "Tous"
-#' @return Combined data frame with Observatory overwritten by site labels
+#' @return Combined data frame with Observatory set to short labels (ordered factor)
 prepare_variant_data <- function(data, obs, site) {
   obs_data <- dplyr::filter(data, .data$Observatory == .env$obs)
-  obs_agg <- obs_data |> dplyr::mutate(Observatory = paste(.env$obs, "- Tous"))
+  obs_agg <- obs_data |> dplyr::mutate(Observatory = "Tous")
 
   if (site == "Tous") {
     site_parts <- purrr::map_dfr(
@@ -57,16 +59,23 @@ prepare_variant_data <- function(data, obs, site) {
       function(s) {
         obs_data |>
           dplyr::filter(.data$Site == s) |>
-          dplyr::mutate(Observatory = paste(.env$obs, "-", s))
+          dplyr::mutate(Observatory = s)
       }
     )
-    dplyr::bind_rows(obs_agg, site_parts)
+    result <- dplyr::bind_rows(obs_agg, site_parts)
   } else {
     site_data <- obs_data |>
       dplyr::filter(.data$Site == .env$site) |>
-      dplyr::mutate(Observatory = paste(.env$obs, "-", .env$site))
-    dplyr::bind_rows(obs_agg, site_data)
+      dplyr::mutate(Observatory = .env$site)
+    result <- dplyr::bind_rows(obs_agg, site_data)
   }
+  # Order Observatory: sites alphabetically, "Tous" last
+  site_levels <- sort(unique(result$Observatory[result$Observatory != "Tous"]))
+  result$Observatory <- factor(
+    result$Observatory,
+    levels = c(site_levels, "Tous")
+  )
+  result
 }
 
 #' Expand data with site-level breakdowns for observatory-specific reports
@@ -74,8 +83,8 @@ prepare_variant_data <- function(data, obs, site) {
 #' In consolidated mode the data is returned unchanged (facets show the
 #' two observatories).
 #' In observatory-specific mode (marovoay / alaotra), the data is expanded
-#' so that the Observatory column contains "{Obs} - Tous" (aggregate) plus
-#' one "{Obs} - {Site}" entry per site.
+#' so that the Observatory column contains short labels: "Tous" (aggregate)
+#' plus one entry per site (e.g. "Bepako", "Ampijoroa").
 #' This allows plots that `facet_wrap(~Observatory)` to display per-site
 #' results alongside the observatory total.
 #'
@@ -93,11 +102,10 @@ expand_sites_for_profile <- function(data) {
 # Variant generators
 # ----------------------------------------------------------
 
-#' Generate site-level PNG variants for a figure and emit download dropdown
+#' Generate a single aggregate PNG for a figure and emit a download link
 #'
 #' Call in a chunk with `#| echo: false` and `#| results: asis`.
-#' Site-level variants with very small sample sizes may produce
-#' unreliable graphs; a footnote is added automatically.
+#' Generates one PNG per observatory showing all sites ("Tous" variant).
 #'
 #' @param id       Unique output identifier (e.g. "fig_age_obs")
 #' @param chapter  Chapter identifier for sub-folder (e.g. "04")
@@ -117,7 +125,6 @@ dl_fig_variants <- function(
   dpi = 150,
   min_cell = 10
 ) {
-  # Skip in non-HTML output (the dropdown is HTML-only)
   if (!knitr::is_html_output()) {
     return(invisible(NULL))
   }
@@ -125,25 +132,16 @@ dl_fig_variants <- function(
   disk_dir <- file.path("docs", "downloads", chapter)
   dir.create(disk_dir, recursive = TRUE, showWarnings = FALSE)
 
-  combos <- get_site_combos(data)
+  obs_list <- intersect(c("Marovoay", "Alaotra"), unique(data$Observatory))
   links <- list()
 
-  for (i in seq_len(nrow(combos))) {
-    obs <- combos$Observatory[i]
-    site <- combos$Site[i]
-
-    variant <- prepare_variant_data(data, obs, site)
+  for (obs in obs_list) {
+    variant <- prepare_variant_data(data, obs, "Tous")
     if (nrow(variant) == 0) {
       next
     }
 
-    # Skip individual-site figures when the site is too small
-    if (site != "Tous") {
-      site_n <- sum(data$Observatory == obs & data$Site == site)
-      if (site_n < min_cell) next
-    }
-
-    fname <- make_dl_filename(id, obs, site, "png")
+    fname <- make_dl_filename(id, obs, "tous", "png")
     disk_path <- file.path(disk_dir, fname)
     web_path <- file.path("downloads", chapter, fname)
 
@@ -159,7 +157,7 @@ dl_fig_variants <- function(
           bg = "white"
         )
         links[[length(links) + 1]] <- list(
-          label = site,
+          label = obs,
           obs = obs,
           href = web_path,
           ext = "png"
@@ -169,15 +167,14 @@ dl_fig_variants <- function(
     )
   }
 
-  emit_dropdown_html(links)
+  emit_download_links(links)
   invisible(NULL)
 }
 
-#' Generate site-level XLSX variants for a table and emit download dropdown
+#' Generate a single aggregate XLSX for a table and emit a download link
 #'
 #' Call in a chunk with `#| echo: false` and `#| results: asis`.
-#' Cells with counts below `min_cell` (default 5) are automatically
-#' suppressed for statistical confidentiality.
+#' Generates one XLSX per observatory showing the "Tous" aggregate.
 #'
 #' @param id       Unique output identifier (e.g. "tbl_men_obs")
 #' @param chapter  Chapter identifier for sub-folder (e.g. "04")
@@ -185,7 +182,6 @@ dl_fig_variants <- function(
 #' @param data     Data frame with Observatory and Site columns
 #' @param min_cell Minimum cell count for confidentiality (default 5)
 dl_tbl_variants <- function(id, chapter, tbl_fn, data, min_cell = 5) {
-  # Skip in non-HTML output (the dropdown is HTML-only)
   if (!knitr::is_html_output()) {
     return(invisible(NULL))
   }
@@ -193,19 +189,16 @@ dl_tbl_variants <- function(id, chapter, tbl_fn, data, min_cell = 5) {
   disk_dir <- file.path("docs", "downloads", chapter)
   dir.create(disk_dir, recursive = TRUE, showWarnings = FALSE)
 
-  combos <- get_site_combos(data)
+  obs_list <- intersect(c("Marovoay", "Alaotra"), unique(data$Observatory))
   links <- list()
 
-  for (i in seq_len(nrow(combos))) {
-    obs <- combos$Observatory[i]
-    site <- combos$Site[i]
-
-    variant <- prepare_variant_data(data, obs, site)
+  for (obs in obs_list) {
+    variant <- prepare_variant_data(data, obs, "Tous")
     if (nrow(variant) == 0) {
       next
     }
 
-    fname <- make_dl_filename(id, obs, site, "xlsx")
+    fname <- make_dl_filename(id, obs, "tous", "xlsx")
     disk_path <- file.path(disk_dir, fname)
     web_path <- file.path("downloads", chapter, fname)
 
@@ -215,7 +208,7 @@ dl_tbl_variants <- function(id, chapter, tbl_fn, data, min_cell = 5) {
         tbl_df <- suppress_for_export(tbl_df, threshold = min_cell)
         writexl::write_xlsx(tbl_df, disk_path)
         links[[length(links) + 1]] <- list(
-          label = site,
+          label = obs,
           obs = obs,
           href = web_path,
           ext = "xlsx"
@@ -225,52 +218,40 @@ dl_tbl_variants <- function(id, chapter, tbl_fn, data, min_cell = 5) {
     )
   }
 
-  emit_dropdown_html(links)
+  emit_download_links(links)
   invisible(NULL)
 }
 
 # ----------------------------------------------------------
-# HTML dropdown emitter
+# HTML download link emitter
 # ----------------------------------------------------------
 
-#' Emit an HTML \code{<details>} dropdown with grouped download links
+#' Emit simple download links (one per observatory)
 #'
-#' Groups links by observatory (Marovoay first, then Alaotra).
 #' @param links List of lists, each with elements: label, obs, href, ext
-emit_dropdown_html <- function(links) {
+emit_download_links <- function(links) {
   if (length(links) == 0) {
     return(invisible(NULL))
   }
 
-  obs_groups <- split(links, vapply(links, \(x) x$obs, character(1)))
-
-  html <- '<details class="dl-variants">\n'
-  html <- paste0(
-    html,
-    '<summary>\U{1F4E5} T\u00e9l\u00e9charger par site</summary>\n'
-  )
-  html <- paste0(html, '<div class="dl-grid">\n')
-
-  for (obs in intersect(c("Marovoay", "Alaotra"), names(obs_groups))) {
-    items <- obs_groups[[obs]]
-    html <- paste0(html, '<div class="dl-group">\n')
-    html <- paste0(html, '<h4>', obs, '</h4>\n<ul>\n')
-    for (item in items) {
+  parts <- vapply(
+    links,
+    function(item) {
       ext_lbl <- toupper(item$ext)
-      html <- paste0(
-        html,
-        '<li><a href="',
+      sprintf(
+        '<a href="%s" download class="dl-link">\U{1F4E5} %s (%s)</a>',
         item$href,
-        '" download>',
         item$label,
-        ' (',
-        ext_lbl,
-        ')</a></li>\n'
+        ext_lbl
       )
-    }
-    html <- paste0(html, '</ul>\n</div>\n')
-  }
+    },
+    character(1)
+  )
 
-  html <- paste0(html, '</div>\n</details>\n')
+  html <- paste0(
+    '<div class="dl-downloads">\n',
+    paste(parts, collapse = " &nbsp; "),
+    '\n</div>\n'
+  )
   cat(html)
 }

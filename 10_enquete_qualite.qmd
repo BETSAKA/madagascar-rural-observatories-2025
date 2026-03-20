@@ -65,7 +65,7 @@ La variable `j11` — *« Qualité de l'enquête »* — est renseignée par l'e
 #| fig-height: 4
 #| label: fig-qualite
 
-qual <- res_deb_site |>
+res_deb_site |>
   mutate(
     Qualité = case_when(
       j11 == 1 ~ "Bonne",
@@ -75,31 +75,23 @@ qual <- res_deb_site |>
     ),
     Qualité = factor(Qualité, levels = c("Bonne", "Moyenne", "Mauvaise"))
   ) |>
-  count(Observatory, Qualité)
-
-ggplot(qual, aes(x = Qualité, y = n, fill = Observatory)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = n), vjust = -0.3, size = 3) +
-  labs(x = NULL, y = "Nombre d'entretiens") +
-  facet_wrap(~Observatory) +
-  theme_minimal()
+  count(Observatory, Qualité) |>
+  ror_bar_v(x = Qualité, y = n, y_label = "Nombre d'entretiens")
 ```
 
 ```{r dl_fig_qualite}
 #| echo: false
 #| results: asis
 dl_fig_variants("fig_qualite", "13", function(d) {
-  q <- d |>
+  d |>
     mutate(
       Qualite = case_when(j11 == 1 ~ "Bonne", j11 == 2 ~ "Moyenne", j11 == 3 ~ "Mauvaise", TRUE ~ as.character(j11)),
       Qualite = factor(Qualite, levels = c("Bonne", "Moyenne", "Mauvaise"))
     ) |>
-    count(Observatory, Qualite)
-  ggplot(q, aes(x = Qualite, y = n, fill = Observatory)) +
-    geom_col(position = "dodge") +
-    geom_text(aes(label = n), position = position_dodge(width = 0.9), vjust = -0.3, size = 3) +
-    labs(x = NULL, y = "Nombre d'entretiens", fill = "Observatoire") +
-    theme_minimal()
+    count(Observatory, Qualite) |>
+    ror_bar_grouped(x = Qualite, y = n, fill = Observatory,
+                    y_label = "Nombre d'entretiens", direction = "vertical",
+                    x_angle = 0, facet = FALSE)
 }, res_deb, width = 8, height = 4)
 ```
 
@@ -155,7 +147,7 @@ La variable `qual1aa` — *« Qualité de la réponse en générale »* — est 
 #| fig-height: 4
 #| label: fig-qual-reponse
 
-qual_rep <- res_remq_site |>
+res_remq_site |>
   filter(!is.na(qual1aa), qual1aa %in% c(1, 2)) |>
   mutate(
     Qualité = case_when(
@@ -165,32 +157,24 @@ qual_rep <- res_remq_site |>
     Qualité = factor(Qualité, levels = c("Bonne", "Mauvaise"))
   ) |>
   count(Observatory, Qualité) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
-
-ggplot(qual_rep, aes(x = Qualité, y = pct, fill = Observatory)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = paste0(pct, "%")), vjust = -0.3, size = 3) +
-  labs(x = NULL, y = "%") +
-  facet_wrap(~Observatory) +
-  theme_minimal()
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  ror_bar_v(x = Qualité, y_label = "% des réponses", show_pct = TRUE)
 ```
 
 ```{r dl_fig_qual_reponse}
 #| echo: false
 #| results: asis
 dl_fig_variants("fig_qual_reponse", "13", function(d) {
-  qr <- d |>
+  d |>
     filter(!is.na(qual1aa), qual1aa %in% c(1, 2)) |>
     mutate(
       Qualite = case_when(qual1aa == 1 ~ "Bonne", qual1aa == 2 ~ "Mauvaise"),
       Qualite = factor(Qualite, levels = c("Bonne", "Mauvaise"))
     ) |>
-    count(Observatory, Qualite)
-  ggplot(qr, aes(x = Qualite, y = n, fill = Observatory)) +
-    geom_col(position = "dodge") +
-    geom_text(aes(label = n), position = position_dodge(width = 0.9), vjust = -0.3, size = 3) +
-    labs(x = NULL, y = "Nombre de menages", fill = "Observatoire") +
-    theme_minimal()
+    count(Observatory, Qualite) |>
+    ror_bar_grouped(x = Qualite, y = n, fill = Observatory,
+                    y_label = "Nombre de menages", direction = "vertical",
+                    x_angle = 0, facet = FALSE)
 }, res_remq, width = 8, height = 4)
 ```
 
@@ -204,7 +188,7 @@ La variable `qual2aa` — *« Réaction du répondant »* — est renseignée pa
 #| fig-height: 4
 #| label: fig-reaction
 
-reaction <- res_remq_site |>
+res_remq_site |>
   filter(!is.na(qual2aa), qual2aa %in% c(1, 2, 3)) |>
   mutate(
     Réaction = case_when(
@@ -215,32 +199,24 @@ reaction <- res_remq_site |>
     Réaction = factor(Réaction, levels = c("Ouvert (à l'aise)", "Neutre", "Méfiant"))
   ) |>
   count(Observatory, Réaction) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
-
-ggplot(reaction, aes(x = Réaction, y = pct, fill = Observatory)) +
-  geom_col(show.legend = FALSE) +
-  geom_text(aes(label = paste0(pct, "%")), vjust = -0.3, size = 3) +
-  labs(x = NULL, y = "%") +
-  facet_wrap(~Observatory) +
-  theme_minimal()
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  ror_bar_v(x = Réaction, y_label = "% des réponses", show_pct = TRUE)
 ```
 
 ```{r dl_fig_reaction}
 #| echo: false
 #| results: asis
 dl_fig_variants("fig_reaction", "13", function(d) {
-  r <- d |>
+  d |>
     filter(!is.na(qual2aa), qual2aa %in% c(1, 2, 3)) |>
     mutate(
       Reaction = case_when(qual2aa == 1 ~ "Ouvert", qual2aa == 2 ~ "Neutre", qual2aa == 3 ~ "Mefiant"),
       Reaction = factor(Reaction, levels = c("Ouvert", "Neutre", "Mefiant"))
     ) |>
-    count(Observatory, Reaction)
-  ggplot(r, aes(x = Reaction, y = n, fill = Observatory)) +
-    geom_col(position = "dodge") +
-    geom_text(aes(label = n), position = position_dodge(width = 0.9), vjust = -0.3, size = 3) +
-    labs(x = NULL, y = "Nombre de menages", fill = "Observatoire") +
-    theme_minimal()
+    count(Observatory, Reaction) |>
+    ror_bar_grouped(x = Reaction, y = n, fill = Observatory,
+                    y_label = "Nombre de menages", direction = "vertical",
+                    x_angle = 0, facet = FALSE)
 }, res_remq, width = 8, height = 4)
 ```
 

@@ -55,8 +55,8 @@ res_deb <- res_deb %>% filter_for_profile()
 res_deb_site <- res_deb |> expand_sites_for_profile()
 
 # Pre-joined datasets for site-level downloads
-sa_full  <- res_sa  %>% left_join(res_deb %>% select(j5, Observatory, Site), by = "j5")
-ssa_full <- res_ssa %>% left_join(res_deb %>% select(j5, Observatory, Site), by = "j5")
+sa_full  <- res_sa  %>% left_join(res_deb %>% select(j5, Observatory, Site), by = "j5") %>% filter(!is.na(Observatory))
+ssa_full <- res_ssa %>% left_join(res_deb %>% select(j5, Observatory, Site), by = "j5") %>% filter(!is.na(Observatory))
 ```
 
 ```{r stats_sa}
@@ -236,18 +236,10 @@ res_sa %>%
   left_join(res_deb, by = "j5") %>%
   expand_sites_for_profile() %>%
   filter(!is.na(sal2d)) %>%
+  mutate(sal2d = factor(sal2d)) %>%
   count(Observatory, sal2d) %>%
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) %>%
-  ggplot(aes(x = factor(sal2d), y = pct)) +
-  geom_col(fill = "#1f77b4") +
-  facet_wrap(~Observatory) +
-  labs(
-    title = "Distribution du nombre de mois de soudure par observatoire",
-    x = "Nombre de mois de soudure",
-    y = "% des ménages"
-  ) +
-  theme_minimal() +
-  theme(plot.title = element_text(face = "bold", size = 12))
+  ror_bar_v(x = sal2d, y_label = "% ménages", x_angle = 45)
 ```
 
 ```{r dl_g1_soudure_distrib}
@@ -256,11 +248,10 @@ res_sa %>%
 dl_fig_variants("g1_soudure_distrib", "09", function(d) {
   d %>%
     filter(!is.na(sal2d)) %>%
-    ggplot(aes(x = factor(sal2d))) +
-    geom_bar(fill = "#1f77b4") +
-    facet_wrap(~Observatory) +
-    labs(x = "Nombre de mois de soudure", y = "Nombre de ménages") +
-    theme_minimal()
+    mutate(sal2d = factor(sal2d)) %>%
+    count(Observatory, sal2d) %>%
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) %>%
+    ror_bar_v(x = sal2d, y_label = "% ménages", x_angle = 45)
 }, sa_full)
 ```
 
@@ -299,7 +290,7 @@ calendrier_soudure %>%
     title = "Calendrier de la soudure par observatoire",
     subtitle = "% de ménages en période de soudure chaque mois"
   ) %>%
-  fmt_number(columns = any_of(c("Alaotra", "Marovoay")), decimals = 1) %>%
+  fmt_number(columns = where(is.numeric), decimals = 1) %>%
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
@@ -325,19 +316,8 @@ dl_tbl_variants("t3_calendrier_soudure", "09", function(d) {
 
 ```{r g2_calendrier_soudure}
 # G2 : Graphique du calendrier de la soudure
-ggplot(calendrier_soudure, aes(x = Mois, y = pct, fill = Observatory)) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~Observatory) +
-  labs(
-    title = "Calendrier de la soudure par observatoire",
-    x = "Mois",
-    y = "% de ménages en soudure"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    plot.title = element_text(face = "bold", size = 12)
-  )
+calendrier_soudure %>%
+  ror_bar_v(x = Mois, y_label = "% ménages en soudure", x_angle = 45)
 ```
 
 ```{r dl_g2_calendrier_soudure}
@@ -353,11 +333,10 @@ dl_fig_variants("g2_calendrier_soudure", "09", function(d) {
     ) %>%
     pivot_longer(-Observatory, names_to = "mois_var", values_to = "pct") %>%
     mutate(Mois = factor(mois_labels[mois_var], levels = mois_labels))
-  ggplot(cal, aes(x = Mois, y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") +
-    labs(x = "Mois", y = "% de ménages en soudure", fill = "Observatoire") +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  cal %>%
+    ror_bar_grouped(x = Mois, fill = Observatory,
+                    y_label = "% ménages en soudure", direction = "vertical",
+                    facet = FALSE, x_angle = 45)
 }, sa_full)
 ```
 
@@ -459,7 +438,7 @@ calendrier_stress %>%
     title = "Calendrier du stress alimentaire par observatoire",
     subtitle = "% de ménages en stress alimentaire chaque mois"
   ) %>%
-  fmt_number(columns = any_of(c("Alaotra", "Marovoay")), decimals = 1) %>%
+  fmt_number(columns = where(is.numeric), decimals = 1) %>%
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
@@ -497,21 +476,10 @@ comparaison <- bind_rows(
   calendrier_stress %>% mutate(Indicateur = "Stress alimentaire")
 )
 
-ggplot(comparaison, aes(x = Mois, y = pct, fill = Indicateur)) +
-  geom_col(position = "dodge") +
-  facet_wrap(~Observatory) +
-  labs(
-    title = "Soudure vs stress alimentaire par observatoire",
-    x = "Mois",
-    y = "% de ménages",
-    fill = "Indicateur"
-  ) +
-  scale_fill_manual(values = c("Soudure" = "#1f77b4", "Stress alimentaire" = "#ff7f0e")) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    plot.title = element_text(face = "bold", size = 12)
-  )
+comparaison %>%
+  ror_bar_grouped(x = Mois, fill = Indicateur,
+                  y_label = "% ménages", direction = "vertical",
+                  x_angle = 45)
 ```
 
 ```{r dl_g3_soudure_vs_stress}
@@ -532,13 +500,10 @@ dl_fig_variants("g3_soudure_vs_stress", "09", function(d) {
     mutate(Mois = factor(mois_labels_stress[mois_var], levels = mois_labels_stress),
            Indicateur = "Stress alimentaire")
   comp <- bind_rows(cal_s, cal_st)
-  ggplot(comp, aes(x = Mois, y = pct, fill = Indicateur)) +
-    geom_col(position = "dodge") +
-    facet_wrap(~Observatory) +
-    labs(x = "Mois", y = "% de ménages", fill = "Indicateur") +
-    scale_fill_manual(values = c("Soudure" = "#1f77b4", "Stress alimentaire" = "#ff7f0e")) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  comp %>%
+    ror_bar_grouped(x = Mois, fill = Indicateur,
+                    y_label = "% ménages", direction = "vertical",
+                    x_angle = 45)
 }, sa_full)
 ```
 
@@ -726,21 +691,8 @@ top_aliments <- comp_dejeuner %>%
 
 comp_dejeuner %>%
   filter(Aliment %in% top_aliments) %>%
-  ggplot(aes(x = Aliment, y = pct, fill = Période)) +
-  geom_col(position = "dodge") +
-  facet_wrap(~Observatory) +
-  labs(
-    title = "Aliment de base au déjeuner : hors vs pendant soudure",
-    x = "Aliment",
-    y = "% de ménages",
-    fill = "Période"
-  ) +
-  scale_fill_manual(values = c("Hors soudure" = "#2ca02c", "Pendant soudure" = "#d62728")) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    plot.title = element_text(face = "bold", size = 12)
-  )
+  ror_bar_grouped(x = Aliment, fill = Période,
+                  y_label = "% ménages", direction = "horizontal")
 ```
 
 ```{r dl_g4_comparaison_dejeuner}
@@ -763,13 +715,8 @@ dl_fig_variants("g4_comparaison_dejeuner", "09", function(d) {
     slice_max(total, n = 5) %>% pull(Aliment)
   comp %>%
     filter(Aliment %in% top_a) %>%
-    ggplot(aes(x = Aliment, y = pct, fill = Période)) +
-    geom_col(position = "dodge") +
-    facet_wrap(~Observatory) +
-    labs(x = "Aliment", y = "% de ménages", fill = "Période") +
-    scale_fill_manual(values = c("Hors soudure" = "#2ca02c", "Pendant soudure" = "#d62728")) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    ror_bar_grouped(x = Aliment, fill = Période,
+                    y_label = "% ménages", direction = "horizontal")
 }, sa_full)
 ```
 
@@ -886,7 +833,7 @@ strat_resume <- strat_data %>%
   group_by(Observatory, Stratégie) %>%
   summarise(pct_freq = sum(pct), .groups = "drop") %>%
   pivot_wider(names_from = Observatory, values_from = pct_freq, values_fill = 0) %>%
-  arrange(desc(rowSums(pick(any_of(c("Alaotra", "Marovoay"))))))
+  arrange(desc(rowSums(pick(where(is.numeric)))))
 
 strat_resume %>%
   gt() %>%
@@ -895,7 +842,7 @@ strat_resume %>%
     subtitle = "% de ménages ayant recours « Quelquefois » ou « Souvent »"
   ) %>%
   safe_cols_label(Stratégie = "Stratégie", Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)") %>%
-  fmt_number(columns = any_of(c("Alaotra", "Marovoay")), decimals = 1) %>%
+  fmt_number(columns = where(is.numeric), decimals = 1) %>%
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
@@ -962,7 +909,7 @@ ggplot(strat_plot, aes(x = pct, y = reorder(Stratégie, pct), fill = Fréquence)
     "Souvent" = "#d62728", "Quelquefois" = "#ff7f0e",
     "Rarement" = "#ffbb78", "Jamais" = "#aec7e8"
   )) +
-  theme_minimal() +
+  theme_ror() +
   theme(
     plot.title = element_text(face = "bold", size = 12),
     axis.text.y = element_text(size = 8)
@@ -1005,7 +952,7 @@ dl_fig_variants("g5_strategies_likert", "09", function(d) {
       "Souvent" = "#d62728", "Quelquefois" = "#ff7f0e",
       "Rarement" = "#ffbb78", "Jamais" = "#aec7e8"
     )) +
-    theme_minimal() +
+    theme_ror() +
     theme(axis.text.y = element_text(size = 8))
 }, ssa_full)
 ```
@@ -1168,26 +1115,17 @@ dl_tbl_variants("t11_sources_emprunt", "09", function(d) {
 }, ssa_full)
 ```
 
-```{r g6_top_strategies}
+```{r g6_top_strategies_data}
 # G6 : Top 5 des stratégies les plus fréquentes
 top5 <- strat_resume %>%
   slice_head(n = 5) %>%
-  pivot_longer(cols = any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
+  pivot_longer(cols = where(is.numeric), names_to = "Observatory", values_to = "pct")
+```
 
-ggplot(top5, aes(x = reorder(Stratégie, pct), y = pct, fill = Observatory)) +
-  geom_col(show.legend = FALSE) +
-  coord_flip() +
-  facet_wrap(~Observatory) +
-  labs(
-    title = "Top 5 des stratégies d'adaptation les plus fréquentes",
-    subtitle = "% « Quelquefois » ou « Souvent »",
-    x = NULL,
-    y = "% de ménages"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold", size = 12)
-  )
+```{r g6_top_strategies}
+#| fig-height: !expr ror_fig_height(top5, "Stratégie")
+top5 %>%
+  make_bar_obs(x = Stratégie, y_label = "% ménages")
 ```
 
 ```{r dl_g6_top_strategies}
@@ -1222,11 +1160,9 @@ dl_fig_variants("g6_top_strategies", "09", function(d) {
     slice_max(total, n = 5) %>% pull(Stratégie)
   sr %>%
     filter(Stratégie %in% top5) %>%
-    ggplot(aes(x = reorder(Stratégie, pct), y = pct, fill = Observatory)) +
-    geom_col(position = "dodge") +
-    coord_flip() +
-    labs(x = NULL, y = "% de ménages", fill = "Observatoire") +
-    theme_minimal()
+    ror_bar_grouped(x = Stratégie, fill = Observatory,
+                    y_label = "% ménages", direction = "horizontal",
+                    facet = FALSE)
 }, ssa_full)
 ```
 
@@ -1306,7 +1242,7 @@ ggplot(csi, aes(x = Observatory, y = csi_score, fill = Observatory)) +
     x = "Observatoire",
     y = "Score CSI"
   ) +
-  theme_minimal() +
+  theme_ror() +
   theme(plot.title = element_text(face = "bold", size = 12))
 ```
 
@@ -1321,7 +1257,7 @@ dl_fig_variants("g7_csi_boxplot", "09", function(d) {
   ggplot(d, aes(x = Observatory, y = csi_score, fill = Observatory)) +
     geom_boxplot(show.legend = FALSE) +
     labs(x = "Observatoire", y = "Score CSI") +
-    theme_minimal()
+    theme_ror()
 }, ssa_full)
 ```
 
@@ -1383,14 +1319,7 @@ sa_gap   <- sa_trends |> filter(year %in% c(2015, 2025))
 #| fig-width: 9
 #| fig-height: 5
 
-ggplot(mapping = aes(x = year, y = soudure_moy, colour = Observatory)) +
-  geom_line(data = sa_solid, linewidth = 0.8) +
-  geom_line(data = sa_gap, linewidth = 0.8, linetype = "31") +
-  geom_point(data = sa_trends, size = 2) +
-  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-  scale_y_continuous(limits = c(0, NA)) +
-  labs(x = NULL, y = "Durée moyenne de soudure (mois)", colour = "Observatoire") +
-  theme_minimal()
+sa_trends |> make_trend_plot(y_var = soudure_moy, y_label = "Durée moyenne soudure (mois)", gap_year = 2015)
 ```
 
 ```{r fig_sa_pct_soudure}
@@ -1398,14 +1327,7 @@ ggplot(mapping = aes(x = year, y = soudure_moy, colour = Observatory)) +
 #| fig-width: 9
 #| fig-height: 5
 
-ggplot(mapping = aes(x = year, y = pct_soudure, colour = Observatory)) +
-  geom_line(data = sa_solid, linewidth = 0.8) +
-  geom_line(data = sa_gap, linewidth = 0.8, linetype = "31") +
-  geom_point(data = sa_trends, size = 2) +
-  scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-  scale_y_continuous(limits = c(0, 100)) +
-  labs(x = NULL, y = "% de ménages ayant connu une soudure", colour = "Observatoire") +
-  theme_minimal()
+sa_trends |> make_trend_plot(y_var = pct_soudure, y_label = "% ménages en soudure", gap_year = 2015)
 ```
 
 :::

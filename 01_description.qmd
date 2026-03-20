@@ -424,7 +424,7 @@ ggplot(chrono, aes(x = date_interview, y = cumul, color = Observatory)) +
     expand = expansion(mult = c(0.01, 0.01))
   ) +
   labs(x = NULL, y = "Nombre cumulé d'entretiens", color = "Observatoire") +
-  theme_minimal() +
+  theme_ror() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
@@ -463,23 +463,19 @@ res_deb |>
 
 L'enquête a mobilisé 20 enquêteurs (10 par observatoire), encadrés par 6 superviseurs (3 par observatoire). La saisie des questionnaires a été assurée par 4 opérateurs. Le @fig-enqueteurs présente le nombre de questionnaires réalisés par chaque enquêteur (identifié par un code anonyme).
 
-```{r}
-#| fig-cap: "Nombre de questionnaires par enquêteur et observatoire"
-#| fig-width: 9
-#| fig-height: 5
-#| label: fig-enqueteurs
-
+```{r enq_data}
 enq <- res_deb |>
   mutate(Enquêteur = paste0("E", sprintf("%02d", j1))) |>
   count(Observatory, Enquêteur)
+```
 
-ggplot(enq, aes(x = fct_reorder(Enquêteur, n), y = n, fill = Observatory)) +
-  geom_col() +
-  coord_flip() +
-  facet_wrap(~Observatory, scales = "free_y") +
-  labs(x = NULL, y = "Questionnaires réalisés", fill = "Observatoire") +
-  theme_minimal() +
-  theme(legend.position = "none")
+```{r}
+#| fig-cap: "Nombre de questionnaires par enquêteur et observatoire"
+#| fig-width: 9
+#| fig-height: !expr ror_fig_height(enq, "Enquêteur")
+#| label: fig-enqueteurs
+enq |>
+  make_bar_obs(x = Enquêteur, y = n, y_label = "Questionnaires réalisés", show_pct = FALSE)
 ```
 
 ```{r}

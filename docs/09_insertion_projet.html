@@ -363,7 +363,7 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
 </figcaption>
 <div aria-describedby="tbl-adhesion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="yodcrrbgad" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="tyyiktifpr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -400,69 +400,9 @@ Table&nbsp;9.1: Appartenance à une organisation ou association
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/12/tbl_adhesion_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_adhesion_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_adhesion_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_adhesion_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_adhesion_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/12/tbl_adhesion_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/12/tbl_adhesion_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/12/tbl_adhesion_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_adhesion_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_adhesion_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_adhesion_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_adhesion_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_adhesion_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_adhesion_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_adhesion_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_adhesion_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="nombre-dorganisations-par-ménage" class="level3" data-number="9.1.2">
 <h3 data-number="9.1.2" class="anchored" data-anchor-id="nombre-dorganisations-par-ménage"><span class="header-section-number">9.1.2</span> Nombre d’organisations par ménage</h3>
@@ -475,12 +415,9 @@ Alaotra
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(j5, Observatory, <span class="at">name =</span> <span class="st">"nb_org"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, nb_org, <span class="at">name =</span> <span class="st">"n_men"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n_men <span class="sc">/</span> <span class="fu">sum</span>(n_men) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(nb_org), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Nombre d'organisations"</span>, <span class="at">y =</span> <span class="st">"% des ménages"</span>) <span class="sc">+</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb_org =</span> <span class="fu">factor</span>(nb_org),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">pct =</span> <span class="fu">round</span>(n_men <span class="sc">/</span> <span class="fu">sum</span>(n_men) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> nb_org, <span class="at">y_label =</span> <span class="st">"% des ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-nb-org" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -495,69 +432,9 @@ Figure&nbsp;9.1: Nombre d’organisations par ménage membre
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/12/fig_nb_org_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_nb_org_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_nb_org_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_nb_org_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_nb_org_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/12/fig_nb_org_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/12/fig_nb_org_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/12/fig_nb_org_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_nb_org_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_nb_org_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_nb_org_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_nb_org_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_nb_org_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_nb_org_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_nb_org_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_nb_org_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="type-dorganisation" class="level3" data-number="9.1.3">
 <h3 data-number="9.1.3" class="anchored" data-anchor-id="type-dorganisation"><span class="header-section-number">9.1.3</span> Type d’organisation</h3>
@@ -565,7 +442,7 @@ Alaotra
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>res_respg <span class="sc">|&gt;</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>org_type_data <span class="ot">&lt;-</span> res_respg <span class="sc">|&gt;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(respgc)) <span class="sc">|&gt;</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">respgc_chr =</span> <span class="fu">as.character</span>(respgc),</span>
@@ -576,15 +453,16 @@ Alaotra
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Type) <span class="sc">|&gt;</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(pct <span class="sc">&gt;=</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Type, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des adhésions"</span>) <span class="sc">+</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>org_type_data <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Type, <span class="at">y_label =</span> <span class="st">"% des adhésions"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-type-org" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -599,69 +477,9 @@ Figure&nbsp;9.2: Type d’organisation (toutes adhésions)
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/12/fig_type_org_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_type_org_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_type_org_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_type_org_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_type_org_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/12/fig_type_org_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/12/fig_type_org_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/12/fig_type_org_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_type_org_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_type_org_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_type_org_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_type_org_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_type_org_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_type_org_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_type_org_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_type_org_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="qui-dans-le-ménage-est-membre" class="level3" data-number="9.1.4">
 <h3 data-number="9.1.4" class="anchored" data-anchor-id="qui-dans-le-ménage-est-membre"><span class="header-section-number">9.1.4</span> Qui dans le ménage est membre</h3>
@@ -669,26 +487,27 @@ Alaotra
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>res_respg <span class="sc">|&gt;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(respgc)) <span class="sc">|&gt;</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Membre =</span> <span class="fu">case_when</span>(</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    respgb <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Chef de ménage"</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    respgb <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"Conjoint(e)"</span>,</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    respgb <span class="sc">%in%</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">23</span> <span class="sc">~</span> <span class="st">"Autre membre"</span>,</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    respgb <span class="sc">==</span> <span class="dv">91</span> <span class="sc">~</span> <span class="st">"Chef et conjoint"</span>,</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    respgb <span class="sc">==</span> <span class="dv">92</span> <span class="sc">~</span> <span class="st">"Tout le ménage"</span>,</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    respgb <span class="sc">==</span> <span class="dv">93</span> <span class="sc">~</span> <span class="st">"Tous les enfants"</span>,</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"Autre"</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Membre) <span class="sc">|&gt;</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Membre, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des adhésions"</span>) <span class="sc">+</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>membre_data <span class="ot">&lt;-</span> res_respg <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(respgc)) <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Membre =</span> <span class="fu">case_when</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    respgb <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Chef de ménage"</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    respgb <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"Conjoint(e)"</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    respgb <span class="sc">%in%</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">23</span> <span class="sc">~</span> <span class="st">"Autre membre"</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    respgb <span class="sc">==</span> <span class="dv">91</span> <span class="sc">~</span> <span class="st">"Chef et conjoint"</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    respgb <span class="sc">==</span> <span class="dv">92</span> <span class="sc">~</span> <span class="st">"Tout le ménage"</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    respgb <span class="sc">==</span> <span class="dv">93</span> <span class="sc">~</span> <span class="st">"Tous les enfants"</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"Autre"</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Membre) <span class="sc">|&gt;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>membre_data <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Membre, <span class="at">y_label =</span> <span class="st">"% des adhésions"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-qui-membre" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -703,69 +522,9 @@ Figure&nbsp;9.3: Membre du ménage affilié à l’organisation
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/12/fig_qui_membre_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_qui_membre_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_qui_membre_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_qui_membre_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_qui_membre_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/12/fig_qui_membre_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/12/fig_qui_membre_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/12/fig_qui_membre_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_qui_membre_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_qui_membre_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_qui_membre_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_qui_membre_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_qui_membre_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_qui_membre_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_qui_membre_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_qui_membre_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="niveau-de-responsabilité" class="level3" data-number="9.1.5">
 <h3 data-number="9.1.5" class="anchored" data-anchor-id="niveau-de-responsabilité"><span class="header-section-number">9.1.5</span> Niveau de responsabilité</h3>
@@ -773,17 +532,13 @@ Alaotra
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>res_respg <span class="sc">|&gt;</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(respgd), respgd <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Role =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(respgd), <span class="at">levels =</span> <span class="fu">names</span>(role_labs), <span class="at">labels =</span> role_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Role) <span class="sc">|&gt;</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Role, <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des adhésions"</span>) <span class="sc">+</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>res_respg <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(respgd), respgd <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Role =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(respgd), <span class="at">levels =</span> <span class="fu">names</span>(role_labs), <span class="at">labels =</span> role_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Role) <span class="sc">|&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Role, <span class="at">y_label =</span> <span class="st">"% des adhésions"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-responsabilite" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -798,69 +553,9 @@ Figure&nbsp;9.4: Niveau de responsabilité dans l’organisation
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/12/fig_responsabilite_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_responsabilite_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_responsabilite_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_responsabilite_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_responsabilite_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/12/fig_responsabilite_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/12/fig_responsabilite_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/12/fig_responsabilite_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_responsabilite_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_responsabilite_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_responsabilite_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_responsabilite_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_responsabilite_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_responsabilite_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_responsabilite_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_responsabilite_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 </section>
 <section id="sec-projets" class="level2" data-number="9.2">
@@ -878,19 +573,19 @@ Alaotra
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res_respg0 <span class="sc">|&gt;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Beneficiaire =</span> <span class="fu">case_when</span>(</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    pro1 <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Oui"</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    pro1 <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"Non"</span>,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    pro1 <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">"Ne sait pas"</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Beneficiaire) <span class="sc">|&gt;</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n) <span class="sc">|&gt;</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Observatory, <span class="at">values_from =</span> pct) <span class="sc">|&gt;</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Le ménage a-t-il bénéficié d'un projet ou d'une formation ?"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">safe_cols_label</span>(<span class="at">Alaotra =</span> <span class="st">"Alaotra (%)"</span>, <span class="at">Marovoay =</span> <span class="st">"Marovoay (%)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>res_respg0 <span class="sc">|&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Beneficiaire =</span> <span class="fu">case_when</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    pro1 <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Oui"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    pro1 <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">"Non"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    pro1 <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">"Ne sait pas"</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">|&gt;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Beneficiaire) <span class="sc">|&gt;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>n) <span class="sc">|&gt;</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Observatory, <span class="at">values_from =</span> pct) <span class="sc">|&gt;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Le ménage a-t-il bénéficié d'un projet ou d'une formation ?"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">safe_cols_label</span>(<span class="at">Alaotra =</span> <span class="st">"Alaotra (%)"</span>, <span class="at">Marovoay =</span> <span class="st">"Marovoay (%)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="tbl-pro1" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -899,7 +594,7 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
 </figcaption>
 <div aria-describedby="tbl-pro1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="pmndigtvrq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="iemyckjxvk" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -938,69 +633,9 @@ Table&nbsp;9.2: Ménages bénéficiaires de projets ou formations
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/12/tbl_pro1_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_pro1_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_pro1_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_pro1_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_pro1_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/12/tbl_pro1_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/12/tbl_pro1_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/12/tbl_pro1_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_pro1_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_pro1_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_pro1_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_pro1_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_pro1_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_pro1_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_pro1_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_pro1_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="taux-de-bénéficiaires-par-type-de-projet" class="level3" data-number="9.2.2">
 <h3 data-number="9.2.2" class="anchored" data-anchor-id="taux-de-bénéficiaires-par-type-de-projet"><span class="header-section-number">9.2.2</span> Taux de bénéficiaires par type de projet</h3>
@@ -1008,36 +643,37 @@ Alaotra
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pro_clean <span class="ot">&lt;-</span> res_pro <span class="sc">|&gt;</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">pro_lib_txt =</span> <span class="fu">safe_to_char</span>(pro_lib),</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">pro_lib_clean =</span> <span class="fu">case_when</span>(</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>      pro_lib_txt <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Fizahan-tany"</span>, <span class="st">"Fizahantany"</span>) <span class="sc">~</span> <span class="st">"Tourisme"</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_detect</span>(pro_lib_txt, <span class="st">"^Hafa"</span>) <span class="sc">~</span> <span class="st">"Autre (ex. HIMO)"</span>,</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      pro_lib_txt <span class="sc">==</span> <span class="st">"Fambolena"</span> <span class="sc">~</span> <span class="st">"Agriculture"</span>,</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      pro_lib_txt <span class="sc">==</span> <span class="st">"Fampianarana &amp;  Faha"</span> <span class="sc">~</span> <span class="st">"Éducation &amp; santé"</span>,</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>      pro_lib_txt <span class="sc">==</span> <span class="st">"Fanjariantsakafo"</span> <span class="sc">~</span> <span class="st">"Nutrition"</span>,</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>      pro_lib_txt <span class="sc">==</span> <span class="st">"Fiompiana/jono"</span> <span class="sc">~</span> <span class="st">"Élevage / pêche"</span>,</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>      pro_lib_txt <span class="sc">==</span> <span class="st">"Asam-pamokarana hafa"</span> <span class="sc">~</span> <span class="st">"Autres productions"</span>,</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>      pro_lib_txt <span class="sc">==</span> <span class="st">"Tontolo iainana"</span> <span class="sc">~</span> <span class="st">"Environnement"</span>,</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> pro_lib_txt</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(pro_lib_clean <span class="sc">!=</span> <span class="st">""</span>)</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>pro_clean <span class="sc">|&gt;</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(pro2), pro2 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct =</span> <span class="fu">round</span>(<span class="fu">mean</span>(pro2 <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(Observatory, pro_lib_clean)</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(pro_lib_clean, pct), <span class="at">y =</span> pct)) <span class="sc">+</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"#2c7bb6"</span>, <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% de ménages bénéficiaires"</span>) <span class="sc">+</span></span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pro_clean <span class="ot">&lt;-</span> res_pro <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">pro_lib_txt =</span> <span class="fu">safe_to_char</span>(pro_lib),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">pro_lib_clean =</span> <span class="fu">case_when</span>(</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>      pro_lib_txt <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Fizahan-tany"</span>, <span class="st">"Fizahantany"</span>) <span class="sc">~</span> <span class="st">"Tourisme"</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_detect</span>(pro_lib_txt, <span class="st">"^Hafa"</span>) <span class="sc">~</span> <span class="st">"Autre (ex. HIMO)"</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>      pro_lib_txt <span class="sc">==</span> <span class="st">"Fambolena"</span> <span class="sc">~</span> <span class="st">"Agriculture"</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>      pro_lib_txt <span class="sc">==</span> <span class="st">"Fampianarana &amp;  Faha"</span> <span class="sc">~</span> <span class="st">"Éducation &amp; santé"</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>      pro_lib_txt <span class="sc">==</span> <span class="st">"Fanjariantsakafo"</span> <span class="sc">~</span> <span class="st">"Nutrition"</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>      pro_lib_txt <span class="sc">==</span> <span class="st">"Fiompiana/jono"</span> <span class="sc">~</span> <span class="st">"Élevage / pêche"</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>      pro_lib_txt <span class="sc">==</span> <span class="st">"Asam-pamokarana hafa"</span> <span class="sc">~</span> <span class="st">"Autres productions"</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>      pro_lib_txt <span class="sc">==</span> <span class="st">"Tontolo iainana"</span> <span class="sc">~</span> <span class="st">"Environnement"</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> pro_lib_txt</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(pro_lib_clean <span class="sc">!=</span> <span class="st">""</span>)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>benef_type_data <span class="ot">&lt;-</span> pro_clean <span class="sc">|&gt;</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(pro2), pro2 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct =</span> <span class="fu">round</span>(<span class="fu">mean</span>(pro2 <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(Observatory, pro_lib_clean)</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>benef_type_data <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> pro_lib_clean, <span class="at">y_label =</span> <span class="st">"% de ménages bénéficiaires"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-benef-type" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1052,84 +688,24 @@ Figure&nbsp;9.5: Taux de ménages bénéficiaires par type de projet
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/12/fig_benef_type_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_benef_type_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_benef_type_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_benef_type_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_benef_type_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/12/fig_benef_type_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/12/fig_benef_type_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/12/fig_benef_type_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_benef_type_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_benef_type_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_benef_type_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_benef_type_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_benef_type_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_benef_type_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_benef_type_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_benef_type_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>pro_clean <span class="sc">|&gt;</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(pro2), pro2 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct =</span> <span class="fu">round</span>(<span class="fu">mean</span>(pro2 <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(Observatory, pro_lib_clean)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Observatory, <span class="at">values_from =</span> pct) <span class="sc">|&gt;</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">rowSums</span>(<span class="fu">pick</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"Alaotra"</span>, <span class="st">"Marovoay"</span>)))))) <span class="sc">|&gt;</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">Type de projet</span><span class="st">`</span> <span class="ot">=</span> pro_lib_clean) <span class="sc">|&gt;</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"% de ménages bénéficiaires par type de projet"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">safe_cols_label</span>(<span class="at">Alaotra =</span> <span class="st">"Alaotra (%)"</span>, <span class="at">Marovoay =</span> <span class="st">"Marovoay (%)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pro_clean <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(pro2), pro2 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct =</span> <span class="fu">round</span>(<span class="fu">mean</span>(pro2 <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(Observatory, pro_lib_clean)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Observatory, <span class="at">values_from =</span> pct) <span class="sc">|&gt;</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">rowSums</span>(<span class="fu">pick</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"Alaotra"</span>, <span class="st">"Marovoay"</span>)))))) <span class="sc">|&gt;</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">`</span><span class="at">Type de projet</span><span class="st">`</span> <span class="ot">=</span> pro_lib_clean) <span class="sc">|&gt;</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"% de ménages bénéficiaires par type de projet"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">safe_cols_label</span>(<span class="at">Alaotra =</span> <span class="st">"Alaotra (%)"</span>, <span class="at">Marovoay =</span> <span class="st">"Marovoay (%)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="tbl-benef-type" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -1138,7 +714,7 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
 </figcaption>
 <div aria-describedby="tbl-benef-type-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="gajznbptro" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="wxsolqbdjb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1202,69 +778,9 @@ Table&nbsp;9.3: Taux de bénéficiaires par type de projet et observatoire
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/12/tbl_benef_type_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_benef_type_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_benef_type_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_benef_type_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_benef_type_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/12/tbl_benef_type_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/12/tbl_benef_type_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/12/tbl_benef_type_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_benef_type_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_benef_type_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_benef_type_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_benef_type_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_benef_type_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_benef_type_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_benef_type_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_benef_type_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="source-des-projets" class="level3" data-number="9.2.3">
 <h3 data-number="9.2.3" class="anchored" data-anchor-id="source-des-projets"><span class="header-section-number">9.2.3</span> Source des projets</h3>
@@ -1272,32 +788,27 @@ Alaotra
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pro_benef <span class="ot">&lt;-</span> pro_clean <span class="sc">|&gt;</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(pro2 <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>pro_source <span class="ot">&lt;-</span> pro_benef <span class="sc">|&gt;</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Etat =</span> <span class="fu">sum</span>(pro3 <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">ONG / Projet</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(pro4) <span class="sc">&amp;</span> pro4 <span class="sc">!=</span> <span class="dv">0</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Eglise =</span> <span class="fu">sum</span>(pro5 <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(Observatory, pro_lib_clean)</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(Etat, <span class="st">`</span><span class="at">ONG / Projet</span><span class="st">`</span>, Eglise),</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"Source"</span>,</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"nb"</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(nb <span class="sc">/</span> n <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>))</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>pro_source <span class="sc">|&gt;</span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(pro_lib_clean, pct), <span class="at">y =</span> pct, <span class="at">fill =</span> Source)) <span class="sc">+</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des bénéficiaires"</span>, <span class="at">fill =</span> <span class="st">"Source"</span>) <span class="sc">+</span></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">11</span>) <span class="sc">+</span></span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pro_benef <span class="ot">&lt;-</span> pro_clean <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(pro2 <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>pro_source <span class="ot">&lt;-</span> pro_benef <span class="sc">|&gt;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Etat =</span> <span class="fu">sum</span>(pro3 <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">ONG / Projet</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(pro4) <span class="sc">&amp;</span> pro4 <span class="sc">!=</span> <span class="dv">0</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">Eglise =</span> <span class="fu">sum</span>(pro5 <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(Observatory, pro_lib_clean)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(Etat, <span class="st">`</span><span class="at">ONG / Projet</span><span class="st">`</span>, Eglise),</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"Source"</span>,</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"nb"</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(nb <span class="sc">/</span> n <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>))</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>pro_source <span class="sc">|&gt;</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_grouped</span>(<span class="at">x =</span> pro_lib_clean, <span class="at">fill =</span> Source,</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>                  <span class="at">y_label =</span> <span class="st">"% des bénéficiaires"</span>, <span class="at">direction =</span> <span class="st">"horizontal"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-source-projet" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1312,81 +823,24 @@ Figure&nbsp;9.6: Source des projets pour les ménages bénéficiaires
 </div>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/12/fig_source_projet_marovoay_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_source_projet_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_source_projet_marovoay_bepako.png" download="">Bepako (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_source_projet_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_source_projet_marovoay_maroala.png" download="">Maroala (PNG)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/12/fig_source_projet_marovoay_tous.png" download="" class="dl-link">📥 Marovoay (PNG)</a> &nbsp; <a href="downloads/12/fig_source_projet_alaotra_tous.png" download="" class="dl-link">📥 Alaotra (PNG)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/12/fig_source_projet_alaotra_tous.png" download="">Tous (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_source_projet_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_source_projet_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_source_projet_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_source_projet_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_source_projet_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_source_projet_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
-</li>
-<li>
-<a href="downloads/12/fig_source_projet_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>pro_benef <span class="sc">|&gt;</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Total bénéficiaires</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">État (nb)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(pro3 <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">État (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">sum</span>(pro3 <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">ONG/Projet (nb)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(pro4) <span class="sc">&amp;</span> pro4 <span class="sc">!=</span> <span class="dv">0</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">ONG/Projet (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(pro4) <span class="sc">&amp;</span> pro4 <span class="sc">!=</span> <span class="dv">0</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Église (nb)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(pro5 <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Observatory</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Source des projets pour les ménages bénéficiaires"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>pro_benef <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Total bénéficiaires</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">État (nb)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(pro3 <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">État (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">sum</span>(pro3 <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">ONG/Projet (nb)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(pro4) <span class="sc">&amp;</span> pro4 <span class="sc">!=</span> <span class="dv">0</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">ONG/Projet (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(pro4) <span class="sc">&amp;</span> pro4 <span class="sc">!=</span> <span class="dv">0</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Église (nb)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(pro5 <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Observatory</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Source des projets pour les ménages bénéficiaires"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="tbl-source-global" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -1395,7 +849,7 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
 </figcaption>
 <div aria-describedby="tbl-source-global-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="alasyabmna" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="cizbyifnte" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1441,69 +895,9 @@ Table&nbsp;9.4: Source des projets (tous types confondus)
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/12/tbl_source_global_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_source_global_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_source_global_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_source_global_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_source_global_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/12/tbl_source_global_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/12/tbl_source_global_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/12/tbl_source_global_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_source_global_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_source_global_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_source_global_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_source_global_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_source_global_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_source_global_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_source_global_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_source_global_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 </section>
 <section id="sec-croisement" class="level2" data-number="9.3">
@@ -1518,26 +912,26 @@ Alaotra
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>res_respg0 <span class="sc">|&gt;</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(pro1 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Membre =</span> <span class="fu">if_else</span>(respga <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Membre"</span>, <span class="st">"Non membre"</span>),</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Beneficiaire =</span> pro1 <span class="sc">==</span> <span class="dv">1</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_benef =</span> <span class="fu">round</span>(<span class="fu">mean</span>(Beneficiaire) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Membre)</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Membre, <span class="at">values_from =</span> <span class="fu">c</span>(n, pct_benef)) <span class="sc">|&gt;</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"% de ménages bénéficiaires de projets selon l'appartenance à une organisation"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_Membre =</span> <span class="st">"N (membres)"</span>,</span>
-<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">n_Non membre</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"N (non membres)"</span>,</span>
-<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_benef_Membre =</span> <span class="st">"Bénéf. (%) membres"</span>,</span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">pct_benef_Non membre</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Bénéf. (%) non membres"</span></span>
-<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>res_respg0 <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(pro1 <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Membre =</span> <span class="fu">if_else</span>(respga <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Membre"</span>, <span class="st">"Non membre"</span>),</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">Beneficiaire =</span> pro1 <span class="sc">==</span> <span class="dv">1</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_benef =</span> <span class="fu">round</span>(<span class="fu">mean</span>(Beneficiaire) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Membre)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Membre, <span class="at">values_from =</span> <span class="fu">c</span>(n, pct_benef)) <span class="sc">|&gt;</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"% de ménages bénéficiaires de projets selon l'appartenance à une organisation"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_Membre =</span> <span class="st">"N (membres)"</span>,</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">n_Non membre</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"N (non membres)"</span>,</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_benef_Membre =</span> <span class="st">"Bénéf. (%) membres"</span>,</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">pct_benef_Non membre</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Bénéf. (%) non membres"</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="tbl-croisement" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -1546,7 +940,7 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
 </figcaption>
 <div aria-describedby="tbl-croisement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="rtqacoajvo" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="zixawdrtqj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1586,69 +980,9 @@ Table&nbsp;9.5: Accès aux projets selon l’appartenance à une organisation
 </figure>
 </div>
 </div>
-<details class="dl-variants">
-<summary>
-📥 Télécharger par site
-</summary>
-<div class="dl-grid">
-<div class="dl-group">
-<h4 class="anchored">
-Marovoay
-</h4>
-<ul>
-<li>
-<a href="downloads/12/tbl_croisement_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_croisement_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_croisement_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_croisement_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_croisement_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
-</li>
-</ul>
+<div class="dl-downloads">
+<p><a href="downloads/12/tbl_croisement_marovoay_tous.xlsx" download="" class="dl-link">📥 Marovoay (XLSX)</a> &nbsp; <a href="downloads/12/tbl_croisement_alaotra_tous.xlsx" download="" class="dl-link">📥 Alaotra (XLSX)</a></p>
 </div>
-<div class="dl-group">
-<h4 class="anchored">
-Alaotra
-</h4>
-<ul>
-<li>
-<a href="downloads/12/tbl_croisement_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_croisement_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_croisement_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_croisement_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_croisement_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_croisement_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_croisement_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_croisement_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
-</li>
-<li>
-<a href="downloads/12/tbl_croisement_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
-</li>
-</ul>
-</div>
-</div>
-</details>
 </section>
 <section id="sec-pistes-insertion" class="level2 obs-technical" data-number="9.4">
 <h2 data-number="9.4" class="anchored" data-anchor-id="sec-pistes-insertion"><span class="header-section-number">9.4</span> Pistes d’analyse complémentaires</h2>
