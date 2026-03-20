@@ -643,5 +643,3 @@ tabulate_binary_set <- function(
     dplyr::mutate(pct = round(n / N * 100, 1)) |>
     dplyr::select(-N)
 }
-
-

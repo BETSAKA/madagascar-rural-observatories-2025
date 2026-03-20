@@ -42,7 +42,6 @@
 
 # ---------------------------------------------------------------------------
 add_cover_to_docx <- function(docx_path, cover_img) {
-
   if (!file.exists(docx_path)) {
     message("  Not found: ", docx_path, " — skipping.")
     return(invisible(FALSE))
@@ -53,7 +52,7 @@ add_cover_to_docx <- function(docx_path, cover_img) {
 
   # --- Image dimensions (EMU: 1 inch = 914 400) ---------------------------
   img_dim <- dim(jpeg::readJPEG(cover_img))
-  target_cx <- 5943000                                    # ~6.5 in
+  target_cx <- 5943000 # ~6.5 in
 
   target_cy <- round(target_cx * img_dim[1] / img_dim[2])
 
@@ -64,7 +63,9 @@ add_cover_to_docx <- function(docx_path, cover_img) {
 
   # --- Copy cover image to word/media/ -------------------------------------
   media_dir <- file.path(tmp, "word", "media")
-  if (!dir.exists(media_dir)) dir.create(media_dir, recursive = TRUE)
+  if (!dir.exists(media_dir)) {
+    dir.create(media_dir, recursive = TRUE)
+  }
   file.copy(
     normalizePath(cover_img),
     file.path(media_dir, "cover_page.jpg"),
@@ -73,52 +74,60 @@ add_cover_to_docx <- function(docx_path, cover_img) {
 
   # --- Add image relationship ----------------------------------------------
   rels_path <- file.path(tmp, "word", "_rels", "document.xml.rels")
-  rels_xml  <- xml2::read_xml(rels_path)
-  ids       <- xml2::xml_attr(xml2::xml_children(rels_xml), "Id")
-  max_id    <- max(as.integer(gsub("rId", "", ids)))
-  new_rid   <- paste0("rId", max_id + 1L)
+  rels_xml <- xml2::read_xml(rels_path)
+  ids <- xml2::xml_attr(xml2::xml_children(rels_xml), "Id")
+  max_id <- max(as.integer(gsub("rId", "", ids)))
+  new_rid <- paste0("rId", max_id + 1L)
 
   xml2::xml_add_child(
-    rels_xml, "Relationship",
-    Id     = new_rid,
-    Type   = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image",
+    rels_xml,
+    "Relationship",
+    Id = new_rid,
+    Type = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image",
     Target = "media/cover_page.jpg"
   )
   xml2::write_xml(rels_xml, rels_path)
 
   # --- Build cover-image paragraph XML -------------------------------------
-  cover_xml <- sprintf(paste0(
-    '<w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"',
-    ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"',
-    ' xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"',
-    ' xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"',
-    ' xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">',
-    '<w:pPr><w:jc w:val="center"/><w:spacing w:before="1440"/></w:pPr>',
-    '<w:r><w:drawing>',
-    '<wp:inline distT="0" distB="0" distL="0" distR="0">',
-    '<wp:extent cx="%d" cy="%d"/>',
-    '<wp:effectExtent b="0" l="0" r="0" t="0"/>',
-    '<wp:docPr id="9999" name="CoverImage" descr="Photo de couverture"/>',
-    '<a:graphic>',
-    '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">',
-    '<pic:pic>',
-    '<pic:nvPicPr>',
-    '<pic:cNvPr id="9998" name="CoverImage"/>',
-    '<pic:cNvPicPr><a:picLocks noChangeAspect="1"/></pic:cNvPicPr>',
-    '</pic:nvPicPr>',
-    '<pic:blipFill>',
-    '<a:blip r:embed="%s"/>',
-    '<a:stretch><a:fillRect/></a:stretch>',
-    '</pic:blipFill>',
-    '<pic:spPr>',
-    '<a:xfrm><a:off x="0" y="0"/><a:ext cx="%d" cy="%d"/></a:xfrm>',
-    '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>',
-    '</pic:spPr>',
-    '</pic:pic>',
-    '</a:graphicData></a:graphic>',
-    '</wp:inline>',
-    '</w:drawing></w:r></w:p>'
-  ), target_cx, target_cy, new_rid, target_cx, target_cy)
+  cover_xml <- sprintf(
+    paste0(
+      '<w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"',
+      ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"',
+      ' xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"',
+      ' xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"',
+      ' xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">',
+      '<w:pPr><w:jc w:val="center"/><w:spacing w:before="1440"/></w:pPr>',
+      '<w:r><w:drawing>',
+      '<wp:inline distT="0" distB="0" distL="0" distR="0">',
+      '<wp:extent cx="%d" cy="%d"/>',
+      '<wp:effectExtent b="0" l="0" r="0" t="0"/>',
+      '<wp:docPr id="9999" name="CoverImage" descr="Photo de couverture"/>',
+      '<a:graphic>',
+      '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">',
+      '<pic:pic>',
+      '<pic:nvPicPr>',
+      '<pic:cNvPr id="9998" name="CoverImage"/>',
+      '<pic:cNvPicPr><a:picLocks noChangeAspect="1"/></pic:cNvPicPr>',
+      '</pic:nvPicPr>',
+      '<pic:blipFill>',
+      '<a:blip r:embed="%s"/>',
+      '<a:stretch><a:fillRect/></a:stretch>',
+      '</pic:blipFill>',
+      '<pic:spPr>',
+      '<a:xfrm><a:off x="0" y="0"/><a:ext cx="%d" cy="%d"/></a:xfrm>',
+      '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom>',
+      '</pic:spPr>',
+      '</pic:pic>',
+      '</a:graphicData></a:graphic>',
+      '</wp:inline>',
+      '</w:drawing></w:r></w:p>'
+    ),
+    target_cx,
+    target_cy,
+    new_rid,
+    target_cx,
+    target_cy
+  )
 
   break_xml <- paste0(
     '<w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">',
@@ -127,9 +136,9 @@ add_cover_to_docx <- function(docx_path, cover_img) {
 
   # --- Insert into document.xml body (after title block, before TOC) ------
   doc_path <- file.path(tmp, "word", "document.xml")
-  doc_xml  <- xml2::read_xml(doc_path)
-  ns       <- xml2::xml_ns(doc_xml)
-  body     <- xml2::xml_find_first(doc_xml, "//w:body", ns)
+  doc_xml <- xml2::read_xml(doc_path)
+  ns <- xml2::xml_ns(doc_xml)
+  body <- xml2::xml_find_first(doc_xml, "//w:body", ns)
 
   # Walk body children to find the last title-block paragraph.
 
@@ -137,14 +146,20 @@ add_cover_to_docx <- function(docx_path, cover_img) {
 
   # French reference-doc uses "Titre", "Sous-titre", etc.
   title_styles <- c(
-    "Title", "Subtitle", "Author", "Date",        # English
-    "Titre", "Sous-titre"                          # French
+    "Title",
+    "Subtitle",
+    "Author",
+    "Date", # English
+    "Titre",
+    "Sous-titre" # French
   )
   body_children <- xml2::xml_children(body)
   last_title_idx <- 0L
   for (i in seq_along(body_children)) {
     style_node <- xml2::xml_find_first(
-      body_children[[i]], ".//w:pPr/w:pStyle", ns
+      body_children[[i]],
+      ".//w:pPr/w:pStyle",
+      ns
     )
     if (inherits(style_node, "xml_node")) {
       sval <- xml2::xml_attr(style_node, "val")
@@ -155,7 +170,9 @@ add_cover_to_docx <- function(docx_path, cover_img) {
     }
     # Skip empty/unstyled paragraphs only while we haven't found a
     # title-block element yet (template padding at top of page)
-    if (last_title_idx == 0L && nchar(xml2::xml_text(body_children[[i]])) == 0L) {
+    if (
+      last_title_idx == 0L && nchar(xml2::xml_text(body_children[[i]])) == 0L
+    ) {
       next
     }
     # Non-title, non-empty paragraph after the title block → stop
@@ -166,18 +183,22 @@ add_cover_to_docx <- function(docx_path, cover_img) {
     anchor <- body_children[[last_title_idx]]
     # Insert page-break first, then cover ("after" inserts immediately
     # after anchor each time, so last inserted ends up closest)
-    xml2::xml_add_sibling(anchor, xml2::read_xml(break_xml),
-                          .where = "after")
-    xml2::xml_add_sibling(anchor, xml2::read_xml(cover_xml),
-                          .where = "after")
+    xml2::xml_add_sibling(anchor, xml2::read_xml(break_xml), .where = "after")
+    xml2::xml_add_sibling(anchor, xml2::read_xml(cover_xml), .where = "after")
     # Final order: ... Title block | cover | page-break | TOC ...
   } else {
     # Fallback: insert before first child if no title block found
     first_child <- xml2::xml_child(body, 1)
-    xml2::xml_add_sibling(first_child, xml2::read_xml(break_xml),
-                          .where = "before")
-    xml2::xml_add_sibling(first_child, xml2::read_xml(cover_xml),
-                          .where = "before")
+    xml2::xml_add_sibling(
+      first_child,
+      xml2::read_xml(break_xml),
+      .where = "before"
+    )
+    xml2::xml_add_sibling(
+      first_child,
+      xml2::read_xml(cover_xml),
+      .where = "before"
+    )
   }
 
   xml2::write_xml(doc_xml, doc_path)
@@ -196,4 +217,6 @@ add_cover_to_docx <- function(docx_path, cover_img) {
 }
 
 # Run main block only when invoked as a script (not when source()'d)
-if (sys.nframe() == 0L) .add_cover_main()
+if (sys.nframe() == 0L) {
+  .add_cover_main()
+}
