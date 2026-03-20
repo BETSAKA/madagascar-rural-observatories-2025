@@ -3,11 +3,11 @@
 # Generic plot functions for the ROR observatory report.
 #
 # Typology:
-#   ror_bar()          Horizontal bar chart (single fill colour)
+#   make_bar_obs()     Horizontal bar chart (single fill colour)
 #   ror_bar_v()        Vertical bar chart   (single fill colour)
 #   ror_bar_grouped()  Grouped (dodged) bar chart (fill = grouping var)
 #   ror_bar_stacked()  Stacked bar chart          (fill = grouping var)
-#   ror_trend()        Multi-year trend line with data-gap dashed segment
+#   make_trend_plot()  Multi-year trend line with data-gap dashed segment
 #   ror_pyramid()      Population pyramid (paired horizontal bars)
 #   ror_gt()           Enhanced gt table (obs_gt + style_table)
 #
@@ -17,6 +17,156 @@
 # ─────────────────────────────────────────────────────────────────
 
 ROR_BLUE <- "#2c7bb6"
+
+# ── Hook-skip flag ────────────────────────────────────────────
+# Quarto's !expr YAML evaluation may strip R attributes, so
+# instead of relying on an attribute to tell the knitr hook
+# "I already computed the multi-row height", we set a global flag
+# that the hook checks and clears.
+.ror_hook_env <- new.env(parent = emptyenv())
+.ror_hook_env$skip <- FALSE
+
+# ── Figure-height helpers ─────────────────────────────────────
+
+#' Number of Observatory facets in the current report profile
+#'
+#' In consolidated mode, counts distinct Observatory values in the
+#' data (typically 2).  In per-observatory mode the plot chunk will
+#' call `expand_sites_for_profile()`, which replaces Observatory
+#' with site names + "Tous".  If the data has already been expanded
+#' we detect that (> 2 distinct values, or values matching known
+#' site names); otherwise we look up the site count from SITES.
+#'
+#' NAs in Observatory (from partial joins) are always excluded.
+.ror_n_obs <- function(data) {
+  mode <- get_report_mode()
+  n <- if ("Observatory" %in% names(data)) {
+    obs_vals <- data$Observatory[!is.na(data$Observatory)]
+    if (length(obs_vals) == 0L) 1L else dplyr::n_distinct(obs_vals)
+  } else {
+    1L
+  }
+
+  if (mode$is_consolidated) {
+    return(n)
+  }
+
+  # Per-observatory mode: if data was already expanded by
+
+  # expand_sites_for_profile(), n will be sites + 1 ("Tous").
+  # If not yet expanded, n == 1; look up from SITES + 1 for "Tous".
+  if (n <= 1L) {
+    obs <- mode$observatory
+    n <- length(SITES[[obs]]) + 1L
+  }
+  n
+}
+
+#' Compute figure height (additive model with per-panel cap)
+#'
+#' Uses an additive formula:
+#'   `base + n_rows * min(n_items * per_item + strip_h, max_panel_h)`
+#'
+#' For single-row layouts (consolidated) the cap is not applied so that
+#' height grows linearly with the category count.  For multi-row layouts
+#' the cap prevents very long figures when there are many categories.
+#'
+#' @param data   Data frame (with an `Observatory` column if faceted).
+#' @param x_col  Character name of the category column (default `"Type"`).
+#' @param per_item  Height per category item in inches (default 0.45).
+#' @param base    Global base height for title/legend in inches (default 1.0).
+#' @param strip_h Per-panel overhead: strip title + axis (default 0.5).
+#' @param max_panel_h  Maximum panel height per row when faceted (default 3.0).
+#' @param max_height  Absolute ceiling in inches (default 20).
+#' @return Numeric: figure height in inches.
+ror_fig_height <- function(
+  data,
+  x_col = "Type",
+  per_item = 0.45,
+  base = 1.0,
+  strip_h = 0.5,
+  max_panel_h = 3.0,
+  max_height = 20
+) {
+  n_items <- dplyr::n_distinct(data[[x_col]])
+  .ror_compute_height(
+    n_items,
+    data = data,
+    per_item = per_item,
+    base = base,
+    strip_h = strip_h,
+    max_panel_h = max_panel_h,
+    max_height = max_height
+  )
+}
+
+#' Compute figure height from a known category count
+#'
+#' Variant of [ror_fig_height()] for cases where the x column is
+#' created during a pipeline (e.g. via `factor()`) and does not
+#' yet exist in the source data.  Pass the number of categories
+#' (typically `length(labels_vector)`) and the source data frame
+#' for the Observatory count.
+#'
+#' @param n_items  Integer: number of y-axis categories.
+#' @param data     Data frame with `Observatory` (for facet-row count),
+#'                 or `NULL` (single panel).
+#' @inheritParams ror_fig_height
+#' @return Numeric: figure height in inches.
+ror_fig_height_n <- function(
+  n_items,
+  data = NULL,
+  per_item = 0.45,
+  base = 1.0,
+  strip_h = 0.5,
+  max_panel_h = 3.0,
+  max_height = 20
+) {
+  .ror_compute_height(
+    n_items,
+    data = data,
+    per_item = per_item,
+    base = base,
+    strip_h = strip_h,
+    max_panel_h = max_panel_h,
+    max_height = max_height
+  )
+}
+
+#' Internal: shared height computation
+#' @noRd
+.ror_compute_height <- function(
+  n_items,
+  data = NULL,
+  per_item = 0.45,
+  base = 1.0,
+  strip_h = 0.5,
+  max_panel_h = 3.0,
+  max_height = 20
+) {
+  if (!is.null(data)) {
+    n_obs <- .ror_n_obs(data)
+  } else {
+    mode <- get_report_mode()
+    n_obs <- if (!mode$is_consolidated) {
+      length(SITES[[mode$observatory]]) + 1L
+    } else {
+      1L
+    }
+  }
+  ncol <- .ror_ncol(n_obs)
+  n_rows <- if (n_obs > 1) ceiling(n_obs / ncol) else 1L
+
+  panel_h <- n_items * per_item + strip_h
+  if (n_rows > 1L) {
+    panel_h <- min(panel_h, max_panel_h)
+  }
+  h <- min(round(base + n_rows * panel_h, 1), max_height)
+
+  # Signal to the knitr hook that this height is auto-computed
+  .ror_hook_env$skip <- TRUE
+  h
+}
 
 # ── Internal helpers ──────────────────────────────────────────
 
@@ -47,7 +197,7 @@ ROR_BLUE <- "#2c7bb6"
 }
 
 
-# ── ror_bar ───────────────────────────────────────────────────
+# ── make_bar_obs ──────────────────────────────────────────────
 #' Horizontal bar chart, optionally faceted by Observatory
 #'
 #' Produces a `geom_col() + coord_flip()` plot with:
@@ -67,7 +217,7 @@ ROR_BLUE <- "#2c7bb6"
 #' @param pct_suffix Suffix for labels (default "%").
 #' @param ncol  Number of facet columns (`NULL` = auto).
 #' @return A ggplot object.
-ror_bar <- function(
+make_bar_obs <- function(
   data,
   x = Type,
   y = pct,
@@ -116,7 +266,7 @@ ror_bar <- function(
       ggplot2::facet_wrap(
         ~Observatory,
         ncol = .ror_ncol(n_fct, ncol),
-        scales = "free_y"
+        scales = "fixed"
       )
   }
 
@@ -127,10 +277,10 @@ ror_bar <- function(
 # ── ror_bar_v ─────────────────────────────────────────────────
 #' Vertical bar chart, optionally faceted by Observatory
 #'
-#' Like `ror_bar()` but without `coord_flip()`.  Best suited for ordinal
+#' Like `make_bar_obs()` but without `coord_flip()`.  Best suited for ordinal
 #' categories (time periods, months) where left-to-right reading is natural.
 #'
-#' @inheritParams ror_bar
+#' @inheritParams make_bar_obs
 #' @param x_angle Angle (degrees) for x-axis text rotation (0 = horizontal).
 ror_bar_v <- function(
   data,
@@ -339,7 +489,7 @@ ror_bar_stacked <- function(
 }
 
 
-# ── ror_trend ─────────────────────────────────────────────────
+# ── make_trend_plot ───────────────────────────────────────────
 #' Multi-year trend line with dashed gap segment
 #'
 #' Draws solid lines up to `gap_year`, then a dashed line from `gap_year`
@@ -350,7 +500,7 @@ ror_bar_stacked <- function(
 #' @param y_label Y-axis label.
 #' @param gap_year Year marking the start of the gap (default 2014).
 #' @param title   Plot title.
-ror_trend <- function(data, y_var, y_label, gap_year = 2014, title = "") {
+make_trend_plot <- function(data, y_var, y_label, gap_year = 2014, title = "") {
   y_quo <- rlang::enquo(y_var)
 
   solid <- data |> dplyr::filter(year <= gap_year)

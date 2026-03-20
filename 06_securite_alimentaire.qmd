@@ -1115,14 +1115,17 @@ dl_tbl_variants("t11_sources_emprunt", "09", function(d) {
 }, ssa_full)
 ```
 
-```{r g6_top_strategies}
+```{r g6_top_strategies_data}
 # G6 : Top 5 des stratégies les plus fréquentes
 top5 <- strat_resume %>%
   slice_head(n = 5) %>%
   pivot_longer(cols = where(is.numeric), names_to = "Observatory", values_to = "pct")
+```
 
+```{r g6_top_strategies}
+#| fig-height: !expr ror_fig_height(top5, "Stratégie")
 top5 %>%
-  ror_bar(x = Stratégie, y_label = "% ménages")
+  make_bar_obs(x = Stratégie, y_label = "% ménages")
 ```
 
 ```{r dl_g6_top_strategies}
@@ -1316,7 +1319,7 @@ sa_gap   <- sa_trends |> filter(year %in% c(2015, 2025))
 #| fig-width: 9
 #| fig-height: 5
 
-sa_trends |> ror_trend(y_var = soudure_moy, y_label = "Durée moyenne soudure (mois)", gap_year = 2015)
+sa_trends |> make_trend_plot(y_var = soudure_moy, y_label = "Durée moyenne soudure (mois)", gap_year = 2015)
 ```
 
 ```{r fig_sa_pct_soudure}
@@ -1324,7 +1327,7 @@ sa_trends |> ror_trend(y_var = soudure_moy, y_label = "Durée moyenne soudure (m
 #| fig-width: 9
 #| fig-height: 5
 
-sa_trends |> ror_trend(y_var = pct_soudure, y_label = "% ménages en soudure", gap_year = 2015)
+sa_trends |> make_trend_plot(y_var = pct_soudure, y_label = "% ménages en soudure", gap_year = 2015)
 ```
 
 :::

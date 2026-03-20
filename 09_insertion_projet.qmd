@@ -183,13 +183,8 @@ dl_fig_variants("fig_nb_org", "12", function(d) {
 
 Les associations villageoises d'épargne et de crédit (tontines, *voamamy*) dominent à Marovoay, tandis que les associations religieuses prédominent à Alaotra. Les associations de femmes (liées au 8 mars) et les organisations de producteurs figurent également parmi les types les plus courants.
 
-```{r}
-#| label: fig-type-org
-#| fig-cap: "Type d'organisation (toutes adhésions)"
-#| fig-width: 11
-#| fig-height: 7
-
-res_respg |>
+```{r type_org_data}
+org_type_data <- res_respg |>
   filter(!is.na(respgc)) |>
   mutate(
     respgc_chr = as.character(respgc),
@@ -202,8 +197,16 @@ res_respg |>
   count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
   filter(pct >= 1) |>
-  expand_sites_for_profile() |>
-  ror_bar(x = Type, y_label = "% des adhésions")
+  expand_sites_for_profile()
+```
+
+```{r}
+#| label: fig-type-org
+#| fig-cap: "Type d'organisation (toutes adhésions)"
+#| fig-width: 11
+#| fig-height: !expr ror_fig_height(org_type_data)
+org_type_data |>
+  make_bar_obs(x = Type, y_label = "% des adhésions")
 ```
 
 ```{r dl_fig_type_org}
@@ -229,13 +232,8 @@ dl_fig_variants("fig_type_org", "12", function(d) {
 
 Le chef de ménage et le ou la conjoint(e) sont les membres les plus fréquemment affiliés, de façon quasi-égale.
 
-```{r}
-#| label: fig-qui-membre
-#| fig-cap: "Membre du ménage affilié à l'organisation"
-#| fig-width: 9
-#| fig-height: 5
-
-res_respg |>
+```{r qui_membre_data}
+membre_data <- res_respg |>
   filter(!is.na(respgc)) |>
   mutate(Membre = case_when(
     respgb == 1 ~ "Chef de ménage",
@@ -248,8 +246,16 @@ res_respg |>
   )) |>
   count(Observatory, Membre) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  expand_sites_for_profile() |>
-  ror_bar(x = Membre, y_label = "% des adhésions")
+  expand_sites_for_profile()
+```
+
+```{r}
+#| label: fig-qui-membre
+#| fig-cap: "Membre du ménage affilié à l'organisation"
+#| fig-width: 9
+#| fig-height: !expr ror_fig_height(membre_data, "Membre")
+membre_data |>
+  make_bar_obs(x = Membre, y_label = "% des adhésions")
 ```
 
 ```{r dl_fig_qui_membre}
@@ -368,12 +374,7 @@ dl_tbl_variants("tbl_pro1", "12", function(d) {
 
 L'éducation et la santé, la nutrition et l'agriculture sont les domaines pour lesquels les ménages bénéficient le plus de projets. Le tourisme reste totalement absent des deux observatoires.
 
-```{r}
-#| label: fig-benef-type
-#| fig-cap: "Taux de ménages bénéficiaires par type de projet"
-#| fig-width: 10
-#| fig-height: 6
-
+```{r benef_type_data}
 pro_clean <- res_pro |>
   mutate(
     pro_lib_txt = safe_to_char(pro_lib),
@@ -391,14 +392,22 @@ pro_clean <- res_pro |>
   ) |>
   filter(pro_lib_clean != "")
 
-pro_clean |>
+benef_type_data <- pro_clean |>
   filter(!is.na(pro2), pro2 %in% c(1, 2)) |>
   summarise(
     pct = round(mean(pro2 == 1) * 100, 1),
     .by = c(Observatory, pro_lib_clean)
   ) |>
-  expand_sites_for_profile() |>
-  ror_bar(x = pro_lib_clean, y_label = "% de ménages bénéficiaires")
+  expand_sites_for_profile()
+```
+
+```{r}
+#| label: fig-benef-type
+#| fig-cap: "Taux de ménages bénéficiaires par type de projet"
+#| fig-width: 10
+#| fig-height: !expr ror_fig_height(benef_type_data, "pro_lib_clean")
+benef_type_data |>
+  make_bar_obs(x = pro_lib_clean, y_label = "% de ménages bénéficiaires")
 ```
 
 ```{r dl_fig_benef_type}

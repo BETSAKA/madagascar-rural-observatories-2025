@@ -231,12 +231,7 @@ dl_fig_variants("fig_evolution_ressources", "10", function(d) {
 
 La question RM3 demande à qui appartient la zone protégée (réponses multiples). La @fig-appartenance montre les réponses par observatoire.
 
-```{r}
-#| fig-cap: "À qui appartient la zone protégée ? (% de Oui, réponses multiples)"
-#| fig-width: 9
-#| fig-height: 5
-#| label: fig-appartenance
-
+```{r appartenance_data}
 rm3_items <- tribble(
   ~var,    ~label,
   "rm3_1", "État (Fanjakana)",
@@ -252,9 +247,15 @@ appart <- rm3_items |>
     pct_oui(res_op_env, var, label)
   }) |>
   pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
+```
 
+```{r}
+#| fig-cap: "À qui appartient la zone protégée ? (% de Oui, réponses multiples)"
+#| fig-width: 9
+#| fig-height: !expr ror_fig_height(appart, "Item")
+#| label: fig-appartenance
 appart |>
-  ror_bar(x = Item, y = pct, y_label = "% de ménages")
+  make_bar_obs(x = Item, y = pct, y_label = "% de ménages")
 ```
 
 ```{r dl_fig_appartenance}
@@ -395,12 +396,7 @@ dl_tbl_variants("tbl_menaces", "10", function(d) {
 
 La question `RM5` interroge les ménages sur ce que la zone protégée représente pour eux (réponses multiples).
 
-```{r}
-#| fig-cap: "Que représente la zone protégée pour les ménages ? (% de Oui)"
-#| fig-width: 10
-#| fig-height: 6
-#| label: fig-representation
-
+```{r representation_data}
 rm5_items <- tribble(
   ~var,    ~label,
   "rm5_a", "Source d'alimentation",
@@ -420,9 +416,15 @@ rm5_items <- tribble(
 repr <- rm5_items |>
   pmap_dfr(\(var, label) pct_oui(res_op_env, var, label)) |>
   pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
+```
 
+```{r}
+#| fig-cap: "Que représente la zone protégée pour les ménages ? (% de Oui)"
+#| fig-width: 10
+#| fig-height: !expr ror_fig_height(repr, "Item")
+#| label: fig-representation
 repr |>
-  ror_bar(x = Item, y = pct, y_label = "% de ménages")
+  make_bar_obs(x = Item, y = pct, y_label = "% de ménages")
 ```
 
 ```{r dl_fig_representation}
@@ -740,12 +742,7 @@ dl_tbl_variants("tbl_frequentation", "10", function(d) {
 
 Pour les ménages qui ne se rendent pas dans l'AP, les raisons invoquées sont les suivantes.
 
-```{r}
-#| fig-cap: "Raisons de ne pas se rendre dans l'Aire protégée (% de Oui parmi ceux qui n'y vont pas)"
-#| fig-width: 9
-#| fig-height: 4
-#| label: fig-non-freq
-
+```{r non_freq_data}
 um1_non <- res_um1 |> filter(um1 == 2)
 
 non_items <- tribble(
@@ -760,9 +757,15 @@ non_items <- tribble(
 non_freq <- non_items |>
   pmap_dfr(\(var, label) pct_oui(um1_non, var, label)) |>
   pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
+```
 
+```{r}
+#| fig-cap: "Raisons de ne pas se rendre dans l'Aire protégée (% de Oui parmi ceux qui n'y vont pas)"
+#| fig-width: 9
+#| fig-height: !expr ror_fig_height(non_freq, "Item")
+#| label: fig-non-freq
 non_freq |>
-  ror_bar(x = Item, y = pct, y_label = "% de ménages")
+  make_bar_obs(x = Item, y = pct, y_label = "% de ménages")
 ```
 
 ```{r dl_fig_non_freq}
@@ -793,12 +796,7 @@ dl_fig_variants("fig_non_freq", "10", function(d) {
 
 Parmi les ménages qui se rendent dans l'AP, la @fig-usages-ap détaille les raisons et la @fig-freq-usages la fréquence des déplacements.
 
-```{r}
-#| fig-cap: "Raisons de se rendre dans l'Aire protégée (% de Oui parmi les usagers)"
-#| fig-width: 10
-#| fig-height: 6
-#| label: fig-usages-ap
-
+```{r usages_data}
 um2_labels <- tribble(
   ~um2_lig, ~Raison,
   1,  "Cueillette plantes (comestibles)",
@@ -824,9 +822,15 @@ usages <- res_um2 |>
     by = "Observatory"
   ) |>
   mutate(pct = round(n / n_usagers * 100, 0))
+```
 
+```{r}
+#| fig-cap: "Raisons de se rendre dans l'Aire protégée (% de Oui parmi les usagers)"
+#| fig-width: 10
+#| fig-height: !expr ror_fig_height(usages, "Raison")
+#| label: fig-usages-ap
 usages |>
-  ror_bar(x = Raison, y = pct, y_label = "% des usagers de l'AP")
+  make_bar_obs(x = Raison, y = pct, y_label = "% des usagers de l'AP")
 ```
 
 ```{r dl_fig_usages_ap}
@@ -990,12 +994,7 @@ dl_fig_variants("fig_saison_ap", "10", function(d) {
 
 Les ménages ont été interrogés sur les raisons pour lesquelles les gens font des feux dans la région (question `S16`, réponses multiples).
 
-```{r}
-#| fig-cap: "Raisons perçues de faire des feux (% de Oui)"
-#| fig-width: 10
-#| fig-height: 6
-#| label: fig-raisons-feux
-
+```{r raisons_feux_data}
 feu_items <- tribble(
   ~var,      ~label,
   "s16_01",  "Augmenter surfaces cultivées",
@@ -1013,9 +1012,15 @@ feu_items <- tribble(
 feu_raisons <- feu_items |>
   pmap_dfr(\(var, label) pct_oui(res_feubrousse, var, label)) |>
   pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
+```
 
+```{r}
+#| fig-cap: "Raisons perçues de faire des feux (% de Oui)"
+#| fig-width: 10
+#| fig-height: !expr ror_fig_height(feu_raisons, "Item")
+#| label: fig-raisons-feux
 feu_raisons |>
-  ror_bar(x = Item, y = pct, y_label = "% de ménages")
+  make_bar_obs(x = Item, y = pct, y_label = "% de ménages")
 ```
 
 ```{r dl_fig_raisons_feux}
@@ -1468,12 +1473,7 @@ dl_fig_variants("fig_jugement_ap", "10", function(d) {
 
 Parmi les ménages favorables à la protection, la question du gestionnaire idéal révèle les préférences des communautés en matière de gouvernance environnementale : gestion communautaire, étatique ou partenariale.
 
-```{r}
-#| fig-cap: "Qui devrait gérer l'AP ? (parmi ceux favorables à la protection)"
-#| fig-width: 9
-#| fig-height: 4
-#| label: fig-gestionnaire
-
+```{r gestionnaire_data}
 gest_labels <- c(
   "1" = "Communautés locales",
   "2" = "Riverains tompontany",
@@ -1489,9 +1489,15 @@ gest <- res_ap |>
   mutate(Gestionnaire = factor(gest_labels[as.character(ap5a)], levels = gest_labels)) |>
   count(Observatory, Gestionnaire) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+```
 
+```{r}
+#| fig-cap: "Qui devrait gérer l'AP ? (parmi ceux favorables à la protection)"
+#| fig-width: 9
+#| fig-height: !expr ror_fig_height(gest, "Gestionnaire")
+#| label: fig-gestionnaire
 gest |>
-  ror_bar(x = Gestionnaire, y = pct, y_label = "% de ménages")
+  make_bar_obs(x = Gestionnaire, y = pct, y_label = "% de ménages")
 ```
 
 ```{r dl_fig_gestionnaire}
@@ -1517,12 +1523,7 @@ dl_fig_variants("fig_gestionnaire", "10", function(d) {
 
 Les mesures de protection souhaitées par les ménages vont de l'interdiction stricte des accès à des approches plus souples intégrant le développement d'activités génératrices de revenus (AGR) et la valorisation des savoirs traditionnels.
 
-```{r}
-#| fig-cap: "Mesures souhaitées pour protéger l'AP (% de Oui, parmi ceux favorables)"
-#| fig-width: 10
-#| fig-height: 7
-#| label: fig-mesures-protection
-
+```{r mesures_data}
 ap5b_items <- tribble(
   ~var,       ~label,
   "ap5b_g1",  "Interdire tous les feux",
@@ -1545,9 +1546,15 @@ ap_favorable <- res_ap |> filter(ap5 == 1)
 mesures <- ap5b_items |>
   pmap_dfr(\(var, label) pct_oui(ap_favorable, var, label)) |>
   pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
+```
 
+```{r}
+#| fig-cap: "Mesures souhaitées pour protéger l'AP (% de Oui, parmi ceux favorables)"
+#| fig-width: 10
+#| fig-height: !expr ror_fig_height(mesures, "Item")
+#| label: fig-mesures-protection
 mesures |>
-  ror_bar(x = Item, y = pct, y_label = "% de ménages")
+  make_bar_obs(x = Item, y = pct, y_label = "% de ménages")
 ```
 
 ```{r dl_fig_mesures_protection}
@@ -1583,12 +1590,7 @@ dl_fig_variants("fig_mesures_protection", "10", function(d) {
 
 Cette question met en tension deux impératifs : la lutte contre la pauvreté et la protection de l'environnement. La répartition des réponses éclaire le positionnement des ménages face à ce dilemme central pour les politiques de développement durable.
 
-```{r}
-#| fig-cap: "Pauvreté vs. protection de l'environnement : quelle priorité ? (par observatoire)"
-#| fig-width: 10
-#| fig-height: 5
-#| label: fig-priorite
-
+```{r priorite_data}
 ap8_labels <- c(
   "1" = "Priorité pauvreté/développement",
   "2" = "Priorité environnement",
@@ -1603,9 +1605,15 @@ priorite <- res_ap |>
   mutate(Priorité = factor(ap8_labels[as.character(ap8)], levels = ap8_labels)) |>
   count(Observatory, Priorité) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+```
 
+```{r}
+#| fig-cap: "Pauvreté vs. protection de l'environnement : quelle priorité ? (par observatoire)"
+#| fig-width: 10
+#| fig-height: !expr ror_fig_height(priorite, "Priorité")
+#| label: fig-priorite
 priorite |>
-  ror_bar(x = Priorité, y = pct, y_label = "% de ménages")
+  make_bar_obs(x = Priorité, y = pct, y_label = "% de ménages")
 ```
 
 ```{r dl_fig_priorite}

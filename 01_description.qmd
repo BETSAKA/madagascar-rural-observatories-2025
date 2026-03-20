@@ -463,18 +463,19 @@ res_deb |>
 
 L'enquête a mobilisé 20 enquêteurs (10 par observatoire), encadrés par 6 superviseurs (3 par observatoire). La saisie des questionnaires a été assurée par 4 opérateurs. Le @fig-enqueteurs présente le nombre de questionnaires réalisés par chaque enquêteur (identifié par un code anonyme).
 
-```{r}
-#| fig-cap: "Nombre de questionnaires par enquêteur et observatoire"
-#| fig-width: 9
-#| fig-height: 5
-#| label: fig-enqueteurs
-
+```{r enq_data}
 enq <- res_deb |>
   mutate(Enquêteur = paste0("E", sprintf("%02d", j1))) |>
   count(Observatory, Enquêteur)
+```
 
+```{r}
+#| fig-cap: "Nombre de questionnaires par enquêteur et observatoire"
+#| fig-width: 9
+#| fig-height: !expr ror_fig_height(enq, "Enquêteur")
+#| label: fig-enqueteurs
 enq |>
-  ror_bar(x = Enquêteur, y = n, y_label = "Questionnaires réalisés", show_pct = FALSE)
+  make_bar_obs(x = Enquêteur, y = n, y_label = "Questionnaires réalisés", show_pct = FALSE)
 ```
 
 ```{r}

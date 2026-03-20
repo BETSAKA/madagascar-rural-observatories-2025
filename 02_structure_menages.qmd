@@ -303,9 +303,7 @@ dl_fig_variants("fig_age_obs", "04", function(d) {
 }, members)
 ```
 
-```{r fig_pyramide}
-#| fig-cap: "Pyramide des âges des membres des ménages enquêtés par observatoire"
-
+```{r pyramide_data}
 hh_age_sex <- members_site |>
   mutate(AgeGroup = classify_age_group(m5), Sexe = classify_sex(m4)) |>
   filter(!is.na(Sexe), !is.na(AgeGroup)) |>
@@ -315,7 +313,11 @@ hh_age_sex <- members_site |>
     Percent = if_else(Sexe == "Homme", -Percent, Percent),
     .by = c(Observatory, Sexe)
   )
+```
 
+```{r fig_pyramide}
+#| fig-cap: "Pyramide des âges des membres des ménages enquêtés par observatoire"
+#| fig-height: !expr ror_fig_height(hh_age_sex, "AgeGroup")
 hh_age_sex |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent)
 ```
 
@@ -868,9 +870,12 @@ obs_gt(cm_act) |>
   cols_hide(n) |>
   fmt_number(columns = Percent, decimals = 1) |>
   style_table()
+```
 
+```{r fig-cm-act}
+#| fig-height: !expr ror_fig_height(cm_act, "Act_principal")
 # Bar chart (better suited to >5 categories than a pie chart)
-cm_act |> ror_bar(x = Act_principal, y = Percent,
+cm_act |> make_bar_obs(x = Act_principal, y = Percent,
                   title = obs_title("Activités principales des CM (%)"),
                   y_label = "%")
 ```
@@ -1446,8 +1451,11 @@ obs_gt(other_act) |>
   cols_hide(n) |>
   fmt_number(columns = Percent, decimals = 1) |>
   style_table()
+```
 
-other_act |> ror_bar(x = Act_principal, y = Percent,
+```{r fig-other-act}
+#| fig-height: !expr ror_fig_height(other_act, "Act_principal")
+other_act |> make_bar_obs(x = Act_principal, y = Percent,
                      title = obs_title("Activités principales des autres membres (%)"),
                      y_label = "%")
 ```
@@ -1637,7 +1645,7 @@ demog_gap   <- demog_trends |> filter(year %in% c(2015, 2025))
 #| fig-width: 9
 #| fig-height: 5
 
-demog_trends |> ror_trend(y_var = taille_moy,
+demog_trends |> make_trend_plot(y_var = taille_moy,
                           y_label = "Taille moyenne du ménage",
                           gap_year = 2015)
 ```
@@ -1649,7 +1657,7 @@ demog_trends |> ror_trend(y_var = taille_moy,
 
 if ("pct_fem_cm" %in% names(demog_trends)) {
   demog_trends |> filter(!is.na(pct_fem_cm)) |>
-    ror_trend(y_var = pct_fem_cm,
+    make_trend_plot(y_var = pct_fem_cm,
               y_label = "% de chefs de ménage femmes",
               gap_year = 2015)
 }
@@ -1662,7 +1670,7 @@ if ("pct_fem_cm" %in% names(demog_trends)) {
 
 if ("taux_scol" %in% names(demog_trends)) {
   demog_trends |> filter(!is.na(taux_scol)) |>
-    ror_trend(y_var = taux_scol,
+    make_trend_plot(y_var = taux_scol,
               y_label = "Taux de scolarisation 6-14 ans (%)",
               gap_year = 2015)
 }
@@ -1675,7 +1683,7 @@ if ("taux_scol" %in% names(demog_trends)) {
 
 if ("age_cm_moy" %in% names(demog_trends)) {
   demog_trends |> filter(!is.na(age_cm_moy)) |>
-    ror_trend(y_var = age_cm_moy,
+    make_trend_plot(y_var = age_cm_moy,
               y_label = "Âge moyen du chef de ménage",
               gap_year = 2015)
 }

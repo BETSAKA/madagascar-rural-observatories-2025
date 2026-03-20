@@ -132,7 +132,10 @@ house |>
   cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
+```
 
+```{r}
+#| fig-height: !expr ror_fig_height(house, "Statut")
 house |> make_bar_obs(x = Statut, title = "Statut d'occupation du logement")
 ```
 
@@ -183,7 +186,10 @@ latrine |>
   cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
+```
 
+```{r}
+#| fig-height: !expr ror_fig_height(latrine)
 latrine |> make_bar_obs(title = obs_title("Types de latrine"))
 ```
 
@@ -234,7 +240,10 @@ water |>
   cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
+```
 
+```{r}
+#| fig-height: !expr ror_fig_height(water)
 water |> make_bar_obs(title = obs_title("Mode d'approvisionnement en eau"))
 ```
 
@@ -271,7 +280,10 @@ light |>
   cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
+```
 
+```{r}
+#| fig-height: !expr ror_fig_height(light)
 light |> make_bar_obs(title = obs_title("Modes d'éclairage"))
 ```
 
@@ -329,7 +341,10 @@ cooking |>
   cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
+```
 
+```{r fig-cooking}
+#| fig-height: !expr ror_fig_height(cooking)
 cooking |> make_bar_obs(title = obs_title("Modes de cuisson"))
 ```
 
@@ -377,7 +392,10 @@ comfort |>
   cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
+```
 
+```{r fig-comfort}
+#| fig-height: !expr ror_fig_height(comfort)
 comfort |> make_bar_obs(title = obs_title("Biens de confort courants"))
 ```
 
@@ -439,9 +457,12 @@ table_equip |>
   fmt_number(columns = N_outils, decimals = 0) |>
   fmt_number(columns = pct_menages, decimals = 1) |>
   style_table()
+```
 
+```{r fig-table-equip}
+#| fig-height: !expr ror_fig_height(table_equip, "Equipement")
 table_equip |>
-  ror_bar(x = Equipement, y = pct_menages,
+  make_bar_obs(x = Equipement, y = pct_menages,
           title = obs_title("Équipements agricoles"), ncol = 1)
 ```
 
@@ -464,7 +485,7 @@ dl_fig_variants("fig_agri_equip", "05", function(d) {
               by = "Observatory") |>
     mutate(pct_menages = round(N_menages / total * 100, 1))
   equip |>
-    ror_bar(x = Equipement, y = pct_menages,
+    make_bar_obs(x = Equipement, y = pct_menages,
             title = "Equipements agricoles par observatoire", ncol = 1)
 }, res_e |> left_join(obs, by = "j5"))
 ```
@@ -500,7 +521,10 @@ comm |>
   cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
+```
 
+```{r fig-comm}
+#| fig-height: !expr ror_fig_height(comm)
 comm |> make_bar_obs(title = obs_title("Matériels de communication"))
 ```
 
@@ -565,11 +589,7 @@ res_t2_obs <- res_t2 |>
   )
 ```
 
-```{r fig-transferts-sortants}
-#| fig-cap: "Valeur moyenne des transferts sortants par observatoire et type"
-#| fig-width: 10
-#| fig-height: 6
-
+```{r transferts_data}
 val_par_type <- res_t2_obs |>
   expand_sites_for_profile() |>
   filter(!is.na(t21d), t21d > 0) |>
@@ -580,10 +600,15 @@ val_par_type <- res_t2_obs |>
     .by = c(Observatory, Type)
   ) |>
   filter(n >= 5)
+```
 
+```{r fig-transferts-sortants}
+#| fig-cap: "Valeur moyenne des transferts sortants par observatoire et type"
+#| fig-width: 10
+#| fig-height: !expr ror_fig_height(val_par_type)
 val_par_type |>
   mutate(val_moy_k = val_moy / 1000) |>
-  ror_bar(x = Type, y = val_moy_k,
+  make_bar_obs(x = Type, y = val_moy_k,
           y_label = "Valeur moyenne (milliers Ar)", show_pct = FALSE)
 ```
 
@@ -633,17 +658,13 @@ dl_tbl_variants("tbl_transferts", "05", function(d) {
 }, res_deb)
 ```
 
-```{r fig-destination-transferts}
-#| fig-cap: "Lieu de residence des destinataires de transferts"
-#| fig-width: 9
-#| fig-height: 5
-
+```{r destination_data}
 dest_labs <- c(
   "1" = "Meme commune", "2" = "Autre commune, meme region",
   "3" = "Autre region", "4" = "Etranger"
 )
 
-res_t2_obs |>
+dest_data <- res_t2_obs |>
   expand_sites_for_profile() |>
   filter(!is.na(t41)) |>
   mutate(
@@ -654,8 +675,15 @@ res_t2_obs |>
     )
   ) |>
   count(Observatory, Destination) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  ror_bar(x = Destination, y_label = "% des transferts")
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+```
+
+```{r fig-destination-transferts}
+#| fig-cap: "Lieu de residence des destinataires de transferts"
+#| fig-width: 9
+#| fig-height: !expr ror_fig_height(dest_data, "Destination")
+dest_data |>
+  make_bar_obs(x = Destination, y_label = "% des transferts")
 ```
 
 ```{r dl_fig_destination}

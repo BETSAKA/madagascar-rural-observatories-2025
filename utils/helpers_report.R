@@ -644,24 +644,4 @@ tabulate_binary_set <- function(
     dplyr::select(-N)
 }
 
-#' Standard horizontal bar chart, optionally faceted by Observatory
-#'
-#' Backward-compatible wrapper around `ror_bar()`.
-#' @param data Tibble with Observatory, a label column, and a percentage column
-#' @param x Unquoted column for labels (default: Type)
-#' @param y Unquoted column for values  (default: pct)
-#' @param title Plot title
-make_bar_obs <- function(data, x = Type, y = pct, title = "") {
-  ror_bar(data, x = {{ x }}, y = {{ y }}, title = title)
-}
 
-#' Standard multi-year trend plot with solid/gap line style
-#'
-#' Backward-compatible wrapper around `ror_trend()`.
-#' @param data Full trends data
-#' @param y_var Unquoted y variable
-#' @param y_label Y-axis label
-#' @param gap_year Year marking the start of the data gap (default 2014)
-make_trend_plot <- function(data, y_var, y_label, gap_year = 2014) {
-  ror_trend(data, y_var = {{ y_var }}, y_label = y_label, gap_year = gap_year)
-}

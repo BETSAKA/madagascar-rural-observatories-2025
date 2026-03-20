@@ -194,10 +194,11 @@ sampling |>
 
 ```{r fig-sampling-rates}
 #| fig-cap: "Distribution des taux de sondage par site et observatoire"
+#| fig-height: !expr ror_fig_height(sampling, "Site")
 
 sampling |>
   filter(!is.na(taux_sondage)) |>
-  ror_bar(
+  make_bar_obs(
     x = Site,
     y = taux_sondage,
     title = "Taux de sondage par site",
@@ -1326,7 +1327,7 @@ Un panel de ménages vieillit mécaniquement : si les mêmes ménages sont suivi
 
 hist_summary |>
   filter(!is.na(age_moy_cm)) |>
-  ror_trend(
+  make_trend_plot(
     y_var = age_moy_cm,
     y_label = "Âge moyen du CM",
     gap_year = 2014,

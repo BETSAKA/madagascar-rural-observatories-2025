@@ -295,10 +295,11 @@ dl_tbl_variants("tbl_cata_type", "11", function(d) {
 La sécheresse est de loin le Catastrophe le plus fréquemment cité, suivi des maladies (cultures/élevage), des rats et des facteurs humains (vol, dégradation). Les cyclones et inondations ont touché un nombre plus limité de ménages dans ces deux observatoires pour cette campagne.
 
 ```{r g1_prevalence_type}
+#| fig-height: !expr ror_fig_height(prev_type, "Catastrophe")
 # G1 : Barres horizontales — types de cataclysmes les plus fréquents
 prev_type |>
   expand_sites_for_profile() |>
-  ror_bar(x = Catastrophe, y_label = "% des ménages")
+  make_bar_obs(x = Catastrophe, y_label = "% des ménages")
 ```
 
 ```{r dl_g1_prevalence_type}
@@ -316,7 +317,7 @@ dl_fig_variants("fig_cata_prevalence_type", "11", function(d) {
       .groups = "drop"
     ) %>%
     mutate(pct = round(n / n_total * 100, 1)) |>
-    ror_bar(x = Catastrophe, y_label = "% des ménages")
+    make_bar_obs(x = Catastrophe, y_label = "% des ménages")
 }, events_full, width = 10, height = 6)
 ```
 
@@ -1178,7 +1179,7 @@ cata_gap   <- cata_trends |> filter(year %in% c(2015, 2025))
 #| fig-height: 5
 
 cata_trends |>
-  ror_trend(y_var = pct_cata, y_label = "% de ménages touchés", gap_year = 2015)
+  make_trend_plot(y_var = pct_cata, y_label = "% de ménages touchés", gap_year = 2015)
 ```
 
 L'évolution de la prévalence des catastrophes sur la période 2003--2025 met en évidence des fluctuations interannuelles importantes, avec des pics correspondant aux passages cycloniques majeurs et aux épisodes de sécheresse prolongée. La tendance de long terme, difficile à isoler des aléas ponctuels, mérite d'être mise en regard de l'évolution des pratiques d'adaptation décrites dans les chapitres précédents.
