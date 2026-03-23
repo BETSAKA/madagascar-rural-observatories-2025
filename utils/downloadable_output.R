@@ -226,7 +226,7 @@ dl_tbl_variants <- function(id, chapter, tbl_fn, data, min_cell = 5) {
 # HTML download link emitter
 # ----------------------------------------------------------
 
-#' Emit simple download links (one per observatory)
+#' Emit download links inside a collapsible details element
 #'
 #' @param links List of lists, each with elements: label, obs, href, ext
 emit_download_links <- function(links) {
@@ -239,7 +239,7 @@ emit_download_links <- function(links) {
     function(item) {
       ext_lbl <- toupper(item$ext)
       sprintf(
-        '<a href="%s" download class="dl-link">\U{1F4E5} %s (%s)</a>',
+        '<li><a href="%s" download>%s (%s)</a></li>',
         item$href,
         item$label,
         ext_lbl
@@ -249,9 +249,12 @@ emit_download_links <- function(links) {
   )
 
   html <- paste0(
-    '<div class="dl-downloads">\n',
-    paste(parts, collapse = " &nbsp; "),
-    '\n</div>\n'
+    '<details class="dl-variants">\n',
+    '<summary>\U{1F4E5} T\u00e9l\u00e9charger par hameau et par observatoire</summary>\n',
+    '<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">\n',
+    paste(parts, collapse = "\n"),
+    '\n</ul>\n',
+    '</details>\n'
   )
   cat(html)
 }

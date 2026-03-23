@@ -35,14 +35,15 @@ format:
           \usepackage{caption}
           \captionsetup{font=small,labelfont=bf}
           \captionsetup[table]{skip=6pt}
-    include-before-body:
-      - text: |
-          \thispagestyle{empty}
-          \begin{center}
-          \vspace*{2cm}
-          \includegraphics[width=0.85\textwidth]{images/cover.jpg}
-          \end{center}
-          \clearpage
+          \usepackage{titling}
+          \renewcommand{\maketitlehookd}{%
+            \vfill
+            \begin{center}%
+            \includegraphics[width=0.75\textwidth]{images/cover.jpg}\\[4pt]%
+            {\small\itshape Rizière dans la région d'Alaotra Mangoro. Photo~: Leja Mitarika / NJProduction,\\ CC~BY-SA~4.0, via Wikimedia Commons.}%
+            \end{center}%
+            \vfill
+          }
   docx:
     toc: true
     lang: fr

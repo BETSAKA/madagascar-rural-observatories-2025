@@ -73,6 +73,9 @@ clean_stale_rmarkdown <- function() {
   }
 }
 
+# Load DOCX cover-insertion utility
+source("utils/add_cover_docx.R")
+
 # --- 1/3: Consolidated (HTML + PDF + DOCX) ---
 # Render HTML first (fast, no xelatex cleanup issues).
 # First render cleans output-dir; subsequent passes use --no-clean
@@ -93,6 +96,7 @@ run_render("1c/3  Consolidated — DOCX", "quarto render --to docx --no-clean")
 clean_stale_files()
 clean_stale_rmarkdown()
 rescue_outputs("docs", "rapport-consolide")
+add_cover_to_docx("docs/rapport-consolide.docx", "images/cover.jpg")
 
 # --- 2/3: Marovoay (PDF + DOCX) ---
 clean_stale_files()
@@ -108,6 +112,7 @@ run_render(
 clean_stale_files()
 clean_stale_rmarkdown()
 rescue_outputs("docs-marovoay", "rapport-marovoay")
+add_cover_to_docx("docs-marovoay/rapport-marovoay.docx", "images/cover.jpg")
 
 # --- 3/3: Alaotra (PDF + DOCX) ---
 clean_stale_files()
@@ -123,6 +128,7 @@ run_render(
 clean_stale_files()
 clean_stale_rmarkdown()
 rescue_outputs("docs-alaotra", "rapport-alaotra")
+add_cover_to_docx("docs-alaotra/rapport-alaotra.docx", "images/cover.jpg")
 
 # Copy per-observatory outputs into docs/downloads/ so the HTML links work
 cat("\n=== Assembling download files ===\n")

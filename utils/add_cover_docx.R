@@ -61,8 +61,15 @@ add_cover_to_docx <- function(docx_path, cover_img) {
   dir.create(tmp)
   unzip(docx_path, exdir = tmp)
 
-  # --- Copy cover image to word/media/ -------------------------------------
+  # --- Check idempotency (skip if cover already inserted) -----------------
   media_dir <- file.path(tmp, "word", "media")
+  if (file.exists(file.path(media_dir, "cover_page.jpg"))) {
+    message("  Cover already present \u2014 skipping.")
+    unlink(tmp, recursive = TRUE)
+    return(invisible(TRUE))
+  }
+
+  # --- Copy cover image to word/media/ -------------------------------------
   if (!dir.exists(media_dir)) {
     dir.create(media_dir, recursive = TRUE)
   }
@@ -129,6 +136,21 @@ add_cover_to_docx <- function(docx_path, cover_img) {
     target_cy
   )
 
+  credit_text <- paste0(
+    "Rizi\u00e8re dans la r\u00e9gion d\u2019Alaotra Mangoro. ",
+    "Photo\u00a0: Leja Mitarika / NJProduction, ",
+    "CC\u00a0BY-SA\u00a04.0, via Wikimedia Commons."
+  )
+
+  credit_xml <- paste0(
+    '<w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">',
+    '<w:pPr><w:jc w:val="center"/><w:spacing w:before="120"/></w:pPr>',
+    '<w:r>',
+    '<w:rPr><w:i/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>',
+    '<w:t xml:space="preserve">', credit_text, '</w:t>',
+    '</w:r></w:p>'
+  )
+
   break_xml <- paste0(
     '<w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">',
     '<w:r><w:br w:type="page"/></w:r></w:p>'
@@ -181,9 +203,11 @@ add_cover_to_docx <- function(docx_path, cover_img) {
 
   if (last_title_idx > 0L) {
     anchor <- body_children[[last_title_idx]]
-    # Insert page-break first, then cover ("after" inserts immediately
-    # after anchor each time, so last inserted ends up closest)
+    # Insert in reverse order ("after" inserts immediately after anchor,
+    # so last inserted ends up closest to anchor)
+    # Final order: ... Title block | cover | credit | page-break | TOC ...
     xml2::xml_add_sibling(anchor, xml2::read_xml(break_xml), .where = "after")
+    xml2::xml_add_sibling(anchor, xml2::read_xml(credit_xml), .where = "after")
     xml2::xml_add_sibling(anchor, xml2::read_xml(cover_xml), .where = "after")
     # Final order: ... Title block | cover | page-break | TOC ...
   } else {
@@ -192,6 +216,11 @@ add_cover_to_docx <- function(docx_path, cover_img) {
     xml2::xml_add_sibling(
       first_child,
       xml2::read_xml(break_xml),
+      .where = "before"
+    )
+    xml2::xml_add_sibling(
+      first_child,
+      xml2::read_xml(credit_xml),
       .where = "before"
     )
     xml2::xml_add_sibling(
