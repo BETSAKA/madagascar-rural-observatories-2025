@@ -137,8 +137,10 @@ fert_labs <- c(
 )
 
 topo_labs <- c(
-  "1" = "Bas-fond", "2" = "Plaine", "3" = "Plaine + inondation",
-  "4" = "Tanety", "5" = "Tavy", "6" = "Baiboho", "7" = "Autre"
+  "2" = "Bas-fond", "3" = "Tanety", "4" = "Tavy",
+  "5" = "Plaine (inondation p\u00e9riodique)",
+  "6" = "Plaine (sans inondation)",
+  "7" = "Retenue d'eau", "8" = "Rizi\u00e8res en escalier"
 )
 
 fert_c_labs <- c(
@@ -2093,29 +2095,42 @@ if (file.exists(agro_file)) {
     
     out <- tibble(year = yr, Observatory = unique(deb$Observatory))
     
-    # --- Rice: production per HH (r6 = production kg by parcel) ---
+    # --- Rice: production per HH (r23 = total production kg; r23a+r23b pre-2010) ---
     if (file.exists(f_r)) {
       r <- read_dta(f_r) |> mutate(j5 = as.character(j5))
       r_obs <- r |>
         select(-any_of("year")) |>
         inner_join(deb |> select(j5, Observatory), by = "j5")
       
-      has_r6 <- "r6" %in% names(r_obs)
+      has_r23  <- "r23"  %in% names(r_obs)
+      has_r23a <- "r23a" %in% names(r_obs)
+      has_r1d  <- "r1d"  %in% names(r_obs)
       
       # Total production per HH
-      prod_hh <- if (has_r6) {
+      prod_hh <- if (has_r23) {
         r_obs |>
-          filter(!is.na(r6), r6 >= 0) |>
-          summarise(prod_kg = sum(r6, na.rm = TRUE), .by = c(j5, Observatory)) |>
+          filter(!is.na(r23), r23 >= 0) |>
+          summarise(prod_kg = sum(r23, na.rm = TRUE), .by = c(j5, Observatory)) |>
+          summarise(prod_moy = round(mean(prod_kg)), .by = Observatory)
+      } else if (has_r23a) {
+        r_obs |>
+          mutate(r23_total = rowSums(pick(any_of(c("r23a", "r23b"))), na.rm = TRUE)) |>
+          filter(r23_total > 0) |>
+          summarise(prod_kg = sum(r23_total, na.rm = TRUE), .by = c(j5, Observatory)) |>
           summarise(prod_moy = round(mean(prod_kg)), .by = Observatory)
       } else tibble()
       
-      # Yield (kg/are) if r23 available
-      has_r23 <- "r23" %in% names(r_obs)
-      rdt <- if (has_r6 && has_r23) {
+      # Yield (kg/are) = production / area
+      rdt <- if (has_r23 && has_r1d) {
         r_obs |>
-          filter(!is.na(r6), r6 > 0, !is.na(r23), r23 > 0) |>
-          mutate(rdt = r6 / r23) |>
+          filter(!is.na(r23), r23 > 0, !is.na(r1d), r1d > 0) |>
+          mutate(rdt = r23 / r1d) |>
+          summarise(rdt_moy = round(mean(rdt, na.rm = TRUE), 1), .by = Observatory)
+      } else if (has_r23a && has_r1d) {
+        r_obs |>
+          mutate(r23_total = rowSums(pick(any_of(c("r23a", "r23b"))), na.rm = TRUE)) |>
+          filter(r23_total > 0, !is.na(r1d), r1d > 0) |>
+          mutate(rdt = r23_total / r1d) |>
           summarise(rdt_moy = round(mean(rdt, na.rm = TRUE), 1), .by = Observatory)
       } else tibble()
       

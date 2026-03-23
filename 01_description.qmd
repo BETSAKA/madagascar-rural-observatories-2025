@@ -74,7 +74,11 @@ Le protocole éthique de l'enquête a fait l'objet d'une approbation. Il est pr�
 
 ## Localisation des sites enquêtés
 
-Les coordonnées GPS des hameaux enquêtés ont été relevées lors de la campagne. La carte ci-dessous présente la localisation approximative de chaque fokontany, calculée comme le centroïde des hameaux qui le composent. Les deux observatoires se situent dans le nord-ouest (Marovoay) et le centre-est (Alaotra) de Madagascar.
+Les coordonnées GPS des hameaux enquêtés ont été relevées lors de la campagne. La carte ci-dessous présente la localisation approximative de chaque fokontany, calculée comme le centroïde des hameaux qui le composent.
+
+::: {.content-visible when-profile="consolidated"}
+Les deux observatoires se situent dans le nord-ouest (Marovoay) et le centre-est (Alaotra) de Madagascar.
+:::
 
 ```{r carte_sites}
 #| fig-cap: "Localisation approximative des fokontany enquêtés (centroïde des hameaux)"
@@ -183,8 +187,20 @@ pa_alaotra <- st_read("data/alaotra_protected_area.geojson", quiet = TRUE)
 pa_ankarafantsika <- st_read("data/ankarafantsika_protected_area.geojson", 
   quiet = TRUE)
 
+# --- Filter centroids and protected areas by profile ---
+fokontany_centroids <- filter_for_profile(fokontany_centroids)
+
 # --- Carte interactive avec tmap ---
 foko_sf <- st_as_sf(fokontany_centroids, coords = c("lon", "lat"), crs = 4326)
+
+# Select protected areas relevant to the active profile
+if (REPORT_MODE$is_consolidated) {
+  pa_display <- bind_rows(pa_alaotra, pa_ankarafantsika)
+} else if (REPORT_MODE$observatory == "Alaotra") {
+  pa_display <- pa_alaotra
+} else {
+  pa_display <- pa_ankarafantsika
+}
 
 if (knitr::is_html_output()) {
   tmap_mode("view")
@@ -202,7 +218,7 @@ tm_shape(foko_sf) +
     id = "Fokontany",
     popup.vars = c("Observatoire" = "Observatory", "Fokontany" = "Fokontany")
   ) +
-    tm_shape(wdpa_mdg |> mutate(`Couche` = "Aires protégées")) +
+    tm_shape(pa_display |> mutate(`Couche` = "Aires protégées")) +
     tm_borders(
       col = "Couche",
       col.scale = tm_scale_categorical(values = c("Aires protégées" = "lightgreen")),

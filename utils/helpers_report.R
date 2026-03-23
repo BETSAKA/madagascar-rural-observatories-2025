@@ -423,6 +423,7 @@ classify_activity <- function(a1) {
       ) ~
       "Artisanat, BTP & Transport",
     a1 == 14 ~ "El\u00e8ve / Etudiant",
+    a1 %in% c(0, 61) ~ "Inactif / Retrait\u00e9",
     is.na(a1) ~ NA_character_,
     TRUE ~ "Services & Autres"
   )
