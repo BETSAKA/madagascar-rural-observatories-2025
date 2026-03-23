@@ -147,7 +147,9 @@ add_cover_to_docx <- function(docx_path, cover_img) {
     '<w:pPr><w:jc w:val="center"/><w:spacing w:before="120"/></w:pPr>',
     '<w:r>',
     '<w:rPr><w:i/><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>',
-    '<w:t xml:space="preserve">', credit_text, '</w:t>',
+    '<w:t xml:space="preserve">',
+    credit_text,
+    '</w:t>',
     '</w:r></w:p>'
   )
 
