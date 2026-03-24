@@ -152,7 +152,19 @@ fix_gt_latex_accents <- function(latex_str) {
   latex_str
 }
 
+# Tables visible in per-observatory reports; all others are hidden.
+.ror_obs_table_whitelist <- c("tbl-men-hameau", "cm_chars")
+
 knit_print.gt_tbl <- function(x, ...) {
+  # In per-obs mode, suppress all tables not in the whitelist
+  mode <- get_report_mode()
+  if (!mode$is_consolidated) {
+    chunk_label <- knitr::opts_current$get("label")
+    if (!chunk_label %in% .ror_obs_table_whitelist) {
+      return(knitr::asis_output(""))
+    }
+  }
+
   if (knitr::is_latex_output()) {
     latex_str <- as.character(gt::as_latex(x))
     latex_str <- fix_gt_latex_accents(latex_str)

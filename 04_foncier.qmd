@@ -707,6 +707,21 @@ dl_tbl_variants("tbl_securisation", "07", function(d) {
 }, fr30_data)
 ```
 
+```{r fig_securisation}
+#| echo: false
+#| fig-cap: "Sécurisation foncière des parcelles possédées"
+#| fig-height: 4
+bind_rows(titre_pct, cert_pct) |>
+  pivot_longer(
+    cols = -Document,
+    names_to = "Observatory",
+    values_to = "pct"
+  ) |>
+  rename(Type = Document) |>
+  expand_sites_for_profile() |>
+  make_bar_obs(show_pct = TRUE)
+```
+
 En l'absence de titre ou de certificat, les ménages s'appuient sur des documents informels de nature très variable (@fig-papiers). Cependant, `r pct_aucun_doc` % des parcelles ne sont accompagnées d'aucun document justificatif, ce qui expose ces ménages à un risque élevé d'insécurité foncière en cas de litige.
 
 ```{r}
@@ -969,6 +984,9 @@ fr34_data |>
   count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
   make_bar_obs(x = Type, y_label = "% des parcelles")
+```
+
+```{r dl_fig_type_exploitee}
 #| echo: false
 #| results: asis
 dl_fig_variants("fig_type_exploitee", "07", function(d) {

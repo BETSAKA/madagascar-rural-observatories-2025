@@ -626,7 +626,8 @@ dl_fig_variants("fig_transferts", "05", function(d) {
     mutate(val_moy_k = val_moy / 1000) |>
     ror_bar_grouped(x = Type, y = val_moy_k, fill = Observatory,
                     y_label = "Valeur moyenne (milliers Ar)",
-                    direction = "horizontal", facet = FALSE)
+                    direction = "horizontal", facet = FALSE,
+                    show_pct = FALSE)
 }, res_t2 |> left_join(obs, by = "j5"))
 ```
 

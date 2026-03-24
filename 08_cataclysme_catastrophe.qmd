@@ -480,6 +480,14 @@ dl_tbl_variants("tbl_degats_logement", "11", function(d) {
 }, events_full)
 ```
 
+```{r fig_degats_logement}
+#| echo: false
+#| fig-cap: "Dégâts sur le logement par type de catastrophe"
+degats_logement_resume %>%
+  rename(Type = Catastrophe, pct = pct_degats) %>%
+  make_bar_obs(y_label = "% ménages touchés")
+```
+
 ### Dégâts sur l'élevage
 
 ```{r t5_degats_elevage}
@@ -612,6 +620,23 @@ dl_tbl_variants("tbl_degats_personnes", "11", function(d) {
     select(-n, -total) %>%
     pivot_wider(names_from = Consequence, values_from = pct, values_fill = 0)
 }, events_full)
+```
+
+```{r fig_degats_personnes}
+#| echo: false
+#| fig-cap: "Conséquences des cataclysmes sur les personnes"
+#| fig-height: !expr ror_fig_height(degats_personnes, "Catastrophe")
+degats_personnes %>%
+  pivot_longer(
+    cols = -c(Observatory, Catastrophe),
+    names_to = "Conséquence",
+    values_to = "pct"
+  ) %>%
+  mutate(pct = pct / 100) %>%
+  ror_bar_stacked(
+    x = Catastrophe, y = pct, fill = Conséquence,
+    title = "Conséquences sur les personnes par type de catastrophe"
+  )
 ```
 
 La conséquence la plus répandue est le manque de vivres, directement lié aux pertes agricoles. Les décès et disparitions, bien que rares, sont signalés pour certains cataclysmes (inondations, cyclones).
@@ -869,6 +894,14 @@ dl_tbl_variants("tbl_cultures_touchees", "11", function(d) {
 }, cca_full)
 ```
 
+```{r fig_cultures_touchees}
+#| echo: false
+#| fig-cap: "Top 10 des cultures les plus touchées"
+cultures_touchees %>%
+  rename(Type = Culture) %>%
+  make_bar_obs(y_label = "% des dégâts déclarés")
+```
+
 Le riz, culture vivrière dominante, est de loin la culture la plus exposée aux cataclysmes. Le haricot, le maïs et le manioc figurent également parmi les cultures les plus touchées.
 
 ### Dégâts sur les champs de riz par type de catastrophe
@@ -948,6 +981,27 @@ dl_tbl_variants("tbl_degats_champs_riz", "11", function(d) {
 }, cca_full)
 ```
 
+```{r fig_degats_champs_riz}
+#| echo: false
+#| fig-cap: "Gravité des dégâts sur les champs de riz"
+#| fig-height: !expr ror_fig_height(riz_champs, "Catastrophe")
+riz_champs %>%
+  pivot_longer(
+    cols = -c(Observatory, Catastrophe),
+    names_to = "Niveau",
+    values_to = "pct"
+  ) %>%
+  mutate(
+    pct = pct / 100,
+    Niveau = factor(Niveau, levels = c("Rien", "Un peu", "Beaucoup", "Destruction totale"))
+  ) %>%
+  ror_bar_stacked(
+    x = Catastrophe, y = pct, fill = Niveau,
+    title = "Dégâts sur les champs de riz par type de catastrophe",
+    palette = c("Rien" = "#4daf4a", "Un peu" = "#ff7f00", "Beaucoup" = "#e41a1c", "Destruction totale" = "#984ea3")
+  )
+```
+
 ### Dégâts sur les stocks de riz par type de catastrophe
 
 ```{r t10_degats_stocks_riz}
@@ -1019,6 +1073,27 @@ dl_tbl_variants("tbl_degats_stocks_riz", "11", function(d) {
     select(-n, -total) %>%
     pivot_wider(names_from = Niveau, values_from = pct, values_fill = 0)
 }, cca_full)
+```
+
+```{r fig_degats_stocks_riz}
+#| echo: false
+#| fig-cap: "Gravité des dégâts sur les stocks de riz"
+#| fig-height: !expr ror_fig_height(riz_stocks, "Catastrophe")
+riz_stocks %>%
+  pivot_longer(
+    cols = -c(Observatory, Catastrophe),
+    names_to = "Niveau",
+    values_to = "pct"
+  ) %>%
+  mutate(
+    pct = pct / 100,
+    Niveau = factor(Niveau, levels = c("Rien", "Un peu", "Beaucoup", "Destruction totale"))
+  ) %>%
+  ror_bar_stacked(
+    x = Catastrophe, y = pct, fill = Niveau,
+    title = "Dégâts sur les stocks de riz par type de catastrophe",
+    palette = c("Rien" = "#4daf4a", "Un peu" = "#ff7f00", "Beaucoup" = "#e41a1c", "Destruction totale" = "#984ea3")
+  )
 ```
 
 Les dégâts sur les stocks, bien que moins fréquents que sur les champs, affectent directement les réserves alimentaires du ménage, en particulier lorsqu'ils surviennent en période de soudure. Les rats et les insectes nuisibles constituent les principales causes de pertes post-récolte, auxquelles s'ajoutent les conditions de stockage précaires face aux intempéries.

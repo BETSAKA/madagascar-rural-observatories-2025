@@ -228,6 +228,15 @@ dl_tbl_variants("t2_soudure_hameau", "09", function(d) {
 }, sa_full)
 ```
 
+```{r fig_soudure_hameau}
+#| echo: false
+#| fig-cap: "Durée moyenne de la soudure par hameau"
+soudure_combined %>%
+  filter(j4bis != "Ensemble") %>%
+  rename(Type = j4bis, pct = mean_soudure) %>%
+  make_bar_obs(show_pct = TRUE, pct_suffix = " mois")
+```
+
 #### Distribution du nombre de mois de soudure
 
 ```{r g1_soudure_distrib}
@@ -1037,6 +1046,14 @@ dl_tbl_variants("t10_sources_endettement", "09", function(d) {
 }, ssa_full)
 ```
 
+```{r fig_sources_endettement}
+#| echo: false
+#| fig-cap: "Sources d'endettement alimentaire"
+sources_dette %>%
+  rename(Type = Source) %>%
+  make_bar_obs(show_pct = TRUE)
+```
+
 ```{r t11_sources_emprunt}
 # T11 : Sources d'emprunt d'aliments par observatoire
 source_emprunt_labels <- c(
@@ -1113,6 +1130,14 @@ dl_tbl_variants("t11_sources_emprunt", "09", function(d) {
               pct = round(n_oui / n_total * 100, 1), .groups = "drop") %>%
     select(Site = Observatory, Source, n_oui, pct)
 }, ssa_full)
+```
+
+```{r fig_sources_emprunt}
+#| echo: false
+#| fig-cap: "Sources d'emprunt d'aliments de base"
+sources_emprunt %>%
+  rename(Type = Source) %>%
+  make_bar_obs(show_pct = TRUE)
 ```
 
 ```{r g6_top_strategies_data}

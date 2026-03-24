@@ -175,7 +175,7 @@ dl_fig_variants("fig_nb_org", "12", function(d) {
     mutate(nb_org = factor(nb_org)) |>
     ror_bar_grouped(x = nb_org, y = n_men, fill = Observatory,
                     y_label = "Nombre de ménages", direction = "vertical",
-                    facet = FALSE)
+                    facet = FALSE, show_pct = FALSE)
 }, res_respg, width = 8, height = 5)
 ```
 
@@ -368,6 +368,20 @@ dl_tbl_variants("tbl_pro1", "12", function(d) {
     select(-n) |>
     pivot_wider(names_from = Observatory, values_from = pct)
 }, res_respg0)
+```
+
+```{r fig_pro1}
+#| echo: false
+#| fig-cap: "Ménages bénéficiaires de projets ou formations"
+res_respg0 |>
+  mutate(Type = case_when(
+    pro1 == 1 ~ "Oui",
+    pro1 == 2 ~ "Non",
+    pro1 == 3 ~ "Ne sait pas"
+  )) |>
+  count(Observatory, Type) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  make_bar_obs(y_label = "% des ménages")
 ```
 
 ### Taux de bénéficiaires par type de projet
@@ -602,6 +616,23 @@ dl_tbl_variants("tbl_croisement", "12", function(d) {
       .by = c(Observatory, Membre)
     )
 }, res_respg0)
+```
+
+```{r fig_croisement}
+#| echo: false
+#| fig-cap: "Accès aux projets selon l'appartenance à une organisation"
+res_respg0 |>
+  filter(pro1 %in% c(1, 2)) |>
+  mutate(
+    Type = if_else(respga == 1, "Membre", "Non membre"),
+    Beneficiaire = pro1 == 1
+  ) |>
+  summarise(
+    pct = round(mean(Beneficiaire) * 100, 1),
+    .by = c(Observatory, Type)
+  ) |>
+  ror_bar_grouped(x = Type, fill = Observatory, y = pct,
+                  y_label = "% bénéficiaires", direction = "vertical")
 ```
 
 ::: {.content-visible when-profile="consolidated"}

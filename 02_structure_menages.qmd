@@ -384,11 +384,13 @@ dl_fig_variants("fig_origine", "04", function(d) {
 La provenance régionale des CM et conjoints qui ne sont pas natifs de la localité permet d'identifier les principaux bassins migratoires alimentant chaque observatoire.
 
 ```{r homeland}
-# Homeland variable (m3a) - use labels from Stata
+# Homeland variable (m3a) - localisation du tombeau ancestral
+# m3a has no value labels in the Stata file; apply manual mapping
+m3a_labs <- c("1" = "Dans le fokontany", "2" = "Dans la commune", "3" = "Hors de la commune")
 homeland_labels <- members |>
   filter(m6 %in% c(1, 2), !is.na(m3a)) |>
   mutate(
-    Homeland = iconv(as.character(labelled::to_factor(m3a)), from = "latin1", to = "UTF-8")
+    Homeland = m3a_labs[as.character(m3a)]
   )
 
 homeland_tbl <- homeland_labels |>
@@ -417,10 +419,11 @@ obs_gt(homeland_tbl) |>
 #| echo: false
 #| results: asis
 dl_tbl_variants("tbl_homeland", "04", function(d) {
+  m3a_labs <- c("1" = "Dans le fokontany", "2" = "Dans la commune", "3" = "Hors de la commune")
   d |>
     filter(m6 %in% c(1, 2), !is.na(m3a)) |>
     mutate(Type = if_else(m6 == 1, "CM", "Conjoint"),
-           Région = iconv(as.character(labelled::to_factor(m3a)), from = "latin1", to = "UTF-8")) |>
+           Région = m3a_labs[as.character(m3a)]) |>
     count(Observatory, Type, Région) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Type)) |>
     rename(Site = Observatory, Effectif = n)
@@ -444,7 +447,7 @@ dl_fig_variants("fig_homeland", "04", function(d) {
   d |>
     filter(m6 %in% c(1, 2), !is.na(m3a)) |>
     mutate(Member_Type = if_else(m6 == 1, "Chef de ménage", "Conjoint"),
-           Homeland = iconv(as.character(labelled::to_factor(m3a)), from = "latin1", to = "UTF-8")) |>
+           Homeland = c("1" = "Dans le fokontany", "2" = "Dans la commune", "3" = "Hors de la commune")[as.character(m3a)]) |>
     count(Observatory, Member_Type, Homeland) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Member_Type)) |>
     ror_bar_grouped(x = Homeland, fill = Member_Type, y = pct,
@@ -645,6 +648,28 @@ dl_tbl_variants("tbl_cm_educ", "04", function(d) {
 }, members)
 ```
 
+```{r fig_cm_educ}
+#| echo: false
+#| fig-cap: "Niveau d'éducation des chefs de ménage"
+cm |>
+  mutate(Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
+  count(Observatory, Type) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  make_bar_obs()
+```
+
+```{r dl_fig_cm_educ}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_cm_educ", "04", function(d) {
+  d |> filter(m6 == 1) |>
+    mutate(Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
+    count(Observatory, Type) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    make_bar_obs()
+}, members)
+```
+
 #### Niveau d'éducation des chefs de ménages par sexe
 
 ```{r cm_educ_sex}
@@ -684,6 +709,36 @@ dl_tbl_variants("tbl_cm_educ_sex", "04", function(d) {
     count(Observatory, Sexe, Niv_education) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
+```{r fig_cm_educ_sex}
+#| echo: false
+#| fig-cap: "Niveau d'éducation des CM par sexe"
+cm |>
+  mutate(
+    Sexe = classify_sex(m4),
+    Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")
+  ) |>
+  filter(!is.na(Sexe)) |>
+  count(Observatory, Sexe, Type) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
+  ror_bar_grouped(x = Type, fill = Sexe, y = pct,
+                  y_label = "%", direction = "horizontal")
+```
+
+```{r dl_fig_cm_educ_sex}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_cm_educ_sex", "04", function(d) {
+  d |> filter(m6 == 1) |>
+    mutate(Sexe = classify_sex(m4),
+           Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
+    filter(!is.na(Sexe)) |>
+    count(Observatory, Sexe, Type) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
+    ror_bar_grouped(x = Type, fill = Sexe, y = pct,
+                    y_label = "%", direction = "horizontal")
 }, members)
 ```
 
@@ -873,10 +928,9 @@ obs_gt(cm_act) |>
 ```
 
 ```{r fig-cm-act}
+#| fig-cap: "Activités principales des chefs de ménages"
 #| fig-height: !expr ror_fig_height(cm_act, "Act_principal")
-# Bar chart (better suited to >5 categories than a pie chart)
 cm_act |> make_bar_obs(x = Act_principal, y = Percent,
-                  title = obs_title("Activités principales des CM (%)"),
                   y_label = "%")
 ```
 
@@ -1108,6 +1162,28 @@ dl_tbl_variants("tbl_other_educ", "04", function(d) {
 }, members)
 ```
 
+```{r fig_other_educ}
+#| echo: false
+#| fig-cap: "Niveau d'éducation des autres membres"
+others |>
+  mutate(Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
+  count(Observatory, Type) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  make_bar_obs()
+```
+
+```{r dl_fig_other_educ}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_other_educ", "04", function(d) {
+  d |> filter(m6 != 1) |>
+    mutate(Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
+    count(Observatory, Type) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    make_bar_obs()
+}, members)
+```
+
 #### Niveau d'éducation des autres membres par sexe
 
 ```{r other_educ_sex}
@@ -1144,6 +1220,36 @@ dl_tbl_variants("tbl_other_educ_sex", "04", function(d) {
     count(Observatory, Sexe, Niv_education) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
+}, members)
+```
+
+```{r fig_other_educ_sex}
+#| echo: false
+#| fig-cap: "Niveau d'éducation des autres membres par sexe"
+others |>
+  mutate(
+    Sexe = classify_sex(m4),
+    Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")
+  ) |>
+  filter(!is.na(Sexe)) |>
+  count(Observatory, Sexe, Type) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
+  ror_bar_grouped(x = Type, fill = Sexe, y = pct,
+                  y_label = "%", direction = "horizontal")
+```
+
+```{r dl_fig_other_educ_sex}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_other_educ_sex", "04", function(d) {
+  d |> filter(m6 != 1) |>
+    mutate(Sexe = classify_sex(m4),
+           Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
+    filter(!is.na(Sexe)) |>
+    count(Observatory, Sexe, Type) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
+    ror_bar_grouped(x = Type, fill = Sexe, y = pct,
+                    y_label = "%", direction = "horizontal")
 }, members)
 ```
 

@@ -491,7 +491,10 @@ enq <- res_deb |>
 #| fig-height: !expr ror_fig_height(enq, "Enquêteur")
 #| label: fig-enqueteurs
 enq |>
-  make_bar_obs(x = Enquêteur, y = n, y_label = "Questionnaires réalisés", show_pct = FALSE)
+  ror_bar_grouped(x = Enquêteur, y = n, fill = Observatory,
+                  y_label = "Questionnaires réalisés",
+                  direction = "horizontal", facet = FALSE,
+                  show_pct = FALSE)
 ```
 
 ```{r}
