@@ -495,11 +495,17 @@ ror_bar_stacked <- function(
     y_vals <- data[[rlang::as_name(y_quo)]]
     is_pct <- max(y_vals, na.rm = TRUE) > 1.5
     if (is_pct) {
-      data$.pct_label <- ifelse(y_vals >= min_pct,
-                                paste0(round(y_vals), "%"), "")
+      data$.pct_label <- ifelse(
+        y_vals >= min_pct,
+        paste0(round(y_vals), "%"),
+        ""
+      )
     } else {
-      data$.pct_label <- ifelse(y_vals >= min_pct / 100,
-                                paste0(round(y_vals * 100), "%"), "")
+      data$.pct_label <- ifelse(
+        y_vals >= min_pct / 100,
+        paste0(round(y_vals * 100), "%"),
+        ""
+      )
     }
     p <- p +
       ggplot2::geom_text(
