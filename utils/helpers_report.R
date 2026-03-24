@@ -22,6 +22,8 @@ REPORT_MODE <- get_report_mode()
 #' @param data Data frame (should contain an Observatory column)
 #' @param ... Additional arguments passed to gt::gt()
 obs_gt <- function(data, ...) {
+  # Drop rows with NA Observatory to prevent empty row-group headers
+  data <- data |> dplyr::filter(!is.na(Observatory))
   n_groups <- dplyr::n_distinct(data$Observatory)
   if (n_groups <= 1) {
     data |>
@@ -152,7 +154,19 @@ fix_gt_latex_accents <- function(latex_str) {
   latex_str
 }
 
+# Tables visible in per-observatory reports; all others are hidden.
+.ror_obs_table_whitelist <- c("tbl-men-hameau", "cm_chars")
+
 knit_print.gt_tbl <- function(x, ...) {
+  # In per-obs mode, suppress all tables not in the whitelist
+  mode <- get_report_mode()
+  if (!mode$is_consolidated) {
+    chunk_label <- knitr::opts_current$get("label")
+    if (!chunk_label %in% .ror_obs_table_whitelist) {
+      return(knitr::asis_output(""))
+    }
+  }
+
   if (knitr::is_latex_output()) {
     latex_str <- as.character(gt::as_latex(x))
     latex_str <- fix_gt_latex_accents(latex_str)

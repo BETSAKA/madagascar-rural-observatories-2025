@@ -8,7 +8,11 @@ source("utils/sites.R")
 source("utils/plot_theme.R")
 REPORT_MODE <- get_report_mode()
 
-# --- gt LaTeX accent fix (simple version; helpers_report.R has comprehensive) ---
+# --- gt LaTeX accent fix ---
+# The comprehensive knit_print.gt_tbl (incl. table-hiding in per-obs mode)
+# is defined in utils/helpers_report.R and registered there.
+# _common.R only registers a minimal fallback for chapters that don't
+# source helpers_report.R (currently none, but kept for safety).
 knit_print.gt_tbl <- function(x, ...) {
   if (knitr::is_latex_output()) {
     latex_str <- as.character(gt::as_latex(x))

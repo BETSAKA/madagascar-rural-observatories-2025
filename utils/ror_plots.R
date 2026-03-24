@@ -289,7 +289,7 @@ ror_bar_v <- function(
   title = "",
   y_label = NULL,
   fill_color = ROR_BLUE,
-  show_pct = FALSE,
+  show_pct = TRUE,
   x_angle = 0,
   ncol = NULL
 ) {
@@ -360,7 +360,9 @@ ror_bar_grouped <- function(
   x_angle = 45,
   ncol = NULL,
   palette = NULL,
-  facet = TRUE
+  facet = TRUE,
+  show_pct = TRUE,
+  pct_suffix = "%"
 ) {
   x_quo <- rlang::enquo(x)
   y_quo <- rlang::enquo(y)
@@ -391,8 +393,40 @@ ror_bar_grouped <- function(
   ) +
     ggplot2::geom_col(position = "dodge")
 
+  if (show_pct) {
+    label_sz <- if (n_fct > 3) 2 else 2.8
+    if (direction == "horizontal") {
+      p <- p +
+        ggplot2::geom_text(
+          ggplot2::aes(
+            label = ifelse(!!y_quo > 0, paste0(!!y_quo, pct_suffix), "")
+          ),
+          position = ggplot2::position_dodge(width = 0.9),
+          hjust = -0.1,
+          size = label_sz
+        )
+    } else {
+      p <- p +
+        ggplot2::geom_text(
+          ggplot2::aes(
+            label = ifelse(!!y_quo > 0, paste0(!!y_quo, pct_suffix), "")
+          ),
+          position = ggplot2::position_dodge(width = 0.9),
+          vjust = -0.3,
+          size = label_sz
+        )
+    }
+  }
+
   if (direction == "horizontal") {
     p <- p + ggplot2::coord_flip()
+  }
+
+  if (show_pct) {
+    p <- p +
+      ggplot2::scale_y_continuous(
+        expand = ggplot2::expansion(mult = c(0, 0.15))
+      )
   }
 
   p <- p +
@@ -439,7 +473,9 @@ ror_bar_stacked <- function(
   direction = "horizontal",
   x_angle = 0,
   ncol = NULL,
-  palette = NULL
+  palette = NULL,
+  show_pct = TRUE,
+  min_pct = 5
 ) {
   x_quo <- rlang::enquo(x)
   y_quo <- rlang::enquo(y)
@@ -453,6 +489,33 @@ ror_bar_stacked <- function(
     ggplot2::aes(x = !!x_quo, y = !!y_quo, fill = !!fill_quo)
   ) +
     ggplot2::geom_col(position = pos)
+
+  if (show_pct && proportion) {
+    label_sz <- if (n_fct > 3) 2 else 2.8
+    y_vals <- data[[rlang::as_name(y_quo)]]
+    is_pct <- max(y_vals, na.rm = TRUE) > 1.5
+    if (is_pct) {
+      data$.pct_label <- ifelse(
+        y_vals >= min_pct,
+        paste0(round(y_vals), "%"),
+        ""
+      )
+    } else {
+      data$.pct_label <- ifelse(
+        y_vals >= min_pct / 100,
+        paste0(round(y_vals * 100), "%"),
+        ""
+      )
+    }
+    p <- p +
+      ggplot2::geom_text(
+        data = data,
+        ggplot2::aes(label = .pct_label),
+        position = ggplot2::position_fill(vjust = 0.5),
+        size = label_sz,
+        colour = "white"
+      )
+  }
 
   if (direction == "horizontal") {
     p <- p + ggplot2::coord_flip()
@@ -556,6 +619,7 @@ ror_pyramid <- function(
     ggplot2::geom_col() +
     ggplot2::coord_flip() +
     ggplot2::scale_fill_manual(values = palette) +
+    ggplot2::scale_y_continuous(labels = function(x) paste0(abs(x))) +
     ggplot2::labs(title = title, x = NULL, y = "%", fill = NULL) +
     theme_ror(n_facets = n_fct)
 

@@ -44,7 +44,7 @@ res_deb_site <- res_deb |> expand_sites_for_profile()
 add_obs <- function(df) {
   df |>
     mutate(j5 = as.character(j5)) |>
-    left_join(res_deb |> select(j5, Observatory, Site), by = "j5")
+    inner_join(res_deb |> select(j5, Observatory, Site), by = "j5")
 }
 
 # Nombre total de ménages
@@ -450,9 +450,8 @@ dl_fig_variants("fig_engrais_riz", "08", function(d) {
 }, res_r)
 ```
 
-```{r}
-#| label: tbl-semences-labour
-#| tbl-cap: "Type de semences et mode de travail du sol (% des parcelles)"
+```{r tbl_semences_labour_data}
+#| include: false
 
 sem <- res_r |>
   filter(!is.na(r24)) |>
@@ -481,10 +480,6 @@ labour <- res_r |>
   select(-n) |>
   pivot_wider(names_from = Observatory, values_from = pct) |>
   mutate(Indicateur = "Travail du sol", .before = 1)
-
-bind_rows(sem, labour) |>
-  gt() |>
-  tab_header(title = "Semences et travail du sol sur les parcelles rizicoles")
 ```
 
 ```{r dl_tbl_semences_labour}
@@ -506,6 +501,38 @@ dl_tbl_variants("tbl_semences_labour", "08", function(d) {
 }, res_r)
 ```
 
+```{r fig_semences_labour}
+#| echo: false
+#| fig-cap: "Mode de travail du sol sur les parcelles rizicoles"
+#| fig-height: !expr ror_fig_height_n(length(labour_labs), res_r)
+res_r |>
+  filter(!is.na(r14)) |>
+  mutate(
+    Type = factor(as.character(r14),
+                  levels = names(labour_labs), labels = labour_labs)
+  ) |>
+  count(Observatory, Type) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  expand_sites_for_profile() |>
+  make_bar_obs(show_pct = TRUE)
+```
+
+```{r dl_fig_semences_labour}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_semences_labour", "08", function(d) {
+  d |>
+    filter(!is.na(r14)) |>
+    mutate(
+      Type = factor(as.character(r14),
+                    levels = names(labour_labs), labels = labour_labs)
+    ) |>
+    count(Observatory, Type) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    make_bar_obs(show_pct = TRUE)
+}, res_r, width = 10, height = 6)
+```
+
 #### Rendements et production
 
 Le rendement rizicole reflète à la fois les conditions agro-écologiques locales et le degré d'intensification des pratiques.
@@ -522,32 +549,28 @@ A Marovoay, le rendement rizicole médian s'établit à `r rdt_med_m` t/ha (hors
 :::
 :::
 
-```{r}
-#| label: tbl-rendement-riz
-#| tbl-cap: "Perception des rendements rizicoles par observatoire"
-
+```{r fig_rendement_perception}
+#| echo: false
+#| fig-cap: "Perception des rendements rizicoles"
 res_r1 |>
   filter(r1a == 1, !is.na(dc23c6)) |>
-  mutate(Perception = safe_to_char(dc23c6)) |>
-  count(Observatory, Perception) |>
+  mutate(Type = safe_to_char(dc23c6)) |>
+  count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  select(-n) |>
-  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0) |>
-  gt() |>
-  tab_header(title = "Comment jugez-vous le rendement de cette campagne ? (% des riziculteurs)")
+  make_bar_obs(y_label = "% des riziculteurs")
 ```
 
-```{r dl_tbl_rendement_riz}
+```{r dl_fig_rendement_perception}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_rendement_riz", "08", function(d) {
+dl_fig_variants("fig_rendement_perception", "08", function(d) {
   d |>
     filter(r1a == 1, !is.na(dc23c6)) |>
-    mutate(Perception = safe_to_char(dc23c6)) |>
-    count(Observatory, Perception) |>
+    mutate(Type = safe_to_char(dc23c6)) |>
+    count(Observatory, Type) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    select(-n) |> rename(Site = Observatory)
-}, res_r1)
+    make_bar_obs(y_label = "% des riziculteurs")
+}, res_r1, width = 10, height = 6)
 ```
 
 ```{r}
@@ -835,9 +858,8 @@ dl_fig_variants("fig_prix_paddy", "08", function(d) {
 
 Le bilan rizicole reconstitue les flux de paddy au niveau du ménage : stock initial, production, transactions (achat, vente, rente, dons), autoconsommation alimentaire, utilisation en semences, et stock final.
 
-```{r}
-#| label: tbl-bilan-riz
-#| tbl-cap: "Bilan rizicole moyen par ménage (kg de paddy)"
+```{r tbl_bilan_riz_data}
+#| include: false
 
 bilan_vars <- c(
   dc01 = "Stock début campagne",
@@ -856,19 +878,6 @@ bilan_vars <- c(
 
 # Only keep variables that exist in the data
 bilan_vars <- bilan_vars[names(bilan_vars) %in% names(res_dc1)]
-
-res_dc1 |>
-  summarise(
-    across(all_of(names(bilan_vars)), \(x) round(mean(x, na.rm = TRUE))),
-    .by = Observatory
-  ) |>
-  pivot_longer(-Observatory, names_to = "Variable", values_to = "Moyenne") |>
-  mutate(Poste = bilan_vars[Variable]) |>
-  select(-Variable) |>
-  pivot_wider(names_from = Observatory, values_from = Moyenne) |>
-  gt() |>
-  tab_header(title = "Bilan rizicole moyen par ménage (kg de paddy)") |>
-  fmt_number(columns = any_of(c("Alaotra", "Marovoay")), use_seps = TRUE, decimals = 0)
 ```
 
 ```{r dl_tbl_bilan_riz}
@@ -885,6 +894,40 @@ dl_tbl_variants("tbl_bilan_riz", "08", function(d) {
     mutate(Poste = bv[Variable]) |>
     select(Site = Observatory, Poste, Moyenne)
 }, res_dc1)
+```
+
+```{r fig_bilan_riz}
+#| echo: false
+#| fig-cap: "Bilan rizicole moyen par ménage (kg de paddy)"
+bv <- bilan_vars[names(bilan_vars) %in% names(res_dc1)]
+res_dc1 |>
+  summarise(
+    across(all_of(names(bv)), \(x) round(mean(x, na.rm = TRUE))),
+    .by = Observatory
+  ) |>
+  pivot_longer(-Observatory, names_to = "Variable", values_to = "Moyenne") |>
+  mutate(Type = bilan_vars[Variable]) |>
+  select(-Variable) |>
+  rename(pct = Moyenne) |>
+  make_bar_obs(show_pct = TRUE, pct_suffix = " kg")
+```
+
+```{r dl_fig_bilan_riz}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_bilan_riz", "08", function(d) {
+  bv <- bilan_vars[names(bilan_vars) %in% names(d)]
+  d |>
+    summarise(
+      across(all_of(names(bv)), \(x) round(mean(x, na.rm = TRUE))),
+      .by = Observatory
+    ) |>
+    pivot_longer(-Observatory, names_to = "Variable", values_to = "Moyenne") |>
+    mutate(Type = bilan_vars[Variable]) |>
+    select(-Variable) |>
+    rename(pct = Moyenne) |>
+    make_bar_obs(show_pct = TRUE, pct_suffix = " kg")
+}, res_dc1, width = 10, height = 6)
 ```
 
 ### Autres cultures {#sec-autres-cultures}
@@ -1028,7 +1071,7 @@ dl_fig_variants("fig_top_cultures", "08", function(d) {
   top |>
     ror_bar_grouped(x = Culture, y = n, fill = Observatory,
                     y_label = "Nombre de ménages", direction = "horizontal",
-                    facet = FALSE)
+                    facet = FALSE, show_pct = FALSE)
 }, res_c)
 ```
 
@@ -1239,7 +1282,7 @@ dl_fig_variants("fig_top_jardin", "08", function(d) {
   top |>
     ror_bar_grouped(x = Produit, y = n, fill = Observatory,
                     y_label = "Nombre de ménages", direction = "horizontal",
-                    facet = FALSE)
+                    facet = FALSE, show_pct = FALSE)
 }, res_jp)
 ```
 
@@ -1292,7 +1335,7 @@ dl_fig_variants("fig_produits_foret", "08", function(d) {
     ungroup() |>
     ror_bar_grouped(x = Produit, y = n, fill = Observatory,
                     y_label = "Nombre de ménages", direction = "horizontal",
-                    facet = FALSE)
+                    facet = FALSE, show_pct = FALSE)
 }, res_ef)
 ```
 
@@ -1402,7 +1445,7 @@ dl_fig_variants("fig_especes_elevage", "08", function(d) {
     ungroup() |>
     ror_bar_grouped(x = Espece, y = n, fill = Observatory,
                     y_label = "Nombre de ménages", direction = "horizontal",
-                    facet = FALSE)
+                    facet = FALSE, show_pct = FALSE)
 }, res_ele)
 ```
 
@@ -1533,7 +1576,7 @@ dl_fig_variants("fig_pertes_elevage", "08", function(d) {
     ungroup() |>
     ror_bar_grouped(x = Espece, y = n, fill = Observatory,
                     y_label = "Nb ménages ayant subi des pertes", direction = "horizontal",
-                    facet = FALSE)
+                    facet = FALSE, show_pct = FALSE)
 }, res_ele)
 ```
 
@@ -1541,9 +1584,8 @@ dl_fig_variants("fig_pertes_elevage", "08", function(d) {
 
 Outre la vente d'animaux sur pied, l'élevage génère des produits dérivés (lait, œufs, miel, fumier) qui contribuent à l'alimentation et aux revenus du ménage.
 
-```{r}
-#| label: tbl-produits-elevage
-#| tbl-cap: "Produits de l'élevage : % des ménages producteurs"
+```{r tbl_produits_elevage_data}
+#| include: false
 
 pe_total <- res_pe |>
   filter(pe_1 != "", !is.na(pe_1)) |>
@@ -1556,14 +1598,7 @@ res_pe |>
   distinct(j5, Observatory, Produit) |>
   count(Observatory, Produit) |>
   left_join(pe_total, by = "Observatory") |>
-  mutate(pct = round(n / n_total * 100, 1)) |>
-  select(-n, -n_total) |>
-  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0) |>
-  mutate(Moy = round(rowMeans(pick(any_of(c("Alaotra", "Marovoay")))), 1)) |>
-  arrange(desc(Moy)) |>
-  select(-Moy) |>
-  gt() |>
-  tab_header(title = "Produits de l'élevage déclarés par les ménages (%)")
+  mutate(pct = round(n / n_total * 100, 1))
 ```
 
 ```{r dl_tbl_produits_elevage}
@@ -1577,6 +1612,44 @@ dl_tbl_variants("tbl_produits_elevage", "08", function(d) {
     count(Observatory, Produit) |>
     rename(Site = Observatory)
 }, res_pe)
+```
+
+```{r fig_produits_elevage}
+#| echo: false
+#| fig-cap: "Produits de l'élevage déclarés par les ménages"
+#| fig-height: 6
+pe_plot <- res_pe |>
+  filter(pe_1 != "", !is.na(pe_1)) |>
+  mutate(Produit = str_to_title(pe_1)) |>
+  distinct(j5, Observatory, Produit) |>
+  count(Observatory, Produit) |>
+  left_join(pe_total, by = "Observatory") |>
+  mutate(pct = round(n / n_total * 100, 1)) |>
+  select(Observatory, Type = Produit, pct)
+
+pe_plot |>
+  expand_sites_for_profile() |>
+  make_bar_obs(show_pct = TRUE)
+```
+
+```{r dl_fig_produits_elevage}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_produits_elevage", "08", function(d) {
+  pe_tot <- d |>
+    filter(pe_1 != "", !is.na(pe_1)) |>
+    distinct(j5, Observatory) |>
+    count(Observatory, name = "n_total")
+  d |>
+    filter(pe_1 != "", !is.na(pe_1)) |>
+    mutate(Produit = str_to_title(pe_1)) |>
+    distinct(j5, Observatory, Produit) |>
+    count(Observatory, Produit) |>
+    left_join(pe_tot, by = "Observatory") |>
+    mutate(pct = round(n / n_total * 100, 1)) |>
+    select(Observatory, Type = Produit, pct) |>
+    make_bar_obs(show_pct = TRUE)
+}, res_pe, width = 10, height = 6)
 ```
 
 ## Chasse et pêche {#sec-chasse-peche}
@@ -1651,7 +1724,7 @@ dl_fig_variants("fig_chasse_especes", "08", function(d) {
     filter(dense_rank(-total) <= 15) |>
     ror_bar_grouped(x = Espece, y = n, fill = Observatory,
                     y_label = "Nombre de mentions", direction = "horizontal",
-                    facet = FALSE)
+                    facet = FALSE, show_pct = FALSE)
 }, res_chph)
 ```
 
@@ -1776,7 +1849,7 @@ if (length(chph6_cols) > 0) {
       count(Observatory, Mois) |>
       ror_bar_grouped(x = Mois, y = n, fill = Observatory,
                       y_label = "Nombre de mentions",
-                      facet = FALSE)
+                      facet = FALSE, show_pct = FALSE)
   }, res_chph)
 }
 ```

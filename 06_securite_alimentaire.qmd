@@ -55,7 +55,7 @@ res_deb <- res_deb %>% filter_for_profile()
 res_deb_site <- res_deb |> expand_sites_for_profile()
 
 # Pre-joined datasets for site-level downloads
-sa_full  <- res_sa  %>% left_join(res_deb %>% select(j5, Observatory, Site), by = "j5") %>% filter(!is.na(Observatory))
+sa_full  <- res_sa  %>% left_join(res_deb %>% select(j5, Observatory, Site, j4bis), by = "j5") %>% filter(!is.na(Observatory))
 ssa_full <- res_ssa %>% left_join(res_deb %>% select(j5, Observatory, Site), by = "j5") %>% filter(!is.na(Observatory))
 ```
 
@@ -172,6 +172,7 @@ dl_tbl_variants("t1_soudure_obs", "09", function(d) {
 #### Durée de la soudure par hameau et observatoire
 
 ```{r t2_soudure_hameau}
+#| include: false
 # T2 : Nombre moyen de mois de soudure par hameau et observatoire
 soudure_hameau <- res_sa %>%
   left_join(res_deb, by = "j5") %>%
@@ -228,6 +229,28 @@ dl_tbl_variants("t2_soudure_hameau", "09", function(d) {
 }, sa_full)
 ```
 
+```{r fig_soudure_hameau}
+#| echo: false
+#| fig-cap: "Durée moyenne de la soudure par hameau"
+soudure_combined %>%
+  filter(j4bis != "Ensemble") %>%
+  rename(Type = j4bis, pct = mean_soudure) %>%
+  make_bar_obs(show_pct = TRUE, pct_suffix = " mois")
+```
+
+```{r dl_fig_soudure_hameau}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_soudure_hameau", "09", function(d) {
+  d %>%
+    filter(!is.na(sal2d)) %>%
+    group_by(Observatory, j4bis) %>%
+    summarise(mean_soudure = round(mean(sal2d, na.rm = TRUE), 1), .groups = "drop") %>%
+    rename(Type = j4bis, pct = mean_soudure) %>%
+    make_bar_obs(show_pct = TRUE, pct_suffix = " mois")
+}, sa_full, width = 10, height = 6)
+```
+
 #### Distribution du nombre de mois de soudure
 
 ```{r g1_soudure_distrib}
@@ -258,6 +281,7 @@ dl_fig_variants("g1_soudure_distrib", "09", function(d) {
 #### Calendrier de la soudure
 
 ```{r t3_calendrier_soudure}
+#| include: false
 # T3 : % de ménages en soudure chaque mois, par observatoire
 mois_labels <- c(
   "sal2d_10" = "Octobre", "sal2d_11" = "Novembre", "sal2d_12" = "Décembre",
@@ -406,6 +430,7 @@ dl_tbl_variants("t4_stress_obs", "09", function(d) {
 #### Calendrier du stress alimentaire
 
 ```{r t5_calendrier_stress}
+#| include: false
 # T5 : % de ménages en stress alimentaire chaque mois
 mois_labels_stress <- c(
   "sal14a_10" = "Octobre", "sal14a_11" = "Novembre", "sal14a_12" = "Décembre",
@@ -469,7 +494,8 @@ dl_tbl_variants("t5_calendrier_stress", "09", function(d) {
 
 #### Comparaison soudure et stress alimentaire
 
-```{r g3_soudure_vs_stress}
+```{r fig-soudure-vs-stress}
+#| fig-cap: "Comparaison soudure et stress alimentaire"
 # G3 : Superposition soudure vs stress alimentaire
 comparaison <- bind_rows(
   calendrier_soudure %>% mutate(Indicateur = "Soudure"),
@@ -784,6 +810,7 @@ Face à l'insécurité alimentaire, les ménages déploient un éventail de stra
 ### Fréquence des stratégies d'adaptation
 
 ```{r t9_strategies}
+#| include: false
 # T9 : Fréquence de chaque stratégie par observatoire
 
 # Labels des stratégies
@@ -960,6 +987,7 @@ dl_fig_variants("g5_strategies_likert", "09", function(d) {
 ### Sources d'endettement et d'emprunt alimentaire
 
 ```{r t10_sources_endettement}
+#| include: false
 # T10 : Sources d'endettement alimentaire par observatoire
 source_labels <- c(
   "ssa01_01" = "Famille", "ssa01_02" = "Voisins",
@@ -1037,7 +1065,38 @@ dl_tbl_variants("t10_sources_endettement", "09", function(d) {
 }, ssa_full)
 ```
 
+```{r fig_sources_endettement}
+#| echo: false
+#| fig-cap: "Sources d'endettement alimentaire"
+sources_dette %>%
+  rename(Type = Source) %>%
+  make_bar_obs(show_pct = TRUE)
+```
+
+```{r dl_fig_sources_endettement}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_sources_endettement", "09", function(d) {
+  src_labs <- c(
+    "ssa01_01" = "Famille", "ssa01_02" = "Voisins",
+    "ssa01_03" = "Usuriers", "ssa01_04" = "Commer\u00e7ants",
+    "ssa01_05" = "Autres"
+  )
+  d %>%
+    filter(ssa01 > 0) %>%
+    select(Observatory, all_of(names(src_labs))) %>%
+    pivot_longer(-Observatory, names_to = "source_var", values_to = "reponse") %>%
+    filter(!is.na(reponse)) %>%
+    mutate(Source = src_labs[source_var], Oui = if_else(reponse == 1, 1L, 0L)) %>%
+    group_by(Observatory, Source) %>%
+    summarise(pct = round(sum(Oui) / n() * 100, 1), .groups = "drop") %>%
+    rename(Type = Source) %>%
+    make_bar_obs(show_pct = TRUE)
+}, ssa_full, width = 10, height = 6)
+```
+
 ```{r t11_sources_emprunt}
+#| include: false
 # T11 : Sources d'emprunt d'aliments par observatoire
 source_emprunt_labels <- c(
   "ssa02_01" = "Famille", "ssa02_02" = "Voisins",
@@ -1113,6 +1172,36 @@ dl_tbl_variants("t11_sources_emprunt", "09", function(d) {
               pct = round(n_oui / n_total * 100, 1), .groups = "drop") %>%
     select(Site = Observatory, Source, n_oui, pct)
 }, ssa_full)
+```
+
+```{r fig_sources_emprunt}
+#| echo: false
+#| fig-cap: "Sources d'emprunt d'aliments de base"
+sources_emprunt %>%
+  rename(Type = Source) %>%
+  make_bar_obs(show_pct = TRUE)
+```
+
+```{r dl_fig_sources_emprunt}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_sources_emprunt", "09", function(d) {
+  src_labs <- c(
+    "ssa02_01" = "Famille", "ssa02_02" = "Voisins",
+    "ssa02_03" = "Usuriers", "ssa02_04" = "Commer\u00e7ants",
+    "ssa02_05" = "Autres"
+  )
+  d %>%
+    filter(ssa02 > 0) %>%
+    select(Observatory, all_of(names(src_labs))) %>%
+    pivot_longer(-Observatory, names_to = "source_var", values_to = "reponse") %>%
+    filter(!is.na(reponse)) %>%
+    mutate(Source = src_labs[source_var], Oui = if_else(reponse == 1, 1L, 0L)) %>%
+    group_by(Observatory, Source) %>%
+    summarise(pct = round(sum(Oui) / n() * 100, 1), .groups = "drop") %>%
+    rename(Type = Source) %>%
+    make_bar_obs(show_pct = TRUE)
+}, ssa_full, width = 10, height = 6)
 ```
 
 ```{r g6_top_strategies_data}

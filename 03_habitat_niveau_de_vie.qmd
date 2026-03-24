@@ -119,6 +119,7 @@ A Marovoay, `r pct_statut_m` % des ménages occupent un logement en « `r top_st
 :::
 
 ```{r house_status}
+#| include: false
 house <- res_h |>
   left_join(obs_site, by = "j5") |>
   mutate(Statut = decode_labelled(h0)) |>
@@ -142,12 +143,6 @@ house |> make_bar_obs(x = Statut, title = "Statut d'occupation du logement")
 ```{r dl_house_status}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_house_status", "05", function(d) {
-  d |> mutate(Statut = decode_labelled(h0)) |>
-    count(Observatory, Statut) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, res_h |> left_join(obs, by = "j5"))
 dl_fig_variants("fig_house_status", "05", function(d) {
   d |> mutate(Statut = decode_labelled(h0)) |>
     count(Observatory, Statut) |>
@@ -173,6 +168,7 @@ A Marovoay, Le type dominant est « `r top_lat_m` » (`r pct_lat_m` % des ménag
 :::
 
 ```{r latrine}
+#| include: false
 latrine <- res_h |>
   left_join(obs_site, by = "j5") |>
   mutate(Type = decode_labelled(h5)) |>
@@ -196,12 +192,6 @@ latrine |> make_bar_obs(title = obs_title("Types de latrine"))
 ```{r dl_latrine}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_latrine", "05", function(d) {
-  d |> mutate(Type = decode_labelled(h5)) |>
-    count(Observatory, Type) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, res_h |> left_join(obs, by = "j5"))
 dl_fig_variants("fig_latrine", "05", function(d) {
   d |> mutate(Type = decode_labelled(h5)) |>
     count(Observatory, Type) |>
@@ -227,9 +217,10 @@ A Marovoay, La source principale est « `r top_eau_m` » (`r pct_eau_m` %).
 :::
 
 ```{r water}
+#| include: false
 water <- res_h |>
   left_join(obs_site, by = "j5") |>
-  mutate(Type = decode_labelled(h4)) |>
+  mutate(Type = str_remove(decode_labelled(h4), "_+$")) |>
   count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
@@ -250,14 +241,8 @@ water |> make_bar_obs(title = obs_title("Mode d'approvisionnement en eau"))
 ```{r dl_water}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_water", "05", function(d) {
-  d |> mutate(Type = decode_labelled(h4)) |>
-    count(Observatory, Type) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, res_h |> left_join(obs, by = "j5"))
 dl_fig_variants("fig_water", "05", function(d) {
-  d |> mutate(Type = decode_labelled(h4)) |>
+  d |> mutate(Type = str_remove(decode_labelled(h4), "_+$")) |>
     count(Observatory, Type) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
     make_bar_obs(title = "Mode d'approvisionnement en eau")
@@ -269,6 +254,7 @@ dl_fig_variants("fig_water", "05", function(d) {
 Le mode d'éclairage reflète le niveau d'accès à l'énergie moderne. Les ménages ruraux dépendent encore largement de sources traditionnelles, même si la pénétration du solaire progresse.
 
 ```{r lighting}
+#| include: false
 light <- res_h |>
   left_join(obs_site, by = "j5") |>
   tabulate_binary_set("h7", exclude_pattern = "h7c[12]|h7i_autre")
@@ -285,6 +271,15 @@ light |>
 ```{r}
 #| fig-height: !expr ror_fig_height(light)
 light |> make_bar_obs(title = obs_title("Modes d'éclairage"))
+```
+
+```{r dl_fig_lighting}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_lighting", "05", function(d) {
+  d |> tabulate_binary_set("h7", exclude_pattern = "h7c[12]|h7i_autre") |>
+    make_bar_obs(title = "Modes d'eclairage par observatoire")
+}, res_h |> left_join(obs, by = "j5"))
 ```
 
 Parmi les ménages utilisant le solaire, la proportion disposant d'un panneau en état de marche est présentée ci-dessous.
@@ -308,8 +303,7 @@ gt(solar_status) |>
 ```
 
 ```{r dl_lighting}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_lighting", "05", function(d) {
   d |> tabulate_binary_set("h7", exclude_pattern = "h7c[12]|h7i_autre") |>
     rename(Site = Observatory, Effectif = n, `%` = pct)
@@ -325,6 +319,7 @@ dl_fig_variants("fig_lighting", "05", function(d) {
 La quasi-totalité des ménages ruraux malgaches dépendent de la biomasse pour la cuisson. La nature exacte du combustible utilisé (bois, charbon de bois) varie selon la disponibilité locale des ressources forestières.
 
 ```{r cooking}
+#| include: false
 cooking <- res_h |>
   left_join(obs_site, by = "j5") |>
   tabulate_binary_set("h6", exclude_pattern = "h6a1|h6e_autre") |>
@@ -351,15 +346,6 @@ cooking |> make_bar_obs(title = obs_title("Modes de cuisson"))
 ```{r dl_cooking}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_cooking", "05", function(d) {
-  d |> tabulate_binary_set("h6", exclude_pattern = "h6a1|h6e_autre") |>
-    mutate(Type = case_when(
-      str_detect(Type, "(?i)r\u00e9sin") ~ "Bois de chauffe",
-      str_detect(Type, "(?i)autre.*pr") ~ "Autre",
-      TRUE ~ Type
-    )) |>
-    rename(Site = Observatory, Effectif = n, `%` = pct)
-}, res_h |> left_join(obs, by = "j5"))
 dl_fig_variants("fig_cooking", "05", function(d) {
   d |> tabulate_binary_set("h6", exclude_pattern = "h6a1|h6e_autre") |>
     mutate(Type = case_when(
@@ -380,6 +366,7 @@ La possession de biens durables constitue un proxy classique du niveau de vie de
 Les biens de confort courant (mobilier, ustensiles, outils) renseignent sur le niveau d'équipement quotidien des ménages et constituent un indicateur de bien-être matériel.
 
 ```{r comfort_goods}
+#| include: false
 comfort <- res_v |>
   left_join(obs_site, by = "j5") |>
   tabulate_binary_set("v", count_mode = TRUE) |>
@@ -402,11 +389,6 @@ comfort |> make_bar_obs(title = obs_title("Biens de confort courants"))
 ```{r dl_comfort}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_comfort", "05", function(d) {
-  d |> tabulate_binary_set("v", count_mode = TRUE) |>
-    mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type)) |>
-    rename(Site = Observatory, Effectif = n, `%` = pct)
-}, res_v |> left_join(obs, by = "j5"))
 dl_fig_variants("fig_comfort", "05", function(d) {
   d |> tabulate_binary_set("v", count_mode = TRUE) |>
     mutate(Type = if_else(str_detect(Type, "(?i)autre.*pr"), "Autre", Type)) |>
@@ -419,6 +401,7 @@ dl_fig_variants("fig_comfort", "05", function(d) {
 L'équipement agricole conditionne la productivité et la capacité d'extension des surfaces cultivées. La possession de matériel mécanisé ou de traction animale constitue un facteur de différenciation important entre les ménages.
 
 ```{r agri_equipment}
+#| include: false
 # Keep common hand tools + mechanisation/traction items
 equip_keep <- c(
   "Angady", "Faucille/Coupe-coupe", "Hache", "Arrosoir/Sceau", "Couteau",
@@ -469,13 +452,6 @@ table_equip |>
 ```{r dl_agri_equipment}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_agri_equip", "05", function(d) {
-  d |> mutate(Equipement = decode_labelled(e11)) |>
-    filter(Equipement != "", str_detect(Equipement, paste(equip_keep, collapse = "|"))) |>
-    count(Observatory, Equipement) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, res_e |> left_join(obs, by = "j5"))
 dl_fig_variants("fig_agri_equip", "05", function(d) {
   equip <- d |> mutate(Equipement = decode_labelled(e11)) |>
     filter(Equipement != "", str_detect(Equipement, paste(equip_keep, collapse = "|"))) |>
@@ -495,6 +471,7 @@ dl_fig_variants("fig_agri_equip", "05", function(d) {
 L'accès aux technologies de communication et d'information constitue un vecteur de connexion aux marchés, aux services et à l'information. La pénétration du téléphone mobile a transformé les pratiques économiques et sociales en milieu rural.
 
 ```{r communication}
+#| include: false
 comm_vars <- c("v5", "v8", "v9", "v20", "v11")
 comm_labels <- tibble(
   v_var = comm_vars,
@@ -531,23 +508,6 @@ comm |> make_bar_obs(title = obs_title("Matériels de communication"))
 ```{r dl_communication}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_communication", "05", function(d) {
-  comm_vars <- c("v5", "v8", "v9", "v20", "v11")
-  comm_labels <- tibble(
-    v_var = comm_vars,
-    Type = vapply(d[comm_vars], function(x) {
-      lab <- iconv(var_label(x), from = "latin1", to = "UTF-8")
-      if (grepl(":", lab)) lab <- sub(".*?:\\s*", "", lab)
-      str_squish(str_to_title(lab))
-    }, character(1)))
-  d |> select(j5, Observatory, all_of(comm_vars)) |>
-    pivot_longer(all_of(comm_vars), names_to = "v_var", values_to = "value") |>
-    filter(value == 1) |>
-    left_join(comm_labels, by = "v_var") |>
-    count(Observatory, Type) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    rename(Site = Observatory, Effectif = n)
-}, res_v |> left_join(obs, by = "j5"))
 dl_fig_variants("fig_communication", "05", function(d) {
   comm_vars <- c("v5", "v8", "v9", "v20", "v11")
   comm_labels <- tibble(
@@ -626,7 +586,8 @@ dl_fig_variants("fig_transferts", "05", function(d) {
     mutate(val_moy_k = val_moy / 1000) |>
     ror_bar_grouped(x = Type, y = val_moy_k, fill = Observatory,
                     y_label = "Valeur moyenne (milliers Ar)",
-                    direction = "horizontal", facet = FALSE)
+                    direction = "horizontal", facet = FALSE,
+                    show_pct = FALSE)
 }, res_t2 |> left_join(obs, by = "j5"))
 ```
 

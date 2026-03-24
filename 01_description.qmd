@@ -202,12 +202,15 @@ if (REPORT_MODE$is_consolidated) {
   pa_display <- pa_ankarafantsika
 }
 
+# Expand bounding box for better framing of centroids
+bb_expanded <- tmaptools::bb(foko_sf, ext = 1.3)
+
 if (knitr::is_html_output()) {
   tmap_mode("view")
 } else {
   tmap_mode("plot")
 }
-tm_shape(foko_sf) +
+tm_shape(foko_sf, bbox = bb_expanded) +
   tm_dots(
     fill = "Observatory",
     fill.scale = tm_scale_categorical(
@@ -491,7 +494,10 @@ enq <- res_deb |>
 #| fig-height: !expr ror_fig_height(enq, "Enquêteur")
 #| label: fig-enqueteurs
 enq |>
-  make_bar_obs(x = Enquêteur, y = n, y_label = "Questionnaires réalisés", show_pct = FALSE)
+  ror_bar_grouped(x = Enquêteur, y = n, fill = Observatory,
+                  y_label = "Questionnaires réalisés",
+                  direction = "horizontal", facet = FALSE,
+                  show_pct = FALSE)
 ```
 
 ```{r}

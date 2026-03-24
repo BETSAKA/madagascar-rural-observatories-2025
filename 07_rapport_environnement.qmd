@@ -53,7 +53,7 @@ res_ap2        <- read_dta("data/ROS_MDG_microdata/2025/res_ap2.dta")
 
 # Ajout de l'observatoire et du site à chaque fichier
 add_obs <- function(df) {
-  df |> left_join(res_deb |> select(j5, Observatory, Site), by = "j5")
+  df |> inner_join(res_deb |> select(j5, Observatory, Site), by = "j5")
 }
 
 res_ap_def     <- add_obs(res_ap_def)
@@ -363,6 +363,36 @@ menaces_long |>
     y_label = "%", direction = "horizontal", facet = FALSE
   ) +
   facet_wrap(~Section, scales = "free_y", ncol = 1)
+```
+
+```{r dl_fig_menaces}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_menaces", "10", function(d) {
+  pct_v <- function(df, var, label) {
+    var_sym <- sym(var)
+    df |> summarise(pct = round(sum(!!var_sym == 1, na.rm = TRUE) / sum(!is.na(!!var_sym)) * 100, 0), .by = Observatory) |> mutate(Item = label)
+  }
+  op_m <- d |> filter(rm4 == 1)
+  menaces <- bind_rows(
+    pct_v(op_m, "rm4a_e", "Feux"), pct_v(op_m, "rm4a_a", "D\u00e9frichage"),
+    pct_v(op_m, "rm4a_c", "Pr\u00e9l. faune"), pct_v(op_m, "rm4a_d", "Pr\u00e9l. flore"),
+    pct_v(op_m, "rm4a_h", "Prosp. mini\u00e8re"), pct_v(op_m, "rm4a_g", "Nomadisme"),
+    pct_v(op_m, "rm4a_b", "Z\u00e9bu/p\u00e2turage"), pct_v(op_m, "rm4a_f", "Tourisme")
+  ) |> mutate(Section = "Menaces")
+  resps <- bind_rows(
+    pct_v(op_m, "rm4b_a", "Tous riverains"), pct_v(op_m, "rm4b_b", "Riverains migrants"),
+    pct_v(op_m, "rm4b_c", "\u00c9tat"), pct_v(op_m, "rm4b_h", "Braconniers"),
+    pct_v(op_m, "rm4b_e", "Gestionnaire"), pct_v(op_m, "rm4b_i", "Nomades"),
+    pct_v(op_m, "rm4b_d", "ONG/entreprises"), pct_v(op_m, "rm4b_g", "Chercheurs"),
+    pct_v(op_m, "rm4b_f", "Touristes")
+  ) |> mutate(Section = "Responsables")
+  all_long <- bind_rows(menaces, resps)
+  all_long |>
+    mutate(Item = reorder(Item, pct)) |>
+    ror_bar_grouped(x = Item, fill = Observatory, y_label = "%", direction = "horizontal", facet = FALSE) +
+    facet_wrap(~Section, scales = "free_y", ncol = 1)
+}, res_op_env, width = 10, height = 8)
 ```
 
 ```{r dl_tbl_menaces}
@@ -1124,6 +1154,28 @@ feu_long |>
   )
 ```
 
+```{r dl_fig_feux}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_feux", "10", function(d) {
+  pct_v <- function(df, var, label) {
+    var_sym <- sym(var)
+    df |> summarise(pct = round(sum(!!var_sym == 1, na.rm = TRUE) / sum(!is.na(!!var_sym)) * 100, 0), .by = Observatory) |> mutate(Item = label)
+  }
+  items <- bind_rows(
+    pct_v(d, "s17", "Pratique normale"),
+    pct_v(d, "s17_a", "Vital/n\u00e9cessaire"),
+    pct_v(d, "s18", "A d\u00e9j\u00e0 fait des feux"),
+    pct_v(d, "s18_b", "Feux 12 derniers mois"),
+    pct_v(d |> filter(s18 == 1), "s19", "Cherche \u00e0 ma\u00eetriser"),
+    pct_v(d |> filter(s18 == 1), "s20", "Un feu lui a \u00e9chapp\u00e9")
+  )
+  items |>
+    mutate(Item = reorder(Item, pct)) |>
+    ror_bar_grouped(x = Item, fill = Observatory, y_label = "%", direction = "horizontal", facet = FALSE)
+}, res_feubrousse, width = 10, height = 6)
+```
+
 ```{r dl_tbl_feux}
 #| echo: false
 #| results: asis
@@ -1378,6 +1430,27 @@ ap_long |>
     x = Item, fill = Observatory,
     y_label = "%", direction = "horizontal", facet = FALSE
   )
+```
+
+```{r dl_fig_connaissance_ap_dl}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_connaissance_ap", "10", function(d) {
+  pct_v <- function(df, var, label) {
+    var_sym <- sym(var)
+    df |> summarise(pct = round(sum(!!var_sym == 1, na.rm = TRUE) / sum(!is.na(!!var_sym)) * 100, 0), .by = Observatory) |> mutate(Item = label)
+  }
+  items <- bind_rows(
+    pct_v(d, "ap1", "A entendu parler de l'AP"),
+    pct_v(d, "ap4", "N\u00e9cessaire de prot\u00e9ger l'env."),
+    pct_v(d, "ap5", "N\u00e9cessaire de prot\u00e9ger cette AP"),
+    pct_v(d, "ap6", "Perte de biodiversit\u00e9"),
+    pct_v(d, "ap7", "AP ont des r\u00e9sultats positifs")
+  )
+  items |>
+    mutate(Item = reorder(Item, pct)) |>
+    ror_bar_grouped(x = Item, fill = Observatory, y_label = "%", direction = "horizontal", facet = FALSE)
+}, res_ap, width = 10, height = 6)
 ```
 
 ```{r dl_tbl_connaissance_ap}

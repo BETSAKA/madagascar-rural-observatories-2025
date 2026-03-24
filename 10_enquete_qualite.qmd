@@ -76,7 +76,7 @@ res_deb_site |>
     Qualité = factor(Qualité, levels = c("Bonne", "Moyenne", "Mauvaise"))
   ) |>
   count(Observatory, Qualité) |>
-  ror_bar_v(x = Qualité, y = n, y_label = "Nombre d'entretiens")
+  ror_bar_v(x = Qualité, y = n, y_label = "Nombre d'entretiens", show_pct = FALSE)
 ```
 
 ```{r dl_fig_qualite}
@@ -91,7 +91,7 @@ dl_fig_variants("fig_qualite", "13", function(d) {
     count(Observatory, Qualite) |>
     ror_bar_grouped(x = Qualite, y = n, fill = Observatory,
                     y_label = "Nombre d'entretiens", direction = "vertical",
-                    x_angle = 0, facet = FALSE)
+                    x_angle = 0, facet = FALSE, show_pct = FALSE)
 }, res_deb, width = 8, height = 4)
 ```
 
@@ -174,7 +174,7 @@ dl_fig_variants("fig_qual_reponse", "13", function(d) {
     count(Observatory, Qualite) |>
     ror_bar_grouped(x = Qualite, y = n, fill = Observatory,
                     y_label = "Nombre de menages", direction = "vertical",
-                    x_angle = 0, facet = FALSE)
+                    x_angle = 0, facet = FALSE, show_pct = FALSE)
 }, res_remq, width = 8, height = 4)
 ```
 
@@ -216,7 +216,7 @@ dl_fig_variants("fig_reaction", "13", function(d) {
     count(Observatory, Reaction) |>
     ror_bar_grouped(x = Reaction, y = n, fill = Observatory,
                     y_label = "Nombre de menages", direction = "vertical",
-                    x_angle = 0, facet = FALSE)
+                    x_angle = 0, facet = FALSE, show_pct = FALSE)
 }, res_remq, width = 8, height = 4)
 ```
 
