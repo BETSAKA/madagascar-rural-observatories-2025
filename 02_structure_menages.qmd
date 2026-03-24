@@ -257,6 +257,7 @@ A Marovoay, `r pct_moins15_m` % des individus ont moins de 15 ans. La population
 #### Au niveau des observatoires
 
 ```{r age_obs}
+#| include: false
 hh_age <- members_site |>
   mutate(AgeGroup = classify_age_group(m5)) |>
   filter(!is.na(AgeGroup)) |>
@@ -272,8 +273,7 @@ obs_gt(hh_age) |>
 ```
 
 ```{r dl_tbl_age_obs}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_age_obs", "04", function(d) {
   d |>
     mutate(AgeGroup = classify_age_group(m5)) |>
@@ -343,13 +343,13 @@ dl_fig_variants("fig_pyramide", "04", function(d) {
 L'origine géographique des chefs de ménage et de leurs conjoints renseigne sur les dynamiques migratoires et le degré d'ancrage local des familles. La classification distingue les *tompon-tany* (autochtones), les *zana-tany* (nés sur place de parents migrants), les *valivotaka* (migrants installés durablement) et les *mpihavy* (arrivants récents). La répartition de ces catégories diffère sensiblement entre les deux observatoires.
 
 ```{r origine}
+#| include: false
 make_origin_table(members_site, m3, classify_origin, "Origine",
                   obs_title("Origine des chefs de ménage et conjoints"))
 ```
 
 ```{r dl_tbl_origine}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_origine", "04", function(d) {
   d |>
     filter(m6 %in% c(1, 2)) |>
@@ -384,6 +384,7 @@ dl_fig_variants("fig_origine", "04", function(d) {
 La provenance régionale des CM et conjoints qui ne sont pas natifs de la localité permet d'identifier les principaux bassins migratoires alimentant chaque observatoire.
 
 ```{r homeland}
+#| include: false
 # Homeland variable (m3a) - localisation du tombeau ancestral
 # m3a has no value labels in the Stata file; apply manual mapping
 m3a_labs <- c("1" = "Dans le fokontany", "2" = "Dans la commune", "3" = "Hors de la commune")
@@ -416,8 +417,7 @@ obs_gt(homeland_tbl) |>
 ```
 
 ```{r dl_tbl_homeland}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_homeland", "04", function(d) {
   m3a_labs <- c("1" = "Dans le fokontany", "2" = "Dans la commune", "3" = "Hors de la commune")
   d |>
@@ -464,13 +464,13 @@ dl_fig_variants("fig_homeland", "04", function(d) {
 Les raisons d'installation des CM et conjoints non originaires du lieu éclairent les motivations migratoires. Elles distinguent notamment les installations liées au mariage de celles motivées par les opportunités économiques (travail agricole ou non agricole).
 
 ```{r raison}
+#| include: false
 make_origin_table(members_site, mg4a, classify_reason, "Raison",
                   obs_title("Raison d'implantation des CM et conjoints"))
 ```
 
 ```{r dl_tbl_raison}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_raison", "04", function(d) {
   d |>
     filter(m6 %in% c(1, 2)) |>
@@ -622,6 +622,7 @@ A Marovoay, le niveau le plus fréquemment atteint est « `r top_educ_m` » (`r 
 #### Niveau d'éducation du Chef de ménage
 
 ```{r cm_educ}
+#| include: false
 cm_educ <- cm |>
   mutate(Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
   count(Observatory, Niv_education) |>
@@ -637,8 +638,7 @@ gt(cm_educ) |>
 ```
 
 ```{r dl_tbl_cm_educ}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_cm_educ", "04", function(d) {
   d |> filter(m6 == 1) |>
     mutate(Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
@@ -673,6 +673,7 @@ dl_fig_variants("fig_cm_educ", "04", function(d) {
 #### Niveau d'éducation des chefs de ménages par sexe
 
 ```{r cm_educ_sex}
+#| include: false
 cm_educ_sex <- cm |>
   mutate(
     Sexe = classify_sex(m4),
@@ -700,8 +701,7 @@ gt(cm_educ_sex) |>
 ```
 
 ```{r dl_tbl_cm_educ_sex}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_cm_educ_sex", "04", function(d) {
   d |> filter(m6 == 1) |>
     mutate(Sexe = classify_sex(m4),
@@ -832,7 +832,7 @@ dl_tbl_variants("tbl_cm_read", "04", function(d) {
 ```
 
 ```{r cm_read_sex}
-#| results: asis
+#| include: false
 literacy_3level_sex(cm_site, s1a, "Aptitude à la lecture des CM selon le sexe")
 ```
 
@@ -842,8 +842,7 @@ literacy_3level_bar(cm_site, s1a, "Aptitude à la lecture des CM selon le sexe")
 ```
 
 ```{r dl_tbl_cm_read_sex}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_cm_read_sex", "04", function(d) {
   d |> filter(m6 == 1) |>
     mutate(Sexe = classify_sex(m4), Niveau = classify_literacy(s1a)) |>
@@ -874,7 +873,7 @@ dl_tbl_variants("tbl_cm_write", "04", function(d) {
 ```
 
 ```{r cm_write_sex}
-#| results: asis
+#| include: false
 literacy_3level_sex(cm_site, s1b, "Aptitude à l'écriture des CM selon le sexe")
 ```
 
@@ -884,8 +883,7 @@ literacy_3level_bar(cm_site, s1b, "Aptitude à l'écriture des CM selon le sexe"
 ```
 
 ```{r dl_tbl_cm_write_sex}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_cm_write_sex", "04", function(d) {
   d |> filter(m6 == 1) |>
     mutate(Sexe = classify_sex(m4), Niveau = classify_literacy(s1b)) |>
@@ -912,6 +910,7 @@ A Marovoay, l'activité dominante est « `r top_act_m` » (`r pct_top_act_m` % d
 :::
 
 ```{r cm_act}
+#| include: false
 cm_act <- cm_site |>
   mutate(Act_principal = classify_activity(a1)) |>
   filter(!is.na(Act_principal)) |>
@@ -935,8 +934,7 @@ cm_act |> make_bar_obs(x = Act_principal, y = Percent,
 ```
 
 ```{r dl_tbl_cm_act}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_cm_act", "04", function(d) {
   d |> filter(m6 == 1) |>
     mutate(Act_principal = classify_activity(a1)) |>
@@ -965,6 +963,7 @@ dl_fig_variants("fig_cm_act", "04", function(d) {
 #### Activités principales des CM par sexe
 
 ```{r cm_act_sex}
+#| include: false
 cm_act_sex <- cm_site |>
   mutate(
     Act_principal = classify_activity(a1),
@@ -1003,9 +1002,16 @@ cm_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
                                   y_label = "%", direction = "horizontal")
 ```
 
+```{r fig_cm_act_sex}
+#| fig-cap: "Activit\u00e9s principales des CM par observatoire et sexe"
+#| fig-height: !expr ror_fig_height(cm_act_sex_plt, "Act_principal")
+cm_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
+                                  title = "Activit\u00e9s principales des CM par observatoire et sexe (%)",
+                                  y_label = "%", direction = "horizontal")
+```
+
 ```{r dl_tbl_cm_act_sex}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_cm_act_sex", "04", function(d) {
   d |> filter(m6 == 1) |>
     mutate(Act_principal = classify_activity(a1),
@@ -1046,6 +1052,7 @@ others_site <- members_site |> filter(m6 != 1)
 # --- Sexe ---
 sexe_table2 <- others |>
   mutate(Sexe = classify_sex(m4)) |>
+  filter(!is.na(Sexe)) |>
   count(Observatory, Sexe) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
   mutate(Valeur = paste0(pct, "%")) |>
@@ -1136,6 +1143,7 @@ Le niveau d'éducation des autres membres de ménage complète le portrait éduc
 #### Niveau d'éducation des autres membres
 
 ```{r other_educ}
+#| include: false
 other_educ <- others |>
   mutate(Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
   count(Observatory, Niv_education) |>
@@ -1151,8 +1159,7 @@ gt(other_educ) |>
 ```
 
 ```{r dl_tbl_other_educ}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_other_educ", "04", function(d) {
   d |> filter(m6 != 1) |>
     mutate(Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
@@ -1187,6 +1194,7 @@ dl_fig_variants("fig_other_educ", "04", function(d) {
 #### Niveau d'éducation des autres membres par sexe
 
 ```{r other_educ_sex}
+#| include: false
 other_educ_sex <- others |>
   mutate(
     Sexe = classify_sex(m4),
@@ -1211,8 +1219,7 @@ gt(other_educ_sex) |>
 ```
 
 ```{r dl_tbl_other_educ_sex}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_other_educ_sex", "04", function(d) {
   d |> filter(m6 != 1) |>
     mutate(Sexe = classify_sex(m4),
@@ -1258,12 +1265,12 @@ dl_fig_variants("fig_other_educ_sex", "04", function(d) {
 ##### Savoir lire
 
 ```{r other_read}
+#| include: false
 literacy_3level(others_site, s1a, "Aptitude à la lecture des autres membres")
 ```
 
 ```{r dl_tbl_other_read}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_other_read", "04", function(d) {
   d |> filter(m6 != 1) |>
     mutate(Niveau = classify_literacy(s1a)) |>
@@ -1275,7 +1282,7 @@ dl_tbl_variants("tbl_other_read", "04", function(d) {
 ```
 
 ```{r other_read_sex}
-#| results: asis
+#| include: false
 literacy_3level_sex(others_site, s1a, "Aptitude à la lecture des autres membres selon le sexe")
 ```
 
@@ -1285,8 +1292,7 @@ literacy_3level_bar(others_site, s1a, "Aptitude à la lecture des autres membres
 ```
 
 ```{r dl_tbl_other_read_sex}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_other_read_sex", "04", function(d) {
   d |> filter(m6 != 1) |>
     mutate(Sexe = classify_sex(m4), Niveau = classify_literacy(s1a)) |>
@@ -1317,7 +1323,7 @@ dl_tbl_variants("tbl_other_write", "04", function(d) {
 ```
 
 ```{r other_write_sex}
-#| results: asis
+#| include: false
 literacy_3level_sex(others_site, s1b, "Aptitude à l'écriture des autres membres selon le sexe")
 ```
 
@@ -1327,8 +1333,7 @@ literacy_3level_bar(others_site, s1b, "Aptitude à l'écriture des autres membre
 ```
 
 ```{r dl_tbl_other_write_sex}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_other_write_sex", "04", function(d) {
   d |> filter(m6 != 1) |>
     mutate(Sexe = classify_sex(m4), Niveau = classify_literacy(s1b)) |>
@@ -1438,7 +1443,7 @@ dl_tbl_variants("tbl_class", "04", function(d) {
 
 #### Raisons de non fréquentation de l'école pour les 6 à 15 ans
 
-La @fig-raisons-non-scol et le @tbl-raisons-non-scol détaillent l'ensemble des motifs de non-scolarisation cités.
+La @fig-raisons-non-scol détaille l'ensemble des motifs de non-scolarisation cités.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
@@ -1513,7 +1518,7 @@ dl_fig_variants("fig_raisons_non_scol", "04", function(d) {
 ```
 
 ```{r tbl-raisons-non-scol}
-#| tbl-cap: "Raisons de non-scolarisation des 6-15 ans par observatoire"
+#| include: false
 
 non_scol |>
   select(Observatory, Raison, pct) |>
@@ -1525,8 +1530,7 @@ non_scol |>
 ```
 
 ```{r dl_tbl_raisons_non_scol}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_raisons_non_scol", "04", function(d) {
   d |>
     filter(m5 >= 6, m5 <= 15, m6 != 1, s2 == 2, !is.na(s5)) |>
@@ -1544,6 +1548,7 @@ dl_tbl_variants("tbl_raisons_non_scol", "04", function(d) {
 La répartition sectorielle des activités des autres membres de ménage reflète la diversification économique au sein des familles et le rôle des conjoints et enfants dans l'économie du ménage. Les activités sont regroupées selon la même nomenclature sectorielle que pour les CM.
 
 ```{r other_act_grouped}
+#| include: false
 other_act <- others_site |>
   mutate(Act_principal = classify_activity(a1)) |>
   filter(!is.na(Act_principal)) |>
@@ -1567,8 +1572,7 @@ other_act |> make_bar_obs(x = Act_principal, y = Percent,
 ```
 
 ```{r dl_tbl_other_act}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_other_act", "04", function(d) {
   d |> filter(m6 != 1) |>
     mutate(Act_principal = classify_activity(a1)) |>
@@ -1597,6 +1601,7 @@ dl_fig_variants("fig_other_act", "04", function(d) {
 #### Activités principales des autres membres par sexe
 
 ```{r other_act_sex}
+#| include: false
 other_act_sex <- others_site |>
   mutate(
     Act_principal = classify_activity(a1),
@@ -1634,9 +1639,15 @@ other_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent
                                      y_label = "%", direction = "horizontal")
 ```
 
+```{r fig_other_act_sex}
+#| fig-height: !expr ror_fig_height(other_act_sex, "Act_principal")
+other_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
+                                     title = "Activités des autres membres par observatoire et sexe (%)",
+                                     y_label = "%", direction = "horizontal")
+```
+
 ```{r dl_tbl_other_act_sex}
-#| echo: false
-#| results: asis
+#| include: false
 dl_tbl_variants("tbl_other_act_sex", "04", function(d) {
   d |> filter(m6 != 1) |>
     mutate(Act_principal = classify_activity(a1),

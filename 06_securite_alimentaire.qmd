@@ -430,6 +430,7 @@ dl_tbl_variants("t4_stress_obs", "09", function(d) {
 #### Calendrier du stress alimentaire
 
 ```{r t5_calendrier_stress}
+#| include: false
 # T5 : % de ménages en stress alimentaire chaque mois
 mois_labels_stress <- c(
   "sal14a_10" = "Octobre", "sal14a_11" = "Novembre", "sal14a_12" = "Décembre",
@@ -493,7 +494,8 @@ dl_tbl_variants("t5_calendrier_stress", "09", function(d) {
 
 #### Comparaison soudure et stress alimentaire
 
-```{r g3_soudure_vs_stress}
+```{r fig-soudure-vs-stress}
+#| fig-cap: "Comparaison soudure et stress alimentaire"
 # G3 : Superposition soudure vs stress alimentaire
 comparaison <- bind_rows(
   calendrier_soudure %>% mutate(Indicateur = "Soudure"),

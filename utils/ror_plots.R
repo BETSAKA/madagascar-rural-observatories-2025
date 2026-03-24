@@ -492,15 +492,19 @@ ror_bar_stacked <- function(
 
   if (show_pct && proportion) {
     label_sz <- if (n_fct > 3) 2 else 2.8
+    y_vals <- data[[rlang::as_name(y_quo)]]
+    is_pct <- max(y_vals, na.rm = TRUE) > 1.5
+    if (is_pct) {
+      data$.pct_label <- ifelse(y_vals >= min_pct,
+                                paste0(round(y_vals), "%"), "")
+    } else {
+      data$.pct_label <- ifelse(y_vals >= min_pct / 100,
+                                paste0(round(y_vals * 100), "%"), "")
+    }
     p <- p +
       ggplot2::geom_text(
-        ggplot2::aes(
-          label = ifelse(
-            !!y_quo >= min_pct / 100,
-            paste0(round(!!y_quo * 100), "%"),
-            ""
-          )
-        ),
+        data = data,
+        ggplot2::aes(label = .pct_label),
         position = ggplot2::position_fill(vjust = 0.5),
         size = label_sz,
         colour = "white"
