@@ -22,6 +22,8 @@ REPORT_MODE <- get_report_mode()
 #' @param data Data frame (should contain an Observatory column)
 #' @param ... Additional arguments passed to gt::gt()
 obs_gt <- function(data, ...) {
+  # Drop rows with NA Observatory to prevent empty row-group headers
+  data <- data |> dplyr::filter(!is.na(Observatory))
   n_groups <- dplyr::n_distinct(data$Observatory)
   if (n_groups <= 1) {
     data |>

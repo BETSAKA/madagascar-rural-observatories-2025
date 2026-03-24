@@ -43,7 +43,7 @@ res_deb_site <- res_deb |> expand_sites_for_profile()
 add_obs <- function(df) {
   df |>
     mutate(j5 = as.character(j5)) |>
-    left_join(res_deb |> select(j5, Observatory, Site), by = "j5")
+    inner_join(res_deb |> select(j5, Observatory, Site), by = "j5")
 }
 
 n_men <- nrow(res_deb)
@@ -636,7 +636,7 @@ dl_fig_variants("fig_proprietaire", "07", function(d) {
 
 ## Sécurisation foncière {#sec-securisation}
 
-La sécurisation foncière est un enjeu majeur à Madagascar. Les ménages peuvent détenir un titre foncier, un certificat foncier (délivré par le guichet foncier communal), ou divers documents informels. Les résultats de l'enquête révèlent un niveau de sécurisation formelle encore très faible (@tbl-securisation).
+La sécurisation foncière est un enjeu majeur à Madagascar. Les ménages peuvent détenir un titre foncier, un certificat foncier (délivré par le guichet foncier communal), ou divers documents informels. Les résultats de l'enquête révèlent un niveau de sécurisation formelle encore très faible (@fig-securisation).
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
@@ -650,9 +650,8 @@ La sécurisation foncière est un enjeu majeur à Madagascar. Les ménages peuve
 :::
 :::
 
-```{r}
-#| label: tbl-securisation
-#| tbl-cap: "Sécurisation foncière des parcelles possédées"
+```{r tbl_securisation_data}
+#| include: false
 
 sec_data <- fr30_data |>
   mutate(
@@ -677,11 +676,6 @@ cert_pct <- sec_data |>
   select(Observatory, pct) |>
   pivot_wider(names_from = Observatory, values_from = pct) |>
   mutate(Document = "Certificat foncier", .before = 1)
-
-bind_rows(titre_pct, cert_pct) |>
-  gt() |>
-  tab_header(title = "% des parcelles disposant d'un document de sécurisation") |>
-  safe_cols_label(Alaotra = "Alaotra (%)", Marovoay = "Marovoay (%)")
 ```
 
 ```{r dl_tbl_securisation}
@@ -709,6 +703,7 @@ dl_tbl_variants("tbl_securisation", "07", function(d) {
 
 ```{r fig_securisation}
 #| echo: false
+#| label: fig-securisation
 #| fig-cap: "Sécurisation foncière des parcelles possédées"
 #| fig-height: 4
 bind_rows(titre_pct, cert_pct) |>
@@ -720,6 +715,29 @@ bind_rows(titre_pct, cert_pct) |>
   rename(Type = Document) |>
   expand_sites_for_profile() |>
   make_bar_obs(show_pct = TRUE)
+```
+
+```{r dl_fig_securisation}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_securisation", "07", function(d) {
+  sec <- d |> mutate(
+    Titre = if_else(fr30j == 1, "Oui", "Non"),
+    Certificat = if_else(fr30l == 1, "Oui", "Non")
+  )
+  bind_rows(
+    sec |> filter(!is.na(Titre)) |>
+      count(Observatory, Titre) |>
+      mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+      filter(Titre == "Oui") |>
+      transmute(Observatory, Type = "Titre foncier", pct),
+    sec |> filter(!is.na(Certificat)) |>
+      count(Observatory, Certificat) |>
+      mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+      filter(Certificat == "Oui") |>
+      transmute(Observatory, Type = "Certificat foncier", pct)
+  ) |> make_bar_obs(show_pct = TRUE)
+}, fr30_data, width = 10, height = 4)
 ```
 
 En l'absence de titre ou de certificat, les ménages s'appuient sur des documents informels de nature très variable (@fig-papiers). Cependant, `r pct_aucun_doc` % des parcelles ne sont accompagnées d'aucun document justificatif, ce qui expose ces ménages à un risque élevé d'insécurité foncière en cas de litige.

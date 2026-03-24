@@ -432,7 +432,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
 </figcaption>
 <div aria-describedby="tbl-parcelles-stats-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="mxaxwjltir" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="nzsqsirivi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -794,85 +794,12 @@ Figure&nbsp;4.7: Qui dans le ménage est propriétaire de la parcelle
 </section>
 <section id="sec-securisation" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="sec-securisation"><span class="header-section-number">4.2</span> Sécurisation foncière</h2>
-<p>La sécurisation foncière est un enjeu majeur à Madagascar. Les ménages peuvent détenir un titre foncier, un certificat foncier (délivré par le guichet foncier communal), ou divers documents informels. Les résultats de l’enquête révèlent un niveau de sécurisation formelle encore très faible (<a href="#tbl-securisation" class="quarto-xref">Table&nbsp;<span>4.2</span></a>).</p>
+<p>La sécurisation foncière est un enjeu majeur à Madagascar. Les ménages peuvent détenir un titre foncier, un certificat foncier (délivré par le guichet foncier communal), ou divers documents informels. Les résultats de l’enquête révèlent un niveau de sécurisation formelle encore très faible (<a href="#fig-securisation" class="quarto-xref">Figure&nbsp;<span>4.8</span></a>).</p>
 <div class="obs-alaotra">
 <p><strong>Alaotra.</strong> Seules 16.2 % des parcelles disposent d’un titre foncier. Les certificats fonciers ne couvrent que 27.5 % des parcelles.</p>
 </div>
 <div class="obs-marovoay">
 <p><strong>Marovoay.</strong> Seules 21.5 % des parcelles disposent d’un titre foncier. Les certificats fonciers ne couvrent que 28.3 % des parcelles.</p>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sec_data <span class="ot">&lt;-</span> fr30_data <span class="sc">|&gt;</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Titre =</span> <span class="fu">if_else</span>(fr30j <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Oui"</span>, <span class="st">"Non"</span>),</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Certificat =</span> <span class="fu">if_else</span>(fr30l <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Oui"</span>, <span class="st">"Non"</span>)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>titre_pct <span class="ot">&lt;-</span> sec_data <span class="sc">|&gt;</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Titre)) <span class="sc">|&gt;</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Titre) <span class="sc">|&gt;</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Titre <span class="sc">==</span> <span class="st">"Oui"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Observatory, pct) <span class="sc">|&gt;</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Observatory, <span class="at">values_from =</span> pct) <span class="sc">|&gt;</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Document =</span> <span class="st">"Titre foncier"</span>, <span class="at">.before =</span> <span class="dv">1</span>)</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>cert_pct <span class="ot">&lt;-</span> sec_data <span class="sc">|&gt;</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Certificat)) <span class="sc">|&gt;</span></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Certificat) <span class="sc">|&gt;</span></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Certificat <span class="sc">==</span> <span class="st">"Oui"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Observatory, pct) <span class="sc">|&gt;</span></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> Observatory, <span class="at">values_from =</span> pct) <span class="sc">|&gt;</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Document =</span> <span class="st">"Certificat foncier"</span>, <span class="at">.before =</span> <span class="dv">1</span>)</span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(titre_pct, cert_pct) <span class="sc">|&gt;</span></span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"% des parcelles disposant d'un document de sécurisation"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">safe_cols_label</span>(<span class="at">Alaotra =</span> <span class="st">"Alaotra (%)"</span>, <span class="at">Marovoay =</span> <span class="st">"Marovoay (%)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div id="tbl-securisation" class="cell quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-tbl figure">
-<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-securisation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
-</figcaption>
-<div aria-describedby="tbl-securisation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="cell-output-display">
-<div id="jgkrvipfaw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-  
-  
-<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
-<thead style="border-style: none;">
-<tr class="gt_heading header" style="border-style: none; background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3;" data-bgcolor="#FFFFFF" data-align="center">
-<td colspan="3" class="gt_heading gt_title gt_font_normal gt_bottom_border" style="text-align: center; border-style: none; color: #333333; font-size: 125%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; background-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; font-weight: normal;" data-bgcolor="#FFFFFF">% des parcelles disposant d'un document de sécurisation</td>
-</tr>
-<tr class="gt_col_headings even" style="border-style: none; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3;">
-<th id="Document" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col" style="text-align: left; border-style: none; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 6px; padding-left: 5px; padding-right: 5px; overflow-x: hidden;" data-bgcolor="#FFFFFF" data-valign="bottom">Document</th>
-<th id="Alaotra" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col" style="text-align: right; border-style: none; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 6px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; font-variant-numeric: tabular-nums;" data-bgcolor="#FFFFFF" data-valign="bottom">Alaotra (%)</th>
-<th id="Marovoay" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col" style="text-align: right; border-style: none; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 6px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; font-variant-numeric: tabular-nums;" data-bgcolor="#FFFFFF" data-valign="bottom">Marovoay (%)</th>
-</tr>
-</thead>
-<tbody class="gt_table_body" style="border-style: none; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3;">
-<tr class="odd" style="border-style: none;">
-<td class="gt_row gt_left" headers="Document" style="text-align: left; border-style: none; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden;" data-valign="middle">Titre foncier</td>
-<td class="gt_row gt_right" headers="Alaotra" style="text-align: right; border-style: none; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; font-variant-numeric: tabular-nums;" data-valign="middle">16.2</td>
-<td class="gt_row gt_right" headers="Marovoay" style="text-align: right; border-style: none; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; font-variant-numeric: tabular-nums;" data-valign="middle">21.5</td>
-</tr>
-<tr class="even" style="border-style: none;">
-<td class="gt_row gt_left" headers="Document" style="text-align: left; border-style: none; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden;" data-valign="middle">Certificat foncier</td>
-<td class="gt_row gt_right" headers="Alaotra" style="text-align: right; border-style: none; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; font-variant-numeric: tabular-nums;" data-valign="middle">27.5</td>
-<td class="gt_row gt_right" headers="Marovoay" style="text-align: right; border-style: none; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; font-variant-numeric: tabular-nums;" data-valign="middle">28.3</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-</figure>
-</div>
 </div>
 <details class="dl-variants">
 <summary>
@@ -889,25 +816,42 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
 </details>
 <div class="cell">
 <div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="04_foncier_files/figure-html/fig_securisation-1.png" class="img-fluid figure-img" width="672"></p>
-<figcaption>Sécurisation foncière des parcelles possédées</figcaption>
+<div id="fig-securisation" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-securisation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="04_foncier_files/figure-html/fig-securisation-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-securisation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.8: Sécurisation foncière des parcelles possédées
+</figcaption>
 </figure>
 </div>
 </div>
 </div>
-<p>En l’absence de titre ou de certificat, les ménages s’appuient sur des documents informels de nature très variable (<a href="#fig-papiers" class="quarto-xref">Figure&nbsp;<span>4.8</span></a>). Cependant, 34.5 % des parcelles ne sont accompagnées d’aucun document justificatif, ce qui expose ces ménages à un risque élevé d’insécurité foncière en cas de litige.</p>
+<details class="dl-variants">
+<summary>
+📥 Télécharger par hameau et par observatoire
+</summary>
+<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<li>
+<a href="downloads/07/fig_securisation_marovoay_tous.png" download="">Marovoay (PNG)</a>
+</li>
+<li>
+<a href="downloads/07/fig_securisation_alaotra_tous.png" download="">Alaotra (PNG)</a>
+</li>
+</ul>
+</details>
+<p>En l’absence de titre ou de certificat, les ménages s’appuient sur des documents informels de nature très variable (<a href="#fig-papiers" class="quarto-xref">Figure&nbsp;<span>4.9</span></a>). Cependant, 34.5 % des parcelles ne sont accompagnées d’aucun document justificatif, ce qui expose ces ménages à un risque élevé d’insécurité foncière en cas de litige.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="sc">|&gt;</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30n)) <span class="sc">|&gt;</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Papier =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30n), <span class="at">levels =</span> <span class="fu">names</span>(papier_labs), <span class="at">labels =</span> papier_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Papier) <span class="sc">|&gt;</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Papier, <span class="at">y_label =</span> <span class="st">"% des parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30n)) <span class="sc">|&gt;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Papier =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30n), <span class="at">levels =</span> <span class="fu">names</span>(papier_labs), <span class="at">labels =</span> papier_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Papier) <span class="sc">|&gt;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Papier, <span class="at">y_label =</span> <span class="st">"% des parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-papiers" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -916,7 +860,7 @@ Table&nbsp;4.2: Sécurisation foncière des parcelles possédées
 <img src="04_foncier_files/figure-html/fig-papiers-1.png" class="img-fluid figure-img" width="960">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-papiers-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.8: Autres documents prouvant la possession
+Figure&nbsp;4.9: Autres documents prouvant la possession
 </figcaption>
 </figure>
 </div>
@@ -938,7 +882,7 @@ Figure&nbsp;4.8: Autres documents prouvant la possession
 </section>
 <section id="sec-cessions" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="sec-cessions"><span class="header-section-number">4.3</span> Parcelles cédées à des tiers</h2>
-<p>Les ménages propriétaires peuvent céder certaines de leurs parcelles à d’autres exploitants, sous forme de prêt, location, métayage ou mise en gage (<a href="#tbl-cession-pratique" class="quarto-xref">Table&nbsp;<span>4.3</span></a>), pour un total de 132 parcelles cédées.</p>
+<p>Les ménages propriétaires peuvent céder certaines de leurs parcelles à d’autres exploitants, sous forme de prêt, location, métayage ou mise en gage (<a href="#tbl-cession-pratique" class="quarto-xref">Table&nbsp;<span>4.2</span></a>), pour un total de 132 parcelles cédées.</p>
 <div class="obs-alaotra">
 <p><strong>Alaotra.</strong> Cette pratique concerne 9.3 % des ménages.</p>
 </div>
@@ -948,25 +892,25 @@ Figure&nbsp;4.8: Autres documents prouvant la possession
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr33a)) <span class="sc">|&gt;</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Nb ménages</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Cèdent (nb)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(fr33a <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Cèdent (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">sum</span>(fr33a <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Observatory</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Ménages cédant des parcelles à des tiers"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr33a)) <span class="sc">|&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Nb ménages</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Cèdent (nb)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(fr33a <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Cèdent (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">sum</span>(fr33a <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Observatory</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Ménages cédant des parcelles à des tiers"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="tbl-cession-pratique" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-cession-pratique-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
+Table&nbsp;4.2: Ménages cédant des parcelles à des tiers
 </figcaption>
 <div aria-describedby="tbl-cession-pratique-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="xfngvcwsvd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="slpfjzgjfw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1016,16 +960,16 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
 </li>
 </ul>
 </details>
-<p>Parmi les parcelles cédées, les modes de faire-valoir varient sensiblement d’un observatoire à l’autre (<a href="#fig-mode-cession" class="quarto-xref">Figure&nbsp;<span>4.9</span></a>). Le prêt et le métayage sont les formes les plus courantes de cession, le métayage occupant une place particulièrement importante dans les zones rizicoles.</p>
+<p>Parmi les parcelles cédées, les modes de faire-valoir varient sensiblement d’un observatoire à l’autre (<a href="#fig-mode-cession" class="quarto-xref">Figure&nbsp;<span>4.10</span></a>). Le prêt et le métayage sont les formes les plus courantes de cession, le métayage occupant une place particulièrement importante dans les zones rizicoles.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fr33_data <span class="sc">|&gt;</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr33gc), <span class="at">levels =</span> <span class="fu">names</span>(fv_labs), <span class="at">labels =</span> fv_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Mode) <span class="sc">|&gt;</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Mode, <span class="at">y_label =</span> <span class="st">"% des parcelles cédées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>fr33_data <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr33gc), <span class="at">levels =</span> <span class="fu">names</span>(fv_labs), <span class="at">labels =</span> fv_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Mode) <span class="sc">|&gt;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Mode, <span class="at">y_label =</span> <span class="st">"% des parcelles cédées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-mode-cession" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1034,7 +978,7 @@ Table&nbsp;4.3: Ménages cédant des parcelles à des tiers
 <img src="04_foncier_files/figure-html/fig-mode-cession-1.png" class="img-fluid figure-img" width="864">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mode-cession-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.9: Mode de faire-valoir des parcelles cédées
+Figure&nbsp;4.10: Mode de faire-valoir des parcelles cédées
 </figcaption>
 </figure>
 </div>
@@ -1053,12 +997,12 @@ Figure&nbsp;4.9: Mode de faire-valoir des parcelles cédées
 </li>
 </ul>
 </details>
-<p>Les motivations de la cession reflètent des stratégies économiques diversifiées (<a href="#fig-motif-cession" class="quarto-xref">Figure&nbsp;<span>4.10</span></a>). Pour certains ménages, céder une parcelle répond à un besoin de liquidités ou à l’impossibilité de cultiver l’ensemble de leur patrimoine ; pour d’autres, il s’agit de maintenir un lien social avec la parenté ou le voisinage.</p>
+<p>Les motivations de la cession reflètent des stratégies économiques diversifiées (<a href="#fig-motif-cession" class="quarto-xref">Figure&nbsp;<span>4.11</span></a>). Pour certains ménages, céder une parcelle répond à un besoin de liquidités ou à l’impossibilité de cultiver l’ensemble de leur patrimoine ; pour d’autres, il s’agit de maintenir un lien social avec la parenté ou le voisinage.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>motif_cession <span class="sc">|&gt;</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Motif, <span class="at">y_label =</span> <span class="st">"% des parcelles cédées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>motif_cession <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Motif, <span class="at">y_label =</span> <span class="st">"% des parcelles cédées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-motif-cession" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1067,7 +1011,7 @@ Figure&nbsp;4.9: Mode de faire-valoir des parcelles cédées
 <img src="04_foncier_files/figure-html/fig-motif-cession-1.png" class="img-fluid figure-img" width="960">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-motif-cession-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.10: Motif de la cession de parcelles
+Figure&nbsp;4.11: Motif de la cession de parcelles
 </figcaption>
 </figure>
 </div>
@@ -1086,12 +1030,12 @@ Figure&nbsp;4.10: Motif de la cession de parcelles
 </li>
 </ul>
 </details>
-<p>Les bénéficiaires des cessions sont principalement des membres de la famille ou des voisins (<a href="#fig-cedee-a-qui" class="quarto-xref">Figure&nbsp;<span>4.11</span></a>), ce qui confirme le caractère en grande partie familial et communautaire du marché foncier local.</p>
+<p>Les bénéficiaires des cessions sont principalement des membres de la famille ou des voisins (<a href="#fig-cedee-a-qui" class="quarto-xref">Figure&nbsp;<span>4.12</span></a>), ce qui confirme le caractère en grande partie familial et communautaire du marché foncier local.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>cedee_qui <span class="sc">|&gt;</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Destinataire, <span class="at">y_label =</span> <span class="st">"% des parcelles cédées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>cedee_qui <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Destinataire, <span class="at">y_label =</span> <span class="st">"% des parcelles cédées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-cedee-a-qui" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1100,7 +1044,7 @@ Figure&nbsp;4.10: Motif de la cession de parcelles
 <img src="04_foncier_files/figure-html/fig-cedee-a-qui-1.png" class="img-fluid figure-img" width="960">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cedee-a-qui-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.11: À qui la parcelle est-elle cédée
+Figure&nbsp;4.12: À qui la parcelle est-elle cédée
 </figcaption>
 </figure>
 </div>
@@ -1122,7 +1066,7 @@ Figure&nbsp;4.11: À qui la parcelle est-elle cédée
 </section>
 <section id="sec-exploitees" class="level2" data-number="4.4">
 <h2 data-number="4.4" class="anchored" data-anchor-id="sec-exploitees"><span class="header-section-number">4.4</span> Parcelles exploitées non possédées</h2>
-<p>En plus de leurs propres parcelles, de nombreux ménages exploitent des terres appartenant à d’autres propriétaires (<a href="#tbl-exploitation-autres" class="quarto-xref">Table&nbsp;<span>4.4</span></a>), pour un total de 713 parcelles. Le recours à l’exploitation de terres d’autrui traduit soit une insuffisance du patrimoine propre, soit une stratégie de diversification de l’assiette foncière cultivée.</p>
+<p>En plus de leurs propres parcelles, de nombreux ménages exploitent des terres appartenant à d’autres propriétaires (<a href="#tbl-exploitation-autres" class="quarto-xref">Table&nbsp;<span>4.3</span></a>), pour un total de 713 parcelles. Le recours à l’exploitation de terres d’autrui traduit soit une insuffisance du patrimoine propre, soit une stratégie de diversification de l’assiette foncière cultivée.</p>
 <div class="obs-alaotra">
 <p><strong>Alaotra.</strong> Cette pratique concerne 45.6 % des ménages.</p>
 </div>
@@ -1132,25 +1076,25 @@ Figure&nbsp;4.11: À qui la parcelle est-elle cédée
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34a)) <span class="sc">|&gt;</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Nb ménages</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Exploitent (nb)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(fr34a <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Exploitent (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">sum</span>(fr34a <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Observatory</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Ménages exploitant des parcelles d'autrui"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34a)) <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Nb ménages</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Exploitent (nb)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(fr34a <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Exploitent (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">sum</span>(fr34a <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Observatory</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Ménages exploitant des parcelles d'autrui"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="tbl-exploitation-autres" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-exploitation-autres-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
+Table&nbsp;4.3: Ménages exploitant des parcelles non possédées
 </figcaption>
 <div aria-describedby="tbl-exploitation-autres-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="vpingbyggi" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="kmehjhoejv" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1200,16 +1144,16 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
 </li>
 </ul>
 </details>
-<p>Les parcelles exploitées sans en être propriétaire sont, comme les parcelles possédées, majoritairement des rizières (<a href="#fig-type-exploitee" class="quarto-xref">Figure&nbsp;<span>4.12</span></a>), reflétant la place centrale de la riziculture dans les stratégies des ménages.</p>
+<p>Les parcelles exploitées sans en être propriétaire sont, comme les parcelles possédées, majoritairement des rizières (<a href="#fig-type-exploitee" class="quarto-xref">Figure&nbsp;<span>4.13</span></a>), reflétant la place centrale de la riziculture dans les stratégies des ménages.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30c1), <span class="at">levels =</span> <span class="fu">names</span>(type_labs), <span class="at">labels =</span> type_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Type) <span class="sc">|&gt;</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Type, <span class="at">y_label =</span> <span class="st">"% des parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30c1), <span class="at">levels =</span> <span class="fu">names</span>(type_labs), <span class="at">labels =</span> type_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Type) <span class="sc">|&gt;</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Type, <span class="at">y_label =</span> <span class="st">"% des parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-type-exploitee" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1218,7 +1162,7 @@ Table&nbsp;4.4: Ménages exploitant des parcelles non possédées
 <img src="04_foncier_files/figure-html/fig-type-exploitee-1.png" class="img-fluid figure-img" width="864">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-type-exploitee-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.12: Type des parcelles exploitées (non possédées)
+Figure&nbsp;4.13: Type des parcelles exploitées (non possédées)
 </figcaption>
 </figure>
 </div>
@@ -1237,17 +1181,17 @@ Figure&nbsp;4.12: Type des parcelles exploitées (non possédées)
 </li>
 </ul>
 </details>
-<p>Le mode de faire-valoir des parcelles exploitées révèle l’équilibre local entre prêt, location et métayage (<a href="#fig-fv-exploitee" class="quarto-xref">Figure&nbsp;<span>4.13</span></a>). Le métayage, qui consiste à partager la récolte avec le propriétaire, reste une forme d’accès au foncier particulièrement répandue.</p>
+<p>Le mode de faire-valoir des parcelles exploitées révèle l’équilibre local entre prêt, location et métayage (<a href="#fig-fv-exploitee" class="quarto-xref">Figure&nbsp;<span>4.14</span></a>). Le métayage, qui consiste à partager la récolte avec le propriétaire, reste une forme d’accès au foncier particulièrement répandue.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34g)) <span class="sc">|&gt;</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34g), <span class="at">levels =</span> <span class="fu">names</span>(fv_labs), <span class="at">labels =</span> fv_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Mode) <span class="sc">|&gt;</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Mode, <span class="at">y_label =</span> <span class="st">"% des parcelles exploitées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34g)) <span class="sc">|&gt;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34g), <span class="at">levels =</span> <span class="fu">names</span>(fv_labs), <span class="at">labels =</span> fv_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Mode) <span class="sc">|&gt;</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Mode, <span class="at">y_label =</span> <span class="st">"% des parcelles exploitées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-fv-exploitee" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1256,7 +1200,7 @@ Figure&nbsp;4.12: Type des parcelles exploitées (non possédées)
 <img src="04_foncier_files/figure-html/fig-fv-exploitee-1.png" class="img-fluid figure-img" width="864">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-fv-exploitee-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.13: Mode de faire-valoir des parcelles exploitées
+Figure&nbsp;4.14: Mode de faire-valoir des parcelles exploitées
 </figcaption>
 </figure>
 </div>
@@ -1275,12 +1219,12 @@ Figure&nbsp;4.13: Mode de faire-valoir des parcelles exploitées
 </li>
 </ul>
 </details>
-<p>Les parcelles exploitées appartiennent le plus souvent à des membres de la famille ou à des voisins (<a href="#fig-proprietaire-exploitee" class="quarto-xref">Figure&nbsp;<span>4.14</span></a>), ce qui témoigne du rôle des réseaux de proximité dans l’accès au foncier.</p>
+<p>Les parcelles exploitées appartiennent le plus souvent à des membres de la famille ou à des voisins (<a href="#fig-proprietaire-exploitee" class="quarto-xref">Figure&nbsp;<span>4.15</span></a>), ce qui témoigne du rôle des réseaux de proximité dans l’accès au foncier.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>prop_exploitee <span class="sc">|&gt;</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Proprietaire, <span class="at">y_label =</span> <span class="st">"% des parcelles exploitées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>prop_exploitee <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Proprietaire, <span class="at">y_label =</span> <span class="st">"% des parcelles exploitées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-proprietaire-exploitee" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1289,7 +1233,7 @@ Figure&nbsp;4.13: Mode de faire-valoir des parcelles exploitées
 <img src="04_foncier_files/figure-html/fig-proprietaire-exploitee-1.png" class="img-fluid figure-img" width="960">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-proprietaire-exploitee-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.14: Propriétaire des parcelles exploitées
+Figure&nbsp;4.15: Propriétaire des parcelles exploitées
 </figcaption>
 </figure>
 </div>
@@ -1308,17 +1252,17 @@ Figure&nbsp;4.14: Propriétaire des parcelles exploitées
 </li>
 </ul>
 </details>
-<p>Le mode d’irrigation des parcelles exploitées diffère-t-il de celui des parcelles possédées ? La <a href="#fig-irrigation-exploitee" class="quarto-xref">Figure&nbsp;<span>4.15</span></a> permet d’examiner si les ménages qui exploitent des terres d’autrui accèdent à des parcelles de même qualité irriguée.</p>
+<p>Le mode d’irrigation des parcelles exploitées diffère-t-il de celui des parcelles possédées ? La <a href="#fig-irrigation-exploitee" class="quarto-xref">Figure&nbsp;<span>4.16</span></a> permet d’examiner si les ménages qui exploitent des terres d’autrui accèdent à des parcelles de même qualité irriguée.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34f)) <span class="sc">|&gt;</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Irrigation =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34f), <span class="at">levels =</span> <span class="fu">names</span>(irrig_labs), <span class="at">labels =</span> irrig_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Irrigation) <span class="sc">|&gt;</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Irrigation, <span class="at">y_label =</span> <span class="st">"% des parcelles exploitées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34f)) <span class="sc">|&gt;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Irrigation =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34f), <span class="at">levels =</span> <span class="fu">names</span>(irrig_labs), <span class="at">labels =</span> irrig_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Irrigation) <span class="sc">|&gt;</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Irrigation, <span class="at">y_label =</span> <span class="st">"% des parcelles exploitées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-irrigation-exploitee" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1327,7 +1271,7 @@ Figure&nbsp;4.14: Propriétaire des parcelles exploitées
 <img src="04_foncier_files/figure-html/fig-irrigation-exploitee-1.png" class="img-fluid figure-img" width="960">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-irrigation-exploitee-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.15: Mode d’irrigation des parcelles exploitées
+Figure&nbsp;4.16: Mode d’irrigation des parcelles exploitées
 </figcaption>
 </figure>
 </div>
@@ -1346,34 +1290,34 @@ Figure&nbsp;4.15: Mode d’irrigation des parcelles exploitées
 </li>
 </ul>
 </details>
-<p>Le coût de l’exploitation de terres d’autrui varie selon le mode de faire-valoir (<a href="#tbl-rente-exploitee" class="quarto-xref">Table&nbsp;<span>4.5</span></a>). Les ménages locataires versent une rente en argent ou en nature, tandis que les métayers cèdent une part de la récolte au propriétaire, généralement comprise entre un quart et la moitié de la production.</p>
+<p>Le coût de l’exploitation de terres d’autrui varie selon le mode de faire-valoir (<a href="#tbl-rente-exploitee" class="quarto-xref">Table&nbsp;<span>4.4</span></a>). Les ménages locataires versent une rente en argent ou en nature, tandis que les métayers cèdent une part de la récolte au propriétaire, généralement comprise entre un quart et la moitié de la production.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34g)) <span class="sc">|&gt;</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34g), <span class="at">levels =</span> <span class="fu">names</span>(fv_labs), <span class="at">labels =</span> fv_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Nb parcelles</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Rente argent moy. (Ar)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">mean</span>(fr34n, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Rente produit moy. (kg)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">mean</span>(fr34o, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">% métayage moyen</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">mean</span>(fr34p, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="dv">1</span>),</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Mode)</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Observatory, <span class="fu">desc</span>(<span class="st">`</span><span class="at">Nb parcelles</span><span class="st">`</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Conditions des parcelles exploitées par mode de faire-valoir"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">Rente argent moy. (Ar)</span><span class="st">`</span>, <span class="st">`</span><span class="at">Rente produit moy. (kg)</span><span class="st">`</span>),</span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">use_seps =</span> <span class="cn">TRUE</span>, <span class="at">decimals =</span> <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34g)) <span class="sc">|&gt;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mode =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34g), <span class="at">levels =</span> <span class="fu">names</span>(fv_labs), <span class="at">labels =</span> fv_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Nb parcelles</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Rente argent moy. (Ar)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">mean</span>(fr34n, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Rente produit moy. (kg)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">mean</span>(fr34o, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">% métayage moyen</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">mean</span>(fr34p, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="dv">1</span>),</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Mode)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(Observatory, <span class="fu">desc</span>(<span class="st">`</span><span class="at">Nb parcelles</span><span class="st">`</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Conditions des parcelles exploitées par mode de faire-valoir"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(<span class="at">columns =</span> <span class="fu">c</span>(<span class="st">`</span><span class="at">Rente argent moy. (Ar)</span><span class="st">`</span>, <span class="st">`</span><span class="at">Rente produit moy. (kg)</span><span class="st">`</span>),</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">use_seps =</span> <span class="cn">TRUE</span>, <span class="at">decimals =</span> <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="tbl-rente-exploitee" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-rente-exploitee-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
+Table&nbsp;4.4: Rentes versées pour les parcelles exploitées
 </figcaption>
 <div aria-describedby="tbl-rente-exploitee-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="ywggfrnohg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="tubbhpuwhw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1488,7 +1432,7 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
 </section>
 <section id="sec-abandon" class="level2" data-number="4.5">
 <h2 data-number="4.5" class="anchored" data-anchor-id="sec-abandon"><span class="header-section-number">4.5</span> Abandon de parcelles</h2>
-<p>L’abandon de la culture de certaines parcelles peut révéler des difficultés structurelles (dégradation des sols, problèmes d’irrigation, insécurité) ou conjoncturelles (manque de main-d’œuvre, coût des intrants) (<a href="#tbl-abandon" class="quarto-xref">Table&nbsp;<span>4.6</span></a>).</p>
+<p>L’abandon de la culture de certaines parcelles peut révéler des difficultés structurelles (dégradation des sols, problèmes d’irrigation, insécurité) ou conjoncturelles (manque de main-d’œuvre, coût des intrants) (<a href="#tbl-abandon" class="quarto-xref">Table&nbsp;<span>4.5</span></a>).</p>
 <div class="obs-alaotra">
 <p><strong>Alaotra.</strong> Cette pratique touche 18.9 % des ménages.</p>
 </div>
@@ -1498,25 +1442,25 @@ Table&nbsp;4.5: Rentes versées pour les parcelles exploitées
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30p)) <span class="sc">|&gt;</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Nb ménages</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Ont abandonné (nb)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(fr30p <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Ont abandonné (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">sum</span>(fr30p <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Observatory</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Abandon de la culture d'une ou plusieurs parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30p)) <span class="sc">|&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Nb ménages</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">n</span>(),</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Ont abandonné (nb)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(fr30p <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Ont abandonné (%)</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">sum</span>(fr30p <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> Observatory</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Abandon de la culture d'une ou plusieurs parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="tbl-abandon" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-abandon-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
+Table&nbsp;4.5: Ménages ayant abandonné la culture de parcelles
 </figcaption>
 <div aria-describedby="tbl-abandon-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="hzjdgkncpe" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="yvdxxvsvbd" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1569,7 +1513,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
 </section>
 <section id="sec-satisfaction" class="level2" data-number="4.6">
 <h2 data-number="4.6" class="anchored" data-anchor-id="sec-satisfaction"><span class="header-section-number">4.6</span> Satisfaction à l’égard de la surface possédée</h2>
-<p>Le jugement des ménages sur la suffisance de leur dotation foncière synthétise l’ensemble des contraintes analysées précédemment (<a href="#fig-satisfaction" class="quarto-xref">Figure&nbsp;<span>4.16</span></a>). Ce sentiment d’insuffisance foncière constitue un enjeu majeur pour les politiques de développement rural.</p>
+<p>Le jugement des ménages sur la suffisance de leur dotation foncière synthétise l’ensemble des contraintes analysées précédemment (<a href="#fig-satisfaction" class="quarto-xref">Figure&nbsp;<span>4.17</span></a>). Ce sentiment d’insuffisance foncière constitue un enjeu majeur pour les politiques de développement rural.</p>
 <div class="obs-alaotra">
 <p><strong>Alaotra.</strong> 29.2 % des ménages jugent leur surface insuffisante ou très insuffisante. Seuls 70.8 % estiment leur dotation suffisante.</p>
 </div>
@@ -1579,13 +1523,13 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30o)) <span class="sc">|&gt;</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Satisfaction =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30o), <span class="at">levels =</span> <span class="fu">names</span>(satis_labs), <span class="at">labels =</span> satis_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Satisfaction) <span class="sc">|&gt;</span></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Satisfaction, <span class="at">y_label =</span> <span class="st">"% des ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>res_fr30a <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30o)) <span class="sc">|&gt;</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Satisfaction =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30o), <span class="at">levels =</span> <span class="fu">names</span>(satis_labs), <span class="at">labels =</span> satis_labs)) <span class="sc">|&gt;</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Satisfaction) <span class="sc">|&gt;</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Satisfaction, <span class="at">y_label =</span> <span class="st">"% des ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-satisfaction" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1594,7 +1538,7 @@ Table&nbsp;4.6: Ménages ayant abandonné la culture de parcelles
 <img src="04_foncier_files/figure-html/fig-satisfaction-1.png" class="img-fluid figure-img" width="864">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-satisfaction-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.16: Satisfaction des ménages par rapport à leur surface foncière
+Figure&nbsp;4.17: Satisfaction des ménages par rapport à leur surface foncière
 </figcaption>
 </figure>
 </div>
