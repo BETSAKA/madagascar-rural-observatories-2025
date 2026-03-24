@@ -27,7 +27,9 @@ BILINGUAL_OUTPUT <- TRUE
 
 #' Inject CSS for MG collapsible sections (called once per document)
 emit_mg_css <- function() {
-  if (.mg_css_injected) return(invisible(NULL))
+  if (.mg_css_injected) {
+    return(invisible(NULL))
+  }
   css <- '
 <style>
 details.mg-version {
@@ -71,15 +73,23 @@ if (requireNamespace("knitr", quietly = TRUE)) {
     default_output <- .default_plot_hook(x, options)
 
     # Skip if bilingual output is disabled
-    if (!exists("BILINGUAL_OUTPUT") || !BILINGUAL_OUTPUT) return(default_output)
-    if (!knitr::is_html_output()) return(default_output)
+    if (!exists("BILINGUAL_OUTPUT") || !BILINGUAL_OUTPUT) {
+      return(default_output)
+    }
+    if (!knitr::is_html_output()) {
+      return(default_output)
+    }
 
     # Skip if chunk explicitly opts out
-    if (isFALSE(options$mg)) return(default_output)
+    if (isFALSE(options$mg)) {
+      return(default_output)
+    }
 
     # Get the ggplot object that was just rendered
     p <- tryCatch(ggplot2::last_plot(), error = function(e) NULL)
-    if (is.null(p) || is.null(p$data)) return(default_output)
+    if (is.null(p) || is.null(p$data)) {
+      return(default_output)
+    }
 
     # Auto-translate the plot data
     d_mg <- tryCatch(auto_translate_data_mg(p$data), error = function(e) p$data)
@@ -88,39 +98,56 @@ if (requireNamespace("knitr", quietly = TRUE)) {
     }
 
     # Build MG version using %+% data replacement
-    p_mg <- tryCatch({
-      pm <- p %+% d_mg
-      # Translate axis/legend labels
-      for (lab in c("title", "x", "y", "fill", "colour", "color")) {
-        val <- p$labels[[lab]]
-        if (!is.null(val) && is.character(val) && nchar(val) > 0) {
-          tr <- translate_mg(val)
-          if (!identical(tr, val)) {
-            args <- stats::setNames(list(tr), lab)
-            pm <- pm + do.call(ggplot2::labs, args)
+    p_mg <- tryCatch(
+      {
+        pm <- p %+% d_mg
+        # Translate axis/legend labels
+        for (lab in c("title", "x", "y", "fill", "colour", "color")) {
+          val <- p$labels[[lab]]
+          if (!is.null(val) && is.character(val) && nchar(val) > 0) {
+            tr <- translate_mg(val)
+            if (!identical(tr, val)) {
+              args <- stats::setNames(list(tr), lab)
+              pm <- pm + do.call(ggplot2::labs, args)
+            }
           }
         }
-      }
-      pm
-    }, error = function(e) NULL)
+        pm
+      },
+      error = function(e) NULL
+    )
 
-    if (is.null(p_mg)) return(default_output)
+    if (is.null(p_mg)) {
+      return(default_output)
+    }
 
     # Render MG plot to base64 PNG
-    mg_html <- tryCatch({
-      tmp <- tempfile(fileext = ".png")
-      on.exit(unlink(tmp), add = TRUE)
-      w <- options$fig.width %||% 10
-      h <- options$fig.height %||% 6
-      ggplot2::ggsave(tmp, p_mg, width = w, height = h, dpi = 150, bg = "white")
-      img_uri <- xfun::base64_uri(tmp)
-      paste0(
-        '\n<details class="mg-version">\n',
-        '<summary>\U0001F1F2\U0001F1EC Dikanteny Malagasy</summary>\n\n',
-        '<img src="', img_uri, '" style="max-width:100%;" alt="Sary Malagasy" />\n',
-        '\n</details>\n\n'
-      )
-    }, error = function(e) "")
+    mg_html <- tryCatch(
+      {
+        tmp <- tempfile(fileext = ".png")
+        on.exit(unlink(tmp), add = TRUE)
+        w <- options$fig.width %||% 10
+        h <- options$fig.height %||% 6
+        ggplot2::ggsave(
+          tmp,
+          p_mg,
+          width = w,
+          height = h,
+          dpi = 150,
+          bg = "white"
+        )
+        img_uri <- xfun::base64_uri(tmp)
+        paste0(
+          '\n<details class="mg-version">\n',
+          '<summary>\U0001F1F2\U0001F1EC Dikanteny Malagasy</summary>\n\n',
+          '<img src="',
+          img_uri,
+          '" style="max-width:100%;" alt="Sary Malagasy" />\n',
+          '\n</details>\n\n'
+        )
+      },
+      error = function(e) ""
+    )
 
     paste0(default_output, mg_html)
   })
@@ -142,30 +169,46 @@ if (requireNamespace("knitr", quietly = TRUE)) {
 #' @param height PNG height in inches (default 6)
 #' @param dpi PNG resolution (default 150)
 emit_mg_plot <- function(
-    data,
-    translate_cols,
-    build_fn,
-    width = 10,
-    height = 6,
-    dpi = 150
+  data,
+  translate_cols,
+  build_fn,
+  width = 10,
+  height = 6,
+  dpi = 150
 ) {
-  if (!BILINGUAL_OUTPUT) return(invisible(NULL))
-  if (!knitr::is_html_output()) return(invisible(NULL))
+  if (!BILINGUAL_OUTPUT) {
+    return(invisible(NULL))
+  }
+  if (!knitr::is_html_output()) {
+    return(invisible(NULL))
+  }
 
   emit_mg_css()
 
   data_mg <- translate_data_mg(data, translate_cols)
   p_mg <- tryCatch(build_fn(data_mg), error = function(e) NULL)
-  if (is.null(p_mg)) return(invisible(NULL))
+  if (is.null(p_mg)) {
+    return(invisible(NULL))
+  }
 
   tmp <- tempfile(fileext = ".png")
   on.exit(unlink(tmp), add = TRUE)
-  ggplot2::ggsave(tmp, p_mg, width = width, height = height, dpi = dpi, bg = "white")
+  ggplot2::ggsave(
+    tmp,
+    p_mg,
+    width = width,
+    height = height,
+    dpi = dpi,
+    bg = "white"
+  )
   img_uri <- xfun::base64_uri(tmp)
 
   cat('<details class="mg-version">\n')
   cat('<summary>\U0001F1F2\U0001F1EC Dikanteny Malagasy</summary>\n\n')
-  cat(sprintf('<img src="%s" style="max-width:100%%;" alt="Sary Malagasy" />\n', img_uri))
+  cat(sprintf(
+    '<img src="%s" style="max-width:100%%;" alt="Sary Malagasy" />\n',
+    img_uri
+  ))
   cat('\n</details>\n\n')
   invisible(NULL)
 }
@@ -179,19 +222,25 @@ emit_mg_plot <- function(
 #' @param x_col Character: name of the category column (for height calc)
 #' @param per_item Height per category in inches (default 0.45)
 emit_mg_plot_auto <- function(
-    data,
-    translate_cols,
-    build_fn,
-    x_col = "Type",
-    per_item = 0.45,
-    width = 10,
-    dpi = 150
+  data,
+  translate_cols,
+  build_fn,
+  x_col = "Type",
+  per_item = 0.45,
+  width = 10,
+  dpi = 150
 ) {
   n_items <- dplyr::n_distinct(data[[x_col]])
   n_obs <- dplyr::n_distinct(data$Observatory)
   height <- max(3, min(1 + n_items * per_item * ceiling(n_obs / 2), 20))
-  emit_mg_plot(data, translate_cols, build_fn,
-               width = width, height = height, dpi = dpi)
+  emit_mg_plot(
+    data,
+    translate_cols,
+    build_fn,
+    width = width,
+    height = height,
+    dpi = dpi
+  )
 }
 
 #' Emit a MG version of a ggplot using auto-translation on its data
@@ -206,20 +255,28 @@ emit_mg_plot_auto <- function(
 #' @param height PNG height in inches
 #' @param dpi PNG resolution (default 150)
 emit_mg_from_plot <- function(
-    p,
-    title_mg = NULL,
-    width = NULL,
-    height = NULL,
-    dpi = 150
+  p,
+  title_mg = NULL,
+  width = NULL,
+  height = NULL,
+  dpi = 150
 ) {
-  if (!BILINGUAL_OUTPUT) return(invisible(NULL))
-  if (!knitr::is_html_output()) return(invisible(NULL))
-  if (is.null(p)) return(invisible(NULL))
+  if (!BILINGUAL_OUTPUT) {
+    return(invisible(NULL))
+  }
+  if (!knitr::is_html_output()) {
+    return(invisible(NULL))
+  }
+  if (is.null(p)) {
+    return(invisible(NULL))
+  }
 
   emit_mg_css()
 
   d_mg <- auto_translate_data_mg(p$data)
-  if (identical(d_mg, p$data)) return(invisible(NULL))
+  if (identical(d_mg, p$data)) {
+    return(invisible(NULL))
+  }
 
   p_mg <- p %+% d_mg
   for (lab in c("title", "x", "y", "fill", "colour", "color")) {
@@ -246,7 +303,10 @@ emit_mg_from_plot <- function(
 
   cat('<details class="mg-version">\n')
   cat('<summary>\U0001F1F2\U0001F1EC Dikanteny Malagasy</summary>\n\n')
-  cat(sprintf('<img src="%s" style="max-width:100%%;" alt="Sary Malagasy" />\n', img_uri))
+  cat(sprintf(
+    '<img src="%s" style="max-width:100%%;" alt="Sary Malagasy" />\n',
+    img_uri
+  ))
   cat('\n</details>\n\n')
   invisible(NULL)
 }
