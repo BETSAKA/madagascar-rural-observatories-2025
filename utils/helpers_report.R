@@ -9,6 +9,8 @@
 source("utils/report_variant.R")
 source("utils/plot_theme.R")
 source("utils/ror_plots.R")
+source("utils/translations.R")
+source("utils/bilingual_output.R")
 REPORT_MODE <- get_report_mode()
 
 # --- Profile-aware display helpers -----------------------------------------
@@ -164,7 +166,25 @@ knit_print.gt_tbl <- function(x, ...) {
     )
     return(knitr::asis_output(latex_str))
   }
-  # HTML / DOCX: default gt rendering
+  # HTML output: render FR table + auto-append MG collapsible section
+  if (knitr::is_html_output()) {
+    fr_html <- as.character(gt::as_raw_html(x))
+    # Attempt MG translation of cell content, headers, and titles
+    mg_html <- translate_html_mg_full(fr_html)
+    # Only append MG section if translation changed something
+    if (!identical(fr_html, mg_html)) {
+      combined <- paste0(
+        fr_html,
+        '\n<details class="mg-version">\n',
+        '<summary>\U0001F1F2\U0001F1EC Dikanteny Malagasy</summary>\n',
+        mg_html,
+        '\n</details>\n'
+      )
+      return(knitr::asis_output(combined))
+    }
+    return(knitr::asis_output(fr_html))
+  }
+  # DOCX / other: default gt rendering
   knitr::knit_print(gt::as_raw_html(x), ...)
 }
 registerS3method(

@@ -286,6 +286,7 @@ dl_tbl_variants("tbl_age_obs", "04", function(d) {
 
 ```{r fig_age_obs}
 #| fig-cap: "Répartition des membres des ménages par tranche d'âge selon les observatoires"
+#| mg: false
 
 hh_age |> ror_bar_v(x = AgeGroup, y = Percent, y_label = "%", x_angle = 45)
 ```
@@ -303,6 +304,14 @@ dl_fig_variants("fig_age_obs", "04", function(d) {
 }, members)
 ```
 
+```{r mg_fig_age_obs}
+#| echo: false
+#| results: asis
+emit_mg_plot(hh_age, "AgeGroup", function(d) {
+  d |> ror_bar_v(x = AgeGroup, y = Percent, y_label = "%", x_angle = 45)
+})
+```
+
 ```{r pyramide_data}
 hh_age_sex <- members_site |>
   mutate(AgeGroup = classify_age_group(m5), Sexe = classify_sex(m4)) |>
@@ -317,6 +326,7 @@ hh_age_sex <- members_site |>
 
 ```{r fig_pyramide}
 #| fig-cap: "Pyramide des âges des membres des ménages enquêtés par observatoire"
+#| mg: false
 #| fig-height: !expr ror_fig_height(hh_age_sex, "AgeGroup")
 hh_age_sex |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent)
 ```
@@ -336,6 +346,14 @@ dl_fig_variants("fig_pyramide", "04", function(d) {
     )
   agg |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent)
 }, members)
+```
+
+```{r mg_fig_pyramide}
+#| echo: false
+#| results: asis
+emit_mg_plot(hh_age_sex, c("AgeGroup", "Sexe"), function(d) {
+  d |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent)
+}, height = 8)
 ```
 
 ### Origine des CM et conjoints
@@ -363,6 +381,7 @@ dl_tbl_variants("tbl_origine", "04", function(d) {
 ```
 
 ```{r fig_origine}
+#| mg: false
 make_origin_histogram(members_site, m3, classify_origin, "Origine",
                       obs_title("Distribution de l'origine des CM et conjoints"))
 ```
@@ -374,6 +393,26 @@ dl_fig_variants("fig_origine", "04", function(d) {
   make_origin_histogram(d, m3, classify_origin, "Origine",
                         "Distribution de l'origine des CM et conjoints")
 }, members)
+```
+
+```{r mg_fig_origine}
+#| echo: false
+#| results: asis
+# Origin categories are already Malagasy — emit plot with translated fill legend
+orig_mg <- members_site |>
+  dplyr::filter(m6 %in% c(1, 2)) |>
+  dplyr::mutate(
+    Member_Type = translate_mg(dplyr::if_else(m6 == 1, "Chef de ménage", "Conjoint")),
+    Variable = classify_origin(m3)
+  ) |>
+  dplyr::filter(!is.na(Variable)) |>
+  dplyr::count(Observatory, Member_Type, Variable) |>
+  dplyr::mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Member_Type))
+emit_mg_plot(orig_mg, character(0), function(d) {
+  d |> ror_bar_grouped(x = Variable, fill = Member_Type, y = pct,
+                       title = translate_mg("Distribution de l'origine des CM et conjoints"),
+                       y_label = "%", direction = "vertical", x_angle = 45)
+})
 ```
 
 ::: {.content-visible when-profile="consolidated"}
@@ -428,6 +467,7 @@ dl_tbl_variants("tbl_homeland", "04", function(d) {
 ```
 
 ```{r fig_homeland}
+#| mg: false
 homeland_labels |>
   mutate(Member_Type = if_else(m6 == 1, "Chef de ménage", "Conjoint")) |>
   count(Observatory, Member_Type, Homeland) |>
@@ -451,6 +491,20 @@ dl_fig_variants("fig_homeland", "04", function(d) {
                     title = "Région d'origine des CM et conjoints",
                     y_label = "%", direction = "horizontal")
 }, members)
+```
+
+```{r mg_fig_homeland}
+#| echo: false
+#| results: asis
+homeland_mg <- homeland_labels |>
+  mutate(Member_Type = translate_mg(if_else(m6 == 1, "Chef de ménage", "Conjoint"))) |>
+  count(Observatory, Member_Type, Homeland) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Member_Type))
+emit_mg_plot(homeland_mg, character(0), function(d) {
+  d |> ror_bar_grouped(x = Homeland, fill = Member_Type, y = pct,
+                       title = "Faritry ny fiavian\u2019ny LT sy ny vady",
+                       y_label = "%", direction = "horizontal")
+}, height = 8)
 ```
 
 :::
@@ -481,6 +535,7 @@ dl_tbl_variants("tbl_raison", "04", function(d) {
 ```
 
 ```{r fig_raison}
+#| mg: false
 make_origin_histogram(members_site, mg4a, classify_reason, "Raison",
                       obs_title("Distribution des raisons d'implantation des CM et conjoints"))
 ```
@@ -492,6 +547,25 @@ dl_fig_variants("fig_raison", "04", function(d) {
   make_origin_histogram(d, mg4a, classify_reason, "Raison",
                         "Distribution des raisons d'implantation des CM et conjoints")
 }, members)
+```
+
+```{r mg_fig_raison}
+#| echo: false
+#| results: asis
+raison_mg <- members_site |>
+  dplyr::filter(m6 %in% c(1, 2)) |>
+  dplyr::mutate(
+    Member_Type = translate_mg(dplyr::if_else(m6 == 1, "Chef de ménage", "Conjoint")),
+    Variable = classify_reason(mg4a)
+  ) |>
+  dplyr::filter(!is.na(Variable)) |>
+  dplyr::count(Observatory, Member_Type, Variable) |>
+  dplyr::mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Member_Type))
+emit_mg_plot(raison_mg, "Variable", function(d) {
+  d |> ror_bar_grouped(x = Variable, fill = Member_Type, y = pct,
+                       title = "Fizarana ny antony nipetrahan\u2019ny LT sy ny vady",
+                       y_label = "%", direction = "vertical", x_angle = 45)
+})
 ```
 
 ## Caractéristiques des chefs de ménages
@@ -783,6 +857,7 @@ literacy_3level_sex(cm_site, s1a, "Aptitude à la lecture des CM selon le sexe")
 
 ```{r fig_cm_read_sex}
 #| fig-cap: "Aptitude à la lecture des CM selon le sexe"
+#| mg: false
 literacy_3level_bar(cm_site, s1a, "Aptitude à la lecture des CM selon le sexe")
 ```
 
@@ -797,6 +872,21 @@ dl_tbl_variants("tbl_cm_read_sex", "04", function(d) {
     mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
+```
+
+```{r mg_fig_cm_read_sex}
+#| echo: false
+#| results: asis
+cm_read_mg <- cm_site |>
+  mutate(Niveau = classify_literacy(s1a), Sexe = classify_sex(m4)) |>
+  filter(!is.na(Niveau), !is.na(Sexe)) |>
+  count(Observatory, Sexe, Niveau) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe))
+emit_mg_plot(cm_read_mg, c("Niveau", "Sexe"), function(d) {
+  d |> ror_bar_grouped(x = Niveau, fill = Sexe, y = pct,
+                       title = "Fahaizan\u2019ny LT mamaky teny araka ny lahy/vavy",
+                       y_label = "%", direction = "vertical")
+})
 ```
 
 #### Savoir écrire
@@ -825,6 +915,7 @@ literacy_3level_sex(cm_site, s1b, "Aptitude à l'écriture des CM selon le sexe"
 
 ```{r fig_cm_write_sex}
 #| fig-cap: "Aptitude à l'écriture des CM selon le sexe"
+#| mg: false
 literacy_3level_bar(cm_site, s1b, "Aptitude à l'écriture des CM selon le sexe")
 ```
 
@@ -839,6 +930,21 @@ dl_tbl_variants("tbl_cm_write_sex", "04", function(d) {
     mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
+```
+
+```{r mg_fig_cm_write_sex}
+#| echo: false
+#| results: asis
+cm_write_mg <- cm_site |>
+  mutate(Niveau = classify_literacy(s1b), Sexe = classify_sex(m4)) |>
+  filter(!is.na(Niveau), !is.na(Sexe)) |>
+  count(Observatory, Sexe, Niveau) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe))
+emit_mg_plot(cm_write_mg, c("Niveau", "Sexe"), function(d) {
+  d |> ror_bar_grouped(x = Niveau, fill = Sexe, y = pct,
+                       title = "Fahaizan\u2019ny LT manoratra araka ny lahy/vavy",
+                       y_label = "%", direction = "vertical")
+})
 ```
 ### Activités principales des Chefs de ménage
 
@@ -874,6 +980,7 @@ obs_gt(cm_act) |>
 
 ```{r fig-cm-act}
 #| fig-height: !expr ror_fig_height(cm_act, "Act_principal")
+#| mg: false
 # Bar chart (better suited to >5 categories than a pie chart)
 cm_act |> make_bar_obs(x = Act_principal, y = Percent,
                   title = obs_title("Activités principales des CM (%)"),
@@ -908,9 +1015,19 @@ dl_fig_variants("fig_cm_act", "04", function(d) {
 }, members)
 ```
 
+```{r mg_fig_cm_act}
+#| echo: false
+#| results: asis
+emit_mg_plot(cm_act, "Act_principal", function(d) {
+  d |> make_bar_obs(x = Act_principal, y = Percent,
+                    title = "Asa fototr\u2019ny LT (%)", y_label = "%")
+}, height = 8)
+```
+
 #### Activités principales des CM par sexe
 
 ```{r cm_act_sex}
+#| mg: false
 cm_act_sex <- cm_site |>
   mutate(
     Act_principal = classify_activity(a1),
@@ -977,6 +1094,16 @@ dl_fig_variants("fig_cm_act_sex", "04", function(d) {
                          title = "Activités principales des CM par observatoire et sexe (%)",
                          y_label = "%", direction = "horizontal")
 }, members)
+```
+
+```{r mg_fig_cm_act_sex}
+#| echo: false
+#| results: asis
+emit_mg_plot(cm_act_sex_plt, c("Act_principal", "Sexe"), function(d) {
+  d |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
+                       title = "Asa fototr\u2019ny LT araka ny lahy/vavy (%)",
+                       y_label = "%", direction = "horizontal")
+}, height = 8)
 ```
 
 ## Caractéristiques des autres membres de ménages
@@ -1175,6 +1302,7 @@ literacy_3level_sex(others_site, s1a, "Aptitude à la lecture des autres membres
 
 ```{r fig_other_read_sex}
 #| fig-cap: "Aptitude à la lecture des autres membres selon le sexe"
+#| mg: false
 literacy_3level_bar(others_site, s1a, "Aptitude à la lecture des autres membres selon le sexe")
 ```
 
@@ -1189,6 +1317,21 @@ dl_tbl_variants("tbl_other_read_sex", "04", function(d) {
     mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
+```
+
+```{r mg_fig_other_read_sex}
+#| echo: false
+#| results: asis
+oth_read_mg <- others_site |>
+  mutate(Niveau = classify_literacy(s1a), Sexe = classify_sex(m4)) |>
+  filter(!is.na(Niveau), !is.na(Sexe)) |>
+  count(Observatory, Sexe, Niveau) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe))
+emit_mg_plot(oth_read_mg, c("Niveau", "Sexe"), function(d) {
+  d |> ror_bar_grouped(x = Niveau, fill = Sexe, y = pct,
+                       title = "Fahaizan\u2019ny mambra hafa mamaky teny araka ny lahy/vavy",
+                       y_label = "%", direction = "vertical")
+})
 ```
 
 ##### Savoir écrire
@@ -1217,6 +1360,7 @@ literacy_3level_sex(others_site, s1b, "Aptitude à l'écriture des autres membre
 
 ```{r fig_other_write_sex}
 #| fig-cap: "Aptitude à l'écriture des autres membres selon le sexe"
+#| mg: false
 literacy_3level_bar(others_site, s1b, "Aptitude à l'écriture des autres membres selon le sexe")
 ```
 
@@ -1231,6 +1375,21 @@ dl_tbl_variants("tbl_other_write_sex", "04", function(d) {
     mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe)) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
+```
+
+```{r mg_fig_other_write_sex}
+#| echo: false
+#| results: asis
+oth_write_mg <- others_site |>
+  mutate(Niveau = classify_literacy(s1b), Sexe = classify_sex(m4)) |>
+  filter(!is.na(Niveau), !is.na(Sexe)) |>
+  count(Observatory, Sexe, Niveau) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Sexe))
+emit_mg_plot(oth_write_mg, c("Niveau", "Sexe"), function(d) {
+  d |> ror_bar_grouped(x = Niveau, fill = Sexe, y = pct,
+                       title = "Fahaizan\u2019ny mambra hafa manoratra araka ny lahy/vavy",
+                       y_label = "%", direction = "vertical")
+})
 ```
 ### Scolarisation
 
@@ -1350,6 +1509,7 @@ A Marovoay, parmi les enfants de 6 à 15 ans non scolarisés, la première raiso
 #| fig-cap: "Principales raisons de non-scolarisation ou d'arrêt des études (6-15 ans)"
 #| fig-width: 10
 #| fig-height: 6
+#| mg: false
 
 raisons_labs <- c(
   "1"  = "Niveau suffisant",
@@ -1406,6 +1566,16 @@ dl_fig_variants("fig_raisons_non_scol", "04", function(d) {
 }, members)
 ```
 
+```{r mg_fig_raisons_non_scol}
+#| echo: false
+#| results: asis
+emit_mg_plot(non_scol |> filter(pct >= 2), "Raison", function(d) {
+  d |> ror_bar_grouped(x = Raison, fill = Observatory, y = pct,
+                       y_label = "% ny ankizy tsy mianatra",
+                       direction = "horizontal", facet = FALSE)
+}, height = 8)
+```
+
 ```{r tbl-raisons-non-scol}
 #| tbl-cap: "Raisons de non-scolarisation des 6-15 ans par observatoire"
 
@@ -1455,6 +1625,7 @@ obs_gt(other_act) |>
 
 ```{r fig-other-act}
 #| fig-height: !expr ror_fig_height(other_act, "Act_principal")
+#| mg: false
 other_act |> make_bar_obs(x = Act_principal, y = Percent,
                      title = obs_title("Activités principales des autres membres (%)"),
                      y_label = "%")
@@ -1488,9 +1659,19 @@ dl_fig_variants("fig_other_act", "04", function(d) {
 }, members)
 ```
 
+```{r mg_fig_other_act}
+#| echo: false
+#| results: asis
+emit_mg_plot(other_act, "Act_principal", function(d) {
+  d |> make_bar_obs(x = Act_principal, y = Percent,
+                    title = "Asa fototr\u2019ny mambra hafa (%)", y_label = "%")
+}, height = 8)
+```
+
 #### Activités principales des autres membres par sexe
 
 ```{r other_act_sex}
+#| mg: false
 other_act_sex <- others_site |>
   mutate(
     Act_principal = classify_activity(a1),
@@ -1556,6 +1737,16 @@ dl_fig_variants("fig_other_act_sex", "04", function(d) {
                          title = "Activités des autres membres par observatoire et sexe (%)",
                          y_label = "%", direction = "horizontal")
 }, members)
+```
+
+```{r mg_fig_other_act_sex}
+#| echo: false
+#| results: asis
+emit_mg_plot(other_act_sex_plt, c("Act_principal", "Sexe"), function(d) {
+  d |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
+                       title = "Asa ny mambra hafa isaky ny toeram-pikarohana sy lahy/vavy (%)",
+                       y_label = "%", direction = "horizontal")
+}, height = 8)
 ```
 
 ::: {.content-visible when-profile="consolidated"}
@@ -1642,6 +1833,7 @@ demog_gap   <- demog_trends |> filter(year %in% c(2015, 2025))
 
 ```{r fig_demog_taille}
 #| fig-cap: "Évolution de la taille moyenne des ménages (1996-2025)"
+#| mg: false
 #| fig-width: 9
 #| fig-height: 5
 
@@ -1650,8 +1842,19 @@ demog_trends |> make_trend_plot(y_var = taille_moy,
                           gap_year = 2015)
 ```
 
+```{r mg_fig_demog_taille}
+#| echo: false
+#| results: asis
+emit_mg_plot(demog_trends, character(0), function(d) {
+  d |> make_trend_plot(y_var = taille_moy,
+                       y_label = "Haben\u2019ny tokantrano",
+                       gap_year = 2015)
+}, width = 9, height = 5)
+```
+
 ```{r fig_demog_fem_cm}
 #| fig-cap: "Évolution du pourcentage de chefs de ménage femmes (1996-2025)"
+#| mg: false
 #| fig-width: 9
 #| fig-height: 5
 
@@ -1663,8 +1866,21 @@ if ("pct_fem_cm" %in% names(demog_trends)) {
 }
 ```
 
+```{r mg_fig_demog_fem_cm}
+#| echo: false
+#| results: asis
+if ("pct_fem_cm" %in% names(demog_trends)) {
+  emit_mg_plot(demog_trends |> filter(!is.na(pct_fem_cm)), character(0), function(d) {
+    d |> make_trend_plot(y_var = pct_fem_cm,
+                         y_label = "% lohan\u2019ny tokantrano vavy",
+                         gap_year = 2015)
+  }, width = 9, height = 5)
+}
+```
+
 ```{r fig_demog_scol}
 #| fig-cap: "Évolution du taux de scolarisation des 6-14 ans (1996-2025)"
+#| mg: false
 #| fig-width: 9
 #| fig-height: 5
 
@@ -1676,8 +1892,21 @@ if ("taux_scol" %in% names(demog_trends)) {
 }
 ```
 
+```{r mg_fig_demog_scol}
+#| echo: false
+#| results: asis
+if ("taux_scol" %in% names(demog_trends)) {
+  emit_mg_plot(demog_trends |> filter(!is.na(taux_scol)), character(0), function(d) {
+    d |> make_trend_plot(y_var = taux_scol,
+                         y_label = "Tahan\u2019ny fiantsoana an-tsekoly 6-14 taona (%)",
+                         gap_year = 2015)
+  }, width = 9, height = 5)
+}
+```
+
 ```{r fig_demog_age_cm}
 #| fig-cap: "Évolution de l'âge moyen du chef de ménage (1996-2025)"
+#| mg: false
 #| fig-width: 9
 #| fig-height: 5
 
@@ -1686,6 +1915,18 @@ if ("age_cm_moy" %in% names(demog_trends)) {
     make_trend_plot(y_var = age_cm_moy,
               y_label = "Âge moyen du chef de ménage",
               gap_year = 2015)
+}
+```
+
+```{r mg_fig_demog_age_cm}
+#| echo: false
+#| results: asis
+if ("age_cm_moy" %in% names(demog_trends)) {
+  emit_mg_plot(demog_trends |> filter(!is.na(age_cm_moy)), character(0), function(d) {
+    d |> make_trend_plot(y_var = age_cm_moy,
+                         y_label = "Taonan\u2019ny lohan\u2019ny tokantrano",
+                         gap_year = 2015)
+  }, width = 9, height = 5)
 }
 ```
 
