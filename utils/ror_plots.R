@@ -495,8 +495,11 @@ ror_bar_stacked <- function(
     p <- p +
       ggplot2::geom_text(
         ggplot2::aes(
-          label = ifelse(!!y_quo >= min_pct / 100,
-                         paste0(round(!!y_quo * 100), "%"), "")
+          label = ifelse(
+            !!y_quo >= min_pct / 100,
+            paste0(round(!!y_quo * 100), "%"),
+            ""
+          )
         ),
         position = ggplot2::position_fill(vjust = 0.5),
         size = label_sz,
