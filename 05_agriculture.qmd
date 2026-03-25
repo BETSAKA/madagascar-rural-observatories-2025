@@ -6,11 +6,17 @@ editor_options:
 
 # Agriculture, élevage et pêche
 
+::: {.content-visible when-profile="consolidated"}
 Ce chapitre analyse les activités agricoles, d'élevage, de chasse et de pêche des ménages des deux observatoires. Le chapitre sur les revenus présente déjà les contributions de ces activités au revenu total ; ici nous nous intéressons aux pratiques, aux facteurs de production et aux performances.
+:::
+
+::: {.content-hidden when-profile="consolidated"}
+Ce chapitre analyse les activités agricoles, d'élevage, de chasse et de pêche des ménages. Le chapitre sur les revenus présente déjà les contributions de ces activités au revenu total ; ici nous nous intéressons aux pratiques, aux facteurs de production et aux performances.
+:::
 
 ::: {.callout-warning}
 ## Travail de vérification en cours
-Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
+Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales.
 :::
 
 ```{r setup_agro}
@@ -253,7 +259,7 @@ pct_mo_m <- res_mp0 |> filter(Observatory == "Marovoay") |>
 
 ### Riziculture {#sec-riziculture}
 
-La riziculture est l'activité agricole dominante dans les deux observatoires.
+La riziculture est l'activité agricole dominante.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
@@ -1077,7 +1083,11 @@ dl_fig_variants("fig_top_cultures", "08", function(d) {
 
 #### Fertilisation et production des autres cultures
 
-L'accès aux engrais (organiques et chimiques) est un facteur déterminant de la productivité des cultures non rizicoles. Les pratiques de fertilisation diffèrent sensiblement entre les deux observatoires en raison de l'accessibilité et du coût des intrants.
+L'accès aux engrais (organiques et chimiques) est un facteur déterminant de la productivité des cultures non rizicoles.
+
+::: {.content-visible when-profile="consolidated"}
+Les pratiques de fertilisation diffèrent sensiblement entre les deux observatoires en raison de l'accessibilité et du coût des intrants.
+:::
 
 ```{r}
 #| label: fig-engrais-autres
@@ -2018,6 +2028,8 @@ dl_tbl_variants("tbl_main_oeuvre_perm", "08", function(d) {
 }, res_mp)
 ```
 
+::: {.content-visible when-profile="consolidated"}
+
 ### Cultures non rizicoles par quintile de revenu
 
 Les ménages les plus aisés cultivent-ils des cultures différentes ? On croise ici les familles de cultures avec les quintiles de revenu courant du ménage.
@@ -2137,6 +2149,8 @@ dl_tbl_variants("tbl_cultures_quintile", "08", function(d) {
     rename(Site = Observatory)
 }, res_c)
 ```
+
+:::
 
 ::: {.content-visible when-profile="consolidated"}
 

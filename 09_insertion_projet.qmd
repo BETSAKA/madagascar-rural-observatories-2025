@@ -10,7 +10,7 @@ Ce chapitre analyse l'insertion sociale des ménages à travers leur appartenanc
 
 ::: {.callout-warning}
 ## Travail de vérification en cours
-Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
+Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales.
 :::
 
 ```{r setup_insertion}
@@ -113,7 +113,11 @@ pct_benef_m <- res_respg0 |> filter(Observatory == "Marovoay", pro1 %in% c(1, 2)
 
 ### Appartenance à une organisation
 
-Sur les `r n_men` ménages enquêtés, `r sum(res_respg0$respga == 1)` (`r round(sum(res_respg0$respga == 1) / n_men * 100, 1)` %) déclarent qu'au moins un de leurs membres appartient à une organisation ou association. La participation est nettement plus élevée à Marovoay qu'à Alaotra.
+Sur les `r n_men` ménages enquêtés, `r sum(res_respg0$respga == 1)` (`r round(sum(res_respg0$respga == 1) / n_men * 100, 1)` %) déclarent qu'au moins un de leurs membres appartient à une organisation ou association.
+
+::: {.content-visible when-profile="consolidated"}
+La participation est nettement plus élevée à Marovoay qu'à Alaotra.
+:::
 
 ```{r}
 #| label: tbl-adhesion
@@ -318,11 +322,11 @@ dl_fig_variants("fig_responsabilite", "12", function(d) {
 
 ## Accès des ménages aux projets {#sec-projets}
 
-Le questionnaire demande aux ménages s'ils ont bénéficié de projets ou de formations dans huit domaines. La variable `pro1` (dans `res_respg0`) indique si au moins un membre du ménage a bénéficié d'un projet, tandis que `res_pro` détaille les bénéficiaires par type de projet et leur source de financement.
+Le questionnaire demande aux ménages s'ils ont bénéficié de projets ou de formations dans huit domaines : agriculture, élevage et pêche, nutrition, éducation et santé, environnement, tourisme, autres productions et travaux à haute intensité de main d'œuvre (HIMO).
 
 ### Bénéficiaires de projets
 
-L'accès aux projets de développement reste inégal entre les deux sites.
+L'accès aux projets de développement reste inégal selon les localités.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
@@ -376,6 +380,7 @@ dl_tbl_variants("tbl_pro1", "12", function(d) {
 #| echo: false
 #| fig-cap: "Ménages bénéficiaires de projets ou formations"
 res_respg0 |>
+  filter(!is.na(pro1)) |>
   mutate(Type = case_when(
     pro1 == 1 ~ "Oui",
     pro1 == 2 ~ "Non",
@@ -391,6 +396,7 @@ res_respg0 |>
 #| results: asis
 dl_fig_variants("fig_pro1", "12", function(d) {
   d |>
+    filter(!is.na(pro1)) |>
     mutate(Type = case_when(
       pro1 == 1 ~ "Oui", pro1 == 2 ~ "Non", pro1 == 3 ~ "Ne sait pas"
     )) |>
@@ -402,7 +408,7 @@ dl_fig_variants("fig_pro1", "12", function(d) {
 
 ### Taux de bénéficiaires par type de projet
 
-L'éducation et la santé, la nutrition et l'agriculture sont les domaines pour lesquels les ménages bénéficient le plus de projets. Le tourisme reste totalement absent des deux observatoires.
+L'éducation et la santé, la nutrition et l'agriculture sont les domaines pour lesquels les ménages bénéficient le plus de projets.
 
 ```{r benef_type_data}
 pro_clean <- res_pro |>

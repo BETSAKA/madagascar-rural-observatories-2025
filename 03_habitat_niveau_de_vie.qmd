@@ -10,7 +10,7 @@ Cette section decrit les conditions d'habitat, les equipements des menages, leur
 
 ::: {.callout-warning}
 ## Travail de vérification en cours
-Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
+Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales.
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
@@ -60,6 +60,7 @@ n_men_h <- n_distinct(h_obs$j5)
 
 # Statut d'occupation
 statut_s <- h_obs |> mutate(S = decode_labelled(h0)) |>
+  filter(!is.na(S)) |>
   count(Observatory, S) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 top_statut_a <- statut_s |> filter(Observatory == "Alaotra") |>
@@ -73,6 +74,7 @@ pct_statut_m <- statut_s |> filter(Observatory == "Marovoay") |>
 
 # Latrine
 latrine_s <- h_obs |> mutate(S = decode_labelled(h5)) |>
+  filter(!is.na(S)) |>
   count(Observatory, S) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 top_lat_a <- latrine_s |> filter(Observatory == "Alaotra") |>
@@ -86,6 +88,7 @@ pct_lat_m <- latrine_s |> filter(Observatory == "Marovoay") |>
 
 # Eau
 water_s <- h_obs |> mutate(S = decode_labelled(h4)) |>
+  filter(!is.na(S)) |>
   count(Observatory, S) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 top_eau_a <- water_s |> filter(Observatory == "Alaotra") |>
@@ -114,7 +117,7 @@ Dans l'Alaotra, `r pct_statut_a` % des ménages occupent un logement en « `r to
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, `r pct_statut_m` % des ménages occupent un logement en « `r top_statut_m` ».
+À Marovoay, `r pct_statut_m` % des ménages occupent un logement en « `r top_statut_m` », avec des proportions particulièrement élevées dans les localités les plus enclavées. À l'inverse, la location reste plus présente dans les hameaux proches de l'axe routier. Ces disparités traduisent des niveaux différents de sécurité résidentielle selon le positionnement géographique des ménages.
 :::
 :::
 
@@ -123,6 +126,7 @@ A Marovoay, `r pct_statut_m` % des ménages occupent un logement en « `r top_st
 house <- res_h |>
   left_join(obs_site, by = "j5") |>
   mutate(Statut = decode_labelled(h0)) |>
+  filter(!is.na(Statut)) |>
   count(Observatory, Statut) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
@@ -145,6 +149,7 @@ house |> make_bar_obs(x = Statut, title = "Statut d'occupation du logement")
 #| results: asis
 dl_fig_variants("fig_house_status", "05", function(d) {
   d |> mutate(Statut = decode_labelled(h0)) |>
+    filter(!is.na(Statut)) |>
     count(Observatory, Statut) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
     make_bar_obs(x = Statut, title = "Statut d'occupation du logement")
@@ -163,7 +168,7 @@ Dans l'Alaotra, Le type dominant est « `r top_lat_a` » (`r pct_lat_a` % des m�
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, Le type dominant est « `r top_lat_m` » (`r pct_lat_m` % des ménages).
+À Marovoay, le type dominant est « `r top_lat_m` » (`r pct_lat_m` % des ménages). L'assainissement se caractérise par une forte prévalence de la défécation à l'air libre et une utilisation limitée des latrines améliorées. De nettes disparités territoriales existent entre les localités, les hameaux les plus éloignés présentant les taux d'accès les plus faibles aux infrastructures sanitaires.
 :::
 :::
 
@@ -172,6 +177,7 @@ A Marovoay, Le type dominant est « `r top_lat_m` » (`r pct_lat_m` % des ménag
 latrine <- res_h |>
   left_join(obs_site, by = "j5") |>
   mutate(Type = decode_labelled(h5)) |>
+  filter(!is.na(Type)) |>
   count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
@@ -194,6 +200,7 @@ latrine |> make_bar_obs(title = obs_title("Types de latrine"))
 #| results: asis
 dl_fig_variants("fig_latrine", "05", function(d) {
   d |> mutate(Type = decode_labelled(h5)) |>
+    filter(!is.na(Type)) |>
     count(Observatory, Type) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
     make_bar_obs(title = "Types de latrine par observatoire")
@@ -212,7 +219,7 @@ Dans l'Alaotra, La source principale est « `r top_eau_a` » (`r pct_eau_a` %).
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, La source principale est « `r top_eau_m` » (`r pct_eau_m` %).
+À Marovoay, la source principale est « `r top_eau_m` » (`r pct_eau_m` %). Les ménages dépendent fortement des sources naturelles : cours d'eau et puits non aménagés représentent ensemble une part importante de l'approvisionnement. L'accès à l'eau améliorée (bornes fontaines publiques, eau courante) reste limité à l'échelle de l'observatoire, avec des disparités marquées entre localités.
 :::
 :::
 
@@ -221,6 +228,7 @@ A Marovoay, La source principale est « `r top_eau_m` » (`r pct_eau_m` %).
 water <- res_h |>
   left_join(obs_site, by = "j5") |>
   mutate(Type = str_remove(decode_labelled(h4), "_+$")) |>
+  filter(!is.na(Type)) |>
   count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
@@ -243,6 +251,7 @@ water |> make_bar_obs(title = obs_title("Mode d'approvisionnement en eau"))
 #| results: asis
 dl_fig_variants("fig_water", "05", function(d) {
   d |> mutate(Type = str_remove(decode_labelled(h4), "_+$")) |>
+    filter(!is.na(Type)) |>
     count(Observatory, Type) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
     make_bar_obs(title = "Mode d'approvisionnement en eau")
@@ -414,7 +423,7 @@ equip_keep <- c(
 equip_data <- res_e |>
   left_join(obs_site, by = "j5") |>
   mutate(Equipement = decode_labelled(e11)) |>
-  filter(Equipement != "", str_detect(Equipement, paste(equip_keep, collapse = "|")))
+  filter(!is.na(Equipement), Equipement != "", str_detect(Equipement, paste(equip_keep, collapse = "|")))
 
 tools <- equip_data |> count(Observatory, Equipement, name = "N_outils")
 households <- equip_data |>
@@ -454,7 +463,7 @@ table_equip |>
 #| results: asis
 dl_fig_variants("fig_agri_equip", "05", function(d) {
   equip <- d |> mutate(Equipement = decode_labelled(e11)) |>
-    filter(Equipement != "", str_detect(Equipement, paste(equip_keep, collapse = "|"))) |>
+    filter(!is.na(Equipement), Equipement != "", str_detect(Equipement, paste(equip_keep, collapse = "|"))) |>
     distinct(j5, Observatory, Equipement) |>
     count(Observatory, Equipement, name = "N_menages") |>
     left_join(d |> distinct(j5, Observatory) |> count(Observatory, name = "total"),
