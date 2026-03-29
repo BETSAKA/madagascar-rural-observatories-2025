@@ -140,7 +140,10 @@ house |>
 ```
 
 ```{r}
-#| fig-height: !expr ror_fig_height(house, "Statut")
+#| label: fig-statut-logement
+#| fig-cap: "Statut d'occupation du logement"
+#| fig-height: !expr fig_h("fig-statut-logement")
+#| fig-width: !expr fig_w("fig-statut-logement")
 house |> make_bar_obs(x = Statut, title = "Statut d'occupation du logement")
 ```
 
@@ -191,7 +194,10 @@ latrine |>
 ```
 
 ```{r}
-#| fig-height: !expr ror_fig_height(latrine)
+#| label: fig-latrine
+#| fig-cap: "Types de latrine"
+#| fig-height: !expr fig_h("fig-latrine")
+#| fig-width: !expr fig_w("fig-latrine")
 latrine |> make_bar_obs(title = obs_title("Types de latrine"))
 ```
 
@@ -242,7 +248,10 @@ water |>
 ```
 
 ```{r}
-#| fig-height: !expr ror_fig_height(water)
+#| label: fig-eau
+#| fig-cap: "Mode d'approvisionnement en eau"
+#| fig-height: !expr fig_h("fig-eau")
+#| fig-width: !expr fig_w("fig-eau")
 water |> make_bar_obs(title = obs_title("Mode d'approvisionnement en eau"))
 ```
 
@@ -278,7 +287,10 @@ light |>
 ```
 
 ```{r}
-#| fig-height: !expr ror_fig_height(light)
+#| label: fig-eclairage
+#| fig-cap: "Modes d'éclairage"
+#| fig-height: !expr fig_h("fig-eclairage")
+#| fig-width: !expr fig_w("fig-eclairage")
 light |> make_bar_obs(title = obs_title("Modes d'éclairage"))
 ```
 
@@ -348,7 +360,7 @@ cooking |>
 ```
 
 ```{r fig-cooking}
-#| fig-height: !expr ror_fig_height(cooking)
+#| fig-height: !expr fig_h("fig-cooking")
 cooking |> make_bar_obs(title = obs_title("Modes de cuisson"))
 ```
 
@@ -391,7 +403,7 @@ comfort |>
 ```
 
 ```{r fig-comfort}
-#| fig-height: !expr ror_fig_height(comfort)
+#| fig-height: !expr fig_h("fig-comfort")
 comfort |> make_bar_obs(title = obs_title("Biens de confort courants"))
 ```
 
@@ -452,10 +464,10 @@ table_equip |>
 ```
 
 ```{r fig-table-equip}
-#| fig-height: !expr ror_fig_height(table_equip, "Equipement")
+#| fig-height: !expr fig_h("fig-table-equip")
 table_equip |>
   make_bar_obs(x = Equipement, y = pct_menages,
-          title = obs_title("Équipements agricoles"), ncol = 1)
+          title = obs_title("Équipements agricoles"), ncol = 2)
 ```
 
 ```{r dl_agri_equipment}
@@ -510,7 +522,7 @@ comm |>
 ```
 
 ```{r fig-comm}
-#| fig-height: !expr ror_fig_height(comm)
+#| fig-height: !expr fig_h("fig-comm")
 comm |> make_bar_obs(title = obs_title("Matériels de communication"))
 ```
 
@@ -573,8 +585,8 @@ val_par_type <- res_t2_obs |>
 
 ```{r fig-transferts-sortants}
 #| fig-cap: "Valeur moyenne des transferts sortants par observatoire et type"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height(val_par_type)
+#| fig-width: !expr fig_w("fig-transferts-sortants")
+#| fig-height: !expr fig_h("fig-transferts-sortants")
 val_par_type |>
   mutate(val_moy_k = val_moy / 1000) |>
   make_bar_obs(x = Type, y = val_moy_k,
@@ -650,8 +662,8 @@ dest_data <- res_t2_obs |>
 
 ```{r fig-destination-transferts}
 #| fig-cap: "Lieu de residence des destinataires de transferts"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height(dest_data, "Destination")
+#| fig-width: !expr fig_w("fig-destination-transferts")
+#| fig-height: !expr fig_h("fig-destination-transferts")
 dest_data |>
   make_bar_obs(x = Destination, y_label = "% des transferts")
 ```
@@ -791,8 +803,8 @@ bind_rows(decomp_display, total_display) |>
 
 ```{r fig_revcou_shares}
 #| fig-cap: "Part des composantes dans le revenu courant moyen par observatoire"
-#| fig-width: 8
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_revcou_shares")
+#| fig-height: !expr fig_h("fig_revcou_shares")
 
 inc |>
   summarise(
@@ -852,8 +864,8 @@ La distribution du revenu total illustre le degré d'inégalité au sein de chaq
 
 ```{r fig_revtot_dist}
 #| fig-cap: "Distribution du revenu total par observatoire (echelle log)"
-#| fig-width: 8
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_revtot_dist")
+#| fig-height: !expr fig_h("fig_revtot_dist")
 
 inc |>
   filter(revtot > 0) |>
@@ -1069,24 +1081,24 @@ trends <- trends |>
 
 ```{r fig_trends_revtot}
 #| fig-cap: "Evolution du revenu total moyen par menage (Ar courants)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_trends_revtot")
+#| fig-height: !expr fig_h("fig_trends_revtot")
 
 trends |> make_trend_plot(revtot_mean, "Revenu total moyen (Ar/menage/an)")
 ```
 
 ```{r fig_trends_revcou}
 #| fig-cap: "Evolution du revenu courant moyen par menage (Ar courants)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_trends_revcou")
+#| fig-height: !expr fig_h("fig_trends_revcou")
 
 trends |> make_trend_plot(revcou_mean, "Revenu courant moyen (Ar/menage/an)")
 ```
 
 ```{r fig_trends_decomp}
 #| fig-cap: "Evolution des composantes du revenu courant moyen (Ar courants)"
-#| fig-width: 10
-#| fig-height: 6
+#| fig-width: !expr fig_w("fig_trends_decomp")
+#| fig-height: !expr fig_h("fig_trends_decomp")
 
 # Note: certaines composantes (rev_cu en 2002-2004) sont negatives en raison
 # de charges superieures aux recettes. On utilise geom_col qui gere
@@ -1121,8 +1133,8 @@ Une prochaine version de ce rapport integrera un IPC regional (Boeny pour Marovo
 
 ```{r fig_ipc_national}
 #| fig-cap: "Evolution de l'IPC national Madagascar (base 2010 = 100)"
-#| fig-width: 9
-#| fig-height: 4
+#| fig-width: !expr fig_w("fig_ipc_national")
+#| fig-height: !expr fig_h("fig_ipc_national")
 
 cpi_series <- trends |>
   distinct(year, cpi) |>
@@ -1147,16 +1159,16 @@ Le prix de vente median du paddy, calcule a partir des ventes declarees par les 
 
 ```{r fig_trends_paddy}
 #| fig-cap: "Evolution du prix median du paddy (Ar/kg)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_trends_paddy")
+#| fig-height: !expr fig_h("fig_trends_paddy")
 
 trends |> make_trend_plot(prix_paddy_median, "Prix median du paddy (Ar/kg)")
 ```
 
 ```{r fig_ipc_vs_paddy}
 #| fig-cap: "Comparaison de l'IPC national et de l'indice du prix du paddy (base 100 en 2010)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_ipc_vs_paddy")
+#| fig-height: !expr fig_h("fig_ipc_vs_paddy")
 
 paddy_2010 <- trends |>
   filter(year == 2010) |>
@@ -1193,16 +1205,16 @@ Les revenus nominaux sont convertis en Ariary constants (base 2010) en divisant 
 
 ```{r fig_trends_revtot_real}
 #| fig-cap: "Evolution du revenu total reel moyen par menage (Ar constants 2010, IPC)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_trends_revtot_real")
+#| fig-height: !expr fig_h("fig_trends_revtot_real")
 
 trends |> make_trend_plot(revtot_real, "Revenu total reel moyen (Ar constants 2010)")
 ```
 
 ```{r fig_trends_revcou_real}
 #| fig-cap: "Evolution du revenu courant reel moyen par menage (Ar constants 2010, IPC)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_trends_revcou_real")
+#| fig-height: !expr fig_h("fig_trends_revcou_real")
 
 trends |> make_trend_plot(revcou_real, "Revenu courant reel moyen (Ar constants 2010)")
 ```
@@ -1213,16 +1225,16 @@ Le prix du paddy, produit central de ces economies rizicoles, offre un deflateur
 
 ```{r fig_trends_revtot_paddy}
 #| fig-cap: "Evolution du revenu total reel moyen par menage (Ar constants paddy 2010)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_trends_revtot_paddy")
+#| fig-height: !expr fig_h("fig_trends_revtot_paddy")
 
 trends |> make_trend_plot(revtot_paddy, "Revenu total reel moyen (Ar constants paddy 2010)")
 ```
 
 ```{r fig_trends_revcou_paddy}
 #| fig-cap: "Evolution du revenu courant reel moyen par menage (Ar constants paddy 2010)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_trends_revcou_paddy")
+#| fig-height: !expr fig_h("fig_trends_revcou_paddy")
 
 trends |> make_trend_plot(revcou_paddy, "Revenu courant reel moyen (Ar constants paddy 2010)")
 ```
@@ -1291,8 +1303,8 @@ hab_gap   <- habitat_trends |> filter(year %in% c(2015, 2025))
 
 ```{r fig_habitat_elec}
 #| fig-cap: "Evolution de l'acces a l'electricite (1997-2025)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_habitat_elec")
+#| fig-height: !expr fig_h("fig_habitat_elec")
 
 if ("pct_elec" %in% names(habitat_trends)) {
   ggplot(mapping = aes(x = year, y = pct_elec, colour = Observatory)) +
@@ -1308,8 +1320,8 @@ if ("pct_elec" %in% names(habitat_trends)) {
 
 ```{r fig_habitat_water}
 #| fig-cap: "Evolution de l'acces a une source d'eau amelioree (1997-2025)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_habitat_water")
+#| fig-height: !expr fig_h("fig_habitat_water")
 
 if ("pct_eau_amelioree" %in% names(habitat_trends)) {
   ggplot(mapping = aes(x = year, y = pct_eau_amelioree, colour = Observatory)) +

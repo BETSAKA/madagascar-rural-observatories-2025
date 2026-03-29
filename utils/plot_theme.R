@@ -10,7 +10,7 @@
 #' @param base_size Base font size (default 11)
 #' @param n_facets  Number of facets in the plot (1 = no faceting)
 #' @return A ggplot2 theme object
-theme_ror <- function(base_size = 11, n_facets = 1) {
+theme_ror <- function(base_size = 12, n_facets = 1) {
   sz <- if (n_facets > 4) max(base_size - 2, 8) else base_size
   ggplot2::theme_minimal(base_size = sz) +
     ggplot2::theme(

@@ -449,8 +449,8 @@ Une erreur de saisie de la date d'interview a été identifiée pour un entretie
 
 ```{r}
 #| fig-cap: "Fréquences cumulées des entretiens par observatoire (à partir du 1er octobre 2025)"
-#| fig-width: 10
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-chronogramme")
+#| fig-height: !expr fig_h("fig-chronogramme")
 #| label: fig-chronogramme
 
 chrono <- res_deb |>
@@ -519,8 +519,8 @@ enq <- res_deb |>
 
 ```{r}
 #| fig-cap: "Nombre de questionnaires par enquêteur et observatoire"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height(enq, "Enquêteur")
+#| fig-width: !expr fig_w("fig-enqueteurs")
+#| fig-height: !expr fig_h("fig-enqueteurs")
 #| label: fig-enqueteurs
 enq |>
   ror_bar_grouped(x = Enquêteur, y = n, fill = Observatory,

@@ -317,7 +317,7 @@ hh_age_sex <- members_site |>
 
 ```{r fig_pyramide}
 #| fig-cap: "Pyramide des âges des membres des ménages enquêtés par observatoire"
-#| fig-height: !expr ror_fig_height(hh_age_sex, "AgeGroup")
+#| fig-height: !expr fig_h("fig_pyramide")
 hh_age_sex |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent)
 ```
 
@@ -667,7 +667,7 @@ dl_tbl_variants("tbl_cm_educ", "04", function(d) {
 ```{r fig_cm_educ}
 #| echo: false
 #| fig-cap: "Niveau d'éducation des chefs de ménage"
-cm |>
+cm_site |>
   mutate(Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
   count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
@@ -731,7 +731,7 @@ dl_tbl_variants("tbl_cm_educ_sex", "04", function(d) {
 ```{r fig_cm_educ_sex}
 #| echo: false
 #| fig-cap: "Niveau d'éducation des CM par sexe"
-cm |>
+cm_site |>
   mutate(
     Sexe = classify_sex(m4),
     Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")
@@ -944,7 +944,7 @@ obs_gt(cm_act) |>
 
 ```{r fig-cm-act}
 #| fig-cap: "Activités principales des chefs de ménages"
-#| fig-height: !expr ror_fig_height(cm_act, "Act_principal")
+#| fig-height: !expr fig_h("fig-cm-act")
 cm_act |> make_bar_obs(x = Act_principal, y = Percent,
                   y_label = "%")
 ```
@@ -1020,7 +1020,7 @@ cm_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
 
 ```{r fig_cm_act_sex}
 #| fig-cap: "Activit\u00e9s principales des CM par observatoire et sexe"
-#| fig-height: !expr ror_fig_height(cm_act_sex_plt, "Act_principal")
+#| fig-height: !expr fig_h("fig_cm_act_sex")
 cm_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
                                   title = "Activit\u00e9s principales des CM par observatoire et sexe (%)",
                                   y_label = "%", direction = "horizontal")
@@ -1202,7 +1202,7 @@ dl_tbl_variants("tbl_other_educ", "04", function(d) {
 ```{r fig_other_educ}
 #| echo: false
 #| fig-cap: "Niveau d'éducation des autres membres"
-others |>
+others_site |>
   mutate(Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
   count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
@@ -1263,7 +1263,7 @@ dl_tbl_variants("tbl_other_educ_sex", "04", function(d) {
 ```{r fig_other_educ_sex}
 #| echo: false
 #| fig-cap: "Niveau d'éducation des autres membres par sexe"
-others |>
+others_site |>
   mutate(
     Sexe = classify_sex(m4),
     Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")
@@ -1489,8 +1489,8 @@ A Marovoay, parmi les enfants de 6 à 15 ans non scolarisés, la première raiso
 
 ```{r fig-raisons-non-scol}
 #| fig-cap: "Principales raisons de non-scolarisation ou d'arrêt des études (6-15 ans)"
-#| fig-width: 10
-#| fig-height: 6
+#| fig-width: !expr fig_w("fig-raisons-non-scol")
+#| fig-height: !expr fig_h("fig-raisons-non-scol")
 
 raisons_labs <- c(
   "1"  = "Niveau suffisant",
@@ -1510,7 +1510,7 @@ raisons_labs <- c(
   "19" = "Paresse"
 )
 
-non_scol <- members |>
+non_scol <- members_site |>
   filter(m5 >= 6, m5 <= 15, m6 != 1, s2 == 2, !is.na(s5)) |>
   mutate(
     Raison = if_else(
@@ -1524,9 +1524,7 @@ non_scol <- members |>
 
 non_scol |>
   filter(pct >= 2) |>
-  ror_bar_grouped(x = Raison, fill = Observatory, y = pct,
-                  y_label = "% des enfants non scolarisés",
-                  direction = "horizontal", facet = FALSE)
+  make_bar_obs(x = Raison, y_label = "% des enfants non scolarisés")
 ```
 
 ```{r dl_fig_raisons_non_scol}
@@ -1595,7 +1593,7 @@ obs_gt(other_act) |>
 ```
 
 ```{r fig-other-act}
-#| fig-height: !expr ror_fig_height(other_act, "Act_principal")
+#| fig-height: !expr fig_h("fig-other-act")
 other_act |> make_bar_obs(x = Act_principal, y = Percent,
                      title = obs_title("Activités principales des autres membres (%)"),
                      y_label = "%")
@@ -1670,7 +1668,7 @@ other_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent
 ```
 
 ```{r fig_other_act_sex}
-#| fig-height: !expr ror_fig_height(other_act_sex, "Act_principal")
+#| fig-height: !expr fig_h("fig_other_act_sex")
 other_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
                                      title = "Activités des autres membres par observatoire et sexe (%)",
                                      y_label = "%", direction = "horizontal")
@@ -1789,8 +1787,8 @@ demog_gap   <- demog_trends |> filter(year %in% c(2015, 2025))
 
 ```{r fig_demog_taille}
 #| fig-cap: "Évolution de la taille moyenne des ménages (1996-2025)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_demog_taille")
+#| fig-height: !expr fig_h("fig_demog_taille")
 
 demog_trends |> make_trend_plot(y_var = taille_moy,
                           y_label = "Taille moyenne du ménage",
@@ -1799,8 +1797,8 @@ demog_trends |> make_trend_plot(y_var = taille_moy,
 
 ```{r fig_demog_fem_cm}
 #| fig-cap: "Évolution du pourcentage de chefs de ménage femmes (1996-2025)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_demog_fem_cm")
+#| fig-height: !expr fig_h("fig_demog_fem_cm")
 
 if ("pct_fem_cm" %in% names(demog_trends)) {
   demog_trends |> filter(!is.na(pct_fem_cm)) |>
@@ -1812,8 +1810,8 @@ if ("pct_fem_cm" %in% names(demog_trends)) {
 
 ```{r fig_demog_scol}
 #| fig-cap: "Évolution du taux de scolarisation des 6-14 ans (1996-2025)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_demog_scol")
+#| fig-height: !expr fig_h("fig_demog_scol")
 
 if ("taux_scol" %in% names(demog_trends)) {
   demog_trends |> filter(!is.na(taux_scol)) |>
@@ -1825,8 +1823,8 @@ if ("taux_scol" %in% names(demog_trends)) {
 
 ```{r fig_demog_age_cm}
 #| fig-cap: "Évolution de l'âge moyen du chef de ménage (1996-2025)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_demog_age_cm")
+#| fig-height: !expr fig_h("fig_demog_age_cm")
 
 if ("age_cm_moy" %in% names(demog_trends)) {
   demog_trends |> filter(!is.na(age_cm_moy)) |>

@@ -259,8 +259,8 @@ pct_suf_m <- satis_stats |> filter(Observatory == "Marovoay", Satis == "Suffisan
 ```{r}
 #| label: fig-nb-parcelles
 #| fig-cap: "Distribution du nombre de parcelles possédées par ménage"
-#| fig-width: 8
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-nb-parcelles")
+#| fig-height: !expr fig_h("fig-nb-parcelles")
 
 res_fr30a |>
   expand_sites_for_profile() |>
@@ -384,8 +384,8 @@ Le patrimoine foncier des ménages se compose principalement de rizières et de 
 ```{r}
 #| label: fig-type-parcelle
 #| fig-cap: "Type des parcelles possédées"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height_n(length(type_labs), fr30_data)
+#| fig-width: !expr fig_w("fig-type-parcelle")
+#| fig-height: !expr fig_h("fig-type-parcelle")
 
 fr30_data |>
   expand_sites_for_profile() |>
@@ -426,8 +426,8 @@ La localisation des parcelles reflète les spécificités agro-écologiques de c
 ```{r}
 #| label: fig-localisation-parcelle
 #| fig-cap: "Localisation des parcelles possédées"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height_n(length(loc_labs), fr30_data)
+#| fig-width: !expr fig_w("fig-localisation-parcelle")
+#| fig-height: !expr fig_h("fig-localisation-parcelle")
 
 fr30_data |>
   expand_sites_for_profile() |>
@@ -464,8 +464,8 @@ Les différences entre Alaotra et Marovoay reflètent les investissements hydrau
 ```{r}
 #| label: fig-irrigation-possedee
 #| fig-cap: "Mode d'irrigation des parcelles possédées"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height_n(length(irrig_labs), fr30_data)
+#| fig-width: !expr fig_w("fig-irrigation-possedee")
+#| fig-height: !expr fig_h("fig-irrigation-possedee")
 
 fr30_data |>
   expand_sites_for_profile() |>
@@ -510,8 +510,8 @@ Le mode d'acquisition des parcelles renseigne sur la dynamique du marché foncie
 ```{r}
 #| label: fig-acquisition
 #| fig-cap: "Mode d'acquisition des parcelles possédées"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height_n(length(acq_labs), fr30_data)
+#| fig-width: !expr fig_w("fig-acquisition")
+#| fig-height: !expr fig_h("fig-acquisition")
 
 fr30_data |>
   expand_sites_for_profile() |>
@@ -542,8 +542,8 @@ L'ancienneté de possession témoigne de l'enracinement des ménages sur leurs t
 ```{r}
 #| label: fig-anciennete
 #| fig-cap: "Ancienneté de possession des parcelles"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-anciennete")
+#| fig-height: !expr fig_h("fig-anciennete")
 
 anc_labs <- c(
   "1" = "Avant 1970", "2" = "Années 1970", "3" = "Années 1980",
@@ -594,8 +594,8 @@ La question de l'identité du propriétaire au sein du ménage soulève des enje
 ```{r}
 #| label: fig-proprietaire
 #| fig-cap: "Qui dans le ménage est propriétaire de la parcelle"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height_n(length(prop_labs), fr30_data)
+#| fig-width: !expr fig_w("fig-proprietaire")
+#| fig-height: !expr fig_h("fig-proprietaire")
 
 fr30_data |>
   expand_sites_for_profile() |>
@@ -709,7 +709,7 @@ dl_tbl_variants("tbl_securisation", "07", function(d) {
 #| echo: false
 #| label: fig-securisation
 #| fig-cap: "Sécurisation foncière des parcelles possédées"
-#| fig-height: 4
+#| fig-height: !expr fig_h("fig-securisation")
 bind_rows(titre_pct, cert_pct) |>
   pivot_longer(
     cols = -Document,
@@ -749,8 +749,8 @@ En l'absence de titre ou de certificat, les ménages s'appuient sur des document
 ```{r}
 #| label: fig-papiers
 #| fig-cap: "Autres documents prouvant la possession"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height_n(length(papier_labs), fr30_data)
+#| fig-width: !expr fig_w("fig-papiers")
+#| fig-height: !expr fig_h("fig-papiers")
 
 fr30_data |>
   expand_sites_for_profile() |>
@@ -835,8 +835,8 @@ fr33_data <- res_fr33 |> filter(!is.na(fr33gc))
 ```{r}
 #| label: fig-mode-cession
 #| fig-cap: "Mode de faire-valoir des parcelles cédées"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height_n(length(fv_labs), fr33_data)
+#| fig-width: !expr fig_w("fig-mode-cession")
+#| fig-height: !expr fig_h("fig-mode-cession")
 
 fr33_data |>
   expand_sites_for_profile() |>
@@ -868,6 +868,7 @@ motif_cession <- fr33_data |>
   expand_sites_for_profile() |>
   filter(!is.na(fr33h)) |>
   mutate(Motif = safe_to_char(fr33h)) |>
+  mutate(Motif = if_else(Motif %in% c("55", "56"), "Autre", Motif)) |>
   mutate(Motif = str_trunc(Motif, 45)) |>
   count(Observatory, Motif) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
@@ -876,8 +877,8 @@ motif_cession <- fr33_data |>
 ```{r}
 #| label: fig-motif-cession
 #| fig-cap: "Motif de la cession de parcelles"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height(motif_cession, "Motif")
+#| fig-width: !expr fig_w("fig-motif-cession")
+#| fig-height: !expr fig_h("fig-motif-cession")
 
 motif_cession |>
   make_bar_obs(x = Motif, y_label = "% des parcelles cédées")
@@ -890,6 +891,7 @@ dl_fig_variants("fig_motif_cession", "07", function(d) {
   d |>
     filter(!is.na(fr33h)) |>
     mutate(Motif = safe_to_char(fr33h)) |>
+    mutate(Motif = if_else(Motif %in% c("55", "56"), "Autre", Motif)) |>
     mutate(Motif = str_trunc(Motif, 45)) |>
     count(Observatory, Motif) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
@@ -915,8 +917,8 @@ cedee_qui <- fr33_data |>
 ```{r}
 #| label: fig-cedee-a-qui
 #| fig-cap: "À qui la parcelle est-elle cédée"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height(cedee_qui, "Destinataire")
+#| fig-width: !expr fig_w("fig-cedee-a-qui")
+#| fig-height: !expr fig_h("fig-cedee-a-qui")
 
 cedee_qui |>
   make_bar_obs(x = Destinataire, y_label = "% des parcelles cédées")
@@ -997,8 +999,8 @@ fr34_data <- res_fr34 |> filter(!is.na(fr30c1))
 ```{r}
 #| label: fig-type-exploitee
 #| fig-cap: "Type des parcelles exploitées (non possédées)"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height_n(length(type_labs), fr34_data)
+#| fig-width: !expr fig_w("fig-type-exploitee")
+#| fig-height: !expr fig_h("fig-type-exploitee")
 
 fr34_data |>
   expand_sites_for_profile() |>
@@ -1027,8 +1029,8 @@ Le mode de faire-valoir des parcelles exploitées révèle l'équilibre local en
 ```{r}
 #| label: fig-fv-exploitee
 #| fig-cap: "Mode de faire-valoir des parcelles exploitées"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height_n(length(fv_labs), fr34_data)
+#| fig-width: !expr fig_w("fig-fv-exploitee")
+#| fig-height: !expr fig_h("fig-fv-exploitee")
 
 fr34_data |>
   expand_sites_for_profile() |>
@@ -1070,8 +1072,8 @@ prop_exploitee <- fr34_data |>
 ```{r}
 #| label: fig-proprietaire-exploitee
 #| fig-cap: "Propriétaire des parcelles exploitées"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height(prop_exploitee, "Proprietaire")
+#| fig-width: !expr fig_w("fig-proprietaire-exploitee")
+#| fig-height: !expr fig_h("fig-proprietaire-exploitee")
 
 prop_exploitee |>
   make_bar_obs(x = Proprietaire, y_label = "% des parcelles exploitées")
@@ -1098,8 +1100,8 @@ Le mode d'irrigation des parcelles exploitées diffère-t-il de celui des parcel
 ```{r}
 #| label: fig-irrigation-exploitee
 #| fig-cap: "Mode d'irrigation des parcelles exploitées"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height_n(length(irrig_labs), fr34_data)
+#| fig-width: !expr fig_w("fig-irrigation-exploitee")
+#| fig-height: !expr fig_h("fig-irrigation-exploitee")
 
 fr34_data |>
   expand_sites_for_profile() |>
@@ -1236,8 +1238,8 @@ Le jugement des ménages sur la suffisance de leur dotation foncière synthétis
 ```{r}
 #| label: fig-satisfaction
 #| fig-cap: "Satisfaction des ménages par rapport à leur surface foncière"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-satisfaction")
+#| fig-height: !expr fig_h("fig-satisfaction")
 
 res_fr30a |>
   expand_sites_for_profile() |>

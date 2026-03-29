@@ -321,15 +321,15 @@ A Marovoay, le mode de faire valoir dominant est le `r top_tenure_m` (`r pct_ten
 ```{r}
 #| label: fig-tenure-riz
 #| fig-cap: "Mode de faire valoir des parcelles rizicoles par observatoire"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height_n(length(tenure_labs), res_r)
+#| fig-width: !expr fig_w("fig-tenure-riz")
+#| fig-height: !expr fig_h("fig-tenure-riz")
 
 res_r |>
   filter(!is.na(r4)) |>
   mutate(Tenure = factor(as.character(r4), levels = names(tenure_labs), labels = tenure_labs)) |>
+  expand_sites_for_profile() |>
   count(Observatory, Tenure) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  expand_sites_for_profile() |>
   make_bar_obs(x = Tenure, y_label = "% des parcelles")
 ```
 
@@ -353,8 +353,8 @@ La gestion de l'eau est un enjeu central de la riziculture.
 ```{r}
 #| label: fig-eau-riz
 #| fig-cap: "Problèmes de maîtrise de l'eau sur les parcelles rizicoles"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height_n(length(eau_labs), res_r)
+#| fig-width: !expr fig_w("fig-eau-riz")
+#| fig-height: !expr fig_h("fig-eau-riz")
 
 res_r |>
   filter(!is.na(r11b)) |>
@@ -399,8 +399,8 @@ A Marovoay, la technique culturale prédominante est le `r top_tech_m` (`r pct_t
 ```{r}
 #| label: fig-technique-riz
 #| fig-cap: "Technique de culture rizicole par observatoire"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height_n(length(tech_labs), res_r)
+#| fig-width: !expr fig_w("fig-technique-riz")
+#| fig-height: !expr fig_h("fig-technique-riz")
 
 res_r |>
   filter(!is.na(r13)) |>
@@ -429,8 +429,8 @@ dl_fig_variants("fig_technique_riz", "08", function(d) {
 ```{r}
 #| label: fig-engrais-riz
 #| fig-cap: "Utilisation d'engrais sur les parcelles rizicoles"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height_n(length(fert_labs), res_r)
+#| fig-width: !expr fig_w("fig-engrais-riz")
+#| fig-height: !expr fig_h("fig-engrais-riz")
 
 res_r |>
   filter(!is.na(r40)) |>
@@ -510,7 +510,7 @@ dl_tbl_variants("tbl_semences_labour", "08", function(d) {
 ```{r fig_semences_labour}
 #| echo: false
 #| fig-cap: "Mode de travail du sol sur les parcelles rizicoles"
-#| fig-height: !expr ror_fig_height_n(length(labour_labs), res_r)
+#| fig-height: !expr fig_h("fig_semences_labour")
 res_r |>
   filter(!is.na(r14)) |>
   mutate(
@@ -561,6 +561,7 @@ A Marovoay, le rendement rizicole médian s'établit à `r rdt_med_m` t/ha (hors
 res_r1 |>
   filter(r1a == 1, !is.na(dc23c6)) |>
   mutate(Type = safe_to_char(dc23c6)) |>
+  expand_sites_for_profile() |>
   count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
   make_bar_obs(y_label = "% des riziculteurs")
@@ -582,8 +583,8 @@ dl_fig_variants("fig_rendement_perception", "08", function(d) {
 ```{r}
 #| label: fig-rendement-riz-tha
 #| fig-cap: "Distribution des rendements rizicoles (t/ha) par observatoire"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-rendement-riz-tha")
+#| fig-height: !expr fig_h("fig-rendement-riz-tha")
 
 res_r |>
   filter(!is.na(r23), r23 > 0, !is.na(r1d), r1d > 0) |>
@@ -592,7 +593,6 @@ res_r |>
   expand_sites_for_profile() |>
   ggplot(aes(x = Observatory, y = rendement_tha, fill = Observatory)) +
   geom_boxplot(alpha = 0.7) +
-  facet_wrap(~Observatory) +
   labs(x = NULL, y = "Rendement (t/ha)", fill = "Observatoire") +
   theme_ror() +
   theme(legend.position = "none")
@@ -617,8 +617,8 @@ dl_fig_variants("fig_rendement_riz_tha", "08", function(d) {
 ```{r}
 #| label: fig-production-riz
 #| fig-cap: "Distribution de la production de paddy par parcelle (kg)"
-#| fig-width: 8
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-production-riz")
+#| fig-height: !expr fig_h("fig-production-riz")
 
 res_r |>
   filter(!is.na(r23), r23 > 0) |>
@@ -631,7 +631,8 @@ res_r |>
     limits = c(0, quantile(res_r[["r23"]][res_r[["r23"]] > 0], 0.95, na.rm = TRUE))
   ) +
   labs(x = "Production de paddy (kg)", y = "Nombre de parcelles") +
-  theme_ror()
+  theme_ror() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ```{r dl_fig_production_riz}
@@ -656,8 +657,8 @@ La position topographique de la parcelle (bas-fond, plaine, tanety) détermine e
 ```{r}
 #| label: fig-topographie-riz
 #| fig-cap: "Topographie des parcelles rizicoles"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height_n(length(topo_labs), res_r)
+#| fig-width: !expr fig_w("fig-topographie-riz")
+#| fig-height: !expr fig_h("fig-topographie-riz")
 
 res_r |>
   filter(!is.na(r10x)) |>
@@ -686,8 +687,8 @@ dl_fig_variants("fig_topographie_riz", "08", function(d) {
 ```{r}
 #| label: fig-saison-riz
 #| fig-cap: "Saison de culture rizicole"
-#| fig-width: 8
-#| fig-height: 4
+#| fig-width: !expr fig_w("fig-saison-riz")
+#| fig-height: !expr fig_h("fig-saison-riz")
 
 saison_labs <- c(
   "1" = "Saison principale", "2" = "Contre saison", "3" = "Saison intermédiaire"
@@ -729,8 +730,8 @@ origine_semence <- res_r |>
 ```{r}
 #| label: fig-origine-semence
 #| fig-cap: "Origine des semences de riz"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height(origine_semence, "Origine")
+#| fig-width: !expr fig_w("fig-origine-semence")
+#| fig-height: !expr fig_h("fig-origine-semence")
 
 origine_semence |>
   make_bar_obs(x = Origine, y_label = "% des parcelles")
@@ -799,8 +800,8 @@ dl_tbl_variants("tbl_ventes_riz_taux", "08", function(d) {
 ```{r}
 #| label: fig-ventes-riz-mois
 #| fig-cap: "Répartition mensuelle des ventes de riz"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-ventes-riz-mois")
+#| fig-height: !expr fig_h("fig-ventes-riz-mois")
 
 res_dc21 |>
   filter(!is.na(dc21), dc21 >= 1, dc21 <= 12) |>
@@ -834,8 +835,8 @@ dl_fig_variants("fig_ventes_riz_mois", "08", function(d) {
 ```{r}
 #| label: fig-prix-paddy
 #| fig-cap: "Distribution du prix de vente du paddy (Ar/kg)"
-#| fig-width: 8
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-prix-paddy")
+#| fig-height: !expr fig_h("fig-prix-paddy")
 
 res_dc21 |>
   filter(!is.na(dc24), dc24 > 0, dc24 < quantile(dc24, 0.98, na.rm = TRUE)) |>
@@ -907,6 +908,7 @@ dl_tbl_variants("tbl_bilan_riz", "08", function(d) {
 #| fig-cap: "Bilan rizicole moyen par ménage (kg de paddy)"
 bv <- bilan_vars[names(bilan_vars) %in% names(res_dc1)]
 res_dc1 |>
+  expand_sites_for_profile() |>
   summarise(
     across(all_of(names(bv)), \(x) round(mean(x, na.rm = TRUE))),
     .by = Observatory
@@ -1000,8 +1002,8 @@ A Marovoay, les ménages cultivent un nombre médian de `r nb_cult_med_m` cultur
 ```{r}
 #| label: fig-diversification
 #| fig-cap: "Nombre de cultures non rizicoles par ménage"
-#| fig-width: 8
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-diversification")
+#| fig-height: !expr fig_h("fig-diversification")
 
 res_c |>
   filter(c0 != "", !is.na(c0)) |>
@@ -1054,8 +1056,8 @@ top_cultures_plot <- top_cult |>
 ```{r}
 #| label: fig-top-cultures
 #| fig-cap: "Cultures non rizicoles les plus fréquentes (nb de ménages pratiquant)"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height(top_cultures_plot, "Culture")
+#| fig-width: !expr fig_w("fig-top-cultures")
+#| fig-height: !expr fig_h("fig-top-cultures")
 
 top_cultures_plot |>
   make_bar_obs(x = Culture, y_label = "% des ménages")
@@ -1092,8 +1094,8 @@ Les pratiques de fertilisation diffèrent sensiblement entre les deux observatoi
 ```{r}
 #| label: fig-engrais-autres
 #| fig-cap: "Utilisation d'engrais sur les parcelles de cultures non rizicoles"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height_n(length(fert_c_labs), res_c)
+#| fig-width: !expr fig_w("fig-engrais-autres")
+#| fig-height: !expr fig_h("fig-engrais-autres")
 
 res_c |>
   filter(c0 != "", !is.na(c0), !is.na(c36)) |>
@@ -1269,8 +1271,8 @@ top_jardin_plot <- top_jp |>
 ```{r}
 #| label: fig-top-jardin
 #| fig-cap: "Produits de jardin / cueillette les plus fréquents"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height(top_jardin_plot, "Produit")
+#| fig-width: !expr fig_w("fig-top-jardin")
+#| fig-height: !expr fig_h("fig-top-jardin")
 
 top_jardin_plot |>
   make_bar_obs(x = Produit, y_label = "% des ménages")
@@ -1324,8 +1326,8 @@ produits_foret <- res_ef |>
 ```{r}
 #| label: fig-produits-foret
 #| fig-cap: "Principaux produits de l'exploitation forestière"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height(produits_foret, "Produit")
+#| fig-width: !expr fig_w("fig-produits-foret")
+#| fig-height: !expr fig_h("fig-produits-foret")
 
 produits_foret |>
   make_bar_obs(x = Produit, y_label = "% des ménages")
@@ -1434,8 +1436,8 @@ especes_elevage <- res_ele |>
 ```{r}
 #| label: fig-especes-elevage
 #| fig-cap: "Espèces élevées (% des ménages pratiquant)"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height(especes_elevage, "Espece")
+#| fig-width: !expr fig_w("fig-especes-elevage")
+#| fig-height: !expr fig_h("fig-especes-elevage")
 
 especes_elevage |>
   make_bar_obs(x = Espece, y_label = "% des ménages")
@@ -1466,8 +1468,8 @@ L'élevage répond à trois objectifs principaux : l'épargne/assurance (constit
 ```{r}
 #| label: fig-objectifs-elevage
 #| fig-cap: "Objectifs de l'élevage par espèce (% des ménages éleveurs)"
-#| fig-width: 10
-#| fig-height: 6
+#| fig-width: !expr fig_w("fig-objectifs-elevage")
+#| fig-height: !expr fig_h("fig-objectifs-elevage")
 
 obj_labs <- c(ele5a = "Épargne / assurance", ele5b = "Autoconsommation", ele5c = "Vente")
 
@@ -1477,11 +1479,13 @@ res_ele |>
   pivot_longer(cols = c(ele5a, ele5b, ele5c), names_to = "Objectif_code", values_to = "val") |>
   filter(val == 1) |>
   mutate(Objectif = obj_labs[Objectif_code]) |>
-  count(Espece, Objectif) |>
+  expand_sites_for_profile() |>
+  count(Observatory, Espece, Objectif) |>
   ggplot(aes(x = reorder(Espece, n), y = n, fill = Objectif)) +
   geom_col(position = "fill") +
   coord_flip() +
   scale_y_continuous(labels = percent) +
+  facet_wrap(~Observatory) +
   labs(x = NULL, y = "Répartition des objectifs", fill = "Objectif") +
   theme_ror()
 ```
@@ -1564,8 +1568,8 @@ pertes_elevage <- res_ele |>
 ```{r}
 #| label: fig-pertes-elevage
 #| fig-cap: "Ménages ayant subi des pertes de bétail"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height(pertes_elevage, "Espece")
+#| fig-width: !expr fig_w("fig-pertes-elevage")
+#| fig-height: !expr fig_h("fig-pertes-elevage")
 
 pertes_elevage |>
   make_bar_obs(x = Espece, y = n, show_pct = FALSE,
@@ -1627,7 +1631,7 @@ dl_tbl_variants("tbl_produits_elevage", "08", function(d) {
 ```{r fig_produits_elevage}
 #| echo: false
 #| fig-cap: "Produits de l'élevage déclarés par les ménages"
-#| fig-height: 6
+#| fig-height: !expr fig_h("fig_produits_elevage")
 pe_plot <- res_pe |>
   filter(pe_1 != "", !is.na(pe_1)) |>
   mutate(Produit = str_to_title(pe_1)) |>
@@ -1712,8 +1716,8 @@ chasse_especes <- res_chph |>
 ```{r}
 #| label: fig-chasse-especes
 #| fig-cap: "Principales espèces chassées/pêchées"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height(chasse_especes, "Espece")
+#| fig-width: !expr fig_w("fig-chasse-especes")
+#| fig-height: !expr fig_h("fig-chasse-especes")
 
 chasse_especes |>
   make_bar_obs(x = Espece, y = n, show_pct = FALSE,
@@ -1743,6 +1747,7 @@ dl_fig_variants("fig_chasse_especes", "08", function(d) {
 chasse_raison <- res_chph |>
   filter(!is.na(chph5)) |>
   mutate(Raison = safe_to_char(chph5)) |>
+  mutate(Raison = if_else(Raison %in% c("7"), "Autre", Raison)) |>
   count(Observatory, Raison) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
   expand_sites_for_profile()
@@ -1751,8 +1756,8 @@ chasse_raison <- res_chph |>
 ```{r}
 #| label: fig-chasse-raison
 #| fig-cap: "Raisons de la chasse/pêche par observatoire"
-#| fig-width: 8
-#| fig-height: !expr ror_fig_height(chasse_raison, "Raison")
+#| fig-width: !expr fig_w("fig-chasse-raison")
+#| fig-height: !expr fig_h("fig-chasse-raison")
 
 chasse_raison |>
   make_bar_obs(x = Raison, y_label = "% des mentions")
@@ -1765,6 +1770,7 @@ dl_fig_variants("fig_chasse_raison", "08", function(d) {
   d |>
     filter(!is.na(chph5)) |>
     mutate(Raison = safe_to_char(chph5)) |>
+    mutate(Raison = if_else(Raison %in% c("7"), "Autre", Raison)) |>
     count(Observatory, Raison) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
     ror_bar_grouped(x = Raison, fill = Observatory,
@@ -1792,8 +1798,8 @@ frequence_peche <- res_chph |>
 ```{r}
 #| label: fig-frequence-peche
 #| fig-cap: "Fréquence de la chasse/pêche"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height(frequence_peche, "Frequence")
+#| fig-width: !expr fig_w("fig-frequence-peche")
+#| fig-height: !expr fig_h("fig-frequence-peche")
 
 frequence_peche |>
   make_bar_obs(x = Frequence, y_label = "% des mentions")
@@ -1817,8 +1823,8 @@ dl_fig_variants("fig_frequence_peche", "08", function(d) {
 ```{r}
 #| label: fig-saisonnalite-peche
 #| fig-cap: "Saisonnalité de la chasse/pêche (% de mentions par mois)"
-#| fig-width: 10
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-saisonnalite-peche")
+#| fig-height: !expr fig_h("fig-saisonnalite-peche")
 
 chph6_cols <- paste0("chph6_", sprintf("%02d", 1:12))
 chph6_cols <- chph6_cols[chph6_cols %in% names(res_chph)]
@@ -2037,8 +2043,8 @@ Les ménages les plus aisés cultivent-ils des cultures différentes ? On croise
 ```{r}
 #| label: fig-cultures-quintile
 #| fig-cap: "Familles de cultures non rizicoles pratiquées selon le quintile de revenu"
-#| fig-width: 10
-#| fig-height: 6
+#| fig-width: !expr fig_w("fig-cultures-quintile")
+#| fig-height: !expr fig_h("fig-cultures-quintile")
 
 # Calcul des revenus pour 2025
 source("utils/calc_incomes_all_years.R")
@@ -2253,8 +2259,8 @@ agro_gap   <- agro_trends |> filter(year %in% c(2015, 2025))
 
 ```{r fig_agro_prod_riz}
 #| fig-cap: "Évolution de la production rizicole moyenne par ménage (kg/ménage/an)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_agro_prod_riz")
+#| fig-height: !expr fig_h("fig_agro_prod_riz")
 
 if ("prod_moy" %in% names(agro_trends)) {
   ggplot(mapping = aes(x = year, y = prod_moy, colour = Observatory)) +
@@ -2270,8 +2276,8 @@ if ("prod_moy" %in% names(agro_trends)) {
 
 ```{r fig_agro_rdt_riz}
 #| fig-cap: "Évolution du rendement rizicole moyen (kg/are) — années avec données de surface"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_agro_rdt_riz")
+#| fig-height: !expr fig_h("fig_agro_rdt_riz")
 
 if ("rdt_moy" %in% names(agro_trends)) {
   rdt_data <- agro_trends |> filter(!is.na(rdt_moy))
@@ -2291,8 +2297,8 @@ if ("rdt_moy" %in% names(agro_trends)) {
 
 ```{r fig_agro_elevage}
 #| fig-cap: "Évolution du taux de pratique de l'élevage (1998–2025)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_agro_elevage")
+#| fig-height: !expr fig_h("fig_agro_elevage")
 
 if ("pct_elevage" %in% names(agro_trends)) {
   el_data <- agro_trends |> filter(!is.na(pct_elevage))

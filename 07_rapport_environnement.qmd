@@ -95,6 +95,18 @@ pct_oui <- function(df, var, label) {
     select(Item, any_of(c("Alaotra", "Marovoay")))
 }
 
+# Version "long" pour les figures avec expansion par site
+pct_oui_site <- function(df, var, label) {
+  var_sym <- sym(var)
+  df |>
+    expand_sites_for_profile() |>
+    summarise(
+      pct = round(sum(!!var_sym == 1, na.rm = TRUE) / sum(!is.na(!!var_sym)) * 100, 0),
+      .by = Observatory
+    ) |>
+    mutate(Item = label)
+}
+
 # Labels mois
 mois_labs <- c("Jan", "Fév", "Mar", "Avr", "Mai", "Jun",
                "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc")
@@ -109,8 +121,8 @@ Les ménages ont été interrogés sur la disponibilité de dix catégories de r
 
 ```{r}
 #| fig-cap: "Disponibilité perçue des ressources naturelles dans la zone protégée, par observatoire"
-#| fig-width: 10
-#| fig-height: 6
+#| fig-width: !expr fig_w("fig-ressources-dispo")
+#| fig-height: !expr fig_h("fig-ressources-dispo")
 #| label: fig-ressources-dispo
 
 res_labels <- tribble(
@@ -128,6 +140,7 @@ res_labels <- tribble(
 )
 
 dispo <- res_ap_def |>
+  expand_sites_for_profile() |>
   filter(rm2_lig %in% 1:10) |>
   left_join(res_labels, by = "rm2_lig") |>
   mutate(
@@ -185,11 +198,12 @@ Les ménages estiment l'évolution de ces ressources sur les trois et cinq derni
 
 ```{r}
 #| fig-cap: "Évolution perçue des ressources naturelles au cours des 3 dernières années"
-#| fig-width: 10
-#| fig-height: 6
+#| fig-width: !expr fig_w("fig-evolution-ressources")
+#| fig-height: !expr fig_h("fig-evolution-ressources")
 #| label: fig-evolution-ressources
 
 evol <- res_ap_def |>
+  expand_sites_for_profile() |>
   filter(rm2_lig %in% 1:10) |>
   left_join(res_labels, by = "rm2_lig") |>
   mutate(
@@ -257,16 +271,13 @@ rm3_items <- tribble(
 )
 
 appart <- rm3_items |>
-  pmap_dfr(\(var, label) {
-    pct_oui(res_op_env, var, label)
-  }) |>
-  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
+  pmap_dfr(\(var, label) pct_oui_site(res_op_env, var, label))
 ```
 
 ```{r}
 #| fig-cap: "À qui appartient la zone protégée ? (% de Oui, réponses multiples)"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height(appart, "Item")
+#| fig-width: !expr fig_w("fig-appartenance")
+#| fig-height: !expr fig_h("fig-appartenance")
 #| label: fig-appartenance
 appart |>
   make_bar_obs(x = Item, y = pct, y_label = "% de ménages")
@@ -360,14 +371,12 @@ bind_rows(
 
 ```{r fig_menaces}
 #| fig-cap: "Menaces perçues et responsables identifiés (% de Oui)"
-#| fig-height: 8
+#| fig-height: !expr fig_h("fig_menaces")
 
 menaces_long <- bind_rows(
-  menaces |> mutate(Section = "Menaces"),
-  resps |> mutate(Section = "Responsables")
+  menace_items |> pmap_dfr(\(var, label) pct_oui_site(op_menace, var, label)) |> mutate(Section = "Menaces"),
+  resp_items |> pmap_dfr(\(var, label) pct_oui_site(op_menace, var, label)) |> mutate(Section = "Responsables")
 ) |>
-  pivot_longer(cols = any_of(c("Alaotra", "Marovoay")),
-               names_to = "Observatory", values_to = "pct") |>
   filter(!is.na(pct))
 
 menaces_long |>
@@ -376,7 +385,7 @@ menaces_long |>
     x = Item, fill = Observatory,
     y_label = "%", direction = "horizontal", facet = FALSE
   ) +
-  facet_wrap(~Section, scales = "free_y", ncol = 1)
+  facet_wrap(~Section, scales = "free_y", ncol = 2)
 ```
 
 ```{r dl_fig_menaces}
@@ -458,14 +467,13 @@ rm5_items <- tribble(
 )
 
 repr <- rm5_items |>
-  pmap_dfr(\(var, label) pct_oui(res_op_env, var, label)) |>
-  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
+  pmap_dfr(\(var, label) pct_oui_site(res_op_env, var, label))
 ```
 
 ```{r}
 #| fig-cap: "Que représente la zone protégée pour les ménages ? (% de Oui)"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height(repr, "Item")
+#| fig-width: !expr fig_w("fig-representation")
+#| fig-height: !expr fig_h("fig-representation")
 #| label: fig-representation
 repr |>
   make_bar_obs(x = Item, y = pct, y_label = "% de ménages")
@@ -505,8 +513,8 @@ Le fichier `res_ef` recense les produits forestiers collectés par les ménages 
 
 ```{r}
 #| fig-cap: "Pourcentage de ménages pratiquant la collecte de produits forestiers, par observatoire"
-#| fig-width: 9
-#| fig-height: 4
+#| fig-width: !expr fig_w("fig-ef-produits")
+#| fig-height: !expr fig_h("fig-ef-produits")
 #| label: fig-ef-produits
 
 ef_labels <- tribble(
@@ -517,17 +525,19 @@ ef_labels <- tribble(
 )
 
 ef_men <- res_ef |>
+  expand_sites_for_profile() |>
   filter(ef_lig %in% 1:3) |>
   left_join(ef_labels, by = "ef_lig") |>
   distinct(j5, Observatory, Produit)
 
 ef_pct <- ef_men |>
   count(Observatory, Produit) |>
-  left_join(res_deb |> count(Observatory, name = "n_tot"), by = "Observatory") |>
+  left_join(res_deb_site |> count(Observatory, name = "n_tot"), by = "Observatory") |>
   mutate(pct = round(n / n_tot * 100, 1))
 
 ef_pct |>
-  ror_bar_v(x = Produit, y = pct, y_label = "% des ménages", show_pct = TRUE)
+  ror_bar_v(x = Produit, y = pct, y_label = "% des ménages", show_pct = TRUE) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ```{r dl_fig_ef_produits}
@@ -549,11 +559,12 @@ dl_fig_variants("fig_ef_produits", "10", function(d) {
 
 ```{r}
 #| fig-cap: "Origine des produits forestiers collectés (dans ou hors Aire Protégée)"
-#| fig-width: 9
-#| fig-height: 4
+#| fig-width: !expr fig_w("fig-ef-origine")
+#| fig-height: !expr fig_h("fig-ef-origine")
 #| label: fig-ef-origine
 
 ef_orig <- res_ef |>
+  expand_sites_for_profile() |>
   filter(ef_lig %in% 1:3, efb %in% c(1, 2)) |>
   left_join(ef_labels, by = "ef_lig") |>
   mutate(
@@ -570,7 +581,8 @@ ef_orig |>
     x = Produit, y = pct, fill = Origine,
     proportion = FALSE, direction = "vertical",
     palette = c("Dans l'AP" = "#d62728", "Hors AP" = "#2ca02c")
-  )
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ```{r dl_fig_ef_origine}
@@ -597,13 +609,14 @@ La collecte de produits forestiers suit un calendrier saisonnier lié aux besoin
 
 ```{r}
 #| fig-cap: "Saisonnalité de la collecte de produits forestiers (% de ménages actifs par mois)"
-#| fig-width: 10
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-ef-saison")
+#| fig-height: !expr fig_h("fig-ef-saison")
 #| label: fig-ef-saison
 
 mois_cols <- paste0("efe_", sprintf("%02d", 1:12))
 
 ef_saison <- res_ef |>
+  expand_sites_for_profile() |>
   filter(ef_lig %in% 1:3) |>
   left_join(ef_labels, by = "ef_lig") |>
   pivot_longer(cols = all_of(mois_cols), names_to = "mois_var", values_to = "actif") |>
@@ -799,14 +812,13 @@ non_items <- tribble(
 )
 
 non_freq <- non_items |>
-  pmap_dfr(\(var, label) pct_oui(um1_non, var, label)) |>
-  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
+  pmap_dfr(\(var, label) pct_oui_site(um1_non, var, label))
 ```
 
 ```{r}
 #| fig-cap: "Raisons de ne pas se rendre dans l'Aire protégée (% de Oui parmi ceux qui n'y vont pas)"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height(non_freq, "Item")
+#| fig-width: !expr fig_w("fig-non-freq")
+#| fig-height: !expr fig_h("fig-non-freq")
 #| label: fig-non-freq
 non_freq |>
   make_bar_obs(x = Item, y = pct, y_label = "% de ménages")
@@ -858,11 +870,12 @@ um2_labels <- tribble(
 )
 
 usages <- res_um2 |>
+  expand_sites_for_profile() |>
   filter(um2_lig %in% 1:12, um2_a == 1) |>
   left_join(um2_labels, by = "um2_lig") |>
   count(Observatory, Raison) |>
   left_join(
-    res_um1 |> filter(um1 == 1) |> count(Observatory, name = "n_usagers"),
+    res_um1 |> expand_sites_for_profile() |> filter(um1 == 1) |> count(Observatory, name = "n_usagers"),
     by = "Observatory"
   ) |>
   mutate(pct = round(n / n_usagers * 100, 0))
@@ -870,8 +883,8 @@ usages <- res_um2 |>
 
 ```{r}
 #| fig-cap: "Raisons de se rendre dans l'Aire protégée (% de Oui parmi les usagers)"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height(usages, "Raison")
+#| fig-width: !expr fig_w("fig-usages-ap")
+#| fig-height: !expr fig_h("fig-usages-ap")
 #| label: fig-usages-ap
 usages |>
   make_bar_obs(x = Raison, y = pct, y_label = "% des usagers de l'AP")
@@ -904,8 +917,8 @@ dl_fig_variants("fig_usages_ap", "10", function(d) {
 
 ```{r}
 #| fig-cap: "Fréquence des déplacements dans l'AP selon l'usage, par observatoire"
-#| fig-width: 10
-#| fig-height: 6
+#| fig-width: !expr fig_w("fig-freq-usages")
+#| fig-height: !expr fig_h("fig-freq-usages")
 #| label: fig-freq-usages
 
 freq_labels <- c(
@@ -916,6 +929,7 @@ freq_labels <- c(
 )
 
 freq_usage <- res_um2 |>
+  expand_sites_for_profile() |>
   filter(um2_lig %in% 1:12, um2_a == 1, um2_b %in% 1:4) |>
   left_join(um2_labels, by = "um2_lig") |>
   mutate(Fréquence = factor(freq_labels[as.character(um2_b)],
@@ -967,8 +981,8 @@ La fréquentation de l'Aire protégée n'est pas uniforme au cours de l'année. 
 
 ```{r}
 #| fig-cap: "Saisonnalité des usages de l'AP (% d'usagers actifs par mois, principales raisons), par observatoire"
-#| fig-width: 10
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-saison-ap")
+#| fig-height: !expr fig_h("fig-saison-ap")
 #| label: fig-saison-ap
 
 um2_mois <- paste0("um2_d_", sprintf("%02d", 1:12))
@@ -980,6 +994,7 @@ top_raisons <- res_um2 |>
   pull(um2_lig)
 
 ap_saison <- res_um2 |>
+  expand_sites_for_profile() |>
   filter(um2_lig %in% top_raisons, um2_a == 1) |>
   left_join(um2_labels, by = "um2_lig") |>
   pivot_longer(cols = all_of(um2_mois), names_to = "mois_var", values_to = "actif") |>
@@ -1054,14 +1069,13 @@ feu_items <- tribble(
 )
 
 feu_raisons <- feu_items |>
-  pmap_dfr(\(var, label) pct_oui(res_feubrousse, var, label)) |>
-  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
+  pmap_dfr(\(var, label) pct_oui_site(res_feubrousse, var, label))
 ```
 
 ```{r}
 #| fig-cap: "Raisons perçues de faire des feux (% de Oui)"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height(feu_raisons, "Item")
+#| fig-width: !expr fig_w("fig-raisons-feux")
+#| fig-height: !expr fig_h("fig-raisons-feux")
 #| label: fig-raisons-feux
 feu_raisons |>
   make_bar_obs(x = Item, y = pct, y_label = "% de ménages")
@@ -1154,10 +1168,14 @@ bind_rows(
 ```{r fig_feux}
 #| fig-cap: "Pratique et perception des feux (% de Oui)"
 
-feu_long <- feu_tbl |>
-  bind_rows(maitr, echap) |>
-  pivot_longer(cols = any_of(c("Alaotra", "Marovoay")),
-               names_to = "Observatory", values_to = "pct") |>
+feu_long <- bind_rows(
+  pct_oui_site(res_feubrousse, "s17",   "Faire des feux est une pratique normale"),
+  pct_oui_site(res_feubrousse, "s17_a", "Faire des feux est vital / n\u00e9cessaire"),
+  pct_oui_site(res_feubrousse, "s18",   "A d\u00e9j\u00e0 fait des feux"),
+  pct_oui_site(res_feubrousse, "s18_b", "Feux au cours des 12 derniers mois"),
+  pct_oui_site(res_feubrousse |> filter(s18 == 1), "s19", "Cherche \u00e0 ma\u00eetriser le feu"),
+  pct_oui_site(res_feubrousse |> filter(s18 == 1), "s20", "Un feu lui a d\u00e9j\u00e0 \u00e9chapp\u00e9")
+) |>
   filter(!is.na(pct))
 
 feu_long |>
@@ -1216,13 +1234,14 @@ Les feux de brousse suivent un calendrier saisonnier bien défini, lié à la pr
 
 ```{r}
 #| fig-cap: "Saisonnalité des feux de brousse pratiqués (% de ménages actifs par mois, parmi ceux qui ont fait du feu)"
-#| fig-width: 10
-#| fig-height: 4
+#| fig-width: !expr fig_w("fig-saison-feux")
+#| fig-height: !expr fig_h("fig-saison-feux")
 #| label: fig-saison-feux
 
 feu_mois_cols <- paste0("s18_a_", sprintf("%02d", 1:12))
 
 feu_saison <- res_feubrousse |>
+  expand_sites_for_profile() |>
   filter(s18 == 1) |>
   pivot_longer(cols = any_of(feu_mois_cols), names_to = "mois_var", values_to = "actif") |>
   mutate(
@@ -1268,11 +1287,12 @@ Les ménages expriment une perception contrastée de l'évolution des feux de br
 
 ```{r}
 #| fig-cap: "Évolution perçue des feux depuis 3 ans, par observatoire"
-#| fig-width: 9
-#| fig-height: 4
+#| fig-width: !expr fig_w("fig-evol-feux")
+#| fig-height: !expr fig_h("fig-evol-feux")
 #| label: fig-evol-feux
 
 evol_feux <- res_feubrousse |>
+  expand_sites_for_profile() |>
   filter(s21 %in% 1:3) |>
   mutate(
     Évolution = case_when(
@@ -1311,11 +1331,12 @@ dl_fig_variants("fig_evol_feux", "10", function(d) {
 
 ```{r}
 #| fig-cap: "Les feux sont-ils un problème dans la région ? (par observatoire)"
-#| fig-width: 9
-#| fig-height: 4
+#| fig-width: !expr fig_w("fig-probleme-feux")
+#| fig-height: !expr fig_h("fig-probleme-feux")
 #| label: fig-probleme-feux
 
 prob_feux <- res_feubrousse |>
+  expand_sites_for_profile() |>
   filter(s22 %in% 1:4) |>
   mutate(
     Importance = case_when(
@@ -1359,11 +1380,12 @@ dl_fig_variants("fig_probleme_feux", "10", function(d) {
 
 ```{r}
 #| fig-cap: "La pratique du feu devrait être… (par observatoire)"
-#| fig-width: 8
-#| fig-height: 4
+#| fig-width: !expr fig_w("fig-reglementation-feux")
+#| fig-height: !expr fig_h("fig-reglementation-feux")
 #| label: fig-reglementation-feux
 
 regl_feux <- res_feubrousse |>
+  expand_sites_for_profile() |>
   filter(s23 %in% 1:3) |>
   mutate(
     Avis = case_when(
@@ -1433,17 +1455,18 @@ ap_items |>
 ```{r fig_connaissance_ap}
 #| fig-cap: "Connaissance de l'Aire protégée et demande de protection (% de Oui)"
 
-ap_long <- ap_items |>
-  pivot_longer(cols = any_of(c("Alaotra", "Marovoay")),
-               names_to = "Observatory", values_to = "pct") |>
+ap_long <- bind_rows(
+  pct_oui_site(res_ap, "ap1", "A entendu parler de l'AP"),
+  pct_oui_site(res_ap, "ap4", "N\u00e9cessaire de prot\u00e9ger l'environnement"),
+  pct_oui_site(res_ap, "ap5", "N\u00e9cessaire de prot\u00e9ger cette AP"),
+  pct_oui_site(res_ap, "ap6", "Perte de biodiversit\u00e9 \u00e0 Madagascar"),
+  pct_oui_site(res_ap, "ap7", "Les AP ont des r\u00e9sultats positifs")
+) |>
   filter(!is.na(pct))
 
 ap_long |>
   mutate(Item = reorder(Item, pct)) |>
-  ror_bar_grouped(
-    x = Item, fill = Observatory,
-    y_label = "%", direction = "horizontal", facet = FALSE
-  )
+  make_bar_obs(x = Item, y_label = "%")
 ```
 
 ```{r dl_fig_connaissance_ap_dl}
@@ -1491,8 +1514,8 @@ Les ménages qui ont entendu parler de l'AP jugent l'impact de ses actions sur t
 
 ```{r}
 #| fig-cap: "Jugement des actions de l'AP sur la situation économique, sociale et environnementale"
-#| fig-width: 10
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-jugement-ap")
+#| fig-height: !expr fig_h("fig-jugement-ap")
 #| label: fig-jugement-ap
 
 ap3_labels <- c(
@@ -1504,6 +1527,7 @@ ap3_labels <- c(
 )
 
 ap3_data <- res_ap |>
+  expand_sites_for_profile() |>
   filter(ap1 == 1) |>
   select(j5, Observatory, ap3_a, ap3_b, ap3_c) |>
   pivot_longer(c(ap3_a, ap3_b, ap3_c), names_to = "Dimension", values_to = "Valeur") |>
@@ -1572,6 +1596,7 @@ gest_labels <- c(
 )
 
 gest <- res_ap |>
+  expand_sites_for_profile() |>
   filter(ap5 == 1, ap5a %in% 1:7) |>
   mutate(Gestionnaire = factor(gest_labels[as.character(ap5a)], levels = gest_labels)) |>
   count(Observatory, Gestionnaire) |>
@@ -1580,8 +1605,8 @@ gest <- res_ap |>
 
 ```{r}
 #| fig-cap: "Qui devrait gérer l'AP ? (parmi ceux favorables à la protection)"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height(gest, "Gestionnaire")
+#| fig-width: !expr fig_w("fig-gestionnaire")
+#| fig-height: !expr fig_h("fig-gestionnaire")
 #| label: fig-gestionnaire
 gest |>
   make_bar_obs(x = Gestionnaire, y = pct, y_label = "% de ménages")
@@ -1631,14 +1656,13 @@ ap5b_items <- tribble(
 ap_favorable <- res_ap |> filter(ap5 == 1)
 
 mesures <- ap5b_items |>
-  pmap_dfr(\(var, label) pct_oui(ap_favorable, var, label)) |>
-  pivot_longer(any_of(c("Alaotra", "Marovoay")), names_to = "Observatory", values_to = "pct")
+  pmap_dfr(\(var, label) pct_oui_site(ap_favorable, var, label))
 ```
 
 ```{r}
 #| fig-cap: "Mesures souhaitées pour protéger l'AP (% de Oui, parmi ceux favorables)"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height(mesures, "Item")
+#| fig-width: !expr fig_w("fig-mesures-protection")
+#| fig-height: !expr fig_h("fig-mesures-protection")
 #| label: fig-mesures-protection
 mesures |>
   make_bar_obs(x = Item, y = pct, y_label = "% de ménages")
@@ -1688,6 +1712,7 @@ ap8_labels <- c(
 )
 
 priorite <- res_ap |>
+  expand_sites_for_profile() |>
   filter(ap8 %in% 1:6) |>
   mutate(Priorité = factor(ap8_labels[as.character(ap8)], levels = ap8_labels)) |>
   count(Observatory, Priorité) |>
@@ -1696,8 +1721,8 @@ priorite <- res_ap |>
 
 ```{r}
 #| fig-cap: "Pauvreté vs. protection de l'environnement : quelle priorité ? (par observatoire)"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height(priorite, "Priorité")
+#| fig-width: !expr fig_w("fig-priorite")
+#| fig-height: !expr fig_h("fig-priorite")
 #| label: fig-priorite
 priorite |>
   make_bar_obs(x = Priorité, y = pct, y_label = "% de ménages")
@@ -1728,8 +1753,8 @@ La @fig-actions-ap présente le degré d'information, de consultation et de bén
 
 ```{r}
 #| fig-cap: "Information, consultation et bénéfice des actions de l'AP (% de Oui), par observatoire"
-#| fig-width: 10
-#| fig-height: 7
+#| fig-width: !expr fig_w("fig-actions-ap")
+#| fig-height: !expr fig_h("fig-actions-ap")
 #| label: fig-actions-ap
 
 ap2_labels <- tribble(
@@ -1746,6 +1771,7 @@ ap2_labels <- tribble(
 )
 
 ap2_data <- res_ap2 |>
+  expand_sites_for_profile() |>
   filter(ap2_lig %in% 1:9) |>
   left_join(ap2_labels, by = "ap2_lig") |>
   summarise(
