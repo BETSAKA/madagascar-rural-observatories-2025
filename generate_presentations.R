@@ -25,7 +25,9 @@ PROJECT_ROOT <- here::here()
 
 #' Extract figure labels from the markdown list
 #' The URLs have the form: .../XX_chapter_files/figure-html/<label>-1.png
-parse_figure_list <- function(md_path = file.path(PROJECT_ROOT, "documentation/list_for_presentation.md")) {
+parse_figure_list <- function(
+  md_path = file.path(PROJECT_ROOT, "documentation/list_for_presentation.md")
+) {
   lines <- readLines(md_path, warn = FALSE)
   # Keep only lines containing a URL to a figure-html PNG
   url_lines <- lines[grepl("figure-html/", lines)]
@@ -39,7 +41,7 @@ parse_figure_list <- function(md_path = file.path(PROJECT_ROOT, "documentation/l
       label = sub(".*/figure-html/(.+)-1\\.png.*", "\\1", raw)
     ) |>
     select(qmd_file, label) |>
-    distinct()  # remove duplicates (fig-tenure-riz listed twice)
+    distinct() # remove duplicates (fig-tenure-riz listed twice)
 
   figures
 }
@@ -165,7 +167,9 @@ extract_setup_code <- function(qmd_path, target_label) {
 
     if (in_chunk && grepl("^```\\s*$", line)) {
       in_chunk <- FALSE
-      if (!is.null(current_label) && current_label == target_label) break
+      if (!is.null(current_label) && current_label == target_label) {
+        break
+      }
       setup_lines <- c(setup_lines, chunk_code)
       next
     }
@@ -196,43 +200,58 @@ load_presentation_sizes <- function() {
 }
 
 DEFAULT_FONTS <- list(
-  base_size = 14, title = 16, axis_text = 12, axis_title = 13,
-  legend_text = 12, legend_title = 13, strip_text = 12, geom_text = 4.5
+  base_size = 14,
+  title = 16,
+  axis_text = 12,
+  axis_title = 13,
+  legend_text = 12,
+  legend_title = 13,
+  strip_text = 12,
+  geom_text = 4.5
 )
 
 #' Get font settings for a figure: defaults → _defaults → per-figure override
 get_pres_fonts <- function(label, pres_sizes = NULL) {
-  if (is.null(pres_sizes)) pres_sizes <- load_presentation_sizes()
+  if (is.null(pres_sizes)) {
+    pres_sizes <- load_presentation_sizes()
+  }
   # Start with hard-coded defaults
 
   fonts <- DEFAULT_FONTS
   # Merge global defaults from YAML
   global <- pres_sizes[["_defaults"]]$fonts
   if (!is.null(global)) {
-    for (k in names(global)) fonts[[k]] <- global[[k]]
+    for (k in names(global)) {
+      fonts[[k]] <- global[[k]]
+    }
   }
   # Merge per-figure overrides
   fig_fonts <- pres_sizes[[label]]$fonts
   if (!is.null(fig_fonts)) {
-    for (k in names(fig_fonts)) fonts[[k]] <- fig_fonts[[k]]
+    for (k in names(fig_fonts)) {
+      fonts[[k]] <- fig_fonts[[k]]
+    }
   }
   fonts
 }
 
 #' Apply presentation font overrides to a ggplot object
 apply_presentation_fonts <- function(p, fonts) {
-  if (is.null(p) || !inherits(p, "gg")) return(p)
-  p <- p + ggplot2::theme(
-    text             = ggplot2::element_text(size = fonts$base_size),
-    plot.title       = ggplot2::element_text(size = fonts$title, face = "bold"),
-    axis.text        = ggplot2::element_text(size = fonts$axis_text),
-    axis.text.x      = ggplot2::element_text(size = fonts$axis_text),
-    axis.text.y      = ggplot2::element_text(size = fonts$axis_text),
-    axis.title       = ggplot2::element_text(size = fonts$axis_title),
-    legend.text      = ggplot2::element_text(size = fonts$legend_text),
-    legend.title     = ggplot2::element_text(size = fonts$legend_title),
-    strip.text       = ggplot2::element_text(size = fonts$strip_text)
-  )
+  if (is.null(p) || !inherits(p, "gg")) {
+    return(p)
+  }
+  p <- p +
+    ggplot2::theme(
+      text = ggplot2::element_text(size = fonts$base_size),
+      plot.title = ggplot2::element_text(size = fonts$title, face = "bold"),
+      axis.text = ggplot2::element_text(size = fonts$axis_text),
+      axis.text.x = ggplot2::element_text(size = fonts$axis_text),
+      axis.text.y = ggplot2::element_text(size = fonts$axis_text),
+      axis.title = ggplot2::element_text(size = fonts$axis_title),
+      legend.text = ggplot2::element_text(size = fonts$legend_text),
+      legend.title = ggplot2::element_text(size = fonts$legend_title),
+      strip.text = ggplot2::element_text(size = fonts$strip_text)
+    )
   # Override geom_text / geom_label layer sizes
   for (i in seq_along(p$layers)) {
     geom <- p$layers[[i]]$geom
@@ -246,10 +265,18 @@ apply_presentation_fonts <- function(p, fonts) {
 #' Get figure dimensions for a given label and profile
 #' Prefers presentation_sizes.yml, falls back to figure_sizes.yml
 #' @return list(width, height) in inches
-get_fig_dims <- function(label, profile = "marovoay",
-                         sizes = NULL, pres_sizes = NULL) {
-  if (is.null(sizes)) sizes <- load_figure_sizes()
-  if (is.null(pres_sizes)) pres_sizes <- load_presentation_sizes()
+get_fig_dims <- function(
+  label,
+  profile = "marovoay",
+  sizes = NULL,
+  pres_sizes = NULL
+) {
+  if (is.null(sizes)) {
+    sizes <- load_figure_sizes()
+  }
+  if (is.null(pres_sizes)) {
+    pres_sizes <- load_presentation_sizes()
+  }
 
   # Prefer presentation sizes (always stored as marovoay base)
   w <- pres_sizes[[label]]$marovoay$width %||%
@@ -295,19 +322,24 @@ render_figure <- function(qmd_file, label, profile) {
   saved_wd <- setwd(PROJECT_ROOT)
   on.exit(setwd(saved_wd), add = TRUE)
 
-  tryCatch({
-    result <- eval(parse(text = paste(figure_code, collapse = "\n")),
-                   envir = globalenv())
-    if (inherits(result, "gg") || inherits(result, "ggplot")) {
-      return(result)
-    } else {
-      message("  Chunk '", label, "' did not return a ggplot object")
+  tryCatch(
+    {
+      result <- eval(
+        parse(text = paste(figure_code, collapse = "\n")),
+        envir = globalenv()
+      )
+      if (inherits(result, "gg") || inherits(result, "ggplot")) {
+        return(result)
+      } else {
+        message("  Chunk '", label, "' did not return a ggplot object")
+        return(NULL)
+      }
+    },
+    error = function(e) {
+      message("  Error rendering '", label, "': ", e$message)
       return(NULL)
     }
-  }, error = function(e) {
-    message("  Error rendering '", label, "': ", e$message)
-    return(NULL)
-  })
+  )
 }
 
 #' Load all setup code for a chapter into the global environment
@@ -376,8 +408,7 @@ load_chapter_env <- function(qmd_file, first_label, profile) {
 #' @param title    Presentation title
 #' @param output_path  Path for the output .pptx file
 generate_pptx <- function(figures, profile, title, output_path) {
-
-  sizes      <- load_figure_sizes()
+  sizes <- load_figure_sizes()
   pres_sizes <- load_presentation_sizes()
 
   # Landscape slide: 13.33 × 7.5 inches (widescreen)
@@ -388,10 +419,11 @@ generate_pptx <- function(figures, profile, title, output_path) {
   # Set slide size to landscape widescreen
   pptx <- pptx |>
     add_slide(layout = "Title Slide", master = "Office Theme") |>
-    ph_with(value = title,
-            location = ph_location_type(type = "ctrTitle")) |>
-    ph_with(value = "Restitution locale — Campagne 2025",
-            location = ph_location_type(type = "subTitle"))
+    ph_with(value = title, location = ph_location_type(type = "ctrTitle")) |>
+    ph_with(
+      value = "Restitution locale — Campagne 2025",
+      location = ph_location_type(type = "subTitle")
+    )
 
   # Group figures by chapter so we load each chapter's data once
   chapter_groups <- split(figures, figures$qmd_file)
@@ -402,9 +434,19 @@ generate_pptx <- function(figures, profile, title, output_path) {
 
     # Extract fig-cap captions for this chapter
     qmd_path <- file.path(PROJECT_ROOT, qmd_file)
-    captions <- if (file.exists(qmd_path)) extract_fig_captions(qmd_path) else list()
+    captions <- if (file.exists(qmd_path)) {
+      extract_fig_captions(qmd_path)
+    } else {
+      list()
+    }
 
-    message("\n=== Loading chapter: ", qmd_file, " (profile: ", profile, ") ===")
+    message(
+      "\n=== Loading chapter: ",
+      qmd_file,
+      " (profile: ",
+      profile,
+      ") ==="
+    )
     tryCatch(
       load_chapter_env(qmd_file, first_label, profile),
       error = function(e) message("  Setup error: ", e$message)
@@ -418,29 +460,39 @@ generate_pptx <- function(figures, profile, title, output_path) {
 
       # If not the first figure, load additional setup between prev and this
       if (i > 1) {
-        tryCatch({
-          Sys.setenv(QUARTO_PROFILE = profile)
-          saved_wd <- setwd(PROJECT_ROOT)
-          on.exit(setwd(saved_wd), add = TRUE)
+        tryCatch(
+          {
+            Sys.setenv(QUARTO_PROFILE = profile)
+            saved_wd <- setwd(PROJECT_ROOT)
+            on.exit(setwd(saved_wd), add = TRUE)
 
-          # Get incremental code between previous and current figure
-          qmd_path <- file.path(PROJECT_ROOT, qmd_file)
-          setup_code <- extract_setup_code(qmd_path, label)
-          prev_setup <- extract_setup_code(qmd_path, chapter_figs$label[i - 1])
-          # Only run lines after what we already ran
-          if (length(setup_code) > length(prev_setup)) {
-            new_code <- setup_code[(length(prev_setup) + 1):length(setup_code)]
-            new_code <- new_code[!grepl("^\\s*knitr::", new_code)]
-            new_code <- new_code[!grepl("knit_print", new_code)]
-            new_code <- new_code[!grepl("registerS3method", new_code)]
-            if (length(new_code) > 0) {
-              eval(parse(text = paste(new_code, collapse = "\n")),
-                   envir = globalenv())
+            # Get incremental code between previous and current figure
+            qmd_path <- file.path(PROJECT_ROOT, qmd_file)
+            setup_code <- extract_setup_code(qmd_path, label)
+            prev_setup <- extract_setup_code(
+              qmd_path,
+              chapter_figs$label[i - 1]
+            )
+            # Only run lines after what we already ran
+            if (length(setup_code) > length(prev_setup)) {
+              new_code <- setup_code[
+                (length(prev_setup) + 1):length(setup_code)
+              ]
+              new_code <- new_code[!grepl("^\\s*knitr::", new_code)]
+              new_code <- new_code[!grepl("knit_print", new_code)]
+              new_code <- new_code[!grepl("registerS3method", new_code)]
+              if (length(new_code) > 0) {
+                eval(
+                  parse(text = paste(new_code, collapse = "\n")),
+                  envir = globalenv()
+                )
+              }
             }
+          },
+          error = function(e) {
+            message("  Incremental setup error for '", label, "': ", e$message)
           }
-        }, error = function(e) {
-          message("  Incremental setup error for '", label, "': ", e$message)
-        })
+        )
       }
 
       # Render the figure
@@ -450,8 +502,8 @@ generate_pptx <- function(figures, profile, title, output_path) {
         dims <- get_fig_dims(label, profile, sizes, pres_sizes)
 
         # Scale to fit slide, preserving aspect ratio
-        margin_top <- 1.5  # space for title
-        avail_w <- slide_w          # full width, no horizontal margin
+        margin_top <- 1.5 # space for title
+        avail_w <- slide_w # full width, no horizontal margin
         avail_h <- slide_h - margin_top
 
         scale_factor <- min(avail_w / dims$width, avail_h / dims$height, 1.5)
@@ -476,25 +528,40 @@ generate_pptx <- function(figures, profile, title, output_path) {
 
         pptx <- pptx |>
           add_slide(layout = "Title Only", master = "Office Theme") |>
-          ph_with(value = slide_title,
-                  location = ph_location_type(type = "title")) |>
-          ph_with(value = dml(ggobj = p),
-                  location = ph_location(
-                    left = left, top = top,
-                    width = plot_w, height = plot_h
-                  ))
+          ph_with(
+            value = slide_title,
+            location = ph_location_type(type = "title")
+          ) |>
+          ph_with(
+            value = dml(ggobj = p),
+            location = ph_location(
+              left = left,
+              top = top,
+              width = plot_w,
+              height = plot_h
+            )
+          )
 
-        message("    \u2713 Added (", round(plot_w, 1), " \u00d7 ", round(plot_h, 1), " in)")
+        message(
+          "    \u2713 Added (",
+          round(plot_w, 1),
+          " \u00d7 ",
+          round(plot_h, 1),
+          " in)"
+        )
       } else {
         # Add a placeholder slide
         slide_title <- captions[[label]] %||% label
         pptx <- pptx |>
           add_slide(layout = "Title Only", master = "Office Theme") |>
-          ph_with(value = slide_title,
-                  location = ph_location_type(type = "title")) |>
-          ph_with(value = paste("Figure could not be rendered:", label),
-                  location = ph_location(left = 2, top = 3,
-                                         width = 8, height = 2))
+          ph_with(
+            value = slide_title,
+            location = ph_location_type(type = "title")
+          ) |>
+          ph_with(
+            value = paste("Figure could not be rendered:", label),
+            location = ph_location(left = 2, top = 3, width = 8, height = 2)
+          )
         message("    ✗ Placeholder slide added")
       }
     }
@@ -519,7 +586,6 @@ generate_pptx <- function(figures, profile, title, output_path) {
 #' @param profile     "marovoay" or "alaotra"
 #' @param output_path Path for the output .xlsx file
 generate_xlsx <- function(figures, profile, output_path) {
-
   sheets <- list()
 
   # Group figures by chapter so we load each chapter's data once
@@ -527,9 +593,15 @@ generate_xlsx <- function(figures, profile, output_path) {
 
   for (qmd_file in names(chapter_groups)) {
     chapter_figs <- chapter_groups[[qmd_file]]
-    first_label  <- chapter_figs$label[1]
+    first_label <- chapter_figs$label[1]
 
-    message("\n=== Loading chapter: ", qmd_file, " (profile: ", profile, ") ===")
+    message(
+      "\n=== Loading chapter: ",
+      qmd_file,
+      " (profile: ",
+      profile,
+      ") ==="
+    )
     tryCatch(
       load_chapter_env(qmd_file, first_label, profile),
       error = function(e) message("  Setup error: ", e$message)
@@ -541,27 +613,38 @@ generate_xlsx <- function(figures, profile, output_path) {
 
       # Incremental setup for subsequent figures in same chapter
       if (i > 1) {
-        tryCatch({
-          Sys.setenv(QUARTO_PROFILE = profile)
-          saved_wd <- setwd(PROJECT_ROOT)
-          on.exit(setwd(saved_wd), add = TRUE)
+        tryCatch(
+          {
+            Sys.setenv(QUARTO_PROFILE = profile)
+            saved_wd <- setwd(PROJECT_ROOT)
+            on.exit(setwd(saved_wd), add = TRUE)
 
-          qmd_path   <- file.path(PROJECT_ROOT, qmd_file)
-          setup_code <- extract_setup_code(qmd_path, label)
-          prev_setup <- extract_setup_code(qmd_path, chapter_figs$label[i - 1])
+            qmd_path <- file.path(PROJECT_ROOT, qmd_file)
+            setup_code <- extract_setup_code(qmd_path, label)
+            prev_setup <- extract_setup_code(
+              qmd_path,
+              chapter_figs$label[i - 1]
+            )
 
-          if (length(setup_code) > length(prev_setup)) {
-            new_code <- setup_code[(length(prev_setup) + 1):length(setup_code)]
-            new_code <- new_code[!grepl("^\\s*knitr::", new_code)]
-            new_code <- new_code[!grepl("knit_print", new_code)]
-            new_code <- new_code[!grepl("registerS3method", new_code)]
-            if (length(new_code) > 0)
-              eval(parse(text = paste(new_code, collapse = "\n")),
-                   envir = globalenv())
+            if (length(setup_code) > length(prev_setup)) {
+              new_code <- setup_code[
+                (length(prev_setup) + 1):length(setup_code)
+              ]
+              new_code <- new_code[!grepl("^\\s*knitr::", new_code)]
+              new_code <- new_code[!grepl("knit_print", new_code)]
+              new_code <- new_code[!grepl("registerS3method", new_code)]
+              if (length(new_code) > 0) {
+                eval(
+                  parse(text = paste(new_code, collapse = "\n")),
+                  envir = globalenv()
+                )
+              }
+            }
+          },
+          error = function(e) {
+            message("  Incremental setup error for '", label, "': ", e$message)
           }
-        }, error = function(e) {
-          message("  Incremental setup error for '", label, "': ", e$message)
-        })
+        )
       }
 
       # Render the figure
@@ -573,10 +656,19 @@ generate_xlsx <- function(figures, profile, output_path) {
           # Apply confidentiality suppression
           df <- suppress_for_export(df)
           # Excel sheet names: max 31 chars, no special chars
-          sheet_name <- substr(gsub("[\\[\\]\\*\\?\\/\\\\:]", "_", label), 1, 31)
+          sheet_name <- substr(
+            gsub("[\\[\\]\\*\\?\\/\\\\:]", "_", label),
+            1,
+            31
+          )
           sheets[[sheet_name]] <- df
-          message("    \u2713 Data extracted (",
-                  nrow(df), " rows, ", ncol(df), " cols)")
+          message(
+            "    \u2713 Data extracted (",
+            nrow(df),
+            " rows, ",
+            ncol(df),
+            " cols)"
+          )
         } else {
           message("    \u2717 No data in plot")
         }
@@ -607,14 +699,13 @@ generate_xlsx <- function(figures, profile, output_path) {
 #' @param title       Document title
 #' @param output_path Path for the output .docx file
 generate_docx <- function(figures, profile, title, output_path) {
-
-  sizes      <- load_figure_sizes()
+  sizes <- load_figure_sizes()
   pres_sizes <- load_presentation_sizes()
 
   # Portrait A4 usable area (margins 0.5 in)
-  margin  <- 0.5
-  avail_w <-  8.27 - 2 * margin        # ~7.27 in
-  avail_h <- 11.69 - 2 * margin - 0.8  # ~9.89 in (allow for heading)
+  margin <- 0.5
+  avail_w <- 8.27 - 2 * margin # ~7.27 in
+  avail_h <- 11.69 - 2 * margin - 0.8 # ~9.89 in (allow for heading)
 
   docx <- read_docx()
 
@@ -629,12 +720,22 @@ generate_docx <- function(figures, profile, title, output_path) {
 
   for (qmd_file in names(chapter_groups)) {
     chapter_figs <- chapter_groups[[qmd_file]]
-    first_label  <- chapter_figs$label[1]
+    first_label <- chapter_figs$label[1]
 
     qmd_path <- file.path(PROJECT_ROOT, qmd_file)
-    captions <- if (file.exists(qmd_path)) extract_fig_captions(qmd_path) else list()
+    captions <- if (file.exists(qmd_path)) {
+      extract_fig_captions(qmd_path)
+    } else {
+      list()
+    }
 
-    message("\n=== Loading chapter: ", qmd_file, " (profile: ", profile, ") ===")
+    message(
+      "\n=== Loading chapter: ",
+      qmd_file,
+      " (profile: ",
+      profile,
+      ") ==="
+    )
     tryCatch(
       load_chapter_env(qmd_file, first_label, profile),
       error = function(e) message("  Setup error: ", e$message)
@@ -646,28 +747,38 @@ generate_docx <- function(figures, profile, title, output_path) {
 
       # Incremental setup for subsequent figures in same chapter
       if (i > 1) {
-        tryCatch({
-          Sys.setenv(QUARTO_PROFILE = profile)
-          saved_wd <- setwd(PROJECT_ROOT)
-          on.exit(setwd(saved_wd), add = TRUE)
+        tryCatch(
+          {
+            Sys.setenv(QUARTO_PROFILE = profile)
+            saved_wd <- setwd(PROJECT_ROOT)
+            on.exit(setwd(saved_wd), add = TRUE)
 
-          qmd_path   <- file.path(PROJECT_ROOT, qmd_file)
-          setup_code <- extract_setup_code(qmd_path, label)
-          prev_setup <- extract_setup_code(qmd_path, chapter_figs$label[i - 1])
+            qmd_path <- file.path(PROJECT_ROOT, qmd_file)
+            setup_code <- extract_setup_code(qmd_path, label)
+            prev_setup <- extract_setup_code(
+              qmd_path,
+              chapter_figs$label[i - 1]
+            )
 
-          if (length(setup_code) > length(prev_setup)) {
-            new_code <- setup_code[(length(prev_setup) + 1):length(setup_code)]
-            new_code <- new_code[!grepl("^\\s*knitr::", new_code)]
-            new_code <- new_code[!grepl("knit_print", new_code)]
-            new_code <- new_code[!grepl("registerS3method", new_code)]
-            if (length(new_code) > 0) {
-              eval(parse(text = paste(new_code, collapse = "\n")),
-                   envir = globalenv())
+            if (length(setup_code) > length(prev_setup)) {
+              new_code <- setup_code[
+                (length(prev_setup) + 1):length(setup_code)
+              ]
+              new_code <- new_code[!grepl("^\\s*knitr::", new_code)]
+              new_code <- new_code[!grepl("knit_print", new_code)]
+              new_code <- new_code[!grepl("registerS3method", new_code)]
+              if (length(new_code) > 0) {
+                eval(
+                  parse(text = paste(new_code, collapse = "\n")),
+                  envir = globalenv()
+                )
+              }
             }
+          },
+          error = function(e) {
+            message("  Incremental setup error for '", label, "': ", e$message)
           }
-        }, error = function(e) {
-          message("  Incremental setup error for '", label, "': ", e$message)
-        })
+        )
       }
 
       # Render the figure
@@ -696,8 +807,13 @@ generate_docx <- function(figures, profile, title, output_path) {
           body_add_par(fig_title, style = "heading 2") |>
           body_add_gg(value = p, width = plot_w, height = plot_h)
 
-        message("    \u2713 Added (", round(plot_w, 1), " \u00d7 ",
-                round(plot_h, 1), " in)")
+        message(
+          "    \u2713 Added (",
+          round(plot_w, 1),
+          " \u00d7 ",
+          round(plot_h, 1),
+          " in)"
+        )
       } else {
         fig_title <- captions[[label]] %||% label
 
@@ -724,8 +840,13 @@ generate_docx <- function(figures, profile, title, output_path) {
 
 main <- function() {
   figures <- parse_figure_list()
-  message("Found ", nrow(figures), " figures to render across ",
-          n_distinct(figures$qmd_file), " chapters\n")
+  message(
+    "Found ",
+    nrow(figures),
+    " figures to render across ",
+    n_distinct(figures$qmd_file),
+    " chapters\n"
+  )
 
   # Marovoay presentation
   generate_pptx(
@@ -749,14 +870,20 @@ main <- function() {
   generate_xlsx(
     figures = figures,
     profile = "marovoay",
-    output_path = file.path(PROJECT_ROOT, "output/presentation_data_marovoay.xlsx")
+    output_path = file.path(
+      PROJECT_ROOT,
+      "output/presentation_data_marovoay.xlsx"
+    )
   )
 
   # Alaotra XLSX
   generate_xlsx(
     figures = figures,
     profile = "alaotra",
-    output_path = file.path(PROJECT_ROOT, "output/presentation_data_alaotra.xlsx")
+    output_path = file.path(
+      PROJECT_ROOT,
+      "output/presentation_data_alaotra.xlsx"
+    )
   )
 
   # ── DOCX proof documents (same display settings as PPTX) ──

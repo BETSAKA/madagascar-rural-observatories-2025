@@ -9,7 +9,7 @@
 # ─────────────────────────────────────────────────────────────────
 
 project_root <- here::here()
-deploy_dir   <- file.path(project_root, "deploy", "calibrate_cloud", "data")
+deploy_dir <- file.path(project_root, "deploy", "calibrate_cloud", "data")
 
 dir.create(deploy_dir, recursive = TRUE, showWarnings = FALSE)
 
