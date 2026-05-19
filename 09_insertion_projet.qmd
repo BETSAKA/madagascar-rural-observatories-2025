@@ -10,7 +10,7 @@ Ce chapitre analyse l'insertion sociale des ménages à travers leur appartenanc
 
 ::: {.callout-warning}
 ## Travail de vérification en cours
-Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
+Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales.
 :::
 
 ```{r setup_insertion}
@@ -113,7 +113,11 @@ pct_benef_m <- res_respg0 |> filter(Observatory == "Marovoay", pro1 %in% c(1, 2)
 
 ### Appartenance à une organisation
 
-Sur les `r n_men` ménages enquêtés, `r sum(res_respg0$respga == 1)` (`r round(sum(res_respg0$respga == 1) / n_men * 100, 1)` %) déclarent qu'au moins un de leurs membres appartient à une organisation ou association. La participation est nettement plus élevée à Marovoay qu'à Alaotra.
+Sur les `r n_men` ménages enquêtés, `r sum(res_respg0$respga == 1)` (`r round(sum(res_respg0$respga == 1) / n_men * 100, 1)` %) déclarent qu'au moins un de leurs membres appartient à une organisation ou association.
+
+::: {.content-visible when-profile="consolidated"}
+La participation est nettement plus élevée à Marovoay qu'à Alaotra.
+:::
 
 ```{r}
 #| label: tbl-adhesion
@@ -151,14 +155,14 @@ Parmi les ménages membres, la plupart n'adhèrent qu'à une seule organisation,
 ```{r}
 #| label: fig-nb-org
 #| fig-cap: "Nombre d'organisations par ménage membre"
-#| fig-width: 8
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-nb-org")
+#| fig-height: !expr fig_h("fig-nb-org")
 
 res_respg |>
   filter(!is.na(respgc)) |>
+  expand_sites_for_profile() |>
   count(j5, Observatory, name = "nb_org") |>
   count(Observatory, nb_org, name = "n_men") |>
-  expand_sites_for_profile() |>
   mutate(nb_org = factor(nb_org),
          pct = round(n_men / sum(n_men) * 100, 1), .by = Observatory) |>
   ror_bar_v(x = nb_org, y_label = "% des ménages")
@@ -194,17 +198,17 @@ org_type_data <- res_respg |>
       paste0("Code ", respgc_chr)
     )
   ) |>
+  expand_sites_for_profile() |>
   count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  filter(pct >= 1) |>
-  expand_sites_for_profile()
+  filter(pct >= 1)
 ```
 
 ```{r}
 #| label: fig-type-org
 #| fig-cap: "Type d'organisation (toutes adhésions)"
-#| fig-width: 11
-#| fig-height: !expr ror_fig_height(org_type_data)
+#| fig-width: !expr fig_w("fig-type-org")
+#| fig-height: !expr fig_h("fig-type-org")
 org_type_data |>
   make_bar_obs(x = Type, y_label = "% des adhésions")
 ```
@@ -244,16 +248,16 @@ membre_data <- res_respg |>
     respgb == 93 ~ "Tous les enfants",
     TRUE ~ "Autre"
   )) |>
+  expand_sites_for_profile() |>
   count(Observatory, Membre) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  expand_sites_for_profile()
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 ```
 
 ```{r}
 #| label: fig-qui-membre
 #| fig-cap: "Membre du ménage affilié à l'organisation"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height(membre_data, "Membre")
+#| fig-width: !expr fig_w("fig-qui-membre")
+#| fig-height: !expr fig_h("fig-qui-membre")
 membre_data |>
   make_bar_obs(x = Membre, y_label = "% des adhésions")
 ```
@@ -288,16 +292,16 @@ La grande majorité des membres se déclarent *membres occasionnels*, et seule u
 ```{r}
 #| label: fig-responsabilite
 #| fig-cap: "Niveau de responsabilité dans l'organisation"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-responsabilite")
+#| fig-height: !expr fig_h("fig-responsabilite")
 
 res_respg |>
   filter(!is.na(respgd), respgd %in% c(1, 2, 3)) |>
   mutate(Role = factor(as.character(respgd), levels = names(role_labs), labels = role_labs)) |>
+  expand_sites_for_profile() |>
   count(Observatory, Role) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  expand_sites_for_profile() |>
-  ror_bar_v(x = Role, y_label = "% des adhésions")
+  ror_bar_v(x = Role, y_label = "% des adhésions", x_angle = 30)
 ```
 
 ```{r dl_fig_responsabilite}
@@ -318,11 +322,11 @@ dl_fig_variants("fig_responsabilite", "12", function(d) {
 
 ## Accès des ménages aux projets {#sec-projets}
 
-Le questionnaire demande aux ménages s'ils ont bénéficié de projets ou de formations dans huit domaines. La variable `pro1` (dans `res_respg0`) indique si au moins un membre du ménage a bénéficié d'un projet, tandis que `res_pro` détaille les bénéficiaires par type de projet et leur source de financement.
+Le questionnaire demande aux ménages s'ils ont bénéficié de projets ou de formations dans huit domaines : agriculture, élevage et pêche, nutrition, éducation et santé, environnement, tourisme, autres productions et travaux à haute intensité de main d'œuvre (HIMO).
 
 ### Bénéficiaires de projets
 
-L'accès aux projets de développement reste inégal entre les deux sites.
+L'accès aux projets de développement reste inégal selon les localités.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
@@ -376,6 +380,8 @@ dl_tbl_variants("tbl_pro1", "12", function(d) {
 #| echo: false
 #| fig-cap: "Ménages bénéficiaires de projets ou formations"
 res_respg0 |>
+  filter(!is.na(pro1)) |>
+  expand_sites_for_profile() |>
   mutate(Type = case_when(
     pro1 == 1 ~ "Oui",
     pro1 == 2 ~ "Non",
@@ -391,6 +397,7 @@ res_respg0 |>
 #| results: asis
 dl_fig_variants("fig_pro1", "12", function(d) {
   d |>
+    filter(!is.na(pro1)) |>
     mutate(Type = case_when(
       pro1 == 1 ~ "Oui", pro1 == 2 ~ "Non", pro1 == 3 ~ "Ne sait pas"
     )) |>
@@ -402,7 +409,7 @@ dl_fig_variants("fig_pro1", "12", function(d) {
 
 ### Taux de bénéficiaires par type de projet
 
-L'éducation et la santé, la nutrition et l'agriculture sont les domaines pour lesquels les ménages bénéficient le plus de projets. Le tourisme reste totalement absent des deux observatoires.
+L'éducation et la santé, la nutrition et l'agriculture sont les domaines pour lesquels les ménages bénéficient le plus de projets.
 
 ```{r benef_type_data}
 pro_clean <- res_pro |>
@@ -424,18 +431,18 @@ pro_clean <- res_pro |>
 
 benef_type_data <- pro_clean |>
   filter(!is.na(pro2), pro2 %in% c(1, 2)) |>
+  expand_sites_for_profile() |>
   summarise(
     pct = round(mean(pro2 == 1) * 100, 1),
     .by = c(Observatory, pro_lib_clean)
-  ) |>
-  expand_sites_for_profile()
+  )
 ```
 
 ```{r}
 #| label: fig-benef-type
 #| fig-cap: "Taux de ménages bénéficiaires par type de projet"
-#| fig-width: 10
-#| fig-height: !expr ror_fig_height(benef_type_data, "pro_lib_clean")
+#| fig-width: !expr fig_w("fig-benef-type")
+#| fig-height: !expr fig_h("fig-benef-type")
 benef_type_data |>
   make_bar_obs(x = pro_lib_clean, y_label = "% de ménages bénéficiaires")
 ```
@@ -495,11 +502,12 @@ Pour les ménages bénéficiaires, le financement provient principalement de l'�
 ```{r}
 #| label: fig-source-projet
 #| fig-cap: "Source des projets pour les ménages bénéficiaires"
-#| fig-width: 10
-#| fig-height: 6
+#| fig-width: !expr fig_w("fig-source-projet")
+#| fig-height: !expr fig_h("fig-source-projet")
 
 pro_benef <- pro_clean |>
-  filter(pro2 == 1)
+  filter(pro2 == 1) |>
+  expand_sites_for_profile()
 
 pro_source <- pro_benef |>
   summarise(
@@ -645,12 +653,12 @@ res_respg0 |>
     Type = if_else(respga == 1, "Membre", "Non membre"),
     Beneficiaire = pro1 == 1
   ) |>
+  expand_sites_for_profile() |>
   summarise(
     pct = round(mean(Beneficiaire) * 100, 1),
     .by = c(Observatory, Type)
   ) |>
-  ror_bar_grouped(x = Type, fill = Observatory, y = pct,
-                  y_label = "% bénéficiaires", direction = "vertical")
+  ror_bar_v(x = Type, y = pct, y_label = "% bénéficiaires")
 ```
 
 ```{r dl_fig_croisement}
@@ -667,8 +675,7 @@ dl_fig_variants("fig_croisement", "12", function(d) {
       pct = round(mean(Beneficiaire) * 100, 1),
       .by = c(Observatory, Type)
     ) |>
-    ror_bar_grouped(x = Type, fill = Observatory, y = pct,
-                    y_label = "% bénéficiaires", direction = "vertical")
+    ror_bar_v(x = Type, y = pct, y_label = "% bénéficiaires")
 }, res_respg0, width = 10, height = 6)
 ```
 

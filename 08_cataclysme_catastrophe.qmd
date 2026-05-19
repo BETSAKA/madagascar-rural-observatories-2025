@@ -15,7 +15,7 @@ Deux fichiers de données sont mobilisés :
 
 ::: {.callout-warning}
 ## Travail de vérification en cours
-Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
+Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales.
 :::
 
 ```{r data_loading_cc}
@@ -94,7 +94,8 @@ res_cc <- res_cc %>%
       cata_labels[cc1_a_clean],
       cc1_a_clean
     )
-  )
+  ) %>%
+  filter(!is.na(Catastrophe))
 
 # Filtrer les événements survenus
 events <- res_cc %>% filter(cc11 == 1)
@@ -140,7 +141,7 @@ top_cata_m <- events_full %>% filter(Observatory == "Marovoay") %>%
 
 ## Prévalence des cataclysmes
 
-L'exposition aux aléas climatiques et biologiques est très élevée dans les deux observatoires.
+L'exposition aux aléas climatiques et biologiques est très élevée dans les zones rurales enquêtées.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
@@ -219,7 +220,7 @@ dl_tbl_variants("tbl_cata_prevalence", "11", function(d) {
 }, hh_cata)
 ```
 
-Le taux d'exposition aux cataclysmes est très élevé dans les deux observatoires.
+Le taux d'exposition aux cataclysmes est très élevé.
 
 ### Prévalence par type de catastrophe
 
@@ -294,13 +295,22 @@ dl_tbl_variants("tbl_cata_type", "11", function(d) {
 }, events_full)
 ```
 
-La sécheresse est de loin le Catastrophe le plus fréquemment cité, suivi des maladies (cultures/élevage), des rats et des facteurs humains (vol, dégradation). Les cyclones et inondations ont touché un nombre plus limité de ménages dans ces deux observatoires pour cette campagne.
+La sécheresse est de loin le cataclysme le plus fréquemment cité, suivi des maladies (cultures/élevage), des rats et des facteurs humains (vol, dégradation). Les cyclones et inondations ont touché un nombre plus limité de ménages pour cette campagne.
 
 ```{r g1_prevalence_type}
-#| fig-height: !expr ror_fig_height(prev_type, "Catastrophe")
+#| fig-height: !expr fig_h("g1_prevalence_type")
 # G1 : Barres horizontales — types de cataclysmes les plus fréquents
-prev_type |>
+events |>
+  inner_join(res_deb, by = "j5") |>
   expand_sites_for_profile() |>
+  group_by(Observatory, Catastrophe) |>
+  summarise(n = n_distinct(j5), .groups = "drop") |>
+  left_join(
+    events |> inner_join(res_deb, by = "j5") |> expand_sites_for_profile() |>
+      count(Observatory, name = "n_total"),
+    by = "Observatory"
+  ) |>
+  mutate(pct = round(n / n_total * 100, 1)) |>
   make_bar_obs(x = Catastrophe, y_label = "% des ménages")
 ```
 
@@ -487,8 +497,19 @@ dl_tbl_variants("tbl_degats_logement", "11", function(d) {
 ```{r fig_degats_logement}
 #| echo: false
 #| fig-cap: "Dégâts sur le logement par type de catastrophe"
-degats_logement_resume %>%
-  rename(Type = Catastrophe, pct = pct_degats) %>%
+events %>%
+  inner_join(res_deb, by = "j5") %>%
+  expand_sites_for_profile() %>%
+  filter(!is.na(cc1a1)) %>%
+  group_by(Observatory, Catastrophe) %>%
+  summarise(
+    n_total = n(),
+    n_degats = sum(cc1a1 >= 2, na.rm = TRUE),
+    pct = round(n_degats / n_total * 100, 1),
+    .groups = "drop"
+  ) %>%
+  filter(n_total >= 5) %>%
+  rename(Type = Catastrophe) %>%
   make_bar_obs(y_label = "% ménages touchés")
 ```
 
@@ -652,14 +673,18 @@ dl_tbl_variants("tbl_degats_personnes", "11", function(d) {
 ```{r fig_degats_personnes}
 #| echo: false
 #| fig-cap: "Conséquences des cataclysmes sur les personnes"
-#| fig-height: !expr ror_fig_height(degats_personnes, "Catastrophe")
-degats_personnes %>%
-  pivot_longer(
-    cols = -c(Observatory, Catastrophe),
-    names_to = "Conséquence",
-    values_to = "pct"
-  ) %>%
-  mutate(pct = pct / 100) %>%
+#| fig-height: !expr fig_h("fig_degats_personnes")
+events %>%
+  inner_join(res_deb, by = "j5") %>%
+  expand_sites_for_profile() %>%
+  filter(!is.na(cc1a4)) %>%
+  mutate(Conséquence = personnes_labels[as.character(cc1a4)]) %>%
+  count(Observatory, Catastrophe, Conséquence) %>%
+  group_by(Observatory, Catastrophe) %>%
+  mutate(pct = n / sum(n), total = sum(n)) %>%
+  ungroup() %>%
+  filter(total >= 5) %>%
+  select(-n, -total) %>%
   ror_bar_stacked(
     x = Catastrophe, y = pct, fill = Conséquence,
     title = "Conséquences sur les personnes par type de catastrophe"
@@ -713,13 +738,13 @@ severite_plot <- events %>%
       levels = c("Destruction totale", "Beaucoup", "Un peu", "Rien")
     )
   ) %>%
+  expand_sites_for_profile() %>%
   count(Observatory, Catastrophe, Niveau) %>%
   group_by(Observatory, Catastrophe) %>%
   mutate(pct = round(n / sum(n) * 100, 1)) %>%
   ungroup()
 
 severite_plot |>
-  expand_sites_for_profile() |>
   ror_bar_stacked(
     x = Catastrophe, y = pct, fill = Niveau,
     y_label = "% des ménages", proportion = FALSE,
@@ -954,7 +979,23 @@ dl_tbl_variants("tbl_cultures_touchees", "11", function(d) {
 ```{r fig_cultures_touchees}
 #| echo: false
 #| fig-cap: "Top 10 des cultures les plus touchées"
-cultures_touchees %>%
+res_cca %>%
+  inner_join(res_deb, by = "j5") %>%
+  expand_sites_for_profile() %>%
+  filter(!is.na(cc1a0) & cc1a0 != 0) %>%
+  mutate(
+    Culture = if_else(
+      as.character(cc1a0) %in% names(culture_labels),
+      culture_labels[as.character(cc1a0)],
+      paste("Code", cc1a0)
+    ),
+    Culture = iconv(Culture, from = "latin1", to = "UTF-8")
+  ) %>%
+  count(Observatory, Culture, sort = TRUE) %>%
+  group_by(Observatory) %>%
+  mutate(pct = round(n / sum(n) * 100, 1), rang = row_number()) %>%
+  filter(rang <= 10) %>%
+  ungroup() %>%
   rename(Type = Culture) %>%
   make_bar_obs(y_label = "% des dégâts déclarés")
 ```
@@ -1069,17 +1110,25 @@ dl_tbl_variants("tbl_degats_champs_riz", "11", function(d) {
 ```{r fig_degats_champs_riz}
 #| echo: false
 #| fig-cap: "Gravité des dégâts sur les champs de riz"
-#| fig-height: !expr ror_fig_height(riz_champs, "Catastrophe")
-riz_champs %>%
-  pivot_longer(
-    cols = -c(Observatory, Catastrophe),
-    names_to = "Niveau",
-    values_to = "pct"
-  ) %>%
+#| fig-height: !expr fig_h("fig_degats_champs_riz")
+res_cca %>%
+  inner_join(res_deb, by = "j5") %>%
+  expand_sites_for_profile() %>%
+  filter(cc1a0 == 101) %>%
+  select(Observatory, starts_with("cc1a5_")) %>%
+  pivot_longer(cols = starts_with("cc1a5_"), names_to = "cata_var", values_to = "niveau") %>%
+  filter(!is.na(niveau)) %>%
   mutate(
-    pct = pct / 100,
-    Niveau = factor(Niveau, levels = c("Rien", "Un peu", "Beaucoup", "Destruction totale"))
+    Catastrophe = cata_champs_labels[cata_var],
+    Niveau = factor(degats_labels[as.character(niveau)],
+                    levels = c("Rien", "Un peu", "Beaucoup", "Destruction totale"))
   ) %>%
+  count(Observatory, Catastrophe, Niveau) %>%
+  group_by(Observatory, Catastrophe) %>%
+  mutate(pct = n / sum(n), total = sum(n)) %>%
+  ungroup() %>%
+  filter(total >= 5) %>%
+  select(-n, -total) %>%
   ror_bar_stacked(
     x = Catastrophe, y = pct, fill = Niveau,
     title = "Dégâts sur les champs de riz par type de catastrophe",
@@ -1197,17 +1246,25 @@ dl_tbl_variants("tbl_degats_stocks_riz", "11", function(d) {
 ```{r fig_degats_stocks_riz}
 #| echo: false
 #| fig-cap: "Gravité des dégâts sur les stocks de riz"
-#| fig-height: !expr ror_fig_height(riz_stocks, "Catastrophe")
-riz_stocks %>%
-  pivot_longer(
-    cols = -c(Observatory, Catastrophe),
-    names_to = "Niveau",
-    values_to = "pct"
-  ) %>%
+#| fig-height: !expr fig_h("fig_degats_stocks_riz")
+res_cca %>%
+  inner_join(res_deb, by = "j5") %>%
+  expand_sites_for_profile() %>%
+  filter(cc1a0 == 101) %>%
+  select(Observatory, starts_with("cc1a6_")) %>%
+  pivot_longer(cols = starts_with("cc1a6_"), names_to = "cata_var", values_to = "niveau") %>%
+  filter(!is.na(niveau)) %>%
   mutate(
-    pct = pct / 100,
-    Niveau = factor(Niveau, levels = c("Rien", "Un peu", "Beaucoup", "Destruction totale"))
+    Catastrophe = cata_stocks_labels[cata_var],
+    Niveau = factor(degats_labels[as.character(niveau)],
+                    levels = c("Rien", "Un peu", "Beaucoup", "Destruction totale"))
   ) %>%
+  count(Observatory, Catastrophe, Niveau) %>%
+  group_by(Observatory, Catastrophe) %>%
+  mutate(pct = n / sum(n), total = sum(n)) %>%
+  ungroup() %>%
+  filter(total >= 5) %>%
+  select(-n, -total) %>%
   ror_bar_stacked(
     x = Catastrophe, y = pct, fill = Niveau,
     title = "Dégâts sur les stocks de riz par type de catastrophe",
@@ -1275,6 +1332,7 @@ champs_vs_stocks <- res_cca %>%
     any_stocks = any(c_across(starts_with("cc1a6_")) >= 2, na.rm = TRUE)
   ) %>%
   ungroup() %>%
+  expand_sites_for_profile() %>%
   group_by(Observatory, Culture) %>%
   summarise(
     n = n(),
@@ -1292,7 +1350,6 @@ champs_vs_stocks_plot <- champs_vs_stocks %>%
   mutate(Type = if_else(Type == "pct_champs", "Champs", "Stocks"))
 
 champs_vs_stocks_plot |>
-  expand_sites_for_profile() |>
   ror_bar_grouped(
     x = Culture, fill = Type,
     y_label = "% des ménages",
@@ -1401,8 +1458,8 @@ cata_gap   <- cata_trends |> filter(year %in% c(2015, 2025))
 
 ```{r fig_cata_prevalence}
 #| fig-cap: "Évolution du pourcentage de ménages ayant subi au moins une catastrophe (2003–2025)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_cata_prevalence")
+#| fig-height: !expr fig_h("fig_cata_prevalence")
 
 cata_trends |>
   make_trend_plot(y_var = pct_cata, y_label = "% de ménages touchés", gap_year = 2015)

@@ -6,6 +6,7 @@
 source("utils/report_variant.R")
 source("utils/sites.R")
 source("utils/plot_theme.R")
+source("utils/figure_sizes.R")
 REPORT_MODE <- get_report_mode()
 
 # --- gt LaTeX accent fix ---

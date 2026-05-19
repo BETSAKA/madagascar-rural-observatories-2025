@@ -10,7 +10,7 @@ Ce chapitre traite de la sécurité alimentaire des ménages des observatoires r
 
 ::: {.callout-warning}
 ## Travail de vérification en cours
-Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
+Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales.
 :::
 
 ```{r data_loading_sa}
@@ -234,8 +234,10 @@ dl_tbl_variants("t2_soudure_hameau", "09", function(d) {
 #| fig-cap: "Durée moyenne de la soudure par hameau"
 soudure_combined %>%
   filter(j4bis != "Ensemble") %>%
-  rename(Type = j4bis, pct = mean_soudure) %>%
-  make_bar_obs(show_pct = TRUE, pct_suffix = " mois")
+  ror_bar_grouped(x = j4bis, y = mean_soudure, fill = Observatory,
+                  y_label = "Mois de soudure (moy.)",
+                  direction = "horizontal", facet = FALSE,
+                  show_pct = TRUE, pct_suffix = " mois")
 ```
 
 ```{r dl_fig_soudure_hameau}
@@ -340,7 +342,17 @@ dl_tbl_variants("t3_calendrier_soudure", "09", function(d) {
 
 ```{r g2_calendrier_soudure}
 # G2 : Graphique du calendrier de la soudure
-calendrier_soudure %>%
+res_sa %>%
+  left_join(res_deb, by = "j5") %>%
+  expand_sites_for_profile() %>%
+  group_by(Observatory) %>%
+  summarise(
+    across(starts_with("sal2d_"),
+      ~ round(sum(!is.na(.) & . == 1) / n() * 100, 1)),
+    .groups = "drop"
+  ) %>%
+  pivot_longer(-Observatory, names_to = "mois_var", values_to = "pct") %>%
+  mutate(Mois = factor(mois_labels[mois_var], levels = mois_labels)) %>%
   ror_bar_v(x = Mois, y_label = "% ménages en soudure", x_angle = 45)
 ```
 
@@ -497,9 +509,26 @@ dl_tbl_variants("t5_calendrier_stress", "09", function(d) {
 ```{r fig-soudure-vs-stress}
 #| fig-cap: "Comparaison soudure et stress alimentaire"
 # G3 : Superposition soudure vs stress alimentaire
+# Rebuild from expanded data for site-level facets
+sa_joined <- res_sa %>%
+  left_join(res_deb, by = "j5") %>%
+  expand_sites_for_profile()
+
 comparaison <- bind_rows(
-  calendrier_soudure %>% mutate(Indicateur = "Soudure"),
-  calendrier_stress %>% mutate(Indicateur = "Stress alimentaire")
+  sa_joined %>%
+    group_by(Observatory) %>%
+    summarise(across(starts_with("sal2d_"),
+      ~ round(sum(!is.na(.) & . == 1) / n() * 100, 1)), .groups = "drop") %>%
+    pivot_longer(-Observatory, names_to = "mois_var", values_to = "pct") %>%
+    mutate(Mois = factor(mois_labels[mois_var], levels = mois_labels),
+           Indicateur = "Soudure"),
+  sa_joined %>%
+    group_by(Observatory) %>%
+    summarise(across(starts_with("sal14a_"),
+      ~ round(sum(!is.na(.) & . == 1) / n() * 100, 1)), .groups = "drop") %>%
+    pivot_longer(-Observatory, names_to = "mois_var", values_to = "pct") %>%
+    mutate(Mois = factor(mois_labels_stress[mois_var], levels = mois_labels_stress),
+           Indicateur = "Stress alimentaire")
 )
 
 comparaison %>%
@@ -535,7 +564,7 @@ dl_fig_variants("g3_soudure_vs_stress", "09", function(d) {
 
 ### Alimentation de base
 
-Cette section compare les aliments de base consommés aux trois repas, hors et pendant la période de soudure. Le riz constitue la base alimentaire dans les deux observatoires, mais sa place relative varie selon la saison et le site. Les substitutions opérées pendant la soudure (manioc, patate douce, maïs) témoignent des stratégies d'adaptation alimentaire des ménages.
+Cette section compare les aliments de base consommés aux trois repas, hors et pendant la période de soudure. Le riz constitue la base alimentaire, mais sa place relative varie selon la saison et la localité. Les substitutions opérées pendant la soudure (manioc, patate douce, maïs) témoignent des stratégies d'adaptation alimentaire des ménages.
 
 ```{r alim_labels}
 # Définir les labels des aliments
@@ -692,6 +721,7 @@ dl_tbl_variants("t7_alim_pendant_soudure", "09", function(d) {
 # G4 : Comparaison hors soudure vs pendant soudure au déjeuner (top 5 aliments)
 comp_dejeuner <- res_sa %>%
   left_join(res_deb, by = "j5") %>%
+  expand_sites_for_profile() %>%
   select(Observatory, sal1b, sal2b) %>%
   pivot_longer(
     cols = c(sal1b, sal2b),
@@ -918,10 +948,21 @@ dl_tbl_variants("t9_strategies", "09", function(d) {
 
 ```{r g5_strategies_likert}
 # G5 : Barres horizontales empilées — profil Likert des stratégies
-strat_plot <- strat_data %>%
+strat_plot <- res_ssa %>%
+  left_join(res_deb, by = "j5") %>%
+  expand_sites_for_profile() %>%
+  select(Observatory, all_of(strat_vars)) %>%
+  pivot_longer(cols = all_of(strat_vars), names_to = "strategie_var", values_to = "frequence") %>%
+  filter(!is.na(frequence)) %>%
   mutate(
-    Fréquence = factor(Fréquence, levels = c("Souvent", "Quelquefois", "Rarement", "Jamais"))
-  )
+    Stratégie = strat_labels[strategie_var],
+    Fréquence = factor(freq_labels[as.character(frequence)],
+                       levels = c("Souvent", "Quelquefois", "Rarement", "Jamais"))
+  ) %>%
+  count(Observatory, Stratégie, Fréquence) %>%
+  group_by(Observatory, Stratégie) %>%
+  mutate(pct = round(n / sum(n) * 100, 1)) %>%
+  ungroup()
 
 ggplot(strat_plot, aes(x = pct, y = reorder(Stratégie, pct), fill = Fréquence)) +
   geom_col(position = "stack") +
@@ -1068,8 +1109,18 @@ dl_tbl_variants("t10_sources_endettement", "09", function(d) {
 ```{r fig_sources_endettement}
 #| echo: false
 #| fig-cap: "Sources d'endettement alimentaire"
-sources_dette %>%
-  rename(Type = Source) %>%
+res_ssa %>%
+  left_join(res_deb, by = "j5") %>%
+  expand_sites_for_profile() %>%
+  filter(ssa01 > 0) %>%
+  select(Observatory, all_of(names(source_labels))) %>%
+  pivot_longer(cols = all_of(names(source_labels)),
+               names_to = "source_var", values_to = "reponse") %>%
+  filter(!is.na(reponse)) %>%
+  mutate(Type = source_labels[source_var],
+         Oui = if_else(reponse == 1, 1L, 0L)) %>%
+  group_by(Observatory, Type) %>%
+  summarise(pct = round(sum(Oui) / n() * 100, 1), .groups = "drop") %>%
   make_bar_obs(show_pct = TRUE)
 ```
 
@@ -1177,8 +1228,18 @@ dl_tbl_variants("t11_sources_emprunt", "09", function(d) {
 ```{r fig_sources_emprunt}
 #| echo: false
 #| fig-cap: "Sources d'emprunt d'aliments de base"
-sources_emprunt %>%
-  rename(Type = Source) %>%
+res_ssa %>%
+  left_join(res_deb, by = "j5") %>%
+  expand_sites_for_profile() %>%
+  filter(ssa02 > 0) %>%
+  select(Observatory, all_of(names(source_emprunt_labels))) %>%
+  pivot_longer(cols = all_of(names(source_emprunt_labels)),
+               names_to = "source_var", values_to = "reponse") %>%
+  filter(!is.na(reponse)) %>%
+  mutate(Type = source_emprunt_labels[source_var],
+         Oui = if_else(reponse == 1, 1L, 0L)) %>%
+  group_by(Observatory, Type) %>%
+  summarise(pct = round(sum(Oui) / n() * 100, 1), .groups = "drop") %>%
   make_bar_obs(show_pct = TRUE)
 ```
 
@@ -1212,8 +1273,28 @@ top5 <- strat_resume %>%
 ```
 
 ```{r g6_top_strategies}
-#| fig-height: !expr ror_fig_height(top5, "Stratégie")
-top5 %>%
+#| fig-height: !expr fig_h("g6_top_strategies")
+res_ssa %>%
+  left_join(res_deb, by = "j5") %>%
+  expand_sites_for_profile() %>%
+  select(Observatory, all_of(strat_vars)) %>%
+  pivot_longer(cols = all_of(strat_vars), names_to = "var", values_to = "freq") %>%
+  filter(!is.na(freq)) %>%
+  mutate(Stratégie = strat_labels[var],
+         Fréquence = freq_labels[as.character(freq)]) %>%
+  filter(Fréquence %in% c("Quelquefois", "Souvent")) %>%
+  count(Observatory, Stratégie) %>%
+  group_by(Observatory) %>%
+  mutate(pct = round(n / sum(n) * 100, 1)) %>%
+  ungroup() %>%
+  {
+    top5_strat <- (.) %>%
+      group_by(Stratégie) %>%
+      summarise(total = sum(pct), .groups = "drop") %>%
+      slice_max(total, n = 5) %>%
+      pull(Stratégie)
+    (.) %>% filter(Stratégie %in% top5_strat)
+  } %>%
   make_bar_obs(x = Stratégie, y_label = "% ménages")
 ```
 
@@ -1324,11 +1405,19 @@ dl_tbl_variants("t12_csi", "09", function(d) {
 
 ```{r g7_csi_boxplot}
 # G7 : Distribution du score CSI par observatoire
-ggplot(csi, aes(x = Observatory, y = csi_score, fill = Observatory)) +
+csi_expanded <- res_ssa %>%
+  left_join(res_deb, by = "j5") %>%
+  expand_sites_for_profile() %>%
+  mutate(csi_score = rowSums(across(all_of(strat_vars), ~replace_na(., 0))))
+
+n_obs <- n_distinct(csi_expanded$Observatory)
+
+ggplot(csi_expanded, aes(x = Observatory, y = csi_score, fill = Observatory)) +
   geom_boxplot(show.legend = FALSE) +
+  { if (n_obs > 1) facet_wrap(~Observatory, scales = "free_x") } +
   labs(
     title = "Distribution du score CSI simplifié par observatoire",
-    x = "Observatoire",
+    x = NULL,
     y = "Score CSI"
   ) +
   theme_ror() +
@@ -1405,16 +1494,16 @@ sa_gap   <- sa_trends |> filter(year %in% c(2015, 2025))
 
 ```{r fig_sa_soudure_duration}
 #| fig-cap: "Évolution de la durée moyenne de soudure (mois/ménage)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_sa_soudure_duration")
+#| fig-height: !expr fig_h("fig_sa_soudure_duration")
 
 sa_trends |> make_trend_plot(y_var = soudure_moy, y_label = "Durée moyenne soudure (mois)", gap_year = 2015)
 ```
 
 ```{r fig_sa_pct_soudure}
 #| fig-cap: "Évolution du pourcentage de ménages en soudure"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_sa_pct_soudure")
+#| fig-height: !expr fig_h("fig_sa_pct_soudure")
 
 sa_trends |> make_trend_plot(y_var = pct_soudure, y_label = "% ménages en soudure", gap_year = 2015)
 ```

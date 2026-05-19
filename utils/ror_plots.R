@@ -172,7 +172,7 @@ ror_fig_height_n <- function(
 
 #' Auto-compute facet ncol
 .ror_ncol <- function(n_fct, ncol = NULL) {
-  ncol %||% (if (n_fct > 3) 2L else n_fct)
+  ncol %||% (if (n_fct > 6) 3L else if (n_fct > 3) 2L else n_fct)
 }
 
 #' Ensure all Observatory × category combinations exist (fills missing with 0)
@@ -237,7 +237,7 @@ make_bar_obs <- function(
   data <- .ror_complete(data, x_quo, y_name, n_fct)
   data <- .ror_global_order(data, x_quo, y_quo)
 
-  label_sz <- if (n_fct > 3) 2.2 else 3.5
+  label_sz <- if (n_fct > 3) 2.5 else 3.8
 
   p <- ggplot2::ggplot(data, ggplot2::aes(x = !!x_quo, y = !!y_quo)) +
     ggplot2::geom_col(fill = fill_color, show.legend = FALSE) +
@@ -247,7 +247,7 @@ make_bar_obs <- function(
     p <- p +
       ggplot2::geom_text(
         ggplot2::aes(
-          label = ifelse(!!y_quo > 0, paste0(!!y_quo, pct_suffix), "")
+          label = ifelse(!!y_quo > 0, round(!!y_quo), "")
         ),
         hjust = -0.1,
         size = label_sz
@@ -304,10 +304,10 @@ ror_bar_v <- function(
     ggplot2::geom_col(fill = fill_color, show.legend = FALSE)
 
   if (show_pct) {
-    label_sz <- if (n_fct > 3) 2.2 else 3
+    label_sz <- if (n_fct > 3) 2.5 else 3.3
     p <- p +
       ggplot2::geom_text(
-        ggplot2::aes(label = ifelse(!!y_quo > 0, paste0(!!y_quo, "%"), "")),
+        ggplot2::aes(label = ifelse(!!y_quo > 0, round(!!y_quo), "")),
         vjust = -0.3,
         size = label_sz
       ) +
@@ -394,12 +394,12 @@ ror_bar_grouped <- function(
     ggplot2::geom_col(position = "dodge")
 
   if (show_pct) {
-    label_sz <- if (n_fct > 3) 2 else 2.8
+    label_sz <- if (n_fct > 3) 2.3 else 3.2
     if (direction == "horizontal") {
       p <- p +
         ggplot2::geom_text(
           ggplot2::aes(
-            label = ifelse(!!y_quo > 0, paste0(!!y_quo, pct_suffix), "")
+            label = ifelse(!!y_quo > 0, round(!!y_quo), "")
           ),
           position = ggplot2::position_dodge(width = 0.9),
           hjust = -0.1,
@@ -409,7 +409,7 @@ ror_bar_grouped <- function(
       p <- p +
         ggplot2::geom_text(
           ggplot2::aes(
-            label = ifelse(!!y_quo > 0, paste0(!!y_quo, pct_suffix), "")
+            label = ifelse(!!y_quo > 0, round(!!y_quo), "")
           ),
           position = ggplot2::position_dodge(width = 0.9),
           vjust = -0.3,
@@ -491,19 +491,19 @@ ror_bar_stacked <- function(
     ggplot2::geom_col(position = pos)
 
   if (show_pct && proportion) {
-    label_sz <- if (n_fct > 3) 2 else 2.8
+    label_sz <- if (n_fct > 3) 2.3 else 3.2
     y_vals <- data[[rlang::as_name(y_quo)]]
     is_pct <- max(y_vals, na.rm = TRUE) > 1.5
     if (is_pct) {
       data$.pct_label <- ifelse(
         y_vals >= min_pct,
-        paste0(round(y_vals), "%"),
+        round(y_vals),
         ""
       )
     } else {
       data$.pct_label <- ifelse(
         y_vals >= min_pct / 100,
-        paste0(round(y_vals * 100), "%"),
+        round(y_vals * 100),
         ""
       )
     }

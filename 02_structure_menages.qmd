@@ -10,7 +10,7 @@ Le ménage est l'unité de base de l'enquête. Cette section décrit la composit
 
 ::: {.callout-warning}
 ## Travail de vérification en cours
-Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
+Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales.
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
@@ -187,7 +187,7 @@ A Alaotra, on a recensé `r n_members_a` individus répartis dans `r n_men_a` m�
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, on a recensé `r n_members_m` individus répartis dans `r n_men_m` ménages. La taille moyenne des ménages s'établit à `r taille_moy_m` personnes.
+A Marovoay, on a recensé `r n_members_m` individus répartis dans `r n_men_m` ménages. La taille moyenne des ménages s'établit à `r taille_moy_m` personnes. Parmi les quatre hameaux, les tailles de ménages varient sensiblement, reflétant des structures familiales distinctes selon les localités.
 :::
 :::
 
@@ -250,7 +250,7 @@ A Alaotra, `r pct_moins15_a` % des individus ont moins de 15 ans. La population 
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, `r pct_moins15_m` % des individus ont moins de 15 ans. La population en âge de travailler (15–64 ans) représente `r pct_15_64_m` %, tandis que les personnes de 65 ans et plus ne constituent que `r pct_65plus_m` %.
+A Marovoay, `r pct_moins15_m` % des individus ont moins de 15 ans, signe d'une population en croissance rapide. La population en âge de travailler (15–64 ans) représente `r pct_15_64_m` %, tandis que les personnes de 65 ans et plus ne constituent que `r pct_65plus_m` %. Cette structure démographique, caractérisée par une base large et un sommet étroit, est caractéristique des populations rurales malgaches et traduit un taux de dépendance élevé.
 :::
 :::
 
@@ -317,7 +317,7 @@ hh_age_sex <- members_site |>
 
 ```{r fig_pyramide}
 #| fig-cap: "Pyramide des âges des membres des ménages enquêtés par observatoire"
-#| fig-height: !expr ror_fig_height(hh_age_sex, "AgeGroup")
+#| fig-height: !expr fig_h("fig_pyramide")
 hh_age_sex |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent)
 ```
 
@@ -340,7 +340,23 @@ dl_fig_variants("fig_pyramide", "04", function(d) {
 
 ### Origine des CM et conjoints
 
-L'origine géographique des chefs de ménage et de leurs conjoints renseigne sur les dynamiques migratoires et le degré d'ancrage local des familles. La classification distingue les *tompon-tany* (autochtones), les *zana-tany* (nés sur place de parents migrants), les *valivotaka* (migrants installés durablement) et les *mpihavy* (arrivants récents). La répartition de ces catégories diffère sensiblement entre les deux observatoires.
+L'origine géographique des chefs de ménage et de leurs conjoints renseigne sur les dynamiques migratoires et le degré d'ancrage local des familles. La classification distingue les *tompon-tany* (autochtones), les *zana-tany* (nés sur place de parents migrants), les *valivotaka* (migrants installés durablement) et les *mpihavy* (arrivants récents).
+
+::: {.content-visible when-profile="consolidated"}
+La répartition de ces catégories diffère sensiblement entre les deux observatoires.
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+À Marovoay, l'équilibre entre *tompon-tany* et *zana-tany* varie selon les localités. La proportion de *valivotaka* et *mpihavy* reflète l'attractivité des zones rizicoles pour les migrants des régions voisines. Les raisons sociales (en particulier le mariage) dépassent largement les motivations économiques comme facteur d'installation.
+:::
+:::
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, la pression foncière croissante et l'attractivité des périmètres rizicoles aménagés se reflètent dans la composition des populations selon leur origine. Les dynamiques migratoires et l'ancrage local varient selon la position des fokontany par rapport aux zones irriguées.
+:::
+:::
 
 ```{r origine}
 #| include: false
@@ -615,7 +631,7 @@ Dans l'Alaotra, le niveau le plus fréquemment atteint est « `r top_educ_a` » 
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, le niveau le plus fréquemment atteint est « `r top_educ_m` » (`r pct_top_educ_m` % des CM).
+A Marovoay, le niveau le plus fréquemment atteint est « `r top_educ_m` » (`r pct_top_educ_m` % des CM). La majorité des chefs de ménage ont un faible niveau d'instruction, avec une dominance du niveau primaire pour les deux sexes. Les femmes chefs de ménage présentent des taux d'instruction nettement plus faibles que les hommes, ce qui accentue leur vulnérabilité socio-économique.
 :::
 :::
 
@@ -651,7 +667,7 @@ dl_tbl_variants("tbl_cm_educ", "04", function(d) {
 ```{r fig_cm_educ}
 #| echo: false
 #| fig-cap: "Niveau d'éducation des chefs de ménage"
-cm |>
+cm_site |>
   mutate(Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
   count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
@@ -715,7 +731,7 @@ dl_tbl_variants("tbl_cm_educ_sex", "04", function(d) {
 ```{r fig_cm_educ_sex}
 #| echo: false
 #| fig-cap: "Niveau d'éducation des CM par sexe"
-cm |>
+cm_site |>
   mutate(
     Sexe = classify_sex(m4),
     Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")
@@ -754,7 +770,7 @@ Dans l'Alaotra, `r pct_alpha_a` % des CM savent lire aisément.
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, `r pct_alpha_m` % des CM savent lire aisément.
+A Marovoay, `r pct_alpha_m` % des CM savent lire aisément. Les niveaux de lecture et d'écriture varient sensiblement selon les localités et le sexe. L'écart entre hommes et femmes en matière d'alphabétisation traduit un accès inégal à l'éducation qui se répercute sur la capacité des ménages féminins à accéder à l'information et aux services.
 :::
 :::
 
@@ -905,7 +921,7 @@ Dans l'Alaotra, l'activité dominante est « `r top_act_a` » (`r pct_top_act_a`
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, l'activité dominante est « `r top_act_m` » (`r pct_top_act_m` % des CM).
+A Marovoay, l'activité dominante est « `r top_act_m` » (`r pct_top_act_m` % des CM). L'agriculture constitue le socle économique des ménages, les cultivateurs exploitants représentant la majorité des chefs de ménage. Le commerce et la restauration, l'artisanat, le BTP et le transport, ainsi que l'élevage et la pêche complètent le panorama des activités. La différenciation des activités selon le sexe est marquée : les hommes sont majoritairement cultivateurs exploitants, tandis que les femmes sont davantage présentes dans le commerce et la restauration.
 :::
 :::
 
@@ -928,7 +944,7 @@ obs_gt(cm_act) |>
 
 ```{r fig-cm-act}
 #| fig-cap: "Activités principales des chefs de ménages"
-#| fig-height: !expr ror_fig_height(cm_act, "Act_principal")
+#| fig-height: !expr fig_h("fig-cm-act")
 cm_act |> make_bar_obs(x = Act_principal, y = Percent,
                   y_label = "%")
 ```
@@ -1004,7 +1020,7 @@ cm_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
 
 ```{r fig_cm_act_sex}
 #| fig-cap: "Activit\u00e9s principales des CM par observatoire et sexe"
-#| fig-height: !expr ror_fig_height(cm_act_sex_plt, "Act_principal")
+#| fig-height: !expr fig_h("fig_cm_act_sex")
 cm_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
                                   title = "Activit\u00e9s principales des CM par observatoire et sexe (%)",
                                   y_label = "%", direction = "horizontal")
@@ -1042,6 +1058,18 @@ dl_fig_variants("fig_cm_act_sex", "04", function(d) {
 ## Caractéristiques des autres membres de ménages
 
 Les autres membres du ménage (conjoints, enfants, dépendants) constituent la majorité de la population recensée. Leur profil démographique, éducatif et économique complète celui des chefs de ménage et permet de dresser un portrait plus complet du capital humain des familles rurales.
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+À Marovoay, les autres membres du ménage forment une population majoritairement féminine et jeune. Les indicateurs d'âge révèlent un profil démographique caractéristique des populations rurales en croissance. La prédominance des mariages selon la tradition et du célibat (pour les membres de 12 ans et plus) témoigne du maintien des pratiques matrimoniales coutumières.
+:::
+:::
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, les membres non-CM présentent un profil jeune avec une prédominance féminine, conformément à la structure démographique attendue dans les zones rurales malgaches.
+:::
+:::
 
 ### Caractéristiques socio-démographiques
 
@@ -1081,8 +1109,9 @@ age_table2 <- others |>
   mutate(Caractéristique = "Âge", .before = Statistique) |>
   rename(Catégorie = Statistique)
 
-# --- Statut matrimonial ---
+# --- Statut matrimonial (exclusion des moins de 12 ans) ---
 statut_table2 <- others |>
+  filter(m5 >= 12) |>
   mutate(Statut = classify_marital(m7)) |>
   filter(!is.na(Statut)) |>
   count(Observatory, Statut) |>
@@ -1100,7 +1129,7 @@ gt(hh_combined2, groupname_col = "Caractéristique") |>
   tab_header(title = "Caractéristiques des autres membres de ménage") |>
   safe_cols_label(Catégorie = "Catégorie", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
   tab_footnote(
-    footnote = "Sexe et Statut matrimonial : pourcentages. Âge : statistiques descriptives.",
+    footnote = "Sexe et Statut matrimonial : pourcentages (statut matrimonial calculé pour les membres de 12 ans et plus). Âge : statistiques descriptives.",
     locations = cells_title(groups = "title")
   ) |>
   style_table()
@@ -1125,11 +1154,12 @@ dl_tbl_variants("tbl_other_chars", "04", function(d) {
     mutate(Variable = "Âge", `%` = NA_real_) |>
     rename(Site = Observatory)
   statut <- oth |>
+    filter(m5 >= 12) |>
     mutate(Catégorie = classify_marital(m7)) |>
     filter(!is.na(Catégorie)) |>
     count(Observatory, Catégorie) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    mutate(Variable = "Statut matrimonial") |>
+    mutate(Variable = "Statut matrimonial (12 ans et +)") |>
     rename(Site = Observatory, Effectif = n)
   bind_rows(sexe, age, statut) |>
     select(Site, Variable, Catégorie, Effectif, `%`)
@@ -1172,7 +1202,7 @@ dl_tbl_variants("tbl_other_educ", "04", function(d) {
 ```{r fig_other_educ}
 #| echo: false
 #| fig-cap: "Niveau d'éducation des autres membres"
-others |>
+others_site |>
   mutate(Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
   count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
@@ -1233,7 +1263,7 @@ dl_tbl_variants("tbl_other_educ_sex", "04", function(d) {
 ```{r fig_other_educ_sex}
 #| echo: false
 #| fig-cap: "Niveau d'éducation des autres membres par sexe"
-others |>
+others_site |>
   mutate(
     Sexe = classify_sex(m4),
     Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")
@@ -1459,8 +1489,8 @@ A Marovoay, parmi les enfants de 6 à 15 ans non scolarisés, la première raiso
 
 ```{r fig-raisons-non-scol}
 #| fig-cap: "Principales raisons de non-scolarisation ou d'arrêt des études (6-15 ans)"
-#| fig-width: 10
-#| fig-height: 6
+#| fig-width: !expr fig_w("fig-raisons-non-scol")
+#| fig-height: !expr fig_h("fig-raisons-non-scol")
 
 raisons_labs <- c(
   "1"  = "Niveau suffisant",
@@ -1480,7 +1510,7 @@ raisons_labs <- c(
   "19" = "Paresse"
 )
 
-non_scol <- members |>
+non_scol <- members_site |>
   filter(m5 >= 6, m5 <= 15, m6 != 1, s2 == 2, !is.na(s5)) |>
   mutate(
     Raison = if_else(
@@ -1494,9 +1524,7 @@ non_scol <- members |>
 
 non_scol |>
   filter(pct >= 2) |>
-  ror_bar_grouped(x = Raison, fill = Observatory, y = pct,
-                  y_label = "% des enfants non scolarisés",
-                  direction = "horizontal", facet = FALSE)
+  make_bar_obs(x = Raison, y_label = "% des enfants non scolarisés")
 ```
 
 ```{r dl_fig_raisons_non_scol}
@@ -1565,7 +1593,7 @@ obs_gt(other_act) |>
 ```
 
 ```{r fig-other-act}
-#| fig-height: !expr ror_fig_height(other_act, "Act_principal")
+#| fig-height: !expr fig_h("fig-other-act")
 other_act |> make_bar_obs(x = Act_principal, y = Percent,
                      title = obs_title("Activités principales des autres membres (%)"),
                      y_label = "%")
@@ -1640,7 +1668,7 @@ other_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent
 ```
 
 ```{r fig_other_act_sex}
-#| fig-height: !expr ror_fig_height(other_act_sex, "Act_principal")
+#| fig-height: !expr fig_h("fig_other_act_sex")
 other_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
                                      title = "Activités des autres membres par observatoire et sexe (%)",
                                      y_label = "%", direction = "horizontal")
@@ -1759,8 +1787,8 @@ demog_gap   <- demog_trends |> filter(year %in% c(2015, 2025))
 
 ```{r fig_demog_taille}
 #| fig-cap: "Évolution de la taille moyenne des ménages (1996-2025)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_demog_taille")
+#| fig-height: !expr fig_h("fig_demog_taille")
 
 demog_trends |> make_trend_plot(y_var = taille_moy,
                           y_label = "Taille moyenne du ménage",
@@ -1769,8 +1797,8 @@ demog_trends |> make_trend_plot(y_var = taille_moy,
 
 ```{r fig_demog_fem_cm}
 #| fig-cap: "Évolution du pourcentage de chefs de ménage femmes (1996-2025)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_demog_fem_cm")
+#| fig-height: !expr fig_h("fig_demog_fem_cm")
 
 if ("pct_fem_cm" %in% names(demog_trends)) {
   demog_trends |> filter(!is.na(pct_fem_cm)) |>
@@ -1782,8 +1810,8 @@ if ("pct_fem_cm" %in% names(demog_trends)) {
 
 ```{r fig_demog_scol}
 #| fig-cap: "Évolution du taux de scolarisation des 6-14 ans (1996-2025)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_demog_scol")
+#| fig-height: !expr fig_h("fig_demog_scol")
 
 if ("taux_scol" %in% names(demog_trends)) {
   demog_trends |> filter(!is.na(taux_scol)) |>
@@ -1795,8 +1823,8 @@ if ("taux_scol" %in% names(demog_trends)) {
 
 ```{r fig_demog_age_cm}
 #| fig-cap: "Évolution de l'âge moyen du chef de ménage (1996-2025)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig_demog_age_cm")
+#| fig-height: !expr fig_h("fig_demog_age_cm")
 
 if ("age_cm_moy" %in% names(demog_trends)) {
   demog_trends |> filter(!is.na(age_cm_moy)) |>

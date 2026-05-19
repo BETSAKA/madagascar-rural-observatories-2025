@@ -25,23 +25,49 @@
     return(invisible())
   }
 
-  cover_img <- "images/cover.jpg"
-  if (!file.exists(cover_img)) {
-    message("add_cover_docx: Cover image not found: ", cover_img)
-    return(invisible())
-  }
+  # Profile-aware cover images and credits
+  cover_config <- list(
+    marovoay = list(
+      img = "images/cover-marovoay.jpg",
+      credit = paste0(
+        "Plaine de Marovoay ",
+        "(Copyright C\u00e9drick Rakotoniaina - Projet BETSAKA 2025)"
+      )
+    ),
+    default = list(
+      img = "images/cover.jpg",
+      credit = paste0(
+        "Rizi\u00e8re dans la r\u00e9gion d\u2019Alaotra Mangoro. ",
+        "Photo\u00a0: Leja Mitarika / NJProduction, ",
+        "CC\u00a0BY-SA\u00a04.0, via Wikimedia Commons."
+      )
+    )
+  )
 
   for (f in docx_files) {
-    message("add_cover_docx: Processing ", f)
+    # Detect profile from output filename
+    profile <- if (grepl("marovoay", basename(f), ignore.case = TRUE)) {
+      "marovoay"
+    } else {
+      "default"
+    }
+    cfg <- cover_config[[profile]]
+
+    if (!file.exists(cfg$img)) {
+      message("add_cover_docx: Cover image not found: ", cfg$img)
+      next
+    }
+
+    message("add_cover_docx: Processing ", f, " (profile: ", profile, ")")
     tryCatch(
-      add_cover_to_docx(f, cover_img),
+      add_cover_to_docx(f, cfg$img, cfg$credit),
       error = function(e) message("  ERROR: ", conditionMessage(e))
     )
   }
 }
 
 # ---------------------------------------------------------------------------
-add_cover_to_docx <- function(docx_path, cover_img) {
+add_cover_to_docx <- function(docx_path, cover_img, credit_text) {
   if (!file.exists(docx_path)) {
     message("  Not found: ", docx_path, " — skipping.")
     return(invisible(FALSE))
@@ -134,12 +160,6 @@ add_cover_to_docx <- function(docx_path, cover_img) {
     new_rid,
     target_cx,
     target_cy
-  )
-
-  credit_text <- paste0(
-    "Rizi\u00e8re dans la r\u00e9gion d\u2019Alaotra Mangoro. ",
-    "Photo\u00a0: Leja Mitarika / NJProduction, ",
-    "CC\u00a0BY-SA\u00a04.0, via Wikimedia Commons."
   )
 
   credit_xml <- paste0(

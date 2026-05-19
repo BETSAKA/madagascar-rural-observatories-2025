@@ -8,7 +8,7 @@ editor_options:
 
 ::: {.callout-warning}
 ## Travail de vérification en cours
-Les résultats présentés ci-dessous sont provisoires et susceptibles de corrections.
+Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales.
 :::
 
 Ce chapitre évalue la représentativité de l'échantillon 2025 des observatoires ruraux et propose des stratégies de pondération pour corriger les biais d'échantillonnage. La démarche suit une progression logique en quatre étapes :
@@ -194,7 +194,7 @@ sampling |>
 
 ```{r fig-sampling-rates}
 #| fig-cap: "Distribution des taux de sondage par site et observatoire"
-#| fig-height: !expr ror_fig_height(sampling, "Site")
+#| fig-height: !expr fig_h("fig-sampling-rates")
 
 sampling |>
   filter(!is.na(taux_sondage)) |>
@@ -692,8 +692,8 @@ La comparaison élargie confirme que l'échantillon OR reproduit raisonnablement
 ```{r fig-rgph-age-pyramid}
 #| eval: !expr rgph_available
 #| fig-cap: "Pyramides des âges comparées : OR 2025 vs. RGPH 2018 (milieu rural)"
-#| fig-width: 10
-#| fig-height: 6
+#| fig-width: !expr fig_w("fig-rgph-age-pyramid")
+#| fig-height: !expr fig_h("fig-rgph-age-pyramid")
 
 # Pyramide OR
 or_pyramid <- res_m_a |>
@@ -742,6 +742,7 @@ ggplot(pyramid_combined, aes(x = Tranche, y = pct)) +
   facet_wrap(~Observatory) +
   scale_fill_manual(values = c("Homme" = "#4E79A7", "Femme" = "#E15759"),
                     name = "OR 2025") +
+  scale_y_continuous(labels = function(x) paste0(abs(x))) +
   labs(title = "Comparaison des pyramides des âges",
        subtitle = "Barres pleines : OR 2025 — Contours noirs : RGPH 2018",
        x = NULL, y = "% de la population") +
@@ -1322,8 +1323,8 @@ Un panel de ménages vieillit mécaniquement : si les mêmes ménages sont suivi
 
 ```{r fig-panel-drift}
 #| fig-cap: "Évolution de l'âge moyen du chef de ménage (1995–2025)"
-#| fig-width: 9
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-panel-drift")
+#| fig-height: !expr fig_h("fig-panel-drift")
 
 hist_summary |>
   filter(!is.na(age_moy_cm)) |>
@@ -1339,7 +1340,7 @@ hist_summary |>
            size = 3, color = "grey50")
 ```
 
-La @fig-panel-drift montre que l'âge moyen du chef de ménage a augmenté d'environ 3 ans entre 1999 et 2014, passant de ~45 à ~48 ans pour les deux observatoires. Le renouvellement de 2025 ramène l'âge moyen autour de 45–46 ans, plus proche de la structure de la population.
+La @fig-panel-drift montre que l'âge moyen du chef de ménage a augmenté d'environ 3 ans entre 1999 et 2014, passant de ~45 à ~48 ans. Le renouvellement de 2025 ramène l'âge moyen autour de 45–46 ans, plus proche de la structure de la population.
 
 Le vieillissement du panel a plusieurs conséquences :
 

@@ -8,7 +8,7 @@ editor_options:
 
 ::: {.callout-warning}
 ## Travail de vérification en cours
-Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
+Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales.
 :::
 
 ```{r setup_desc}
@@ -30,7 +30,11 @@ source("utils/helpers_report.R")
 
 ## Contexte et objectifs
 
-Les Observatoires Ruraux (OR) de Madagascar sont un dispositif d'enquête longitudinale auprès de ménages ruraux, mis en place à partir de 1995 dans le cadre du réseau des observatoires ruraux coordonné par l'IRD et l'INSTAT, puis le Ministère de l'agriculture. Deux OR font l'objet de cette campagne d'enquête en 2025 :
+Les Observatoires Ruraux (OR) de Madagascar sont un dispositif d'enquête longitudinale auprès de ménages ruraux, mis en place à partir de 1995 dans le cadre du réseau des observatoires ruraux coordonné par l'IRD et l'INSTAT, puis le Ministère de l'agriculture.
+
+::: {.content-visible when-profile="consolidated"}
+Deux OR font l'objet de cette campagne d'enquête en 2025 :
+:::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
@@ -44,7 +48,21 @@ Les Observatoires Ruraux (OR) de Madagascar sont un dispositif d'enquête longit
 :::
 :::
 
+::: {.content-visible when-profile="consolidated"}
 Ces enquêtes d'observatoires ruraux ont été menées de manière régulière entre 1995 et 2014 (Marovoay) et 1999 et 2014 (Alaotra), avec une seule interruption l'année 2009 en raison de la crise politique qui a secoué le pays. La campagne 2025, réalisée par le projet BETSAKA, renoue avec ce suivi après une interruption de plus de dix ans. L'enquête conserve les instruments et la méthodologie des campagnes antérieures, tout en reprenant des ajustements faits dans le cadre de l'observatoire du Makay en 2022 et 2024, et en les adaptant au contexte actuel.
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+Les enquêtes de l'observatoire rural de Marovoay ont été menées de manière régulière entre 1995 et 2014, avec une seule interruption l'année 2009 en raison de la crise politique qui a secoué le pays. La campagne 2025, réalisée par le projet BETSAKA, renoue avec ce suivi après une interruption de plus de dix ans. L'enquête conserve les instruments et la méthodologie des campagnes antérieures, tout en reprenant des ajustements faits dans le cadre de l'observatoire du Makay en 2022 et 2024, et en les adaptant au contexte actuel.
+:::
+:::
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Les enquêtes de l'observatoire rural d'Alaotra ont été menées de manière régulière entre 1999 et 2014, avec une seule interruption l'année 2009 en raison de la crise politique qui a secoué le pays. La campagne 2025, réalisée par le projet BETSAKA, renoue avec ce suivi après une interruption de plus de dix ans. L'enquête conserve les instruments et la méthodologie des campagnes antérieures, tout en reprenant des ajustements faits dans le cadre de l'observatoire du Makay en 2022 et 2024, et en les adaptant au contexte actuel.
+:::
+:::
 
 Les principales modifications du questionnaire concernent :
 - la suppression du module dédié aux dépenses, qui était très long à administrer et qui avait peu été exploité dans le passé ;
@@ -256,6 +274,13 @@ res_deb <- res_deb |>
     )
   )
 
+# Correction erreur de saisie confirmée : date d'entretien 03/09/2025 → 03/10/2025
+res_deb <- res_deb |>
+  mutate(j14 = {
+    .d <- dmy(sprintf("%08d", as.integer(j14)))
+    if_else(!is.na(.d) & .d < as.Date("2025-10-01"), j14 + 10000, j14)
+  })
+
 res_m_a <- res_m_a |>
   left_join(res_deb |> select(j5, Observatory), by = "j5")
 ```
@@ -416,12 +441,16 @@ gt(tab_ham, groupname_col = "Observatory") |>
 
 ### Période de collecte
 
-Les entretiens se sont déroulés entre début octobre et mi-novembre 2025. Un entretien isolé a été réalisé à Marovoay le 3 septembre. Le @fig-chronogramme présente l'évolution cumulée du nombre d'entretiens réalisés à partir du 1^er^ octobre 2025.
+Les entretiens se sont déroulés entre début octobre et mi-novembre 2025. Le @fig-chronogramme présente l'évolution cumulée du nombre d'entretiens réalisés à partir du 1^er^ octobre 2025.
+
+::: {.callout-note}
+Une erreur de saisie de la date d'interview a été identifiée pour un entretien à Marovoay (03/09/2025 au lieu de 03/10/2025). Cette date a été corrigée dans les données avant analyse.
+:::
 
 ```{r}
 #| fig-cap: "Fréquences cumulées des entretiens par observatoire (à partir du 1er octobre 2025)"
-#| fig-width: 10
-#| fig-height: 5
+#| fig-width: !expr fig_w("fig-chronogramme")
+#| fig-height: !expr fig_h("fig-chronogramme")
 #| label: fig-chronogramme
 
 chrono <- res_deb |>
@@ -490,8 +519,8 @@ enq <- res_deb |>
 
 ```{r}
 #| fig-cap: "Nombre de questionnaires par enquêteur et observatoire"
-#| fig-width: 9
-#| fig-height: !expr ror_fig_height(enq, "Enquêteur")
+#| fig-width: !expr fig_w("fig-enqueteurs")
+#| fig-height: !expr fig_h("fig-enqueteurs")
 #| label: fig-enqueteurs
 enq |>
   ror_bar_grouped(x = Enquêteur, y = n, fill = Observatory,
