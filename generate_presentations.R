@@ -447,10 +447,6 @@ generate_pptx <- function(figures, profile, title, output_path) {
       p <- render_figure(qmd_file, label, profile)
 
       if (!is.null(p)) {
-        # Apply presentation font overrides
-        fonts <- get_pres_fonts(label, pres_sizes)
-        p <- apply_presentation_fonts(p, fonts)
-
         dims <- get_fig_dims(label, profile, sizes, pres_sizes)
 
         # Scale to fit slide, preserving aspect ratio
@@ -461,6 +457,15 @@ generate_pptx <- function(figures, profile, title, output_path) {
         scale_factor <- min(avail_w / dims$width, avail_h / dims$height, 1.5)
         plot_w <- dims$width * scale_factor
         plot_h <- dims$height * scale_factor
+
+        # Apply presentation font overrides.
+        # When scale_factor < 1 the figure is rendered smaller than calibrated,
+        # so scale fonts down proportionally to preserve visual appearance.
+        fonts <- get_pres_fonts(label, pres_sizes)
+        if (scale_factor < 1) {
+          fonts <- lapply(fonts, function(x) round(x * scale_factor, 1))
+        }
+        p <- apply_presentation_fonts(p, fonts)
 
         # Left-align, no margin
         left <- 0
@@ -722,37 +727,37 @@ main <- function() {
   message("Found ", nrow(figures), " figures to render across ",
           n_distinct(figures$qmd_file), " chapters\n")
 
-  # # Marovoay presentation
-  # generate_pptx(
-  #   figures = figures,
-  #   profile = "marovoay",
-  #   title = "Campagne 2025 de l\u2019Observatoire rural de Marovoay",
-  #   output_path = file.path(PROJECT_ROOT, "output/presentation_marovoay.pptx")
-  # )
-  #
-  # # Alaotra presentation
-  # generate_pptx(
-  #   figures = figures,
-  #   profile = "alaotra",
-  #   title = "Campagne 2025 de l\u2019Observatoire rural de l\u2019Alaotra",
-  #   output_path = file.path(PROJECT_ROOT, "output/presentation_alaotra.pptx")
-  # )
-  #
-  # # ── XLSX data exports (one workbook per observatory) ──
-  #
-  # # Marovoay XLSX
-  # generate_xlsx(
-  #   figures = figures,
-  #   profile = "marovoay",
-  #   output_path = file.path(PROJECT_ROOT, "output/presentation_data_marovoay.xlsx")
-  # )
-  #
-  # # Alaotra XLSX
-  # generate_xlsx(
-  #   figures = figures,
-  #   profile = "alaotra",
-  #   output_path = file.path(PROJECT_ROOT, "output/presentation_data_alaotra.xlsx")
-  # )
+  # Marovoay presentation
+  generate_pptx(
+    figures = figures,
+    profile = "marovoay",
+    title = "Campagne 2025 de l\u2019Observatoire rural de Marovoay",
+    output_path = file.path(PROJECT_ROOT, "output/presentation_marovoay.pptx")
+  )
+
+  # Alaotra presentation
+  generate_pptx(
+    figures = figures,
+    profile = "alaotra",
+    title = "Campagne 2025 de l\u2019Observatoire rural de l\u2019Alaotra",
+    output_path = file.path(PROJECT_ROOT, "output/presentation_alaotra.pptx")
+  )
+
+  # ── XLSX data exports (one workbook per observatory) ──
+
+  # Marovoay XLSX
+  generate_xlsx(
+    figures = figures,
+    profile = "marovoay",
+    output_path = file.path(PROJECT_ROOT, "output/presentation_data_marovoay.xlsx")
+  )
+
+  # Alaotra XLSX
+  generate_xlsx(
+    figures = figures,
+    profile = "alaotra",
+    output_path = file.path(PROJECT_ROOT, "output/presentation_data_alaotra.xlsx")
+  )
 
   # ── DOCX proof documents (same display settings as PPTX) ──
 

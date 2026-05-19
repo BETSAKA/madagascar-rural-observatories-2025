@@ -481,7 +481,8 @@ server <- function(input, output, session) {
     })
   },
   height = function() input$height * 96,
-  width  = function() input$width  * 96)
+  width  = function() input$width  * 96,
+  res    = 96)
 
   # --- Render info ---
   output$render_log <- renderPrint({
