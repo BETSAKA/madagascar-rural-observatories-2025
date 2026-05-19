@@ -14,7 +14,7 @@ Cette partie rassemble les indicateurs de qualité de la collecte. Les trois var
 
 ::: {.callout-warning}
 ## Travail de vérification en cours
-Les résultats présentés ci-dessous sont provisoires, et sont susceptibles de faire l'objet de corrections.
+Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales.
 :::
 
 ```{r setup_qualite}
@@ -61,8 +61,8 @@ La variable `j11` — *« Qualité de l'enquête »* — est renseignée par l'e
 
 ```{r}
 #| fig-cap: "Qualité de l'enquête selon l'enquêteur (j11, page de couverture)"
-#| fig-width: 8
-#| fig-height: 4
+#| fig-width: !expr fig_w("fig-qualite")
+#| fig-height: !expr fig_h("fig-qualite")
 #| label: fig-qualite
 
 res_deb_site |>
@@ -76,7 +76,8 @@ res_deb_site |>
     Qualité = factor(Qualité, levels = c("Bonne", "Moyenne", "Mauvaise"))
   ) |>
   count(Observatory, Qualité) |>
-  ror_bar_v(x = Qualité, y = n, y_label = "Nombre d'entretiens", show_pct = FALSE)
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  ror_bar_v(x = Qualité, y_label = "% des entretiens")
 ```
 
 ```{r dl_fig_qualite}
@@ -143,8 +144,8 @@ La variable `qual1aa` — *« Qualité de la réponse en générale »* — est 
 
 ```{r}
 #| fig-cap: "Qualité de la réponse selon l'enquêteur (qual1aa, fin de questionnaire)"
-#| fig-width: 8
-#| fig-height: 4
+#| fig-width: !expr fig_w("fig-qual-reponse")
+#| fig-height: !expr fig_h("fig-qual-reponse")
 #| label: fig-qual-reponse
 
 res_remq_site |>
@@ -184,8 +185,8 @@ La variable `qual2aa` — *« Réaction du répondant »* — est renseignée pa
 
 ```{r}
 #| fig-cap: "Réaction du répondant selon l'enquêteur (qual2aa, fin de questionnaire)"
-#| fig-width: 8
-#| fig-height: 4
+#| fig-width: !expr fig_w("fig-reaction")
+#| fig-height: !expr fig_h("fig-reaction")
 #| label: fig-reaction
 
 res_remq_site |>

@@ -7,9 +7,28 @@
 # so that every chapter that sources helpers_report.R gets them automatically.
 
 source("utils/report_variant.R")
+source("utils/sites.R")
 source("utils/plot_theme.R")
+source("utils/figure_sizes.R")
 source("utils/ror_plots.R")
 REPORT_MODE <- get_report_mode()
+
+# --- Figure height scaling for observatory profiles ---
+# Chunks using !expr fig_h() already account for multi-site
+# facets and set the .ror_hook_env$skip flag.  All other chunks with a
+# hardcoded fig.height still need the proportional scale-up so that
+# faceted boxplots, histograms, etc. remain readable.
+if (!REPORT_MODE$is_consolidated) {
+  .obs_fig_h_scale <- if (REPORT_MODE$observatory == "Marovoay") 2.0 else 2.5
+  knitr::opts_hooks$set(fig.height = function(options) {
+    if (.ror_hook_env$skip) {
+      .ror_hook_env$skip <- FALSE
+      return(options)
+    }
+    options$fig.height <- min(options$fig.height * .obs_fig_h_scale, 20)
+    options
+  })
+}
 
 # --- Profile-aware display helpers -----------------------------------------
 

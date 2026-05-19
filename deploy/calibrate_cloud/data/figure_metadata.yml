@@ -1,0 +1,334 @@
+# figure_metadata.yml
+# Plot type and column mappings for each presentation figure.
+# Used by the cloud calibration app to rebuild plots from aggregate XLSX data.
+#
+# plot_type: make_bar_obs | ror_bar_v | ror_bar_grouped | ror_bar_stacked | custom
+# x, y, fill: column names in the XLSX sheet
+# params: extra arguments passed to the plot function
+
+# ── 02_structure_menages ─────────────────────────────────────
+
+fig_origine:
+  plot_type: ror_bar_grouped
+  x: Variable
+  "y": pct
+  fill: Member_Type
+  params:
+    direction: horizontal
+
+fig_cm_educ:
+  plot_type: make_bar_obs
+  x: Type
+  "y": pct
+
+fig-cm-act:
+  plot_type: make_bar_obs
+  x: Act_principal
+  "y": Percent
+  params:
+    y_label: "%"
+
+# ── 04_foncier ───────────────────────────────────────────────
+
+fig-type-exploitee:
+  plot_type: make_bar_obs
+  x: Type
+  "y": pct
+  params:
+    y_label: "% des parcelles"
+
+# ── 05_agriculture ───────────────────────────────────────────
+
+fig-tenure-riz:
+  plot_type: make_bar_obs
+  x: Tenure
+  "y": pct
+  params:
+    y_label: "% des parcelles"
+
+fig-production-riz:
+  plot_type: custom
+  note: "Histogram of r23 (production) — cannot rebuild from aggregate data"
+
+# ── 06_securite_alimentaire ──────────────────────────────────
+
+fig-soudure-vs-stress:
+  plot_type: ror_bar_grouped
+  x: Mois
+  "y": pct
+  fill: Indicateur
+  params:
+    direction: vertical
+    x_angle: 45
+
+# ── 07_rapport_environnement ─────────────────────────────────
+
+fig-ressources-dispo:
+  plot_type: ror_bar_stacked
+  x: Ressource
+  "y": pct
+  fill: "Disponibilité"
+  params:
+    direction: horizontal
+    palette:
+      Abondant: "#2ca02c"
+      Normal: "#ffbf00"
+      "Peu ou pas": "#d62728"
+
+fig-evolution-ressources:
+  plot_type: ror_bar_stacked
+  x: Ressource
+  "y": pct
+  fill: "Évolution"
+  params:
+    direction: horizontal
+    palette:
+      "En augmentation": "#2ca02c"
+      Stable: "#ffbf00"
+      "En diminution": "#d62728"
+
+fig-appartenance:
+  plot_type: make_bar_obs
+  x: Item
+  "y": pct
+  params:
+    y_label: "% de ménages"
+
+fig_menaces:
+  plot_type: ror_bar_grouped
+  x: Item
+  "y": pct
+  fill: Observatory
+  params:
+    direction: horizontal
+    facet: false
+    extra_facet: Section
+
+fig-representation:
+  plot_type: make_bar_obs
+  x: Item
+  "y": pct
+  params:
+    y_label: "% de ménages"
+
+fig-ef-produits:
+  plot_type: ror_bar_v
+  x: Produit
+  "y": pct
+  params:
+    y_label: "% des ménages"
+    x_angle: 45
+
+fig-ef-origine:
+  plot_type: ror_bar_stacked
+  x: Produit
+  "y": pct
+  fill: Origine
+  params:
+    proportion: false
+    direction: vertical
+    x_angle: 45
+    palette:
+      "Dans l'AP": "#d62728"
+      "Hors AP": "#2ca02c"
+
+fig-usages-ap:
+  plot_type: make_bar_obs
+  x: Raison
+  "y": pct
+  params:
+    y_label: "% des usagers de l'AP"
+
+fig-raisons-feux:
+  plot_type: make_bar_obs
+  x: Item
+  "y": pct
+  params:
+    y_label: "% de ménages"
+
+fig-evol-feux:
+  plot_type: ror_bar_v
+  x: "Évolution"
+  "y": pct
+  params:
+    y_label: "% de ménages"
+
+fig-probleme-feux:
+  plot_type: ror_bar_v
+  x: Importance
+  "y": pct
+  params:
+    y_label: "% de ménages"
+    x_angle: 15
+
+fig_connaissance_ap:
+  plot_type: make_bar_obs
+  x: Item
+  "y": pct
+  params:
+    y_label: "%"
+
+fig-jugement-ap:
+  plot_type: ror_bar_stacked
+  x: Dimension
+  "y": pct
+  fill: Jugement
+  params:
+    direction: horizontal
+    palette:
+      "Très positif": "#2ca02c"
+      "Plutôt positif": "#a1d99b"
+      "Plutôt négatif": "#fdae6b"
+      "Très négatif": "#d62728"
+      "Ne connaît pas": "#bdbdbd"
+
+fig-gestionnaire:
+  plot_type: make_bar_obs
+  x: Gestionnaire
+  "y": pct
+  params:
+    y_label: "% de ménages"
+
+fig-mesures-protection:
+  plot_type: make_bar_obs
+  x: Item
+  "y": pct
+  params:
+    y_label: "% de ménages"
+
+fig-priorite:
+  plot_type: make_bar_obs
+  x: "Priorité"
+  "y": pct
+  params:
+    y_label: "% de ménages"
+
+fig-actions-ap:
+  plot_type: ror_bar_grouped
+  x: Action
+  "y": pct
+  fill: Indicateur
+  params:
+    direction: horizontal
+    palette_brewer: Set2
+
+# ── 08_cataclysme_catastrophe ────────────────────────────────
+
+g1_prevalence_type:
+  plot_type: make_bar_obs
+  x: Catastrophe
+  "y": pct
+  params:
+    y_label: "% des ménages"
+
+fig_degats_logement:
+  plot_type: make_bar_obs
+  x: Type
+  "y": pct
+  params:
+    y_label: "% ménages touchés"
+
+fig_degats_personnes:
+  plot_type: ror_bar_stacked
+  x: Catastrophe
+  "y": pct
+  fill: "Conséquence"
+
+g2_severite_profil:
+  plot_type: ror_bar_stacked
+  x: Catastrophe
+  "y": pct
+  fill: Niveau
+  params:
+    proportion: false
+    direction: horizontal
+    y_label: "% des ménages"
+    palette:
+      "Destruction totale": "#d62728"
+      Beaucoup: "#ff7f0e"
+      "Un peu": "#ffbb78"
+      Rien: "#aec7e8"
+
+fig_cultures_touchees:
+  plot_type: make_bar_obs
+  x: Type
+  "y": pct
+  params:
+    y_label: "% des dégâts déclarés"
+
+fig_degats_champs_riz:
+  plot_type: ror_bar_stacked
+  x: Catastrophe
+  "y": pct
+  fill: Niveau
+  params:
+    palette:
+      Rien: "#4daf4a"
+      "Un peu": "#ff7f00"
+      Beaucoup: "#e41a1c"
+      "Destruction totale": "#984ea3"
+
+g4_champs_vs_stocks:
+  plot_type: ror_bar_grouped
+  x: Culture
+  "y": pct
+  fill: Type
+  params:
+    direction: vertical
+    x_angle: 45
+    palette:
+      Champs: "#1f77b4"
+      Stocks: "#ff7f0e"
+
+# ── 09_insertion_projet ──────────────────────────────────────
+
+fig-nb-org:
+  plot_type: ror_bar_v
+  x: nb_org
+  "y": pct
+  params:
+    y_label: "% des ménages"
+
+fig-type-org:
+  plot_type: make_bar_obs
+  x: Type
+  "y": pct
+  params:
+    y_label: "% des adhésions"
+
+fig-responsabilite:
+  plot_type: ror_bar_v
+  x: Role
+  "y": pct
+  params:
+    y_label: "% des adhésions"
+    x_angle: 30
+
+fig_pro1:
+  plot_type: make_bar_obs
+  x: Type
+  "y": pct
+  params:
+    y_label: "% des ménages"
+
+fig-benef-type:
+  plot_type: make_bar_obs
+  x: pro_lib_clean
+  "y": pct
+  params:
+    y_label: "% de ménages bénéficiaires"
+
+fig-source-projet:
+  plot_type: ror_bar_grouped
+  x: pro_lib_clean
+  "y": pct
+  fill: Source
+  params:
+    direction: horizontal
+
+fig_croisement:
+  plot_type: ror_bar_v
+  x: Type
+  "y": pct
+  params:
+    y_label: "% bénéficiaires"
