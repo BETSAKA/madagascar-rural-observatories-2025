@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>8&nbsp; Cataclysmes et catastrophes – Campagne 2025 des Observatoires ruraux d'Alaotra et Marovoay</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -69,15 +72,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="./07_rapport_environnement.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-70a47bd5681a7291082a5b9f83d58762.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-9e3e5b9121e68b3f077afb32f2c64d95.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -133,9 +135,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
-      <a href="./index.html" class="sidebar-logo-link">
-      </a>
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Campagne 2025 des Observatoires ruraux d’Alaotra et Marovoay</a> 
         <div class="sidebar-tools-main">
@@ -514,7 +514,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<div id="avvvytfbuo" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="duewrrvclq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -576,9 +576,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># G1 : Barres horizontales — types de cataclysmes les plus fréquents</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>prev_type <span class="sc">|&gt;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Catastrophe, <span class="at">y_label =</span> <span class="st">"% des ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>events <span class="sc">|&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(res_deb, <span class="at">by =</span> <span class="st">"j5"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Observatory, Catastrophe) <span class="sc">|&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n_distinct</span>(j5), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    events <span class="sc">|&gt;</span> <span class="fu">inner_join</span>(res_deb, <span class="at">by =</span> <span class="st">"j5"</span>) <span class="sc">|&gt;</span> <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">count</span>(Observatory, <span class="at">name =</span> <span class="st">"n_total"</span>),</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">"Observatory"</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> n_total <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Catastrophe, <span class="at">y_label =</span> <span class="st">"% des ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -659,7 +668,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<div id="bkaplehyyn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="hpbhzykktw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -846,13 +855,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Destruction totale"</span>, <span class="st">"Beaucoup"</span>, <span class="st">"Un peu"</span>, <span class="st">"Rien"</span>)</span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Catastrophe, Niveau) <span class="sc">%&gt;%</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Observatory, Catastrophe) <span class="sc">%&gt;%</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>severite_plot <span class="sc">|&gt;</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Catastrophe, Niveau) <span class="sc">%&gt;%</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Observatory, Catastrophe) <span class="sc">%&gt;%</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>severite_plot <span class="sc">|&gt;</span></span>
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_stacked</span>(</span>
 <span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Catastrophe, <span class="at">y =</span> pct, <span class="at">fill =</span> Niveau,</span>
 <span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">y_label =</span> <span class="st">"% des ménages"</span>, <span class="at">proportion =</span> <span class="cn">FALSE</span>,</span>
@@ -1048,24 +1057,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">any_stocks =</span> <span class="fu">any</span>(<span class="fu">c_across</span>(<span class="fu">starts_with</span>(<span class="st">"cc1a6_"</span>)) <span class="sc">&gt;=</span> <span class="dv">2</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
 <span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Observatory, Culture) <span class="sc">%&gt;%</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_champs =</span> <span class="fu">round</span>(<span class="fu">sum</span>(any_champs) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_stocks =</span> <span class="fu">round</span>(<span class="fu">sum</span>(any_stocks) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>champs_vs_stocks_plot <span class="ot">&lt;-</span> champs_vs_stocks <span class="sc">%&gt;%</span></span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(pct_champs, pct_stocks),</span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"Type"</span>,</span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"pct"</span></span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="fu">if_else</span>(Type <span class="sc">==</span> <span class="st">"pct_champs"</span>, <span class="st">"Champs"</span>, <span class="st">"Stocks"</span>))</span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>champs_vs_stocks_plot <span class="sc">|&gt;</span></span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Observatory, Culture) <span class="sc">%&gt;%</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_champs =</span> <span class="fu">round</span>(<span class="fu">sum</span>(any_champs) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_stocks =</span> <span class="fu">round</span>(<span class="fu">sum</span>(any_stocks) <span class="sc">/</span> <span class="fu">n</span>() <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>champs_vs_stocks_plot <span class="ot">&lt;-</span> champs_vs_stocks <span class="sc">%&gt;%</span></span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(pct_champs, pct_stocks),</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"Type"</span>,</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"pct"</span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Type =</span> <span class="fu">if_else</span>(Type <span class="sc">==</span> <span class="st">"pct_champs"</span>, <span class="st">"Champs"</span>, <span class="st">"Stocks"</span>))</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>champs_vs_stocks_plot <span class="sc">|&gt;</span></span>
 <span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_grouped</span>(</span>
 <span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Culture, <span class="at">fill =</span> Type,</span>
 <span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">y_label =</span> <span class="st">"% des ménages"</span>,</span>
