@@ -2,35 +2,45 @@
 output: html_document
 editor_options: 
   chunk_output_type: console
+editor: 
+  markdown: 
+    wrap: sentence
 ---
 
 # Caractéristiques socio-démographiques des ménages
 
-Le ménage est l'unité de base de l'enquête. Cette section décrit la composition des ménages, les caractéristiques des chefs de ménage et de leurs membres, ainsi que l'évolution de ces indicateurs.
+Le ménage est l'unité de base de l'enquête.
+Cette section décrit la composition des ménages, les caractéristiques des chefs de ménage et de leurs membres, ainsi que l'évolution de ces indicateurs.
 
-::: {.callout-warning}
+::: callout-warning
 ## Travail de vérification en cours
+
 Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales.
 :::
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+Dans l’Alaotra, la riziculture irriguée constitue le socle de l’économie domestique, et la taille des exploitations rizicoles influence directement la structure et les revenus des ménages.
+Les fokontany proches des périmètres irrigués (Avaradrano, Feramanga Atsimo) présentent des profils économiques distincts de ceux situés en périphérie de la cuvette (Analamiranga, Maritampona), où la dépendance au riz pluvial et à l’élevage est plus marquée.
+:::
+::::
 
-::: {.content-hidden when-profile="marovoay"}
-::: {.obs-alaotra}
-Dans l’Alaotra, la riziculture irriguée constitue le socle de l’économie domestique, et la taille des exploitations rizicoles influence directement la structure et les revenus des ménages. Les fokontany proches des périmètres irrigués (Avaradrano, Feramanga Atsimo) présentent des profils économiques distincts de ceux situés en périphérie de la cuvette (Analamiranga, Maritampona), où la dépendance au riz pluvial et à l’élevage est plus marquée.
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la structure des ménages est marquée par l'hétérogénéité des stratégies économiques et des structures familiales.
+La proximité de la ville de Marovoay et de la route nationale RN4 reliant Antananarivo à Mahajanga facilite les échanges et influence les activités non agricoles des ménages.
 :::
-:::
+::::
 
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
-À Marovoay, la structure des ménages est marquée par l'hétérogénéité des  stratégies économiques et des structures familiales. La proximité de la ville de Marovoay et de la route nationale RN4 reliant Antananarivo à Mahajanga facilite les échanges et influence les activités non agricoles des ménages.
+:::: {.content-visible when-profile="consolidated"}
+::: obs-technical
+Les indicateurs démographiques présentés dans cette section sont calculés à partir du fichier ménage (`res_deb`) et du fichier des membres (`res_m_a`).
+La classification des activités principales s'appuie sur une nomenclature sectorielle inspirée de la CITI Rév.
+4.
+Les effectifs inférieurs à cinq sont masqués par souci de confidentialité statistique.
+Les comparaisons entre les deux observatoires doivent tenir compte de la différence de taille des échantillons et de la structure spatiale des zones enquêtées.
 :::
-:::
-
-::: {.content-visible when-profile="consolidated"}
-::: {.obs-technical}
-Les indicateurs démographiques présentés dans cette section sont calculés à partir du fichier ménage (`res_deb`) et du fichier des membres (`res_m_a`). La classification des activités principales s'appuie sur une nomenclature sectorielle inspirée de la CITI Rév. 4. Les effectifs inférieurs à cinq sont masqués par souci de confidentialité statistique. Les comparaisons entre les deux observatoires doivent tenir compte de la différence de taille des échantillons et de la structure spatiale des zones enquêtées.
-:::
-:::
+::::
 
 ```{r data_loading}
 library(tidyverse)
@@ -175,30 +185,50 @@ pct_top_raison_m <- non_scol_s |> filter(Observatory == "Marovoay") |>
 
 ## Description des ménages
 
-::: {.content-visible when-profile="consolidated"}
-::: {.obs-technical}
+:::: {.content-visible when-profile="consolidated"}
+::: obs-technical
 L'enquête a permis de recenser `r n_members` individus répartis dans `r n_men` ménages au sein des deux observatoires.
-Les ménages de Marovoay sont globalement plus larges que ceux de l'Alaotra. 
+Les ménages de Marovoay sont globalement plus larges que ceux de l'Alaotra.
 :::
-:::
+::::
 
 <!-- ::: {.content-hidden when-profile="marovoay"} -->
+
 <!-- ::: {.obs-alaotra} -->
+
 <!-- A Alaotra, on a recensé `r n_members_a` individus répartis dans `r n_men_a` ménages. La taille moyenne des ménages s'établit à `r taille_moy_a` personnes. -->
+
 <!-- ::: -->
+
 <!-- ::: -->
 
 <!-- ::: {.content-hidden when-profile="alaotra"} -->
+
 <!-- ::: {.obs-marovoay} -->
+
 <!-- A Marovoay, on a recensé `r n_members_m` individus répartis dans `r n_men_m` ménages. La taille moyenne des ménages s'établit à `r taille_moy_m` personnes. Parmi les quatre hameaux, les tailles de ménages varient sensiblement, reflétant des structures familiales distinctes selon les localités. -->
+
 <!-- ::: -->
+
 <!-- ::: -->
 
 ### Taille des ménages par observatoire
 
 La taille des ménages correspond au nombre total d’individus qui composent et vivent au sein d'une même ménage.
-    • A Alaotra, on a recensé 1975 individus répartis dans 507 ménages. La taille moyenne des ménages s’établit à 3.9 personnes. 
-    • A Marovoay, on a recensé 2297 individus répartis dans 519 ménages. La taille moyenne des ménages s’établit à 4.4 personnes.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, on a recensé 1975 individus répartis dans 507 ménages. La taille moyenne des ménages s’établit à 3.9 personnes.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, on a recensé 2297 individus répartis dans 519 ménages. La taille moyenne des ménages s’établit à 4.4 personnes.
+:::
+::::
+
+
 
 ```{r tbl-men-obs}
 #| tbl-cap: "Taille moyenne des ménages par observatoire"
@@ -226,9 +256,20 @@ dl_tbl_variants("tbl_men_obs", "04", function(d) {
 ```
 
 ### Taille des ménages par hameau et par observatoire
+
 Pour Marovoay, Ampijoroa se distingue par les ménages les plus nombreux de l'échantillon tandis que les hameaux de l'Alaotra présentent une homogénéité plus forte autour de 4 personnes par foyer.
-    • A Alaotra, les tailles varient peu : de 3.76 (Avaradrano) à 4.03 (Ambatoharanana, Ambatomanga, Mangabe). 
-    • A Marovoay , les contrastes sont plus marqués allant de 3.86 (Madiromiongana) à 4.81 (Ampijoroa). 
+
+:::: {.content-hidden when-profile="marovoay"} 
+::: obs-alaotra 
+A Alaotra, les tailles varient peu : de 3.76 (Avaradrano) à 4.03 (Ambatoharanana, Ambatomanga, Mangabe).
+::: 
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay , les contrastes sont plus marqués allant de 3.86 (Madiromiongana) à 4.81 (Ampijoroa).
+:::
+::::
 
 ```{r tbl_men_hameau}
 hh_size_hameau <- members |>
@@ -250,23 +291,28 @@ obs_gt(hh_size_hameau) |>
 
 ### Structure par âge
 
-La structure démographique des ménages enquêtés révèle une population jeune. Cette distribution, caractéristique des populations rurales malgaches, implique un fort taux de dépendance.
-
+La structure démographique des ménages enquêtés révèle une population jeune.
+Cette distribution, caractéristique des populations rurales malgaches, implique un fort taux de dépendance.
 
 #### Au niveau des observatoires
-La population est extrêmement jeune, avec une base de pyramide (0-10 ans) représentant près de 30 % des effectifs dans les deux zones. Marovoay présente un taux de dépendance des jeunes plus élevé qu'Alaotra. 
 
-::: {.content-hidden when-profile="marovoay"}
-::: {.obs-alaotra}
-A Alaotra, `r pct_moins15_a` % des individus ont moins de 15 ans. La population en âge de travailler (15–64 ans) représente `r pct_15_64_a` %, tandis que les personnes de 65 ans et plus ne constituent que `r pct_65plus_a` %.
-:::
-:::
+La population est extrêmement jeune, avec une base de pyramide (0-10 ans) représentant près de 30 % des effectifs dans les deux zones.
+Marovoay présente un taux de dépendance des jeunes plus élevé qu'Alaotra.
 
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
-A Marovoay, `r pct_moins15_m` % des individus ont moins de 15 ans, signe d'une population en croissance rapide. La population en âge de travailler (15–64 ans) représente `r pct_15_64_m` %, tandis que les personnes de 65 ans et plus ne constituent que `r pct_65plus_m` %. Cette structure démographique, caractérisée par une base large et un sommet étroit, est caractéristique des populations rurales malgaches et traduit un taux de dépendance élevé.
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, `r pct_moins15_a` % des individus ont moins de 15 ans.
+La population en âge de travailler (15–64 ans) représente `r pct_15_64_a` %, tandis que les personnes de 65 ans et plus ne constituent que `r pct_65plus_a` %.
 :::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, `r pct_moins15_m` % des individus ont moins de 15 ans, signe d'une population en croissance rapide.
+La population en âge de travailler (15–64 ans) représente `r pct_15_64_m` %, tandis que les personnes de 65 ans et plus ne constituent que `r pct_65plus_m` %.
+Cette structure démographique, caractérisée par une base large et un sommet étroit, est caractéristique des populations rurales malgaches et traduit un taux de dépendance élevé.
 :::
+::::
 
 ```{r age_obs}
 #| include: false
@@ -352,25 +398,28 @@ dl_fig_variants("fig_pyramide", "04", function(d) {
 
 ### Origine des Chefs de Ménage et conjoints
 
-L'origine géographique des chefs de ménage (CM) et de leurs conjoints renseigne sur les dynamiques migratoires et le degré d'ancrage local des familles. La classification distingue les *tompon-tany* (autochtones), les *zana-tany* (nés sur place de parents migrants), les *valivotaka* (migrants installés durablement) et les *mpihavy* (arrivants récents).
+L'origine géographique des chefs de ménage (CM) et de leurs conjoints renseigne sur les dynamiques migratoires et le degré d'ancrage local des familles.
+La classification distingue les *tompon-tany* (autochtones), les *zana-tany* (nés sur place de parents migrants), les *valivotaka* (migrants installés durablement) et les *mpihavy* (arrivants récents).
 
 ::: {.content-visible when-profile="consolidated"}
-La répartition de ces catégories diffère sensiblement entre les deux observatoires. L'Alaotra reste une zone de peuplement stable, tandis que Marovoay illustre une dynamique migratoire historique forte, où les descendants de migrants sont désormais aussi nombreux que les natifs.
+La répartition de ces catégories diffère sensiblement entre les deux observatoires.
+L'Alaotra reste une zone de peuplement stable, tandis que Marovoay illustre une dynamique migratoire historique forte, où les descendants de migrants sont désormais aussi nombreux que les natifs.
 :::
 
-::: {.content-hidden when-profile="marovoay"}
-::: {.obs-alaotra}
-Dans l'Alaotra, la pression foncière croissante et l'attractivité des périmètres rizicoles aménagés se reflètent dans la composition des populations selon leur origine avec une forte dominance des «tompon-tany» à 66.8 % pour les chefs de ménage. . Les dynamiques migratoires et l'ancrage local varient selon la position des fokontany par rapport aux zones irriguées.
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+Dans l'Alaotra, la pression foncière croissante et l'attractivité des périmètres rizicoles aménagés se reflètent dans la composition des populations selon leur origine avec une forte dominance des «tompon-tany» à 66.8 % pour les chefs de ménage.
+. Les dynamiques migratoires et l'ancrage local varient selon la position des fokontany par rapport aux zones irriguées.
 :::
-:::
+::::
 
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
-À Marovoay, l'équilibre entre *tompon-tany* (39 %) et *zana-tany* (39.4 %)varie selon les localités. La proportion de *valivotaka* et *mpihavy* reflète l'attractivité des zones rizicoles pour les migrants des régions voisines. Les raisons sociales (en particulier le mariage) dépassent largement les motivations économiques comme facteur d'installation.
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, l'équilibre entre *tompon-tany* (39 %) et *zana-tany* (39.4 %)varie selon les localités.
+La proportion de *valivotaka* et *mpihavy* reflète l'attractivité des zones rizicoles pour les migrants des régions voisines.
+Les raisons sociales (en particulier le mariage) dépassent largement les motivations économiques comme facteur d'installation.
 :::
-:::
-
-
+::::
 
 ```{r origine}
 #| include: false
@@ -406,12 +455,23 @@ dl_fig_variants("fig_origine", "04", function(d) {
 }, members)
 ```
 
-::: {.content-visible when-profile="consolidated"}
-::: {.obs-technical}
-
+:::: {.content-visible when-profile="consolidated"}
+::: obs-technical
 ### Région d'origine
 
 La provenance régionale des CM et conjoints qui ne sont pas natifs de la localité permet d'identifier les principaux bassins migratoires alimentant chaque observatoire.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, les chefs de ménage et leurs conjoints non natifs de la localité proviennent majoritairement de l’extérieur de la commune de résidence, avec respectivement 62.5% et 54.3%. Les personnes originaires de la même commune représentent ensuite 21.9% des chefs de ménage et 32.4% des conjoints. Enfin, les non natifs issus du même fokontany constituent 15.6% des chefs de ménage et 13.3% des conjoints.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, l’origine principale des chefs de ménage et de leurs conjoints non natifs de la localité se situe également hors de la commune de résidence, avec 89.1% des chefs de ménage et 74.5% des conjoints concernés. Par ailleurs, 19.1% des conjoints non natifs proviennent de la même commune.
+:::
+::::
 
 ```{r homeland}
 #| include: false
@@ -485,13 +545,25 @@ dl_fig_variants("fig_homeland", "04", function(d) {
                     y_label = "%", direction = "horizontal")
 }, members)
 ```
-
 :::
-:::
+::::
 
 ### Raison d'installation
 
-Les raisons d'installation des CM et conjoints non originaires du lieu éclairent les motivations migratoires. Elles distinguent notamment les installations liées au mariage de celles motivées par les opportunités économiques (travail agricole ou non agricole).
+Les raisons d'installation des CM et conjoints non originaires du lieu éclairent les motivations migratoires.
+Elles distinguent notamment les installations liées au mariage de celles motivées par les opportunités économiques (travail agricole ou non agricole).
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, les motifs sociaux liés à la naissance, au mariage et aux attaches familiales constituent la principale raison d’implantation, aussi bien pour les conjoints (92.7%) que pour les chefs de ménage (90.3%). Les motivations d’ordre économique, liées au travail ou à l’accès aux ressources, ainsi que les autres motifs conjoncturels, demeurent marginales et restent toutes inférieures à 10% dans cet observatoire.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, les raisons sociales représentent également le principal motif d’implantation, avec 89.6% des conjoints et 83.8% des chefs de ménage concernés. Les motivations économiques, associées au travail et à l’accès aux ressources, occupent une place plus importante chez les chefs de ménage, où elles atteignent 15.6%, contre 9.8% chez les conjoints.
+:::
+::::
 
 ```{r raison}
 #| include: false
@@ -529,21 +601,27 @@ dl_fig_variants("fig_raison", "04", function(d) {
 
 ## Caractéristiques des chefs de ménages
 
-Le profil des chefs de ménage (CM) est décrit ci-dessous.
-
-::: {.content-hidden when-profile="marovoay"}
-::: {.obs-alaotra}
-Dans l'Alaotra, `r pct_cm_h_a` % des CM sont des hommes, soit `r pct_cm_f_a` % de ménages dirigés par des femmes. L'âge moyen des CM est de `r age_cm_a` ans. Sur le plan conjugal, `r pct_couple_a` % des CM vivent en couple (mariés ou en concubinage).
-:::
-:::
-
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
-A Marovoay, `r pct_cm_h_m` % des CM sont des hommes, soit `r pct_cm_f_m` % de ménages dirigés par des femmes. L'âge moyen des CM est de `r age_cm_m` ans. Sur le plan conjugal, `r pct_couple_m` % des CM vivent en couple (mariés ou en concubinage).
-:::
-:::
+Cette section analyse le profil des chefs de ménage dans les deux observatoires, en examinant notamment leurs caractéristiques socio-démographiques, leur niveau d’éducation, leur alphabétisation, ainsi que leurs activités principales.
 
 ### Caractéristiques socio-démographiques
+
+Le profil des chefs de ménage (CM) est décrit ci-dessous.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+Dans l'Alaotra, `r pct_cm_h_a` % des CM sont des hommes, soit `r pct_cm_f_a` % de ménages dirigés par des femmes.
+L'âge moyen des CM est de `r age_cm_a` ans.
+Sur le plan conjugal, `r pct_couple_a` % des CM vivent en couple (mariés ou en concubinage).
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, `r pct_cm_h_m` % des CM sont des hommes, soit `r pct_cm_f_m` % de ménages dirigés par des femmes.
+L'âge moyen des CM est de `r age_cm_m` ans.
+Sur le plan conjugal, `r pct_couple_m` % des CM vivent en couple (mariés ou en concubinage).
+:::
+::::
 
 ```{r cm_chars}
 cm <- members |> filter(m6 == 1)
@@ -635,21 +713,34 @@ dl_tbl_variants("tbl_cm_chars", "04", function(d) {
 
 ### Niveau d'éducation
 
-Le niveau d'éducation des chefs de ménage constitue un déterminant majeur de la capacité d'adaptation et de la vulnérabilité des ménages ruraux. L'analyse croisée par sexe met en évidence des disparités supplémentaires.
+Le niveau d'éducation des chefs de ménage constitue un déterminant majeur de la capacité d'adaptation et de la vulnérabilité des ménages ruraux.
+L'analyse croisée par sexe met en évidence des disparités supplémentaires.
 
-::: {.content-hidden when-profile="marovoay"}
-::: {.obs-alaotra}
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
 Dans l'Alaotra, le niveau le plus fréquemment atteint est « `r top_educ_a` » (`r pct_top_educ_a` % des CM).
 :::
-:::
+::::
 
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
-A Marovoay, le niveau le plus fréquemment atteint est « `r top_educ_m` » (`r pct_top_educ_m` % des CM). La majorité des chefs de ménage ont un faible niveau d'instruction, avec une dominance du niveau primaire pour les deux sexes. Les femmes chefs de ménage présentent des taux d'instruction nettement plus faibles que les hommes, ce qui accentue leur vulnérabilité socio-économique.
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, le niveau le plus fréquemment atteint est « `r top_educ_m` » (`r pct_top_educ_m` % des CM).
+La majorité des chefs de ménage ont un faible niveau d'instruction, avec une dominance du niveau primaire pour les deux sexes.
 :::
-:::
+::::
 
 #### Niveau d'éducation du Chef de ménage
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, le profil éducatif des chefs de ménage de l'Alaotra montre une forte prédominance de l'instruction primaire qui concerne 60.6 % de cet effectif. La zone affiche une performance notable en termes d'accès de base, puisque le taux de non-scolarisation est contenu à 7.9 %. L'accès au premier cycle du secondaire reste significatif pour 21.5 % des ménages.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la structure éducative est plus hétérogène avec une part de non-scolarisation de 13.9 %. Si le niveau primaire demeure la référence pour 51.8 % des chefs, on note paradoxalement une insertion plus forte dans le premier cycle secondaire qui atteint 25.0 %. Ces chiffres traduisent une disparité interne plus marquée dans l'accès aux cycles d'études au sein de cet observatoire.
+:::
+::::
 
 ```{r cm_educ}
 #| include: false
@@ -701,6 +792,20 @@ dl_fig_variants("fig_cm_educ", "04", function(d) {
 ```
 
 #### Niveau d'éducation des chefs de ménages par sexe
+Il existe un fossé de genre persistant pour l'accès aux études longues : les hommes chefs de ménage ont environ deux fois plus de chances d'atteindre le second cycle du secondaire ou le niveau supérieur par rapport aux femmes, et ce, dans les deux observatoires. Le niveau "Primaire" reste le socle commun le plus fréquent pour les deux sexes, oscillant entre 49 % et 64 % selon les catégories.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, Le niveau primaire reste le socle commun pour les deux sexes, bien que légèrement plus élevé chez les femmes (63.6 % contre 59.7 % pour les hommes). L'accès au niveau secondaire 2ème cycle et supérieur est deux fois plus fréquent chez les hommes (8.8 %) que chez les femmes (4.5 %). Cette situation est marquée par une vulnérabilité des femmes à la base. Une disparité de genre marquée s'observe dès la non-scolarisation. Les femmes chefs de ménage sont nettement plus nombreuses à n'avoir jamais fréquenté l'école (14.5 %) par rapport aux hommes (6 %).
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les femmes chefs de ménage présentent des taux d'instruction nettement plus faibles que les hommes, ce qui accentue leur vulnérabilité socio-économique. Les hommes sont deux fois plus nombreux (9.1 %) que les femmes (4.4 %) à atteindre les cycles d'études les plus longs. Si les femmes de Marovoay accèdent plus souvent à l'école que les hommes (moins de non-scolarisées et plus de niveau primaire avec 61.4 %), elles sont plus précocement limitées dans leur progression vers les niveaux secondaires et supérieurs par rapport à leurs homologues masculins. Contrairement à la tendance habituelle, le taux de non-scolarisation est plus élevé chez les chefs de ménage hommes (14.6 %) que chez les femmes (11.4 %).
+:::
+::::
+
 
 ```{r cm_educ_sex}
 #| include: false
@@ -774,19 +879,9 @@ dl_fig_variants("fig_cm_educ_sex", "04", function(d) {
 
 ### Alphabétisation des chefs de ménage
 
-L'aptitude à lire et écrire conditionne l'accès à l'information, aux services publics et aux opportunités économiques. Les sections suivantes détaillent les compétences en lecture et en écriture séparément, en distinguant trois niveaux : lecture/écriture aisée, avec effort, ou absente.
+L'aptitude à lire et écrire conditionne l'accès à l'information, aux services publics et aux opportunités économiques.
+Les sections suivantes détaillent les compétences en lecture et en écriture séparément, en distinguant trois niveaux : lecture/écriture aisée, avec effort, ou absente.
 
-::: {.content-hidden when-profile="marovoay"}
-::: {.obs-alaotra}
-Dans l'Alaotra, `r pct_alpha_a` % des CM savent lire aisément.
-:::
-:::
-
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
-A Marovoay, `r pct_alpha_m` % des CM savent lire aisément. Les niveaux de lecture et d'écriture varient sensiblement selon les localités et le sexe. L'écart entre hommes et femmes en matière d'alphabétisation traduit un accès inégal à l'éducation qui se répercute sur la capacité des ménages féminins à accéder à l'information et aux services.
-:::
-:::
 
 ```{r cm_literacy_helpers}
 #| include: false
@@ -843,6 +938,21 @@ literacy_3level_bar <- function(data, var, title_text) {
 ```
 
 #### Savoir lire
+L'aptitude à la lecture est nettement supérieure dans le bassin de l'Alaotra. À Marovoay, 1 chef de ménage sur 5 ne sait pas lire du tout. 
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+Dans l'Alaotra, `r pct_alpha_a` % des CM savent lire aisément.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, `r pct_alpha_m` % des CM savent lire aisément.
+Les niveaux de lecture et d'écriture varient sensiblement selon les localités et le sexe.
+L'écart entre hommes et femmes en matière d'alphabétisation traduit un accès inégal à l'éducation qui se répercute sur la capacité des ménages féminins à accéder à l'information et aux services.
+:::
+::::
 
 ```{r cm_read}
 literacy_3level(cm_site, s1a, "Aptitude à la lecture des chefs de ménage")
@@ -860,6 +970,20 @@ dl_tbl_variants("tbl_cm_read", "04", function(d) {
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la majorité des chefs de ménage savent lire, avec une proportion plus élevée chez les hommes (85.9%) que chez les femmes (79.1%). En revanche, la non-aptitude à la lecture est davantage observée chez les femmes, dont 16.4% déclarent ne pas savoir lire contre 7.3% des hommes.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, les niveaux d’aptitude à la lecture sont relativement similaires entre les sexes, avec 74.6% des femmes et 73.8% des hommes sachant lire. À l’inverse, les proportions de chefs de ménage ne sachant pas lire demeurent importantes, atteignant 20.5% chez les hommes et 18.4% chez les femmes.
+:::
+::::
+
+La lecture avec difficulté concerne une faible proportion des chefs de ménage quelque soit leur genre.
 
 ```{r cm_read_sex}
 #| include: false
@@ -884,6 +1008,19 @@ dl_tbl_variants("tbl_cm_read_sex", "04", function(d) {
 ```
 
 #### Savoir écrire
+On observe une corrélation presque parfaite entre lecture et écriture dans les deux zones. 
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les difficultés d'écriture concernent 15.6 % des chefs de ménage, ce qui correspond au cumul de ceux qui ne savent pas écrire (10.3 %) et de ceux qui écrivent avec effort (5.3 %). Ce résultat témoigne d'un niveau d'alphabétisation relativement élevé dans cette zone, où 84.4 % des chefs de ménage maîtrisent l'écriture sans difficulté.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la proportion de chefs de ménage rencontrant des obstacles face à l'écrit est nettement plus marquée, atteignant 27.1 %. Ce groupe se compose de 20.4 % de personnes incapables d'écrire et de 6.7 % de personnes le faisant avec effort.
+:::
+::::
 
 ```{r cm_write}
 literacy_3level(cm_site, s1b, "Aptitude à l'écriture des chefs de ménage")
@@ -901,6 +1038,20 @@ dl_tbl_variants("tbl_cm_write", "04", function(d) {
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la majorité des chefs de ménage savent écrire, avec une proportion plus élevée chez les hommes (85.9%) que chez les femmes (79.1%). En revanche, la non-aptitude à l’écriture est davantage observée chez les femmes, dont 16.4% déclarent ne pas savoir écrire, contre 8.6% des hommes.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, les niveaux d’aptitude à l’écriture sont relativement proches entre les sexes, avec 73.7% des femmes et 72.6% des hommes sachant écrire. Par ailleurs, les proportions de chefs de ménage ne sachant pas écrire demeurent importantes, atteignant 20.7% chez les hommes et 19.3% chez les femmes.
+:::
+::::
+
+Les chefs de ménage capables d’écrire avec difficulté restent peu nombreux.
 
 ```{r cm_write_sex}
 #| include: false
@@ -923,21 +1074,27 @@ dl_tbl_variants("tbl_cm_write_sex", "04", function(d) {
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
+
 ### Activités principales des Chefs de ménage
 
-L'activité économique principale des chefs de ménage traduit la structure productive de chaque observatoire. Les activités sont regroupées en catégories sectorielles inspirées de la CITI Rév. 4 afin de garantir un effectif suffisant dans chaque classe et de préserver la confidentialité statistique.
+L'activité économique principale des chefs de ménage traduit la structure productive de chaque observatoire.
+Les activités sont regroupées en catégories sectorielles inspirées de la CITI Rév.
+4 afin de garantir un effectif suffisant dans chaque classe et de préserver la confidentialité statistique.
 
-::: {.content-hidden when-profile="marovoay"}
-::: {.obs-alaotra}
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
 Dans l'Alaotra, l'activité dominante est « `r top_act_a` » (`r pct_top_act_a` % des CM).
 :::
-:::
+::::
 
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
-A Marovoay, l'activité dominante est « `r top_act_m` » (`r pct_top_act_m` % des CM). L'agriculture constitue le socle économique des ménages, les cultivateurs exploitants représentant la majorité des chefs de ménage. Le commerce et la restauration, l'artisanat, le BTP et le transport, ainsi que l'élevage et la pêche complètent le panorama des activités. La différenciation des activités selon le sexe est marquée : les hommes sont majoritairement cultivateurs exploitants, tandis que les femmes sont davantage présentes dans le commerce et la restauration.
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, l'activité dominante est « `r top_act_m` » (`r pct_top_act_m` % des CM).
+L'agriculture constitue le socle économique des ménages, les cultivateurs exploitants représentant la majorité des chefs de ménage.
+Le commerce et la restauration, l'artisanat, le BTP et le transport, ainsi que l'élevage et la pêche complètent le panorama des activités.
+La différenciation des activités selon le sexe est marquée : les hommes sont majoritairement cultivateurs exploitants, tandis que les femmes sont davantage présentes dans le commerce et la restauration.
 :::
-:::
+::::
 
 ```{r cm_act}
 #| include: false
@@ -1071,19 +1228,22 @@ dl_fig_variants("fig_cm_act_sex", "04", function(d) {
 
 ## Caractéristiques des autres membres de ménages
 
-Les autres membres du ménage (conjoints, enfants, dépendants) constituent la majorité de la population recensée. Leur profil démographique, éducatif et économique complète celui des chefs de ménage et permet de dresser un portrait plus complet du capital humain des familles rurales.
+Les autres membres du ménage (conjoints, enfants, dépendants) constituent la majorité de la population recensée.
+Leur profil démographique, éducatif et économique complète celui des chefs de ménage et permet de dresser un portrait plus complet du capital humain des familles rurales.
 
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
-À Marovoay, les autres membres du ménage forment une population majoritairement féminine et jeune. Les indicateurs d'âge révèlent un profil démographique caractéristique des populations rurales en croissance. La prédominance des mariages selon la tradition et du célibat (pour les membres de 12 ans et plus) témoigne du maintien des pratiques matrimoniales coutumières.
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, les autres membres du ménage forment une population majoritairement féminine et jeune.
+Les indicateurs d'âge révèlent un profil démographique caractéristique des populations rurales en croissance.
+La prédominance des mariages selon la tradition et du célibat (pour les membres de 12 ans et plus) témoigne du maintien des pratiques matrimoniales coutumières.
 :::
-:::
+::::
 
-::: {.content-hidden when-profile="marovoay"}
-::: {.obs-alaotra}
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
 Dans l'Alaotra, les membres non-CM présentent un profil jeune avec une prédominance féminine, conformément à la structure démographique attendue dans les zones rurales malgaches.
 :::
-:::
+::::
 
 ### Caractéristiques socio-démographiques
 
@@ -1182,7 +1342,8 @@ dl_tbl_variants("tbl_other_chars", "04", function(d) {
 
 ### Éducation et scolarisation
 
-Le niveau d'éducation des autres membres de ménage complète le portrait éducatif des familles. Les disparités entre sexes et entre observatoires donnent un aperçu des inégalités d'accès à l'éducation.
+Le niveau d'éducation des autres membres de ménage complète le portrait éducatif des familles.
+Les disparités entre sexes et entre observatoires donnent un aperçu des inégalités d'accès à l'éducation.
 
 #### Niveau d'éducation des autres membres
 
@@ -1387,21 +1548,22 @@ dl_tbl_variants("tbl_other_write_sex", "04", function(d) {
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
+
 ### Scolarisation
 
 Le taux de scolarisation des enfants de 6 à 14 ans constitue un indicateur clé du développement humain et de l'investissement des ménages dans l'éducation.
 
-::: {.content-hidden when-profile="marovoay"}
-::: {.obs-alaotra}
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
 Dans l'Alaotra, le taux de scolarisation s'élève à `r taux_scol_a` %.
 :::
-:::
+::::
 
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
 Dans Marovoay, le taux de scolarisation s'élève à `r taux_scol_m` %.
 :::
-:::
+::::
 
 #### Taux de scolarisation des enfants de 6 à 14 ans
 
@@ -1437,7 +1599,6 @@ dl_tbl_variants("tbl_schooling", "04", function(d) {
 ```
 
 ::: {.content-visible when-profile="consolidated"}
-
 #### Classe suivie 2024-2025
 
 ```{r class_attended}
@@ -1482,24 +1643,23 @@ dl_tbl_variants("tbl_class", "04", function(d) {
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
-
 :::
 
 #### Raisons de non fréquentation de l'école pour les 6 à 15 ans
 
 La @fig-raisons-non-scol détaille l'ensemble des motifs de non-scolarisation cités.
 
-::: {.content-hidden when-profile="marovoay"}
-::: {.obs-alaotra}
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
 Dans l'Alaotra, parmi les enfants de 6 à 15 ans non scolarisés, la première raison invoquée est « `r top_raison_a` » (`r pct_top_raison_a` %).
 :::
-:::
+::::
 
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
 A Marovoay, parmi les enfants de 6 à 15 ans non scolarisés, la première raison invoquée est « `r top_raison_m` » (`r pct_top_raison_m` %).
 :::
-:::
+::::
 
 ```{r fig-raisons-non-scol}
 #| fig-cap: "Principales raisons de non-scolarisation ou d'arrêt des études (6-15 ans)"
@@ -1587,7 +1747,8 @@ dl_tbl_variants("tbl_raisons_non_scol", "04", function(d) {
 
 ### Activités principales des autres membres de ménages
 
-La répartition sectorielle des activités des autres membres de ménage reflète la diversification économique au sein des familles et le rôle des conjoints et enfants dans l'économie du ménage. Les activités sont regroupées selon la même nomenclature sectorielle que pour les CM.
+La répartition sectorielle des activités des autres membres de ménage reflète la diversification économique au sein des familles et le rôle des conjoints et enfants dans l'économie du ménage.
+Les activités sont regroupées selon la même nomenclature sectorielle que pour les CM.
 
 ```{r other_act_grouped}
 #| include: false
@@ -1717,16 +1878,19 @@ dl_fig_variants("fig_other_act_sex", "04", function(d) {
 }, members)
 ```
 
-::: {.content-visible when-profile="consolidated"}
-
+:::: {.content-visible when-profile="consolidated"}
 ## Évolution des indicateurs démographiques (1996-2025) {#sec-demog-multiyear}
 
-Les observatoires disposent de données démographiques depuis les années 1990. Cette section retrace l'évolution de quatre indicateurs clés : la taille moyenne des ménages, la proportion de chefs de ménage femmes, le taux de scolarisation des 6-14 ans et l'âge moyen du chef de ménage.
+Les observatoires disposent de données démographiques depuis les années 1990.
+Cette section retrace l'évolution de quatre indicateurs clés : la taille moyenne des ménages, la proportion de chefs de ménage femmes, le taux de scolarisation des 6-14 ans et l'âge moyen du chef de ménage.
 
-::: {.callout-caution}
+::: callout-caution
 ## Interprétation : effet du panel et de l'échantillonnage
 
-Les tendances présentées dans cette section doivent être interprétées avec prudence. Les observatoires suivaient un dispositif de **panel** : la première année, les ménages sont tirés au sort dans la localités, puis ils sont réinterrogés chaque année (avec remplacement partiel si le ménage a disparu ou refuse de répondre).  En 2025, après dix ans d'interruption, un **nouveau tirage** a été effectué à partir du dénombrement. Les évolutions observées reflètent donc à la fois des dynamiques réelles dans les localités et des changements de composition de l'échantillon (vieillissement du panel, attrition sélective, renouvellement complet en 2025). 
+Les tendances présentées dans cette section doivent être interprétées avec prudence.
+Les observatoires suivaient un dispositif de **panel** : la première année, les ménages sont tirés au sort dans la localités, puis ils sont réinterrogés chaque année (avec remplacement partiel si le ménage a disparu ou refuse de répondre).
+En 2025, après dix ans d'interruption, un **nouveau tirage** a été effectué à partir du dénombrement.
+Les évolutions observées reflètent donc à la fois des dynamiques réelles dans les localités et des changements de composition de l'échantillon (vieillissement du panel, attrition sélective, renouvellement complet en 2025).
 :::
 
 ```{r demog_trends_compute}
@@ -1847,5 +2011,4 @@ if ("age_cm_moy" %in% names(demog_trends)) {
               gap_year = 2015)
 }
 ```
-
-:::
+::::
