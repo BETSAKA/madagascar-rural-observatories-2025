@@ -13,15 +13,16 @@ Le ménage est l'unité de base de l'enquête. Cette section décrit la composit
 Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales.
 :::
 
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
-À Marovoay, la structure des ménages est marquée par l'hétérogénéité des  stratégies économiques et des structures familiales. La proximité de la ville de Marovoay et de la route nationale RN4 reliant Antananarivo à Mahajanga facilite les échanges et influence les activités non agricoles des ménages.
-:::
-:::
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, la riziculture irriguée constitue le socle de l'économie domestique, et la taille des exploitations rizicoles influence directement la structure et les revenus des ménages. Les fokontany proches des périmètres irrigués (Avaradrano, Feramanga Atsimo) présentent des profils économiques distincts de ceux situés en périphérie de la cuvette (Analamiranga, Maritampona), où la dépendance au riz pluvial et à l'élevage est plus marquée.
+Dans l’Alaotra, la riziculture irriguée constitue le socle de l’économie domestique, et la taille des exploitations rizicoles influence directement la structure et les revenus des ménages. Les fokontany proches des périmètres irrigués (Avaradrano, Feramanga Atsimo) présentent des profils économiques distincts de ceux situés en périphérie de la cuvette (Analamiranga, Maritampona), où la dépendance au riz pluvial et à l’élevage est plus marquée.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+À Marovoay, la structure des ménages est marquée par l'hétérogénéité des  stratégies économiques et des structures familiales. La proximité de la ville de Marovoay et de la route nationale RN4 reliant Antananarivo à Mahajanga facilite les échanges et influence les activités non agricoles des ménages.
 :::
 :::
 
@@ -177,21 +178,27 @@ pct_top_raison_m <- non_scol_s |> filter(Observatory == "Marovoay") |>
 ::: {.content-visible when-profile="consolidated"}
 ::: {.obs-technical}
 L'enquête a permis de recenser `r n_members` individus répartis dans `r n_men` ménages au sein des deux observatoires.
-:::
-:::
-::: {.content-hidden when-profile="marovoay"}
-::: {.obs-alaotra}
-A Alaotra, on a recensé `r n_members_a` individus répartis dans `r n_men_a` ménages. La taille moyenne des ménages s'établit à `r taille_moy_a` personnes.
+Les ménages de Marovoay sont globalement plus larges que ceux de l'Alaotra. 
 :::
 :::
 
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
-A Marovoay, on a recensé `r n_members_m` individus répartis dans `r n_men_m` ménages. La taille moyenne des ménages s'établit à `r taille_moy_m` personnes. Parmi les quatre hameaux, les tailles de ménages varient sensiblement, reflétant des structures familiales distinctes selon les localités.
-:::
-:::
+<!-- ::: {.content-hidden when-profile="marovoay"} -->
+<!-- ::: {.obs-alaotra} -->
+<!-- A Alaotra, on a recensé `r n_members_a` individus répartis dans `r n_men_a` ménages. La taille moyenne des ménages s'établit à `r taille_moy_a` personnes. -->
+<!-- ::: -->
+<!-- ::: -->
+
+<!-- ::: {.content-hidden when-profile="alaotra"} -->
+<!-- ::: {.obs-marovoay} -->
+<!-- A Marovoay, on a recensé `r n_members_m` individus répartis dans `r n_men_m` ménages. La taille moyenne des ménages s'établit à `r taille_moy_m` personnes. Parmi les quatre hameaux, les tailles de ménages varient sensiblement, reflétant des structures familiales distinctes selon les localités. -->
+<!-- ::: -->
+<!-- ::: -->
 
 ### Taille des ménages par observatoire
+
+La taille des ménages correspond au nombre total d’individus qui composent et vivent au sein d'une même ménage.
+    • A Alaotra, on a recensé 1975 individus répartis dans 507 ménages. La taille moyenne des ménages s’établit à 3.9 personnes. 
+    • A Marovoay, on a recensé 2297 individus répartis dans 519 ménages. La taille moyenne des ménages s’établit à 4.4 personnes.
 
 ```{r tbl-men-obs}
 #| tbl-cap: "Taille moyenne des ménages par observatoire"
@@ -219,6 +226,9 @@ dl_tbl_variants("tbl_men_obs", "04", function(d) {
 ```
 
 ### Taille des ménages par hameau et par observatoire
+Pour Marovoay, Ampijoroa se distingue par les ménages les plus nombreux de l'échantillon tandis que les hameaux de l'Alaotra présentent une homogénéité plus forte autour de 4 personnes par foyer.
+    • A Alaotra, les tailles varient peu : de 3.76 (Avaradrano) à 4.03 (Ambatoharanana, Ambatomanga, Mangabe). 
+    • A Marovoay , les contrastes sont plus marqués allant de 3.86 (Madiromiongana) à 4.81 (Ampijoroa). 
 
 ```{r tbl_men_hameau}
 hh_size_hameau <- members |>
@@ -242,6 +252,10 @@ obs_gt(hh_size_hameau) |>
 
 La structure démographique des ménages enquêtés révèle une population jeune. Cette distribution, caractéristique des populations rurales malgaches, implique un fort taux de dépendance.
 
+
+#### Au niveau des observatoires
+La population est extrêmement jeune, avec une base de pyramide (0-10 ans) représentant près de 30 % des effectifs dans les deux zones. Marovoay présente un taux de dépendance des jeunes plus élevé qu'Alaotra. 
+
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
 A Alaotra, `r pct_moins15_a` % des individus ont moins de 15 ans. La population en âge de travailler (15–64 ans) représente `r pct_15_64_a` %, tandis que les personnes de 65 ans et plus ne constituent que `r pct_65plus_a` %.
@@ -253,8 +267,6 @@ A Alaotra, `r pct_moins15_a` % des individus ont moins de 15 ans. La population 
 A Marovoay, `r pct_moins15_m` % des individus ont moins de 15 ans, signe d'une population en croissance rapide. La population en âge de travailler (15–64 ans) représente `r pct_15_64_m` %, tandis que les personnes de 65 ans et plus ne constituent que `r pct_65plus_m` %. Cette structure démographique, caractérisée par une base large et un sommet étroit, est caractéristique des populations rurales malgaches et traduit un taux de dépendance élevé.
 :::
 :::
-
-#### Au niveau des observatoires
 
 ```{r age_obs}
 #| include: false
@@ -338,25 +350,27 @@ dl_fig_variants("fig_pyramide", "04", function(d) {
 }, members)
 ```
 
-### Origine des CM et conjoints
+### Origine des Chefs de Ménage et conjoints
 
-L'origine géographique des chefs de ménage et de leurs conjoints renseigne sur les dynamiques migratoires et le degré d'ancrage local des familles. La classification distingue les *tompon-tany* (autochtones), les *zana-tany* (nés sur place de parents migrants), les *valivotaka* (migrants installés durablement) et les *mpihavy* (arrivants récents).
+L'origine géographique des chefs de ménage (CM) et de leurs conjoints renseigne sur les dynamiques migratoires et le degré d'ancrage local des familles. La classification distingue les *tompon-tany* (autochtones), les *zana-tany* (nés sur place de parents migrants), les *valivotaka* (migrants installés durablement) et les *mpihavy* (arrivants récents).
 
 ::: {.content-visible when-profile="consolidated"}
-La répartition de ces catégories diffère sensiblement entre les deux observatoires.
-:::
-
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
-À Marovoay, l'équilibre entre *tompon-tany* et *zana-tany* varie selon les localités. La proportion de *valivotaka* et *mpihavy* reflète l'attractivité des zones rizicoles pour les migrants des régions voisines. Les raisons sociales (en particulier le mariage) dépassent largement les motivations économiques comme facteur d'installation.
-:::
+La répartition de ces catégories diffère sensiblement entre les deux observatoires. L'Alaotra reste une zone de peuplement stable, tandis que Marovoay illustre une dynamique migratoire historique forte, où les descendants de migrants sont désormais aussi nombreux que les natifs.
 :::
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, la pression foncière croissante et l'attractivité des périmètres rizicoles aménagés se reflètent dans la composition des populations selon leur origine. Les dynamiques migratoires et l'ancrage local varient selon la position des fokontany par rapport aux zones irriguées.
+Dans l'Alaotra, la pression foncière croissante et l'attractivité des périmètres rizicoles aménagés se reflètent dans la composition des populations selon leur origine avec une forte dominance des «tompon-tany» à 66.8 % pour les chefs de ménage. . Les dynamiques migratoires et l'ancrage local varient selon la position des fokontany par rapport aux zones irriguées.
 :::
 :::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+À Marovoay, l'équilibre entre *tompon-tany* (39 %) et *zana-tany* (39.4 %)varie selon les localités. La proportion de *valivotaka* et *mpihavy* reflète l'attractivité des zones rizicoles pour les migrants des régions voisines. Les raisons sociales (en particulier le mariage) dépassent largement les motivations économiques comme facteur d'installation.
+:::
+:::
+
+
 
 ```{r origine}
 #| include: false
