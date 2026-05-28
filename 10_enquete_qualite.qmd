@@ -57,7 +57,21 @@ res_remq_site <- res_remq |> expand_sites_for_profile()
 
 ## Qualité de l'enquête (évaluation par l'enquêteur, page de couverture)
 
+Ce chapitre ne repose pas sur les déclarations des ménages mais sur l'auto-évaluation des enquêteurs concernant la fiabilité des données recueillies et l'attitude des répondants.
+
 La variable `j11` — *« Qualité de l'enquête »* — est renseignée par l'enquêteur sur la page de couverture du questionnaire. Les modalités sont : 1 = bonne, 2 = moyenne, 3 = mauvaise. La grande majorité des entretiens sont jugés de bonne qualité ou de qualité moyenne (@fig-qualite).
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, la qualité des enquêtes est majoritairement jugée bonne, avec un effectif largement dominant d’environ 450 entretiens. Les enquêtes de qualité moyenne restent beaucoup moins nombreuses, avec un peu plus de 50 cas. Les enquêtes considérées comme mauvaises sont quasiment inexistantes, tandis que les cas non renseignés demeurent très marginaux.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les enquêtes de qualité moyenne sont les plus fréquentes avec près de 290 entretiens, devant les enquêtes jugées bonnes qui représentent un peu plus de 200 cas. Les enquêtes de mauvaise qualité restent limitées, avec environ 25 entretiens, tandis que les valeurs non renseignées sont très faibles.
+:::
+::::
 
 ```{r}
 #| fig-cap: "Qualité de l'enquête selon l'enquêteur (j11, page de couverture)"
@@ -99,6 +113,18 @@ dl_fig_variants("fig_qualite", "13", function(d) {
 ## Répondant
 
 Dans la plupart des cas, le répondant est le chef de ménage lui-même ou son conjoint. Quelques entretiens ont été réalisés avec un autre membre du ménage (@tbl-repondant).
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À l'Alaotra, le répondant est le Chef de ménage (282 cas) ou son Conjoint (212 cas).
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, les chefs de ménage constituent la grande majorité des répondants avec 340 entretiens, tandis que la participation des conjoints est plus restreinte, totalisant 157 cas.
+:::
+::::
 
 ```{r}
 #| tbl-cap: "Qualité du répondant par observatoire"
@@ -142,6 +168,21 @@ dl_tbl_variants("tbl_repondant", "13", function(d) {
 
 La variable `qual1aa` — *« Qualité de la réponse en générale »* — est renseignée par l'enquêteur dans le module de remarques en fin de questionnaire. Les modalités prévues sont : **1 = bonne, 2 = mauvaise**. La @fig-qual-reponse présente la répartition par observatoire (les codes aberrants sont exclus, voir l'encadré ci-dessous).
 
+Il existe un décalage important entre les deux observatoires. À Marovoay, les enquêteurs ont ressenti une difficulté plus grande à obtenir des données précises.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+**Alaotra :** 62 % des réponses sont jugées « Bonnes ».
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+**Marovoay :** Seulement 43,5 % sont jugées « Bonnes », tandis que 56,5 % sont qualifiées de « Mauvaises » par les enquêteurs. 
+:::
+::::
+
+
 ```{r}
 #| fig-cap: "Qualité de la réponse selon l'enquêteur (qual1aa, fin de questionnaire)"
 #| fig-width: !expr fig_w("fig-qual-reponse")
@@ -182,6 +223,20 @@ dl_fig_variants("fig_qual_reponse", "13", function(d) {
 ## Réaction du répondant (évaluation par l'enquêteur, fin de questionnaire)
 
 La variable `qual2aa` — *« Réaction du répondant »* — est renseignée par l'enquêteur dans le même module. Les modalités prévues sont : **1 = ouvert (à l'aise), 2 = neutre, 3 = méfiant**. La @fig-reaction présente la répartition (les codes aberrants sont exclus).
+
+Le climat de confiance semble mieux établi à l'Alaotra. À Marovoay, la méfiance, bien que minoritaire, est presque trois fois plus élevée.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+**Alaotra :** 75.4 % des répondants étaient « Ouverts (à l'aise) ».
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+**Marovoay :** Ce taux tombe à 56.9 %. Les répondants y sont plus souvent « Neutres » (37.3 %) ou « Méfiants » (5.8 %). 
+:::
+::::
 
 ```{r}
 #| fig-cap: "Réaction du répondant selon l'enquêteur (qual2aa, fin de questionnaire)"
@@ -304,6 +359,20 @@ dl_tbl_variants("tbl_codes_aberrants", "13", function(d) {
 ## Synthèse croisée
 
 Le @tbl-synthese-qualite croise les deux indicateurs d'évaluation de fin de questionnaire (`qual1aa` et `qual2aa`) par observatoire, en ne retenant que les codes valides.
+
+Le croisement entre la qualité de la réponse et la réaction montre une corrélation forte. 
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, le répondant était « Ouvert » dans la quasi-totalité des entretiens sur les 301 cas où la réponse est « Bonne ».
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, une part significative des répondants jugés « Neutres » (184 cas) a produit des réponses considérées comme « Mauvaises » par les enquêteurs.
+:::
+::::
 
 ```{r}
 #| tbl-cap: "Synthèse croisée qualité de la réponse × réaction du répondant, par observatoire"
