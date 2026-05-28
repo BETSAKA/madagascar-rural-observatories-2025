@@ -13,15 +13,15 @@ Cette section decrit les conditions d'habitat, les equipements des menages, leur
 Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales.
 :::
 
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
- À Marovoay, les conditions d'habitat sont étroitement liées à la position des ménages par rapport au fleuve Betsiboka. Les fokontany de la rive droite (Bepako, Madiromiongana), situés en lisière du Parc national d'Ankarafantsika, ont un accès plus limité aux ressources en bois et matériaux de construction, notamment en raison des restrictions liées à la conservation. L'approvisionnement en eau dépend en grande partie du fleuve et de puits traditionnels. L'équipement agricole y est dominé par les outils manuels, complétés par le recours à la traction bovine pour le labour des rizières.
-:::
-:::
-
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
 Dans l'Alaotra, les conditions d'habitat bénéficient de la relative prospérité du premier bassin rizicole du pays. L'accès à l'eau est facilité par la proximité du lac et du réseau d'irrigation, mais la qualité de l'eau potable reste un enjeu sanitaire. Les ménages des fokontany proches des périmètres irrigués (Avaradrano, Feramanga Atsimo, Mangabe) disposent en moyenne d'un meilleur équipement agricole que ceux des zones périphériques. La possession de biens de confort courants y est plus répandue que dans d'autres observatoires ruraux de Madagascar.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+ À Marovoay, les conditions d'habitat sont étroitement liées à la position des ménages par rapport au fleuve Betsiboka. Les fokontany de la rive droite (Bepako, Madiromiongana), situés en lisière du Parc national d'Ankarafantsika, ont un accès plus limité aux ressources en bois et matériaux de construction, notamment en raison des restrictions liées à la conservation. L'approvisionnement en eau dépend en grande partie du fleuve et de puits traditionnels. L'équipement agricole y est dominé par les outils manuels, complétés par le recours à la traction bovine pour le labour des rizières.
 :::
 :::
 
@@ -111,7 +111,7 @@ Le statut d'occupation du logement traduit la sécurité résidentielle des mén
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, `r pct_statut_a` % des ménages occupent un logement en « `r top_statut_a` ».
+Dans l'Alaotra, `r pct_statut_a` % des ménages occupent un logement en « `r top_statut_a` ».Cette zone rizicole compte plus de locataires (10.1 %) et de logements prêtés (15.8 %).
 :::
 :::
 
@@ -165,13 +165,13 @@ Le type de latrine constitue un indicateur sanitaire fondamental.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, Le type dominant est « `r top_lat_a` » (`r pct_lat_a` % des ménages).
+Dans l'Alaotra, le type d’assainissement le plus répandu est la « `r top_lat_a` » utilisée par `r pct_lat_a` % des ménages. Elle est suivie par la « fosse perdue individuelle » qui concerne 24% des ménages. En revanche, les pratiques de défécation dans la nature demeurent très marginales au sein de cet observatoire.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-À Marovoay, le type dominant est « `r top_lat_m` » (`r pct_lat_m` % des ménages). L'assainissement se caractérise par une forte prévalence de la défécation à l'air libre et une utilisation limitée des latrines améliorées. De nettes disparités territoriales existent entre les localités, les hameaux les plus éloignés présentant les taux d'accès les plus faibles aux infrastructures sanitaires.
+À Marovoay, le type dominant est « `r top_lat_m` » (`r pct_lat_m` % des ménages). L'assainissement se caractérise par une forte prévalence de la défécation à l'air libre et une utilisation limitée des latrines améliorées. Les fosses perdues en commun et les fosses perdues individuelles occupent une place secondaire, chacune étant utilisée par un quart des ménages. De nettes disparités territoriales existent entre les localités, les hameaux les plus éloignés présentant les taux d'accès les plus faibles aux infrastructures sanitaires.
 :::
 :::
 
@@ -213,19 +213,20 @@ dl_fig_variants("fig_latrine", "05", function(d) {
 }, res_h |> left_join(obs, by = "j5"))
 ```
 
-### Acces a l'eau
+### Accès a l'eau
 
 L'approvisionnement en eau détermine en grande partie les conditions sanitaires des ménages ruraux.
+L'accès à une eau plus sécurisée est nettement supérieur à Alaotra. Marovoay reste très dépendant des eaux de surface prenant source au fleuve Betsiboka. Ce qui pose des enjeux de santé publique.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, La source principale est « `r top_eau_a` » (`r pct_eau_a` %).
+Dans l'Alaotra, la source principale est « `r top_eau_a` » (`r pct_eau_a` %). Les puits non aménagés constituent le deuxième mode d’accès à l’eau avec 31.4% des ménages concernés. Les autres sources d’approvisionnement restent minoritaires.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-À Marovoay, la source principale est « `r top_eau_m` » (`r pct_eau_m` %). Les ménages dépendent fortement des sources naturelles : cours d'eau et puits non aménagés représentent ensemble une part importante de l'approvisionnement. L'accès à l'eau améliorée (bornes fontaines publiques, eau courante) reste limité à l'échelle de l'observatoire, avec des disparités marquées entre localités.
+À Marovoay, l’approvisionnement en eau repose principalement sur les « `r top_eau_m` » utilisés par `r pct_eau_m` % des ménages. . Les ménages dépendent fortement des sources naturelles : cours d'eau et puits non aménagés représentent ensemble une part importante de l'approvisionnement (27.6%).L'accès à l'eau améliorée (bornes fontaines publiques, eau courante) reste limité à l'échelle de l'observatoire, avec des disparités marquées entre localités. Les puits à margelle représentent aussi une part notable avec 11.2% des ménages utilisateurs.
 :::
 :::
 
@@ -271,6 +272,20 @@ dl_fig_variants("fig_water", "05", function(d) {
 
 Le mode d'éclairage reflète le niveau d'accès à l'énergie moderne. Les ménages ruraux dépendent encore largement de sources traditionnelles, même si la pénétration du solaire progresse.
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, les principaux modes d’éclairage des ménages sont le pétrole lampant et l’énergie solaire, utilisés respectivement par environ 57% et 47.5% des ménages. Les piles et les batteries occupent une place secondaire, avec respectivement 12.4% et 11.6% des ménages utilisateurs. Les autres sources d’éclairage restent peu utilisées dans cet observatoire.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le pétrole lampant constitue également le principal mode d’éclairage, avec 54.5% des ménages concernés. L’énergie solaire représente le deuxième mode d’éclairage le plus utilisé avec 31.2%, suivie des piles qui concernent 29.1% des ménages. Les batteries sont aussi utilisées par une part non négligeable des ménages, soit 12.5%.
+:::
+::::
+
+Enfin, le recours au bois de chauffe comme mode d’éclairage reste marginal dans les deux observatoires.
+
 ```{r lighting}
 #| include: false
 light <- res_h |>
@@ -302,6 +317,18 @@ dl_fig_variants("fig_lighting", "05", function(d) {
     make_bar_obs(title = "Modes d'eclairage par observatoire")
 }, res_h |> left_join(obs, by = "j5"))
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la grande majorité des ménages utilisant l’énergie solaire disposent de panneaux solaires en état de marche, soit 92.4% des utilisateurs. En revanche, seuls 7.6% déclarent que leurs panneaux solaires ne fonctionnent pas.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la situation est similaire, avec 92% des utilisateurs de l’énergie solaire possédant des panneaux en état de marche. À l’inverse, 8% des ménages utilisateurs indiquent que leurs panneaux solaires ne sont pas fonctionnels.
+:::
+::::
 
 Parmi les ménages utilisant le solaire, la proportion disposant d'un panneau en état de marche est présentée ci-dessous.
 
@@ -335,9 +362,21 @@ dl_fig_variants("fig_lighting", "05", function(d) {
 }, res_h |> left_join(obs, by = "j5"))
 ```
 
-### Source d'energie pour la cuisson
+### Source d'énergie pour la cuisson
 
 La quasi-totalité des ménages ruraux malgaches dépendent de la biomasse pour la cuisson. La nature exacte du combustible utilisé (bois, charbon de bois) varie selon la disponibilité locale des ressources forestières.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, le bois de chauffe constitue de loin le principal mode de cuisson des ménages, utilisé par 82.8% d’entre eux. Le charbon occupe la deuxième place avec 43% des ménages utilisateurs. En revanche, les autres sources d’énergie, notamment le gaz et les modes de cuisson classés dans la catégorie « autre », restent très marginales.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le bois de chauffe demeure également le mode de cuisson dominant, concernant 72.6% des ménages. Le charbon est aussi largement utilisé, avec 46.4% des ménages qui y recourent. Les autres modes de cuisson apparaissent quant à eux très peu utilisés dans cet observatoire.
+:::
+::::
 
 ```{r cooking}
 #| include: false
@@ -386,6 +425,18 @@ La possession de biens durables constitue un proxy classique du niveau de vie de
 
 Les biens de confort courant (mobilier, ustensiles, outils) renseignent sur le niveau d'équipement quotidien des ménages et constituent un indicateur de bien-être matériel.
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, les biens de confort les plus répandus au sein des ménages sont les marmites, les lits, les chaises et les tables, avec des proportions dépassant largement 85%. Le téléphone fixe ou mobile est également largement présent, puisqu’il concerne 61.9% des ménages. La radio ou le radio-K7 reste relativement fréquent avec 58.8%, tandis que la bicyclette est détenue par 41.4% des ménages. Les nattes pour dormir concernent 30.2% des ménages. En revanche, les équipements tels que la télévision, le lecteur VCD/DVD, la moto, l’antenne parabolique et la voiture demeurent peu répandus.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, les marmites constituent également le bien de confort le plus courant, suivies des nattes pour dormir qui concernent 83.2% des ménages. Les téléphones fixes ou mobiles sont présents dans 69% des ménages, tandis que les tables et les lits concernent respectivement 64.4% et 63.4% des ménages. La radio ou le radio-K7 reste aussi relativement répandue avec 47.6%. Les autres équipements, notamment la bicyclette, la télévision, la moto, le lecteur VCD/DVD, l’antenne parabolique et la voiture, restent faiblement représentés.
+:::
+::::
+
 ```{r comfort_goods}
 #| include: false
 comfort <- res_v |>
@@ -420,6 +471,18 @@ dl_fig_variants("fig_comfort", "05", function(d) {
 ### Equipement agricole
 
 L'équipement agricole conditionne la productivité et la capacité d'extension des surfaces cultivées. La possession de matériel mécanisé ou de traction animale constitue un facteur de différenciation important entre les ménages.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, les équipements agricoles les plus répandus sont l’angady, détenu par 87.2% des ménages, et la faucille ou coupe-coupe, utilisée par 53.3% des ménages. L’arrosoir ou le seau occupe également une place importante avec 32.5% des ménages utilisateurs. Les râteaux et fourches concernent 17.9% des ménages, tandis que les haches représentent 15.2%. Les autres équipements agricoles, tels que la charrue, le pulvérisateur, la sarcleuse, la pompe hydraulique ou encore le motoculteur, restent faiblement utilisés.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, l’angady constitue également l’équipement agricole dominant avec 81.9% des ménages concernés, suivi de la faucille ou coupe-coupe utilisée par 60.5% des ménages. Les haches, les charrues et les couteaux occupent aussi une place notable, avec respectivement 25.6%, 23.5% et 22% des ménages utilisateurs. Les herses, pulvériseurs et rotovators concernent 20.2% des ménages. Les autres équipements agricoles demeurent peu répandus dans cet observatoire.
+:::
+::::
 
 ```{r agri_equipment}
 #| include: false
@@ -487,9 +550,21 @@ dl_fig_variants("fig_agri_equip", "05", function(d) {
 }, res_e |> left_join(obs, by = "j5"))
 ```
 
-### Materiel de communication audiovisuelle et telecommunication
+### Matériel de communication audiovisuelle et télécommunication
 
 L'accès aux technologies de communication et d'information constitue un vecteur de connexion aux marchés, aux services et à l'information. La pénétration du téléphone mobile a transformé les pratiques économiques et sociales en milieu rural.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l’usage des matériels de communication se concentre principalement sur la radio, qui atteint 45% des ménages. Le téléphone fixe ou mobile est également bien implanté avec 32.5%. La télévision reste présente mais plus limitée à 13.2%, tandis que les lecteurs VCD, DVD ou DivX ne concernent que 6.7% des utilisateurs. Enfin, l’antenne parabolique est marginale avec 2.6%, ce qui montre une adoption faible des services satellitaires. Ces chiffres traduisent une préférence pour les moyens traditionnels de communication et d’information.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, la radio domine aussi avec 44%, suivie de près par le téléphone fixe ou mobile à 41%. La télévision est beaucoup moins répandue, ne représentant que 5.3%. Les lecteurs VCD, DVD ou DivX sont quasi absents avec seulement 1%, et l’antenne parabolique atteint 3.1%. Ces données révèlent une forte dépendance aux outils de communication de base avec une présence très réduite des équipements audiovisuels modernes.
+:::
+::::
 
 ```{r communication}
 #| include: false
@@ -550,7 +625,21 @@ dl_fig_variants("fig_communication", "05", function(d) {
 
 ## Transferts sortants
 
+La section consacrée aux transferts sortants recense les aides envoyées par les ménages à des personnes extérieures au foyer, en précisant notamment le type de transfert (argent ou riz), sa valeur et le lieu de résidence du destinataire. 
+
 Le fichier `res_t2` recense les transferts envoyes par les menages a des personnes exterieures au foyer. Chaque ligne correspond a un destinataire. Les variables cles sont le type de transfert (`t21a`), le lieu de residence du destinataire (`t41`), le poids de riz envoye (`t42`, en kg) et la valeur totale (`t21d`, en Ar).
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les transferts en argent atteignent une valeur moyenne de 100 000 Ar. Les transferts en riz et non précis suivent avec une valeur moyenne de 80 000 Ar.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les transferts en argent présentent une valeur moyenne de 470 000 Ar. Les transferts non précisée enregistrent une valeur moyenne de 80 000Ar.
+:::
+::::
 
 ```{r transfers_load}
 res_t2 <- read_dta("data/ROS_MDG_microdata/2025/res_t2.dta") |> mutate(j5 = as.character(j5))
@@ -612,6 +701,19 @@ dl_fig_variants("fig_transferts", "05", function(d) {
 }, res_t2 |> left_join(obs, by = "j5"))
 ```
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, tous les ménages enquêtés participent à 100% à l’envoi de transferts.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la part des ménages envoyeurs est de 100.0 % indiquant que l’ensemble des ménages observés effectuent des transferts.
+:::
+::::
+
+
 ```{r tbl-transferts-sortants}
 #| tbl-cap: "Transferts sortants : resume par observatoire"
 
@@ -639,6 +741,18 @@ dl_tbl_variants("tbl_transferts", "05", function(d) {
     rename(Site = Observatory)
 }, res_deb)
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la majorité des destinataires des transferts résident dans un lieu non précisé avec une proportion de 78.4 %. Les destinataires vivant dans la même commune représentent 10.6 %. Ceux résidant dans une autre commune de la même région constituent 6.4 %. Les transferts destinés vers une autre région représentent 4.7 %.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le lieu de résidence de 63.9 % des ménages destinataires des transferts n’est pas précis. Les destinataires vivant dans la même commune constituent 13.3 %. Ceux installés dans une autre commune de la même région représentent 10.8 %. Les transferts destinés vers une autre région atteignent 12.0 %.
+:::
+::::
 
 ```{r destination_data}
 dest_labs <- c(
