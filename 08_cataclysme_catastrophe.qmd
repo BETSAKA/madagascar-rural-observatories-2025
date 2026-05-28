@@ -141,7 +141,11 @@ top_cata_m <- events_full %>% filter(Observatory == "Marovoay") %>%
 
 ## Prévalence des cataclysmes
 
-L'exposition aux aléas climatiques et biologiques est très élevée dans les zones rurales enquêtées.
+L'exposition aux aléas climatiques et biologiques est très élevée dans les zones rurales enquêtées. Le niveau d'exposition est quasi identique et extrêmement élevé dans les deux zones, touchant près de trois foyers sur quatre.
+
+### Taux d'exposition global
+
+Quelle part des ménages enquêtés ont été touchés par au moins une catastrophe au cours de la campagne ?
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
@@ -154,10 +158,6 @@ Dans l'Alaotra, `r pct_touch_a` % des ménages déclarent avoir été touchés p
 A Marovoay, `r pct_touch_m` % des ménages déclarent avoir été touchés par au moins un événement. Les ménages affectés subissent en moyenne `r nb_moy_m` événements. Le cataclysme le plus fréquemment cité est « `r top_cata_m` ».
 :::
 :::
-
-### Taux d'exposition global
-
-Quelle part des ménages enquêtés ont été touchés par au moins une catastrophe au cours de la campagne ?
 
 ```{r t1_prevalence_globale}
 # T1 : % de ménages touchés par au moins une catastrophe, par observatoire
@@ -223,6 +223,18 @@ dl_tbl_variants("tbl_cata_prevalence", "11", function(d) {
 Le taux d'exposition aux cataclysmes est très élevé.
 
 ### Prévalence par type de catastrophe
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l'analyse de la répartition des cataclysmes a met en évidence une prédominance marquée de la sécheresse qui affecte 56.4% des ménages. Les risques liés aux nuisibles constituent le second pôle de vulnérabilité avec 15.2% des foyers touchés par d'autres bestioles et 13.4% par les rats. Les maladies des cultures ou de l'élevage, tout comme les facteurs humains incluant les vols et dégradations concernent chacun 13.0% de la population enquêtée. Les aléas climatiques violents tels que les inondations et les cyclones présentent des taux de prévalence respectifs de 9.5% et 5.5%. Les autres catégories d'évènements, notamment la grêle (1.4%), les incendies ou la foudre (0.8%), les oiseaux (0.8%) et les invasions de criquets (0.4%), demeurent plus marginales au cours de la période de référence.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, la structure de l'exposition aux risques est également dominée par la sécheresse, signalée par 52.4% des ménages. Les pathologies affectant le capital productif regroupées sous la catégorie des maladies des cultures et de l'élevage représentent un défi majeur touchant 20.0% des foyers. Les dommages imputables aux rats et aux facteurs humains atteignent des niveaux identiques concernant chacun 8.1% de l'échantillon. La zone enregistre par ailleurs des incidents liés aux criquets à hauteur de 3.9% suivis par les autres bestioles (3.5%) ainsi que les cyclones (3.1%) et les inondations (3.1%).
+:::
+::::
 
 ```{r t2_prevalence_type}
 #| include: false
@@ -337,6 +349,20 @@ dl_fig_variants("fig_cata_prevalence_type", "11", function(d) {
 
 Un ménage peut être touché par plusieurs types de catastrophes au cours de la même campagne. Le tableau suivant indique le nombre moyen de catastrophes subies.
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À l'Alaotra, les hameaux d'Avaradrano et de Mangabe sont les plus exposés avec respectivement 1.7 et 1.5 catastrophe en moyenne par ménage.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, Madiromiongana et Maroala sont les sites les plus touchés (1.5 et 1.1 catastrophe en moyenne).
+:::
+::::
+
+Dans la quasi-totalité des 8 hameaux de l'Alaotra, les ménages subissent en moyenne au moins un sinistre par an à l'exception d'Ambatomanga qui est à 0.9.
+
 ```{r t3_nb_moyen_catastrophes}
 # T3 : Nombre moyen de catastrophes par ménage, par hameau et observatoire
 nb_cata <- events %>%
@@ -415,6 +441,20 @@ Les niveaux de dégâts sont codés ainsi :
 ### Dégâts sur le logement
 
 Les dégâts sur le logement sont évalués selon quatre niveaux de gravité, du plus bénin (« Rien ») à la destruction totale. Le croisement avec le type de catastrophe permet d'identifier les aléas les plus destructeurs pour l'habitat.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l'évaluation des dommages causés aux habitations par les différents aléas révèle une sensibilité particulière aux événements cycloniques pour 45.8% des ménages . Les nuisibles biologiques, spécifiquement les rats, représentent également une menace significative pour l'intégrité du bâti touchant 35.9% des ménages exposés à ce risque. Les impacts liés aux actions humaines (8.3%) ou à d'autres types d'insectes et bestioles (5.6%) demeurent plus restreints. 
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les cyclones s'avèrent être la cause la plus fréquente de dommages, affectant 60.0% des ménages ayant déclaré ce type de sinistre. La sécheresse influe également sur l'état des habitations pour 20.0% des ménages concernés, tandis que les inondations touchent 14.3% des logements exposés. L'influence des rats (7.3%), des autres bestioles (5.9%) et des facteurs humains incluant les vols ou dégradations (2.6%) sur l’habitat est nettement moins prononcée.
+:::
+::::
+
+Il est à noter que les phénomènes de sécheresse, d'inondation ou de grêle n'ont engendré aucune dégradation déclarée sur les habitats durant cette campagne d’enquête.
 
 ```{r t4_degats_logement}
 #| include: false
@@ -534,6 +574,8 @@ dl_fig_variants("fig_degats_logement", "11", function(d) {
 
 ### Dégâts sur l'élevage
 
+**A VOIR DANS LE CODE R POURQUOI LA FIGURE NE S'AFFICHE PAS + INTERPRETATION**
+
 ```{r t5_degats_elevage}
 #| include: false
 # T5 : Gravité des dégâts sur l'élevage par type de Catastrophe et observatoire
@@ -612,6 +654,20 @@ dl_tbl_variants("tbl_degats_elevage", "11", function(d) {
 Les dégâts sur l'élevage sont particulièrement importants pour certains aléas : les maladies et la sécheresse peuvent entraîner des pertes significatives (catégorie « Beaucoup » ou « Destruction totale »).
 
 ### Conséquences sur les personnes
+
+La conséquence la plus répandue est le manque de vivres, directement lié aux pertes agricoles. Les décès et disparitions, bien que rares, sont signalés pour certains cataclysmes (inondations, cyclones).
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les événements cycloniques se distinguent par une incidence élevée sur la santé, affectant 24.0% des ménages exposés sous forme de blessures ou de maladies. Les pathologies liées au capital productif, incluant les cultures et l'élevage, engendrent également des conséquences sanitaires pour 15.3% des ménages concernés. Le manque de vivres, bien que relativement contenu pour la majorité des aléas, atteint 11.9% des cas lors de catastrophes d'origine humaine. Enfin, bien que rares, des décès ou disparitions sont rapportés lors d'inondations (2.4%), de maladies (1.7%), d'attaques de nuisibles (1.5%) et de périodes de sécheresse (1.2%), illustrant la dangerosité potentielle de ces phénomènes malgré une majorité de situations sans dommage corporel direct.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, la sécheresse constitue l'aléa le plus critique à cet égard, provoquant un manque de vivres pour 48.5% des ménages touchés. Les inondations et les cyclones présentent des profils de risques mixtes associant des manques de vivre pour respectivement 18.8% et 13.3% des ménages à des impacts sanitaires notables sous forme de blessures ou maladies touchant environ 20.0% des répondants. Les maladies affectant les cultures ou l'élevage ont également des conséquences directes sur les individus, avec 11.8% de cas de blessures ou maladies et 2.9% de décès ou disparitions signalés. Enfin, les dommages liés aux nuisibles ou aux facteurs humains se traduisent essentiellement par des difficultés d'approvisionnement alimentaire, affectant entre 5.3% et 11.8% de la population concernée.
+:::
+::::
 
 ```{r t6_degats_personnes}
 #| include: false
@@ -717,9 +773,21 @@ dl_fig_variants("fig_degats_personnes", "11", function(d) {
 }, events_full, width = 10, height = 8)
 ```
 
-La conséquence la plus répandue est le manque de vivres, directement lié aux pertes agricoles. Les décès et disparitions, bien que rares, sont signalés pour certains cataclysmes (inondations, cyclones).
-
 ### Profil de sévérité des principaux cataclysmes
+
+Le graphique précédent révèle que la sévérité des dégâts sur l’élevage varie fortement selon le type de catastrophe. Les destructions totales sont surtout associées aux événements les plus violents (cyclones, inondations), tandis que les sécheresses et les maladies animales engendrent des pertes plus diffuses mais néanmoins significatives.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l'analyse de la sévérité des dégâts sur l'élevage montre que les maladies constituent la menace la plus grave pour l’agriculture et l’élevage. Près de 51.6% des ménages touchés par des maladies des cultures/élevage rapportent des dommages importants ou une destruction totale . Les sinistres d'origine humaine, incluant les vols et dégradations, entraînent également des pertes sévères pour 36.1% des foyers concernés. À l'inverse, l'impact des rats, de la sécheresse et des autres nuisibles biologiques reste marginal. Plus de 90.0% des ménages exposés à ces aléas ne déclarant aucun dégât notable.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, le profil de sévérité des catastrophes sur l’agriculture et l'élevage est dominé par l'impact massif des maladies et des facteurs humains. Les pathologies afférentes provoquent des pertes qualifiées de beaucoup ou de destruction totale pour 72.1% des ménages sinistrés. Les actes de malveillance ou vols (facteurs humains) affichent également un niveau de sévérité élevé avec 59.0% de dommages importants. En revanche, la sécheresse et les rats engendrent des préjudices plus limités tandis que les autres bestioles ne causent une destruction totale que dans 5.6% des cas recensés.
+:::
+::::
 
 ```{r g2_severite_profil}
 # G2 : Barres empilées — sévérité des dégâts pour les 5 cataclysmes les plus fréquents
@@ -784,6 +852,21 @@ Le graphique précédent révèle que la sévérité des dégâts sur l'élevage
 ## Saisonnalité des cataclysmes
 
 Les événements peuvent survenir en période de soudure (lorsque les stocks sont déjà bas) ou hors soudure. La coïncidence avec la soudure aggrave considérablement l'impact sur la sécurité alimentaire.
+
+La majorité des cataclysmes surviennent pendant la période de soudure, ce qui amplifie leur impact sur la sécurité alimentaire des ménages. La sécheresse et les maladies, notamment, frappent souvent lorsque les stocks sont déjà au plus bas.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l'analyse de la période de survenance des aléas met en évidence une forte corrélation entre les chocs climatiques majeurs et la période de soudure. Les cyclones et les inondations surviennent ainsi très majoritairement durant cette phase critique avec des taux respectifs de 85.7% et 77.1%. Les phénomènes de grêle (71.4%) sont également prédominants durant les mois de pénurie alimentaire. Bien qu'une légère majorité des cas (55.2%) soit enregistrée pendant la soudure, la sécheresse présente une répartition plus équilibrée. À l'inverse, les risques biologiques et humains sont plus fréquents hors période de soudure notamment pour les attaques de rats (80.9%), les maladies des cultures et de l'élevage (68.2%) et les nuisibles divers (59.7%). Les facteurs humains incluant les vols et dégradations touchent 54.5% des ménages en dehors de la phase de soudure.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, la majorité des cataclysmes coïncident avec la période de soudure exacerbant la vulnérabilité des ménages. Les cyclones constituent l'aléa le plus saisonnier avec 81.2% des événements se produisant durant la soudure, suivis par les inondations (75.0%) et les attaques de nuisibles biologiques tels que les rats (66.7%) ou d'autres bestioles (66.7%). La sécheresse, risque majeur dans cette zone, survient également en priorité pendant les mois de soudure pour 64.3% des signalements. Les invasions de criquets et les facteurs humains présentent une distribution relativement homogène entre les deux périodes avec une légère prédominance durant la soudure (respectivement 50.0% et 54.8%). A l’exception, les maladies affectant l’agriculture et l’élevage  sont plus fréquents hors période de soudure (54.8%).
+:::
+::::
+
 
 ```{r t7_saisonnalite}
 #| include: false
@@ -901,9 +984,23 @@ La majorité des cataclysmes surviennent pendant la période de soudure, ce qui 
 
 ## Dégâts agricoles par culture
 
+Ce chapitre identifie les:cultures les plus sinistrées, détaille la gravité des dommages subis par les champs et les stocks de riz selon le type d'aléa.
+
 Le fichier `res_cca` détaille les dégâts subis par chaque culture, en distinguant les pertes sur les champs (en cours de croissance) et sur les stocks (après récolte). Cette information est cruciale pour évaluer l'impact réel sur la production alimentaire.
 
 ### Cultures les plus touchées
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, le riz s'impose comme la culture la plus fréquemment touchée pour 33.9% des ménages déclarant des dégâts. Devant le maïs à 9.1% et le manioc à 6.5%, le haricot constitue le second pôle de fragilité avec 16.9% de signalements . Les brèdes et le haricot vert subissent également des pertes notables concernant respectivement 5.4% et 4.7% des exploitants. Le reste du classement est composé du concombre (2.4%), de l'arachide (1.8%) ainsi que de la carotte et de la mangue, qui enregistrent chacune un taux de sinistralité de 1.7%.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, la hiérarchie des cultures touchées par les catastrophes souligne la fragilité structurelle de l'activité principale de la zone. Le riz est la culture la plus sinistrée, affectant 66.7% des ménages enquêtés. Les autres cultures de base présentent une exposition plus restreinte avec des taux de 14.2% pour le maïs et 7.6% pour le manioc. L'impact sur les autres cultures comme l'arachide (2.9%), la banane (1.6%) et la canne à sucre (1.3%) est moins étendu. Les dégâts se répartissent enfin de manière résiduelle sur les légumineuses Black Eyes (1.0%), la courge (1.0%), les brèdes (0.8%) et le concombre (0.8%).
+:::
+::::
 
 ```{r t8_cultures_touchees}
 #| include: false
@@ -1031,6 +1128,18 @@ Le riz, culture vivrière dominante, est de loin la culture la plus exposée aux
 ### Dégâts sur les champs de riz par type de catastrophe
 
 Le riz étant la culture la plus exposée, il est utile de décomposer la gravité des dégâts sur les champs de riz selon le type de catastrophe. La lecture croisée de la sévérité et du type d'événement permet de hiérarchiser les risques pour la production rizicole.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, la sécheresse et les inondations constituent les menaces les plus sévères pour les champs de riz. Près de 71.7% des exploitants touchés par la sécheresse rapportent des dommages qualifiés de beaucoup ou une destruction totale, soit respectivement 58.6% et 13.1%. De même, les inondations engendrent des pertes importantes ou totales pour 53.9% des ménages sinistrés. Bien que moins fréquente, la grêle se distingue par une intensité de dégâts remarquable avec 77.8% des cas étant classés dans la catégorie beaucoup. Les nuisibles biologiques comme les rats ont un impact significatif, affectant un peu de la production pour 58.5% des parcelles et beaucoup pour 12.2% d'entre elles. En revanche, les événements liés aux cyclones se traduisent majoritairement par des dégâts qualifiés de «un peu» pour 70.0% des répondants sans enregistrer de destruction totale sur les champs de riz au cours de cette campagne.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, la sécheresse s'avère particulièrement dévastatrice avec 79.0% des ménages affectés déclarant des pertes massives ou une destruction totale de leurs champs. Dans le détail, 66.5% des sinistrés rapportent beaucoup de dégâts et 12.5% une destruction totale. Les attaques de rats présentent également un profil de sévérité élevé, provoquant des dommages sur 94.3% des parcelles exposées, dont 22.9% subissent des pertes qualifiées de beaucoup. Les inondations impactent sévèrement 40.0% des exploitants concernés, tandis que les criquets génèrent essentiellement des dégâts modérés qualifiés de un peu pour 70.6% des sinistrés. Il est à noter que les maladies ont un impact destructeur limité, 90.5% des cas ne donnant lieu à aucun dégât notable sur les champs de riz. Enfin, les cyclones ont entraîné des conséquences relativement contenues sur les cultures en place, avec 75.0% de signalements sans aucun dommage.
+:::
+::::
 
 ```{r t9_degats_champs_riz}
 #| include: false
@@ -1170,6 +1279,19 @@ dl_fig_variants("fig_degats_champs_riz", "11", function(d) {
 
 ### Dégâts sur les stocks de riz par type de catastrophe
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l'évaluation de la gravité des préjudices subis par les réserves de riz révèle une vulnérabilité particulièrement marquée face à la grêle et à la sécheresse. Pour les ménages touchés par la grêle, 62.5% signalent des dégâts qualifiés de beaucoup. La sécheresse constitue l'aléa le plus diversifié dans ses impacts provoquant une destruction totale des stocks pour 1.9% des sinistrés, tandis que 17.5% rapportent des pertes importantes et 24.5% des dommages modérés. Les événements cycloniques impactent également les stocks, avec 11.1% de pertes importantes et 22.2% de dégâts légers. Les nuisibles biologiques tels que les rats et autres bestioles engendrent des dommages pour respectivement 17.5% et 11.7% des ménages exposés. En revanche, les facteurs humains, les inondations et les maladies ont des répercussions plus limitées sur le stockage, la grande majorité des cas ne donnant lieu à aucun dégât notable.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, la sévérité des pertes sur les stocks de riz est principalement imputable aux attaques de rongeurs. Les rats affectent la majorité des stocks exposés avec 54.3% de dégâts qualifiés de un peu et 5.7% de beaucoup laissant seulement 40.0% des ménages sans dommage. La sécheresse et les inondations ont une incidence nettement moindre sur les réserves après récolte ne touchant respectivement que 6.7% et 10.0% des foyers concernés essentiellement sous forme de dégâts légers ou modérés. Les autres types d'aléas notamment les cyclones, les invasions de criquets, les maladies ainsi que les facteurs humains n'ont engendré aucune perte déclarée sur les stocks de riz au cours de la période de référence. 
+:::
+::::
+
+
 ```{r t10_degats_stocks_riz}
 #| include: false
 # T10 : Gravité des dégâts sur les stocks pour le riz
@@ -1308,6 +1430,20 @@ Les dégâts sur les stocks, bien que moins fréquents que sur les champs, affec
 
 ### Comparaison dégâts champs vs stocks pour les principales cultures
 
+Les dégâts sur les champs (cultures en cours) sont systématiquement plus fréquents que les pertes de stocks. Toutefois, les pertes de stocks, même si elles concernent moins de ménages, ont un impact direct sur les réserves alimentaires disponibles.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l'analyse comparative de l'incidence des sinistres entre les cultures sur pied et les produits stockés met en évidence une vulnérabilité systématiquement plus élevée des champs par rapport aux stocks. Pour la production rizicole, plus de 90.0% des ménages rapportent des dommages significatifs sur les parcelles en croissance, alors que les pertes sur les stocks concernent environ 40.0% de ces ménages. Une tendance similaire est observée pour les autres cultures majeures telles que le maïs, le haricot et le manioc, où la prévalence des dégâts aux champs se situe entre 80.0% et 90.0%, tandis que les atteintes aux stocks demeurent nettement inférieures, affectant environ 25.0% à 30.0% des cas. Les brèdes affichent également un contraste marqué avec environ 75.0% de sinistralité aux champs contre 20.0% pour le stockage. 
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, la fréquence des dommages agricoles est nettement plus élevée sur les parcelles cultivées que sur les produits récoltés. La riziculture, le maïs et le manioc présentent des taux de sinistralité extrêmement élevés touchant plus de 90.0% des ménages engagés dans ces productions. En revanche, l'impact sur les stocks est beaucoup plus limité dans cette zone s'établissant à environ 15.0% pour le riz et se situant aux alentours de 10.0% pour le maïs et le manioc. Concernant les brèdes, si les dégâts sur les champs affectent près de 65.0% des exploitants, aucune perte n'est signalée au niveau des stocks dans l'échantillon.
+:::
+::::
+
 ```{r g4_champs_vs_stocks}
 # G4 : Comparaison dégâts champs vs stocks pour les 5 cultures principales
 top5_cultures <- res_cca %>%
@@ -1391,7 +1527,22 @@ Les dégâts sur les champs (cultures en cours) sont systématiquement plus fré
 
 ## Évolution de la prévalence des catastrophes (2003–2025) {#sec-cata-multiyear}
 
+L'évolution de la prévalence des catastrophes sur la période 2003--2025 met en évidence des fluctuations interannuelles importantes, avec des pics correspondant aux passages cycloniques majeurs et aux épisodes de sécheresse prolongée. La tendance de long terme, difficile à isoler des aléas ponctuels, mérite d'être mise en regard de l'évolution des pratiques d'adaptation décrites dans les chapitres précédents.
+
 Le module « catastrophes » (`res_cc`) est disponible depuis 2003. On retrace ici la proportion de ménages ayant déclaré au moins un aléa climatique ou biologique au cours de la campagne.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l'analyse de l'exposition des ménages aux aléas met en évidence des fluctuations interannuelles marquées sur les deux dernières décennies. En début de période, le taux de sinistralité s'établit à 55.0% en 2003 et 58.0% en 2004 avant de connaître un repli sensible à 23.0% en 2005. Une phase de très faible prévalence est observée entre 2008 et 2010 ( respectivement 3.0% et 5.0%). À partir de 2011, le pourcentage de ménages touchés s'inscrit dans une tendance haussière irrégulière atteignant 45.0% en 2014. La campagne 2025 marque un sommet pour la zone avec 73.0% des foyers déclarant avoir subi au moins une catastrophe au cours de l'année.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, un pic exceptionnel est enregistré en 2004, année au cours de laquelle environ 92.0% des ménages ont été sinistrés. Après cette crise majeure, le taux d'exposition a progressivement diminué pour atteindre ses niveaux les plus bas entre 2008 et 2010 se situant entre 12.0% et 15.0%. Une recrudescence notable des évènements est observée en 2012 affectant 45.0% de l'échantillon suivie d'une redescente à 25.0% en 2014. Pour la dernière période de référence en 2025, le taux de ménages ayant été confrontés à au moins un aléa remonte significativement pour s'établir à 71.1%.
+:::
+::::
+
 
 ```{r cata_trends_compute}
 #| include: false
@@ -1465,6 +1616,6 @@ cata_trends |>
   make_trend_plot(y_var = pct_cata, y_label = "% de ménages touchés", gap_year = 2015)
 ```
 
-L'évolution de la prévalence des catastrophes sur la période 2003--2025 met en évidence des fluctuations interannuelles importantes, avec des pics correspondant aux passages cycloniques majeurs et aux épisodes de sécheresse prolongée. La tendance de long terme, difficile à isoler des aléas ponctuels, mérite d'être mise en regard de l'évolution des pratiques d'adaptation décrites dans les chapitres précédents.
+
 
 :::
