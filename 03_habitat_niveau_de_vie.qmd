@@ -805,6 +805,8 @@ dl_fig_variants("fig_destination", "05", function(d) {
 
 ## Revenu
 
+L’analyse des revenus constitue un élément essentiel dans l’étude des conditions de vie des ménages ruraux. Elle permet d’apprécier leur capacité à satisfaire les besoins fondamentaux et à faire face aux différentes contraintes économiques. L’étude des sources et du niveau des revenus offre également une meilleure compréhension des stratégies de subsistance adoptées par les ménages en milieu rural.
+
 Les revenus presentes ici sont des revenus annuels par menage, calcules sur la periode de reference (PR) de la campagne 2025. Le revenu total (`revtot`) se decompose en revenu courant (`revcou`) et revenu exceptionnel (`revexcept`).
 
 Le revenu courant agrege sept composantes :
@@ -829,6 +831,18 @@ inc <- compute_income_year(2025) |>
 ### Structure du revenu total
 
 Le revenu total annuel par ménage synthétise l'ensemble des ressources monétaires et non-monétaires. Les écarts entre moyenne et médiane reflètent le degré d'inégalité au sein de chaque observatoire.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, le revenu total annuel moyen par ménage est de 4 488 029 Ar. La moitié des ménages ont des revenu au maximum 2 692 468 Ar. L’écart-type atteint 10 312 760 Ar ce qui traduit une forte dispersion des revenus entre les ménages. Le revenu minimum observé est de -7 244 963 Ar alors que le revenu maximum atteint 171 961 683 Ar.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le revenu annuel moyen par ménage est de 3 480 646 Ar et la médiane est de 2 094 749 Ar. L’écart-type est de 5 475 598 Ar indiquant une variation importante des revenus au sein des ménages enquêtés. Le revenu minimum enregistré est de -4 219 928 Ar tandis que le revenu maximum s’élève à 72 641 968 Ar.
+:::
+::::
 
 ```{r t_revtot_obs}
 inc |>
@@ -866,6 +880,20 @@ dl_tbl_variants("tbl_revtot", "05", function(d) {
 ### Decomposition du revenu courant
 
 La décomposition du revenu courant en ses sept composantes met en lumière la structure productive de chaque observatoire et le degré de dépendance à l'égard de la riziculture.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les revenus nets rizicoles constituent la principale composante du revenu courant moyen par ménage avec 38.0 % du total, soit 1,654,368 Ar/an. Les revenus indépendants arrivent en deuxième position avec 24.0 %, représentant 1,043,037 Ar/an. Les salaires agricoles occupent la troisième place avec 19.8 %, soit 860,748 Ar/an.L’élevage contribue à hauteur de 7.0 % du revenu courant moyen, correspondant à 302,73 5 Ar/an. Les salaires non agricoles représentent 6.8 %, soit 297,052 Ar/an. Les revenus nets issus des autres cultures participent pour 4.4 %, équivalant à 191,317 Ar/an.  Le revenu courant moyen total par ménage dans l’observatoire d’Alaotra est de 4,349,257 Ar/an.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les revenus nets rizicoles représentent la plus grande part du revenu courant moyen par ménage avec 39.2 % du total, soit 1,287,310 Ar/an. Les revenus indépendants se placent en deuxième position avec 23.2 %, correspondant à 759,874 Ar/an. Les salaires agricoles arrivent ensuite avec 18.4 %, soit 604,846 Ar/an. L’élevage contribue pour 7.7 % du revenu courant moyen, représentant 253,697 Ar/an. Les salaires non agricoles participent à hauteur de 6.2 %, soit 204,131 Ar/an. Les revenus nets des autres cultures représentent 5.2 %, correspondant à 170,901 Ar/an. Le revenu courant moyen total par ménage dans l’observatoire de Marovoay est de 3,280,758 Ar/an.
+:::
+::::
+
+Pour les deux observatoires, la pêche ne contribue pas au revenu courant moyen.
 
 ```{r t_revcou_decomp}
 decomp <- inc |>
@@ -976,6 +1004,18 @@ dl_fig_variants("fig_revcou_shares", "05", function(d) {
 
 La distribution du revenu total illustre le degré d'inégalité au sein de chaque observatoire. L'utilisation d'une échelle logarithmique permet de mieux visualiser l'étalement de la distribution et la concentration des ménages à bas revenus.
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, la distribution du revenu total annuel des ménages dans l’observatoire d’Alaotra montre une forte concentration des revenus autour des valeurs intermédiaires, avec une densité maximale située approximativement entre 1,000,000 et 10,000,000 Ar en échelle logarithmique. La courbe présente une forme relativement asymétrique vers la droite, indiquant que certains ménages disposent de revenus plus élevés mais restent peu nombreux. Les très faibles revenus ainsi que les revenus extrêmement élevés apparaissent avec une faible densité. La distribution traduit donc une concentration majoritaire des ménages autour des revenus moyens.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, la distribution du revenu total annuel des ménages suit également une forme unimodale avec une concentration importante des ménages autour des revenus intermédiaires. La densité maximale se situe dans la même plage logarithmique, principalement entre 1,000,000 et 10,000,000 Ar. La courbe présente une légère asymétrie à droite, ce qui montre l’existence de quelques ménages à revenus élevés, mais en effectif limité. Les ménages à très faibles revenus ainsi que ceux ayant des revenus très élevés restent minoritaires dans la distribution globale.
+:::
+::::
+
 ```{r fig_revtot_dist}
 #| fig-cap: "Distribution du revenu total par observatoire (echelle log)"
 #| fig-width: !expr fig_w("fig_revtot_dist")
@@ -1008,6 +1048,18 @@ dl_fig_variants("fig_revtot_dist", "05", function(d) {
 ### Revenu courant et revenu exceptionnel
 
 La distinction entre revenu courant (activités régulières) et revenu exceptionnel (transferts, décapitalisation, travaux HIMO) renseigne sur la durabilité des ressources des ménages. Un poids élevé du revenu exceptionnel peut signaler une vulnérabilité économique.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, le revenu total moyen par ménage est estimé à 4,488,029 Ar/an. Le revenu courant constitue l’essentiel de ce revenu total avec 4,349,257 Ar/an, soit 96.9 % du total. Le revenu exceptionnel représente une part limitée de 138,771 Ar/an, correspondant à 3.1 % du revenu total. Cette structure montre que le revenu des ménages repose principalement sur des sources régulières et récurrentes. 
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, le revenu total moyen par ménage s’élève à 3,480,646 Ar/an. Le revenu courant atteint 3,280,758 Ar/an et représente 94.3 % du revenu total. Le revenu exceptionnel est de 199,888 Ar/an, soit 5.7 % du total. Les ménages tirent donc majoritairement leurs ressources de revenus courants tandis que les revenus exceptionnels occupent une place plus réduite dans la structure globale des revenus.
+:::
+::::
 
 ```{r t_revcou_revexcept}
 inc |>
@@ -1051,6 +1103,18 @@ dl_tbl_variants("tbl_revcou_revexcept", "05", function(d) {
 
 Certains menages presentent un revenu courant negatif, principalement en raison de charges agricoles superieures aux produits (mauvaises recoltes, couts d'intrants eleves).
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, le **tableau??** montre que sur 507 ménages enquêtés, 2.0 % ont un revenu courant inférieur ou égal à 0, tandis que 1 % ont un revenu total inférieur ou égal à 0.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, sur 519 ménages enquêtés, 1.9 % présentent un revenu courant inférieur ou égal à 0, et 1 % ont un revenu total inférieur ou égal à 0.
+:::
+::::
+
 ```{r t_rev_negatif}
 inc |>
   summarise(
@@ -1083,6 +1147,19 @@ dl_tbl_variants("tbl_rev_negatif", "05", function(d) {
 ## Evolution des revenus nominaux depuis 1995 {#sec-income-multiyear}
 
 Les observatoires de Marovoay et d'Alaotra disposent de series longues permettant de suivre l'evolution des revenus sur trois decennies. Les donnees couvrent 1995-2008 et 2010-2014 pour Marovoay, 1999-2008 et 2010-2014 pour Alaotra, ainsi que la campagne 2025 pour les deux. Les annees 2009 et 2015-2024 ne contiennent pas ces observatoires. Le trait pointille materialise l'absence de donnees.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, le revenu total moyen par ménage présente d’abord un niveau relativement faible entre 1999 et 2003, avec des fluctuations autour de 500000 à 700000 Ar/ménage/an. À partir de 2004, une forte progression est observée, traduisant une amélioration rapide des revenus des ménages. Malgré quelques variations importantes entre 2005 et 2011, notamment une baisse après le pic de 2010, la tendance générale reste orientée à la hausse. Après 2012, les revenus augmentent de manière plus régulière et atteignent environ 3400000 Ar vers 2014. Les projections jusqu’en 2025 indiquent une poursuite de cette croissance, avec un revenu estimé autour de 4500000 Ar/ménage/an.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, le revenu total moyen par ménage évolue progressivement entre 1995 et 2000, passant d’environ 350000 Ar à plus de 1200000 Ar/ménage/an. Une légère baisse apparaît ensuite au début des années 2000 avant qu’une hausse marquée ne survienne en 2004. Après ce changement rapide, les revenus connaissent une phase de relative stabilité entre 2006 et 2011, autour de 2300000 à 2400000 Ar/ménage/an. À partir de 2012, une nouvelle progression est observée, malgré quelques petites fluctuations. Les prévisions jusqu’en 2025 montrent une augmentation continue des revenus, qui pourraient atteindre près de 3500000 Ar/ménage/an. 
+:::
+::::
+
 
 ```{r trends_load}
 #| include: false
@@ -1201,6 +1278,19 @@ trends <- trends |>
 trends |> make_trend_plot(revtot_mean, "Revenu total moyen (Ar/menage/an)")
 ```
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, le revenu courant moyen par ménage reste relativement faible entre 1999 et 2003, avec des valeurs oscillant autour de 500000 à 700000 Ar/ménage/an. À partir de 2004, une augmentation rapide est enregistrée, traduisant une amélioration importante des revenus des ménages. Entre 2005 et 2012, l’évolution demeure irrégulière, avec plusieurs hausses et baisses successives, mais les revenus se maintiennent globalement au-dessus de 2000000 Ar. Après 2012, la tendance devient de nouveau croissante et les revenus atteignent plus de 3000000 Ar vers 2014. Les projections jusqu’en 2025 indiquent une poursuite de cette hausse, avec un revenu pouvant dépasser 4300000 Ar/ménage/an. 
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, le revenu courant moyen par ménage augmente progressivement entre 1995 et 2000, passant d’environ 350000 Ar à plus de 1000000 Ar/ménage/an. Une légère diminution est ensuite observée au début des années 2000 avant une forte progression en 2004, où les revenus dépassent 2000000 Ar. Entre 2006 et 2011, les revenus évoluent de manière relativement stable autour de 2000000 à 2300000 Ar/ménage/an, malgré quelques fluctuations. À partir de 2012, une reprise de la croissance apparaît et les projections montrent une augmentation régulière des revenus jusqu’en 2025, avec des valeurs estimées autour de 3300000 Ar/ménage/an.
+:::
+::::
+
+
 ```{r fig_trends_revcou}
 #| fig-cap: "Evolution du revenu courant moyen par menage (Ar courants)"
 #| fig-width: !expr fig_w("fig_trends_revcou")
@@ -1208,6 +1298,19 @@ trends |> make_trend_plot(revtot_mean, "Revenu total moyen (Ar/menage/an)")
 
 trends |> make_trend_plot(revcou_mean, "Revenu courant moyen (Ar/menage/an)")
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, le revenu courant moyen augmente globalement au fil des années, malgré quelques fluctuations intermédiaires. Les revenus nets rizicoles constituent la principale composante du revenu total sur l’ensemble de la période et connaissent une progression marquée, passant d’environ 300000 Ariary au début de la série à près de 2800000 Ariary en fin de période. Les salaires agricoles représentent également une part importante et progressent progressivement, atteignant environ 900000 Ariary dans les dernières années. Les revenus indépendants restent plus modestes mais augmentent tout de même jusqu’à environ 700000 Ariary. Les salaires non agricoles demeurent relativement faibles, avec des niveaux généralement inférieurs à 400000 Ariary. Les revenus issus de la pêche, de l’élevage et des autres cultures restent secondaires tout au long de la période, même si les autres cultures enregistrent ponctuellement des montants proches de 300000 Ariary.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, le revenu courant moyen suit également une tendance générale à la hausse au cours du temps. Les revenus nets rizicoles occupent la place la plus importante dans la structure des revenus et atteignent environ 1700000 Ariary lors des dernières années observées. Les salaires agricoles augmentent de manière régulière et représentent une composante significative, avec des montants avoisinant 1000000 Ariary en fin de période. Les revenus indépendants progressent aussi graduellement pour atteindre près de 600000 Ariary. Les salaires non agricoles restent limités, généralement autour de 200000 à 300000 Ariary. Les revenus provenant de l’élevage, de la pêche et des autres cultures demeurent relativement faibles durant toute la période, avec des contributions modestes dans le revenu total moyen.
+:::
+::::
+
 
 ```{r fig_trends_decomp}
 #| fig-cap: "Evolution des composantes du revenu courant moyen (Ar courants)"
@@ -1241,6 +1344,8 @@ trends |>
 
 La comparaison des revenus sur longue periode necessite de tenir compte de l'inflation. Nous utilisons ici l'**IPC national** publie par la Banque Mondiale (indicateur `FP.CPI.TOTL`, base 2010 = 100). Cet indice est calcule a partir d'un panier de consommation urbain ; il ne reflete donc qu'imparfaitement l'evolution des prix en milieu rural. Pour 2024-2025, non encore publies par la Banque Mondiale, l'IPC est extrapole a +9 % par an.
 
+L’IPC national de Madagascar présente une augmentation continue entre 1995 et 2025, traduisant une hausse progressive du niveau général des prix sur l’ensemble de la période. L’indice passe d’environ 25 en 1995 à près de 50 au début des années 2000, avant d’atteindre le niveau de base 100 en 2010. Après 2010, la progression se poursuit de manière régulière avec un indice d’environ 130 en 2014, puis une accélération plus marquée à partir de 2015. En 2025, l’IPC atteint près de 290, soit presque trois fois le niveau de 2010. Cette évolution montre une inflation soutenue sur le long terme, avec une hausse particulièrement importante au cours des dix dernières années.
+
 ::: {.callout-note}
 Une prochaine version de ce rapport integrera un IPC regional (Boeny pour Marovoay, Alaotra-Mangoro pour Alaotra), extrait des series de l'INSTAT ou des enquetes EPM, afin de mieux capter l'inflation locale.
 :::
@@ -1269,7 +1374,23 @@ cpi_series |>
 
 ### Prix median du paddy et comparaison avec l'IPC
 
+Cette section examine l'évolution du prix de vente médian du paddy à partir des déclarations des ménages et compare cette tendance à l'indice des prix à la consommation (IPC) national pour mesurer l'inflation locale. 
+
 Le prix de vente median du paddy, calcule a partir des ventes declarees par les menages (`dc24` dans `res_dc21`), fournit un indicateur complementaire de l'inflation locale.
+
+Le prix médian du paddy augmente de manière globale dans les deux observatoires entre 1995 et 2025, malgré quelques fluctuations au cours de certaines années.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, le prix passe d’environ 180 Ar/kg en 1995 à près de 300 Ar/kg au début des années 2000, avant d’atteindre environ 500 Ar/kg vers 2005. Après une légère baisse autour de 2006, le prix reprend progressivement sa hausse pour atteindre environ 650 Ar/kg en 2013. Une diminution apparaît ensuite autour de 2014 avec un niveau proche de 550 Ar/kg, avant une forte augmentation après 2015. En 2025, le prix médian atteint environ 1500 Ar/kg, soit le niveau le plus élevé de toute la série.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le prix médian du paddy suit également une tendance haussière sur l’ensemble de la période. Les niveaux restent inférieurs à 300 Ar/kg jusqu’au début des années 2000, puis augmentent rapidement pour atteindre près de 500 Ar/kg autour de 2005. Entre 2006 et 2013, les prix fluctuent généralement entre 450 et 600 Ar/kg. Une baisse apparaît également autour de 2014 avec un niveau proche de 500 Ar/kg, suivie d’une forte progression à partir de 2015. En fin de période, le prix médian atteint environ 1600 Ar/kg en 2025, correspondant au niveau maximal observé sur la série.
+:::
+::::
 
 ```{r fig_trends_paddy}
 #| fig-cap: "Evolution du prix median du paddy (Ar/kg)"
@@ -1278,6 +1399,21 @@ Le prix de vente median du paddy, calcule a partir des ventes declarees par les 
 
 trends |> make_trend_plot(prix_paddy_median, "Prix median du paddy (Ar/kg)")
 ```
+
+L’évolution de l’indice des prix montre une augmentation continue de l’IPC national et des indices du prix du paddy entre 1995 et 2025, avec une accélération marquée après 2015. L’IPC national progresse régulièrement en passant d’environ 30 en 1995 à 100 en 2010, puis atteint près de 290 en 2025. Cette hausse traduit une augmentation générale et continue du niveau des prix dans le pays sur l’ensemble de la période.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l’indice du prix du paddy suit également une tendance haussière. Après des niveaux proches de 40 à 50 à la fin des années 1990, l’indice dépasse 100 autour de 2005, connaît quelques fluctuations entre 2006 et 2014 autour de 90 à 140, puis augmente fortement après 2015. En 2025, l’indice atteint environ 300, indiquant une hausse importante du prix du paddy par rapport au niveau de 2010.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, l’évolution de l’indice du prix du paddy est plus marquée en fin de période. L’indice reste inférieur à 60 avant les années 2000, dépasse 100 autour de 2005, puis fluctue entre environ 90 et 140 jusqu’en 2014. Après 2015, la progression devient très rapide et l’indice atteint près de 350 en 2025. Cette évolution montre une augmentation particulièrement forte du prix du paddy au cours des dernières années.
+:::
+::::
+
 
 ```{r fig_ipc_vs_paddy}
 #| fig-cap: "Comparaison de l'IPC national et de l'indice du prix du paddy (base 100 en 2010)"
@@ -1317,6 +1453,20 @@ index_all |>
 
 Les revenus nominaux sont convertis en Ariary constants (base 2010) en divisant par l'IPC national. Ceci permet d'evaluer l'evolution du pouvoir d'achat, sous reserve des limites du deflateur urbain.
 
+Le revenu total réel moyen par ménage présente des fluctuations importantes dans les deux observatoires entre 1995 et 2025.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, le revenu augmente progressivement entre 1995 et le début des années 2000, passant d’environ 1400000 Ariary à près de 1800000 Ariary, avant de connaître une forte baisse autour de 2002 avec un niveau proche de 1000000 Ariary. Une hausse très marquée apparaît ensuite entre 2003 et 2005, conduisant à un pic d’environ 3700000 Ariary en 2005. Après cette période, le revenu diminue progressivement malgré quelques fluctuations intermédiaires, oscillant autour de 2300000 à 3100000 Ariary entre 2006 et 2013. La tendance projetée après 2015 indique une baisse continue, avec un revenu proche de 1600000 Ariary en 2025.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le revenu total réel moyen suit également une évolution irrégulière. Le revenu passe d’environ 1400000 Ariary en 1995 à plus de 3000000 Ariary au début des années 2000, avant de diminuer autour de 2002 et 2003. Une très forte hausse est observée en 2004 avec un niveau supérieur à 4300000 Ariary, correspondant au maximum de toute la série. Après ce pic, le revenu diminue progressivement tout en restant proche de 2800000 à 3000000 Ariary entre 2005 et 2009. À partir de 2010, la tendance devient décroissante avec des niveaux proches de 2000000 Ariary après 2013. La projection jusqu’en 2025 montre une poursuite de cette baisse, conduisant à un revenu d’environ 1200000 Ariary en fin de période.
+:::
+::::
+
 ```{r fig_trends_revtot_real}
 #| fig-cap: "Evolution du revenu total reel moyen par menage (Ar constants 2010, IPC)"
 #| fig-width: !expr fig_w("fig_trends_revtot_real")
@@ -1324,6 +1474,21 @@ Les revenus nominaux sont convertis en Ariary constants (base 2010) en divisant 
 
 trends |> make_trend_plot(revtot_real, "Revenu total reel moyen (Ar constants 2010)")
 ```
+
+Le revenu courant réel moyen par ménage présente une évolution très fluctuante dans les deux observatoires sur l’ensemble de la période étudiée.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, le revenu diminue d’abord entre 1999 et 2002, passant d’environ 1900000 Ariary à moins de 1000000 Ariary. Une forte hausse intervient ensuite entre 2003 et 2005, avec un pic proche de 3500000 Ariary en 2005. Après cette augmentation, le revenu reste instable entre 2006 et 2010, oscillant généralement entre 2500000 et 3300000 Ariary. À partir de 2011, les niveaux se situent autour de 2200000 à 2500000 Ariary avant une tendance projetée à la baisse après 2015. En 2025, le revenu courant réel moyen est estimé à environ 1500000 Ariary.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le revenu courant réel moyen augmente fortement entre 1995 et 2000, passant d’environ 1400000 Ariary à près de 2800000 Ariary. Après une baisse autour de 2002 et 2003, une hausse très importante apparaît en 2004 avec un niveau proche de 4000000 Ariary, correspondant au maximum observé sur toute la série. Le revenu diminue ensuite progressivement tout en restant autour de 2500000 à 3000000 Ariary jusqu’en 2008. Après 2010, la tendance devient davantage décroissante, avec des niveaux proches de 1800000 à 2200000 Ariary. La projection jusqu’en 2025 montre une poursuite de cette baisse, conduisant à un revenu d’environ 1200000 Ariary en fin de période.
+:::
+::::
+
 
 ```{r fig_trends_revcou_real}
 #| fig-cap: "Evolution du revenu courant reel moyen par menage (Ar constants 2010, IPC)"
@@ -1337,6 +1502,20 @@ trends |> make_trend_plot(revcou_real, "Revenu courant reel moyen (Ar constants 
 
 Le prix du paddy, produit central de ces economies rizicoles, offre un deflateur alternatif plus proche de la realite locale que l'IPC national. Les revenus sont ici exprimes en equivalent-paddy a prix 2010, c'est-a-dire divises par l'indice du prix median du paddy de chaque observatoire (base 2010 = 1). Ce deflateur est propre a chaque observatoire.
 
+Le revenu total réel moyen par ménage exprimé en constants paddy 2010 présente de fortes fluctuations dans les deux observatoires au cours de la période étudiée.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, le revenu diminue d’abord entre 1999 et 2001, passant d’environ 1600000 Ariary à près de 1300000 Ariary, avant d’augmenter fortement jusqu’à environ 2300000 Ariary en 2003. Une hausse très marquée est ensuite observée entre 2005 et 2007, avec un maximum proche de 3300000 Ariary en 2007. Après une baisse autour de 2008 à environ 2500000 Ariary, le revenu remonte de nouveau autour de 3100000 Ariary en 2010. Les années suivantes restent fluctuantes entre 2100000 et 2800000 Ariary. La projection après 2015 indique une diminution progressive du revenu, qui atteint environ 1500000 Ariary en 2025.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le revenu total réel moyen évolue également de manière irrégulière. Le revenu augmente fortement entre 1997 et 1998, passant d’environ 1600000 Ariary à plus de 2400000 Ariary. Entre 1999 et 2005, les niveaux fluctuent généralement entre 1800000 et 2600000 Ariary, avec plusieurs hausses et baisses successives. Une chute importante apparaît en 2005 avec un niveau proche de 1500000 Ariary, suivie d’une remontée progressive autour de 2200000 Ariary entre 2006 et 2010. Après une légère baisse autour de 2011, le revenu atteint près de 2400000 Ariary en 2012 avant de redescendre autour de 1900000 Ariary en 2013. La projection jusqu’en 2025 montre ensuite une baisse continue, conduisant à un revenu proche de 1000000 Ariary en fin de période.
+:::
+::::
+
 ```{r fig_trends_revtot_paddy}
 #| fig-cap: "Evolution du revenu total reel moyen par menage (Ar constants paddy 2010)"
 #| fig-width: !expr fig_w("fig_trends_revtot_paddy")
@@ -1344,6 +1523,20 @@ Le prix du paddy, produit central de ces economies rizicoles, offre un deflateur
 
 trends |> make_trend_plot(revtot_paddy, "Revenu total reel moyen (Ar constants paddy 2010)")
 ```
+
+Le revenu courant réel moyen par ménage exprimé en constants paddy 2010 présente de fortes variations dans les deux observatoires au cours de la période étudiée.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, le revenu diminue fortement entre 1999 et 2000, passant d’environ 1500000 Ariary à près de 1100000 Ariary, avant de remonter autour de 2000000 Ariary en 2001. Une nouvelle baisse apparaît ensuite en 2002 avec un niveau proche de 1100000 Ariary, suivie d’une forte progression jusqu’à environ 3100000 Ariary en 2006, correspondant au niveau maximal observé dans la série. Après une diminution autour de 2400000 Ariary en 2007, le revenu remonte de nouveau près de 3000000 Ariary en 2009. Entre 2010 et 2013, les niveaux restent fluctuants entre environ 2100000 et 2600000 Ariary. La projection après 2015 montre une tendance continue à la baisse, avec un revenu proche de 1450000 Ariary en 2025.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le revenu courant réel moyen évolue également de manière irrégulière sur l’ensemble de la période. Le revenu augmente fortement entre 1997 et 1998, passant d’environ 1500000 Ariary à plus de 2100000 Ariary, puis fluctue entre environ 1800000 et 2400000 Ariary jusqu’en 2004. Une forte baisse apparaît en 2005 avec un niveau proche de 1300000 Ariary, avant une remontée progressive autour de 2000000 Ariary entre 2006 et 2010. Après une légère diminution autour de 2011, le revenu atteint près de 2100000 Ariary en 2013 avant de redescendre autour de 1600000 Ariary en 2014. La projection jusqu’en 2025 indique ensuite une baisse régulière du revenu, qui atteint environ 900000 Ariary en fin de période.
+:::
+::::
 
 ```{r fig_trends_revcou_paddy}
 #| fig-cap: "Evolution du revenu courant reel moyen par menage (Ar constants paddy 2010)"
@@ -1356,6 +1549,20 @@ trends |> make_trend_plot(revcou_paddy, "Revenu courant reel moyen (Ar constants
 ## Evolution des conditions d'habitat (1997-2025) {#sec-habitat-multiyear}
 
 Les donnees sur l'habitat permettent de suivre l'evolution de la source d'eclairage (acces a l'electricite) et de la source d'eau principale sur la periode couverte.
+
+L’accès à l’électricité reste très faible dans les deux observatoires sur l’ensemble de la période étudiée.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la proportion de ménages ayant accès à l’électricité est quasiment nulle durant la majorité des années observées. Les niveaux restent proches de 0.0 % entre 1997 et 2004, avec seulement une légère hausse autour de 2000 où la proportion atteint environ 0.2 %. Une augmentation exceptionnelle apparaît en 2005 avec un niveau proche de 1.6 %, correspondant au maximum observé dans la série. Après cette année, les valeurs retombent rapidement autour de 0.0 % et demeurent très faibles jusqu’en 2015. En 2025, la proportion atteint environ 0.2 %, montrant une amélioration limitée de l’accès à l’électricité.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, l’évolution de l’accès à l’électricité reste également faible mais présente quelques variations plus régulières. La proportion de ménages concernés augmente progressivement entre 1995 et 2000, passant de 0.0 % à environ 0.2 %. Une hausse plus marquée apparaît autour de 2001 avec un niveau proche de 0.6 %, avant une diminution progressive jusqu’à près de 0.0 % en 2004 et 2005. Entre 2006 et 2009, les niveaux se stabilisent autour de 0.2 %, puis diminuent de nouveau vers 0.0 % entre 2012 et 2013. Une nouvelle hausse apparaît en 2014 avec une proportion proche de 0.6 %, avant de revenir à environ 0.0 % en 2025.
+:::
+::::
 
 ```{r habitat_trends_compute}
 #| include: false
@@ -1431,6 +1638,21 @@ if ("pct_elec" %in% names(habitat_trends)) {
     theme_ror()
 }
 ```
+
+L’accès à une source d’eau améliorée présente des évolutions contrastées dans les deux observatoires au cours de la période étudiée.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la proportion de ménages concernés augmente fortement entre 1997 et 2000, passant d’environ 20 % à près de 60 %. Entre 2001 et 2008, les niveaux restent relativement élevés et fluctuent généralement entre 60 % et 70 %, avec un maximum proche de 70 % autour de 2006. Après 2008, une tendance progressive à la baisse apparaît, conduisant à des niveaux proches de 50 % entre 2012 et 2014. En 2015, la proportion descend à environ 38 %, avant de remonter autour de 60 % dans la projection pour 2025.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, l’accès à une source d’eau améliorée demeure beaucoup plus faible sur l’ensemble de la période. Les niveaux restent proches de 0 % jusqu’à la fin des années 1990, puis augmentent progressivement pour atteindre environ 6 % au début des années 2000. Une hausse plus importante apparaît entre 2003 et 2006, avec un maximum proche de 13 % en 2006. Après cette période, la proportion diminue autour de 5 % entre 2007 et 2010, puis se stabilise légèrement au-dessus de ce niveau jusqu’en 2014. En 2015, la proportion atteint environ 8 %, tandis que la projection pour 2025 indique un niveau proche de 30 %.
+:::
+::::
+
 
 ```{r fig_habitat_water}
 #| fig-cap: "Evolution de l'acces a une source d'eau amelioree (1997-2025)"
