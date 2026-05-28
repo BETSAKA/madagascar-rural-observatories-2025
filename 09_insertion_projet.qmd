@@ -111,13 +111,27 @@ pct_benef_m <- res_respg0 |> filter(Observatory == "Marovoay", pro1 %in% c(1, 2)
 
 ## Insertion sociale {#sec-insertion}
 
+L'insertion sociale des ménages est appréhendée à travers leur adhésion à des organisations et associations locales, en examinant la nature de leur engagement et leur niveau de responsabilité au sein de ces structures.
+
 ### Appartenance à une organisation
 
 Sur les `r n_men` ménages enquêtés, `r sum(res_respg0$respga == 1)` (`r round(sum(res_respg0$respga == 1) / n_men * 100, 1)` %) déclarent qu'au moins un de leurs membres appartient à une organisation ou association.
 
 ::: {.content-visible when-profile="consolidated"}
-La participation est nettement plus élevée à Marovoay qu'à Alaotra.
+La participation est nettement plus élevée à Marovoay qu'à Alaotra avec un taux de participation supérieur de plus de 20 points.
 :::
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+**Alaotra :** Seulement 32.1 % des ménages sont membres. 
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+**Marovoay :** Une majorité de 55.3 % des ménages participent à la vie associative.
+:::
+::::
 
 ```{r}
 #| label: tbl-adhesion
@@ -150,7 +164,19 @@ dl_tbl_variants("tbl_adhesion", "12", function(d) {
 
 ### Nombre d'organisations par ménage
 
-Parmi les ménages membres, la plupart n'adhèrent qu'à une seule organisation, mais certains cumulent jusqu'à quatre affiliations.
+Parmi les ménages membres, la plupart n'adhèrent qu'à une seule organisation, mais certains cumulent jusqu'à quatre affiliations. Une minorité (moins de 5%) atteint 3 ou 4 affiliations.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, la grande majorité des ménages membres, soit environ 71 %, ne sont affiliés qu'à une seule structure. L'adhésion à deux organisations concerne près de 22 % des foyers engagés, tandis que la multi-affiliation plus intensive (trois ou quatre organisations) demeure marginale, touchant moins de 8 % des membres.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, 73 % des ménages membres sont affiliés à une organisation unique. Le cumul de deux affiliations est légèrement plus fréquent concernant 25 % des ménages membres. En revanche, l'appartenance à trois ou quatre organisations est exceptionnelle, ne représentant environ que 1 % des cas pour chaque catégorie.
+:::
+::::
 
 ```{r}
 #| label: fig-nb-org
@@ -185,7 +211,19 @@ dl_fig_variants("fig_nb_org", "12", function(d) {
 
 ### Type d'organisation
 
-Les associations villageoises d'épargne et de crédit (tontines, *voamamy*) dominent à Marovoay, tandis que les associations religieuses prédominent à Alaotra. Les associations de femmes (liées au 8 mars) et les organisations de producteurs figurent également parmi les types les plus courants.
+Les profils associatifs sont radicalement différents selon la zone. Les associations villageoises d'épargne et de crédit (tontines, *voamamy*) dominent à Marovoay, tandis que les associations religieuses prédominent à Alaotra. Les associations de femmes (liées au 8 mars) et les organisations de producteurs figurent également parmi les types les plus courants.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+**Alaotra :** Les associations religieuses écrasent le paysage (environ 55 % des adhésions), suivies des associations de femmes.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+**Marovoay :** Les associations villageoises d'épargne et de crédit (tontines, voamamy) sont majoritaires (près de 50 %), suivies par les « autres organisations » et les associations de femmes.
+:::
+::::
 
 ```{r type_org_data}
 org_type_data <- res_respg |>
@@ -235,6 +273,18 @@ dl_fig_variants("fig_type_org", "12", function(d) {
 ### Qui dans le ménage est membre
 
 Le chef de ménage et le ou la conjoint(e) sont les membres les plus fréquemment affiliés, de façon quasi-égale.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+Pour Alaotra, le conjoint et le chef de ménage représentent chacun environ 41 à 42 % des affiliations. La participation des autres membres du ménage est notable avec 16.3 % des adhésions. Ce qui témoigne d'une insertion sociale plus large des différents membres de la famille par rapport à l'autre site.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+Pour Marovoay, l'insertion sociale est presque exclusivement réservée aux adultes à la tête du foyer (plus de 94 % des membres affiliés). Le conjoint est le membre le plus fréquemment membre d'une organisation (49.5 %) suivi de près par le chef de ménage (45.3 %).  Ne représentant que 5.2 % des affiliations, la participation des jeunes ou des autres membres de la famille est négligeable. 
+:::
+::::
 
 ```{r qui_membre_data}
 membre_data <- res_respg |>
@@ -289,6 +339,18 @@ dl_fig_variants("fig_qui_membre", "12", function(d) {
 
 La grande majorité des membres se déclarent *membres occasionnels*, et seule une minorité occupe un poste de responsable.
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, 60% des affiliations correspondent à des membres se déclarant occasionnels. La proportion d'individus occupant des fonctions de responsable s'établit à 21%, tandis que les membres actifs représentent approximativement 19% des adhésions enregistrées.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les membres occasionnels constituent la grande majorité des effectifs, représentant 81.0% des adhésions totales. En revanche, l'encadrement des structures est assuré par une minorité de responsables qui comptent pour 13% des membres, alors que la part des membres actifs est particulièrement réduite avec seulement 6% des cas identifiés. 
+:::
+::::
+
 ```{r}
 #| label: fig-responsabilite
 #| fig-cap: "Niveau de responsabilité dans l'organisation"
@@ -322,6 +384,8 @@ dl_fig_variants("fig_responsabilite", "12", function(d) {
 
 ## Accès des ménages aux projets {#sec-projets}
 
+L’accès des ménages aux programmes de développement est évalué à travers le bénéfice de projets ou de formations dans divers domaines d'activité, en précisant la nature des interventions et l'origine de leur financement.
+
 Le questionnaire demande aux ménages s'ils ont bénéficié de projets ou de formations dans huit domaines : agriculture, élevage et pêche, nutrition, éducation et santé, environnement, tourisme, autres productions et travaux à haute intensité de main d'œuvre (HIMO).
 
 ### Bénéficiaires de projets
@@ -330,13 +394,13 @@ L'accès aux projets de développement reste inégal selon les localités.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, `r pct_benef_a` % des ménages déclarent avoir bénéficié d'au moins un projet ou d'une formation.
+Dans l'Alaotra, `r pct_benef_a` % des ménages déclarent avoir bénéficié d'au moins un projet ou d'une formation. **A VERIFIER LA VALEUR 20%**
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, `r pct_benef_m` % des ménages déclarent avoir bénéficié d'au moins un projet ou d'une formation.
+A Marovoay, `r pct_benef_m` % des ménages déclarent avoir bénéficié d'au moins un projet ou d'une formation. **A VERIFIER LA VALEUR 25%**
 :::
 :::
 
@@ -410,6 +474,18 @@ dl_fig_variants("fig_pro1", "12", function(d) {
 ### Taux de bénéficiaires par type de projet
 
 L'éducation et la santé, la nutrition et l'agriculture sont les domaines pour lesquels les ménages bénéficient le plus de projets.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les projets portant sur l'éducation et la santé constituent la principale forme d'assistance, bénéficiant à 56.4% des ménages ayant eu accès à un programme de développement. Le soutien à l'agriculture représente le second axe majeur avec un taux de 43.4%, suivi de près par les actions liées à la nutrition qui touchent 39.4% des bénéficiaires. À l'inverse, les thématiques environnementales (8.6%) et celles relatives à l'élevage ou à la pêche (5.4%) occupent une place secondaire, tandis qu'aucune intervention n'est enregistrée dans le secteur du tourisme ou pour d'autres types de productions.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les interventions en éducation et santé sont les plus fréquentes concernant 40.8% des ménages bénéficiaires, suivies immédiatement par la catégorie des autres projets incluant les activités de type HIMO à hauteur de 39.6%. La nutrition et l'agriculture constituent également des piliers importants de l'assistance avec des taux respectifs de 32.0% et 23.7%. Bien que le secteur touristique demeure totalement inexploré, les domaines de l'environnement (9.3%), de l'élevage ou de la pêche (7.5%) ainsi que les autres productions (6.6%) complètent un éventail d'interventions plus diversifié. 
+:::
+::::
 
 ```{r benef_type_data}
 pro_clean <- res_pro |>
@@ -499,6 +575,19 @@ dl_tbl_variants("tbl_benef_type", "12", function(d) {
 
 Pour les ménages bénéficiaires, le financement provient principalement de l'État et des ONG/projets. L'Église et les autres sources restent marginales.
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l’État constitue le principal pilier des services sociaux et des programmes de travaux, assurant le financement de 100.0% des ménages engagés dans les projets de type HIMO, environ 95.0% de ceux bénéficiant d'actions en éducation et santé, et 92.0% dans le domaine de la nutrition. À l'inverse, les organisations non gouvernementales et les projets de développement dominent le soutien au secteur productif, finançant 81.0% des bénéficiaires en agriculture et 50.0% des initiatives environnementales. Le secteur de l'élevage et de la pêche présente une configuration mixte où l'État intervient à hauteur de 60.0% contre 40.0% pour les ONG. La contribution des structures confessionnelles demeure négligeable, avec une présence marginale uniquement relevée dans le secteur agricole.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les ONG et projets de développement financent ainsi environ 86.0% des ménages bénéficiaires dans les catégories de l'élevage et de la pêche ainsi que pour les projets de type HIMO. Cette domination des organismes internationaux et associatifs se retrouve également dans les autres productions (83.0%) et dans l'agriculture (78.0%). L'État conserve sa mission prioritaire dans les secteurs sociaux en prenant en charge 92.0% des bénéficiaires en éducation et santé et 88.0% en nutrition. Le domaine de l'environnement affiche une structure plus équilibrée avec 45.0% de financements étatiques et 33.0% issus des ONG. L'implication de l'Église reste extrêmement limitée, ne représentant qu'une source mineure de l'ordre de 3.0% pour les projets divers.
+:::
+::::
+
+
 ```{r}
 #| label: fig-source-projet
 #| fig-cap: "Source des projets pour les ménages bénéficiaires"
@@ -548,6 +637,18 @@ dl_fig_variants("fig_source_projet", "12", function(d) {
 }, pro_benef, width = 10, height = 6)
 ```
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra révèle une prédominance marquée des financements publics. L'État constitue le principal pilier de l'aide au développement dans cette zone, intervenant auprès de 71.8% des bénéficiaires recensés. Les organisations non gouvernementales représentent la seconde source de soutien, touchant 32.2% de ces ménages. La contribution des structures confessionnelles demeure quant à elle marginale, avec un seul cas enregistré dans l'échantillon.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, l’État assure le financement des interventions pour 66.9% des ménages bénéficiaires. En parallèle, les organisations non gouvernementales jouent un rôle significatif en appuyant 43.0% des ménages assistés. Les institutions religieuses ne constituent qu'une source de financement exceptionnelle, ne concernant qu'un seul ménage de l'échantillon.
+:::
+::::
+
 ```{r}
 #| label: tbl-source-global
 #| tbl-cap: "Source des projets (tous types confondus)"
@@ -590,13 +691,13 @@ Les ménages membres d'une organisation sont-ils davantage bénéficiaires de pr
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, `r pct_membre_a` % des ménages sont membres d'une organisation.
+Dans l'Alaotra, `r pct_membre_a` % **(??27.5%)**  des ménages sont membres d'une organisation.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, `r pct_membre_m` % des ménages sont membres d'une organisation.
+A Marovoay, `r pct_membre_m` % **(??35.4% )** des ménages sont membres d'une organisation.
 :::
 :::
 
@@ -682,6 +783,8 @@ dl_fig_variants("fig_croisement", "12", function(d) {
 ::: {.content-visible when-profile="consolidated"}
 ::: {.obs-technical}
 ## Pistes d'analyse complémentaires {#sec-pistes-insertion}
+
+L'exploitation des données relatives à l'insertion sociale et à l'accès aux interventions de développement ouvre plusieurs perspectives d'analyses thématiques et méthodologiques complémentaires.
 
 - **Lien organisation–type de projet** : les ménages membres d'organisations de producteurs bénéficient-ils davantage de projets agricoles ?
 - **Codes ONG/Projet** (`pro4`) : les valeurs numériques (10–15, 24, etc.) semblent correspondre à des identifiants de projets spécifiques dont la correspondance avec des noms de projets reste à documenter.
