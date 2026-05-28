@@ -2015,6 +2015,18 @@ En 2025, après dix ans d'interruption, un **nouveau tirage** a été effectué 
 Les évolutions observées reflètent donc à la fois des dynamiques réelles dans les localités et des changements de composition de l'échantillon (vieillissement du panel, attrition sélective, renouvellement complet en 2025).
 :::
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la taille moyenne des ménages reste relativement stable entre 1999 et 2004, oscillant autour de 5.3 à 5.4 personnes par ménage. À partir de 2005, une hausse progressive est observée, la taille moyenne passant d’environ 5.7 personnes à près de 7 personnes en 2014. Cette évolution traduit une tendance à l’agrandissement des ménages au fil des années. Toutefois, une légère baisse est enregistrée à la fin de la période, avant une chute marquée en 2025 où la taille moyenne des ménages descend à environ 3.9 personnes.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la taille moyenne des ménages présente davantage de fluctuations au cours de la période observée. Entre 1996 et 1999, elle augmente progressivement pour atteindre près de 5.8 personnes par ménage, avant de diminuer légèrement au début des années 2000. Une baisse très prononcée est observée en 2005, avec une taille moyenne inférieure à 4 personnes. Par la suite, une reprise rapide s’amorce dès 2006 et se poursuit jusqu’en 2014, où la taille moyenne dépasse 7 personnes par ménage, représentant le niveau le plus élevé de la série. En 2025, une diminution importante est également constatée, la taille moyenne des ménages revenant à environ 4.4 personnes. 
+:::
+::::
+
 ```{r demog_trends_compute}
 #| include: false
 
@@ -2095,6 +2107,19 @@ demog_trends |> make_trend_plot(y_var = taille_moy,
                           gap_year = 2015)
 ```
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la proportion de femmes chefs de ménage augmente entre 1999 et 2001, passant d’environ 18.9% à plus de 21%. Par la suite, une tendance générale à la baisse est observée jusqu’en 2004. Entre 2005 et 2014, les variations restent relativement faibles, avec des proportions oscillant autour de 18% à 19%. En 2025, le pourcentage de femmes chefs de ménage connaît une nouvelle hausse et atteint environ 21.7%.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, l’évolution du pourcentage de femmes chefs de ménage apparaît plus irrégulière. Entre 1996 et 1998, la proportion diminue fortement pour atteindre près de 15.7%, avant d’augmenter progressivement au début des années 2000. Un pic marqué est observé en 2005, où la proportion dépasse 23%, représentant le niveau le plus élevé de la série. Après une baisse en 2006, la proportion repart à la hausse et se stabilise globalement autour de 21% à 22% jusqu’en 2014. En 2025, le pourcentage de femmes chefs de ménage reste élevé, atteignant environ 22%.
+:::
+::::
+
+
 ```{r fig_demog_fem_cm}
 #| fig-cap: "Évolution du pourcentage de chefs de ménage femmes (1996-2025)"
 #| fig-width: !expr fig_w("fig_demog_fem_cm")
@@ -2108,6 +2133,18 @@ if ("pct_fem_cm" %in% names(demog_trends)) {
 }
 ```
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, le taux de scolarisation des enfants de 6 à 14 ans demeure globalement élevé sur l’ensemble de la période observée. Après une baisse entre 1999 et 2000, le taux augmente fortement pour atteindre plus de 95% en 2003. Par la suite, quelques fluctuations sont observées, avec une diminution autour de 2007 et 2008, avant une nouvelle hausse en 2010. Entre 2011 et 2013, le taux reste relativement stable autour de 91% à 92%, puis progresse à nouveau en 2014 pour atteindre près de 94%. En 2025, le taux de scolarisation demeure élevé et se situe autour de 94%.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le taux de scolarisation des enfants de 6 à 14 ans est plus faible et plus variable. Entre 1996 et 1998, une baisse importante est enregistrée, le taux descendant jusqu’à environ 64%. À partir de 1999, une amélioration progressive est observée, culminant à plus de 88% en 2003. Toutefois, après cette période, le taux connaît plusieurs fluctuations, avec des baisses notables en 2008 et entre 2011 et 2012. Malgré ces variations, le taux reste globalement compris entre 79% et 85% à partir de 2010. En 2025, le taux de scolarisation atteint environ 82%.
+:::
+::::
+
 ```{r fig_demog_scol}
 #| fig-cap: "Évolution du taux de scolarisation des 6-14 ans (1996-2025)"
 #| fig-width: !expr fig_w("fig_demog_scol")
@@ -2120,6 +2157,19 @@ if ("taux_scol" %in% names(demog_trends)) {
               gap_year = 2015)
 }
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, l’âge moyen des chefs de ménage augmente globalement au cours de la période observée. Entre 1999 et 2004, il oscille entre 44.5 et 46.7 ans, avant de connaître quelques fluctuations entre 2005 et 2010 autour de 46 ans. Une hausse plus marquée est ensuite observée en 2011 et 2012, où l’âge moyen atteint près de 48 ans. Après une légère baisse en 2013, il remonte en 2014 avant de diminuer de nouveau pour se situer autour de 46.9 ans. En 2025, l’âge moyen des chefs de ménage est d’environ 45.4 ans.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, l’âge moyen des chefs de ménage progresse entre 1996 et le début des années 2000, passant d’environ 44 ans à plus de 47 ans. Après une relative stabilité jusqu’en 2004, une chute importante est enregistrée en 2005, où l’âge moyen descend à près de 41 ans. Dès 2006, une forte remontée est observée et la tendance redevient croissante jusqu’en 2011, année durant laquelle l’âge moyen atteint son niveau le plus élevé, proche de 49 ans. Entre 2012 et 2014, l’âge moyen se maintient autour de 47 à 48 ans avec de faibles variations. En 2025, il s’établit à environ 46 ans.
+:::
+::::
+
 
 ```{r fig_demog_age_cm}
 #| fig-cap: "Évolution de l'âge moyen du chef de ménage (1996-2025)"
