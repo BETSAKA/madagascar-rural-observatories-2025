@@ -242,6 +242,8 @@ pct_suf_m <- satis_stats |> filter(Observatory == "Marovoay", Satis == "Suffisan
 
 ## Patrimoine foncier {#sec-patrimoine}
 
+L'analyse du patrimoine foncier permet de caractériser la dotation globale en terres des ménages en détaillant le nombre de parcelles possédées, leurs spécificités agro-physiques ainsi que les dynamiques historiques et sociales d'accès à la propriété
+
 ### Nombre de parcelles possédées
 
 ::: {.content-hidden when-profile="marovoay"}
@@ -284,6 +286,20 @@ dl_fig_variants("fig_nb_parcelles", "07", function(d) {
     theme_ror()
 }, res_fr30a)
 ```
+
+Le @tbl-parcelles-stats résume les principales caractéristiques du patrimoine foncier possédé.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+**Alaotra.** La superficie moyenne par parcelle est de 51.6 ares, et la surface totale possédée par ménage atteint en moyenne 117.4 ares.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+**Marovoay.** La superficie moyenne par parcelle est de 78.9 ares, et la surface totale possédée par ménage atteint en moyenne 163.2 ares.
+:::
+::::
 
 ```{r}
 #| label: tbl-parcelles-stats
@@ -351,8 +367,6 @@ dl_tbl_variants("tbl_parcelles_stats", "07", function(d) {
 }, res_fr30)
 ```
 
-Le @tbl-parcelles-stats résume les principales caractéristiques du patrimoine foncier possédé.
-
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
 **Alaotra.** La superficie moyenne par parcelle est de `r sup_parc_moy_a` ares, et la surface totale possédée par ménage atteint en moyenne `r sup_men_moy_a` ares.
@@ -371,13 +385,13 @@ Le patrimoine foncier des ménages se compose principalement de rizières et de 
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** Les rizières représentent `r pct_riziere_a` % des parcelles possédées et les champs `r pct_champs_a` %.
+**Alaotra.** Avec une plus grande diversité, les rizières représentent `r pct_riziere_a` % des parcelles possédées et les champs `r pct_champs_a` %.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay.** Les rizières représentent `r pct_riziere_m` % des parcelles possédées et les champs `r pct_champs_m` %.
+**Marovoay.** Quasi exclusivement tourné vers la rizière de plaine, les rizières représentent `r pct_riziere_m` % des parcelles possédées et les champs `r pct_champs_m` %.
 :::
 :::
 
@@ -413,13 +427,13 @@ La localisation des parcelles reflète les spécificités agro-écologiques de c
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** Les parcelles se concentrent principalement en `r tolower(top_loc_a$Loc)` (`r top_loc_a$pct` %).
+**Alaotra.** Les parcelles se concentrent principalement en `r tolower(top_loc_a$Loc)` (`r top_loc_a$pct` %) puis sur tanety avec 28.3% .
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay.** La localisation la plus fréquente est la `r tolower(top_loc_m$Loc)` (`r top_loc_m$pct` %).
+**Marovoay.** La localisation la plus fréquente est la `r tolower(top_loc_m$Loc)` (`r top_loc_m$pct` %) puis sur tanety avec 29%.
 :::
 :::
 
@@ -461,6 +475,20 @@ L'accès à l'irrigation est un facteur déterminant de la productivité rizicol
 Les différences entre Alaotra et Marovoay reflètent les investissements hydrauliques historiques de chaque périmètre.
 :::
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, près de 48 % des parcelles n'ont aucune irrigation et le réseau traditionnel occupe 39 %.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le réseau traditionnel est le mode principal (43 %), suivi de l'absence totale d'irrigation (39 %).
+:::
+::::
+
+Malgré le statut de « greniers à riz », une part importante des terres dépend encore uniquement de la pluviométrie ou de réseaux traditionnels peu sécurisés.
+
 ```{r}
 #| label: fig-irrigation-possedee
 #| fig-cap: "Mode d'irrigation des parcelles possédées"
@@ -497,13 +525,13 @@ Le mode d'acquisition des parcelles renseigne sur la dynamique du marché foncie
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** L'héritage concerne `r pct_heritage_a` % des parcelles, l'achat `r pct_achat_a` % et la mise en valeur `r pct_mev_a` %.
+**Alaotra.** Le marché foncier est plus dynamique avec une dominance de l’achat. L'héritage concerne `r pct_heritage_a` % des parcelles, l'achat `r pct_achat_a` % et la mise en valeur `r pct_mev_a` %.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay.** L'héritage concerne `r pct_heritage_m` % des parcelles, l'achat `r pct_achat_m` % et la mise en valeur `r pct_mev_m` %.
+**Marovoay** reste marqué par la transmission familiale. L'héritage concerne `r pct_heritage_m` % des parcelles, l'achat `r pct_achat_m` % et la mise en valeur `r pct_mev_m` %.
 :::
 :::
 
@@ -538,6 +566,18 @@ dl_fig_variants("fig_acquisition", "07", function(d) {
 ```
 
 L'ancienneté de possession témoigne de l'enracinement des ménages sur leurs terres (@fig-anciennete). Une part importante des parcelles est détenue depuis plusieurs décennies, reflétant la continuité de l'occupation foncière dans les deux zones. Les acquisitions récentes (années 2010 et au-delà) sont toutefois observables, signe que le marché foncier reste actif.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, les données indiquent que près d'un quart des parcelles (24.6%) ont été acquises récemment, au cours des années 2010. Les acquisitions durant les années 2000 représentent 19.5% du patrimoine foncier, suivies par les années 1990 avec 14.2%. Les possessions plus anciennes sont proportionnellement moins nombreuses, avec 8.9% pour les années 1980, 4.7% pour les années 1970 et seulement 2.6% pour la période antérieure à 1970.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, les acquisitions réalisées durant les années 2010 sont les plus fréquentes et concernent 24.5% des parcelles possédées. Les parcelles obtenues dans les années 2000 constituent 16.3% de l'ensemble, tandis que celles datant des années 1990 représentent 12.2%. La part des terrains acquis plus anciennement est plus faible, s'établissant à 7.3% pour les années 1980, 1.9% pour les années 1970 et 2.6% pour la période avant 1970. Il est notable qu'une part importante des répondants (14.9%) déclare ne pas se rappeler de la date d'acquisition de leurs terres.
+:::
+::::
 
 ```{r}
 #| label: fig-anciennete
@@ -577,7 +617,7 @@ dl_fig_variants("fig_anciennete", "07", function(d) {
 
 ### Propriétaire dans le ménage
 
-La question de l'identité du propriétaire au sein du ménage soulève des enjeux de genre importants (@fig-proprietaire). Le chef de ménage est déclaré propriétaire de la majorité des parcelles, ce qui illustre les inégalités d'accès au foncier.
+La question de l'identité du propriétaire au sein du ménage soulève des enjeux de genre importants (@fig-proprietaire). Le chef de ménage est déclaré propriétaire de la majorité des parcelles, ce qui illustre les inégalités d'accès au foncier qui sont plus marquées encore à Marovoay qu’à Alaotra.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
@@ -640,7 +680,7 @@ dl_fig_variants("fig_proprietaire", "07", function(d) {
 
 ## Sécurisation foncière {#sec-securisation}
 
-La sécurisation foncière est un enjeu majeur à Madagascar. Les ménages peuvent détenir un titre foncier, un certificat foncier (délivré par le guichet foncier communal), ou divers documents informels. Les résultats de l'enquête révèlent un niveau de sécurisation formelle encore très faible (@fig-securisation).
+La sécurisation foncière est un enjeu majeur à Madagascar. Les ménages peuvent détenir un titre foncier, un certificat foncier (délivré par le guichet foncier communal), ou divers documents informels. Les résultats de l'enquête révèlent un niveau de sécurisation formelle encore très faible.  Les ménages s'appuient massivement sur des documents informels comme le « Taratasy visa Fokontany » ou le « Visa Mairie » (@fig-securisation).
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
@@ -746,6 +786,18 @@ dl_fig_variants("fig_securisation", "07", function(d) {
 
 En l'absence de titre ou de certificat, les ménages s'appuient sur des documents informels de nature très variable (@fig-papiers). Cependant, `r pct_aucun_doc` % des parcelles ne sont accompagnées d'aucun document justificatif, ce qui expose ces ménages à un risque élevé d'insécurité foncière en cas de litige.
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l'analyse des documents prouvant la possession des parcelles par les ménages montre que la situation la plus courante est l'absence de tout document justificatif. Ce qui concerne 33.5 % des parcelles. Pour les terrains disposant d'une forme de sécurisation informelle, le visa de la mairie est la modalité la plus fréquente avec un taux de 27.6 %. Viennent ensuite les documents non visés pour 15.3 % des parcelles et les actes munis d'un visa du fokontany pour 14.1 %. 
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, la part des parcelles ne disposant d'aucun document de possession s'élève à 35.5 %. En ce qui concerne les autres types de preuves informelles, le visa de la mairie est le plus utilisé puisqu'il concerne 28.1 % des parcelles possédées. Il est suivi par les documents munis d'un visa du fokontany qui représentent 25.6 % des cas recensés.
+:::
+::::
+
 ```{r}
 #| label: fig-papiers
 #| fig-cap: "Autres documents prouvant la possession"
@@ -827,6 +879,20 @@ dl_tbl_variants("tbl_cession_pratique", "07", function(d) {
 
 Parmi les parcelles cédées, les modes de faire-valoir varient sensiblement d'un observatoire à l'autre (@fig-mode-cession). Le prêt et le métayage sont les formes les plus courantes de cession, le métayage occupant une place particulièrement importante dans les zones rizicoles.
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, le métayage est la pratique la plus répandue avec environ 48 % des terrains concernés. Il est suivi par la location pour environ 39 % des parcelles et par le prêt qui représente 12 % des cessions.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la location constitue le principal mode de cession des parcelles et concerne environ 64 % des cas. Le métayage arrive en deuxième position avec environ 30 % des réponses. Les autres modalités de cession en particulier le prêt se situent toutes en dessous du seuil de 10 % dans cet observatoire.
+:::
+::::
+
+Il n’ y a aucune pratique de mise en gage de parcelles dans aucune des deux observatoires.
+
 ```{r fr33_prep}
 #| include: false
 fr33_data <- res_fr33 |> filter(!is.na(fr33gc))
@@ -861,6 +927,19 @@ dl_fig_variants("fig_mode_cession", "07", function(d) {
 ```
 
 Les motivations de la cession reflètent des stratégies économiques diversifiées (@fig-motif-cession). Pour certains ménages, céder une parcelle répond à un besoin de liquidités ou à l'impossibilité de cultiver l'ensemble de leur patrimoine ; pour d'autres, il s'agit de maintenir un lien social avec la parenté ou le voisinage.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les raisons de la cession de parcelles dépassant le seuil de 10% sont l'urgence familiale (maladie, décès, accident) pour environ 19% des cas, suivie par le motif identifié sous le **code 55** à hauteur de 17%. Le manque d'argent pour cultiver la parcelle concernée représente 15.5% des cessions. Viennent ensuite l'aide apportée à un membre de la famille pour environ 12% et les dépenses familiales prévues telles que les frais de scolarité ou de cimetière pour 11.5%. 
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les motivations principales de cession de parcelles sont plus concentrées. L'urgence familiale (maladie, décès, accident) constitue le motif prédominant avec 38% des réponses. Elle est suivie par le manque de moyens financiers pour cultiver la parcelle pour 16.5% des répondants et par le motif correspondant au **code 56** qui concerne 11% des terrains cédés. 
+:::
+::::
+
 
 ```{r motif_cession_data}
 #| include: false
@@ -902,6 +981,18 @@ dl_fig_variants("fig_motif_cession", "07", function(d) {
 ```
 
 Les bénéficiaires des cessions sont principalement des membres de la famille ou des voisins (@fig-cedee-a-qui), ce qui confirme le caractère en grande partie familial et communautaire du marché foncier local.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les bénéficiaires des parcelles cédées concernent majoritairement le cercle familial et le voisinage immédiat les parents du chef de ménage sont les premiers destinataires avec environ 29.2% des cessions, suivis par les bénéficiaires identifiés sous le **code 23** pour 25.5% des cas. Les personnes hors de la famille résidant dans la même commune ou une commune voisine reçoivent 17.2% des parcelles, tandis que celles situées dans le même fokontany en obtiennent 12.1%. En ce qui concerne les parents du conjoint, ils représentent 5.3% des statistiques de cession dans cet observatoire.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la répartition des bénéficiaires privilégie davantage le voisinage géographique. Les personnes hors famille résidant dans le même fokontany constituent le groupe principal avec 36.8% des réponses. Les parents du chef de ménage arrivent en deuxième position avec 22.8% des parcelles cédées, suivis par **le groupe codé 23** à hauteur de 14.7%. Enfin, les personnes hors famille de la même commune ou d'une commune voisine représentent 12.2% des bénéficiaires. Pour cet observatoire, les statistiques indiquent que les parents du conjoint reçoivent 4.2% des parcelles cédées. 
+:::
+::::
 
 ```{r cedee_data}
 #| include: false
@@ -991,6 +1082,18 @@ dl_tbl_variants("tbl_exploitation_autres", "07", function(d) {
 
 Les parcelles exploitées sans en être propriétaire sont, comme les parcelles possédées, majoritairement des rizières (@fig-type-exploitee), reflétant la place centrale de la riziculture dans les stratégies des ménages.
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les parcelles exploitées sans en être propriétaire sont majoritairement les rizières, qui constituent environ 58 % des parcelles concernées, suivies par les champs de cultures pluviales à hauteur de 41 %.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la spécialisation est encore plus marquée pour les parcelles exploitées en faire-valoir indirect. Les rizières représentent environ 85 % des réponses, tandis que les champs constituent la seule autre catégorie significative avec environ 15 %.
+:::
+::::
+
 ```{r fr34_prep}
 #| include: false
 fr34_data <- res_fr34 |> filter(!is.na(fr30c1))
@@ -1026,6 +1129,19 @@ dl_fig_variants("fig_type_exploitee", "07", function(d) {
 
 Le mode de faire-valoir des parcelles exploitées révèle l'équilibre local entre prêt, location et métayage (@fig-fv-exploitee). Le métayage, qui consiste à partager la récolte avec le propriétaire, reste une forme d'accès au foncier particulièrement répandue.
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, la majorité des parcelles exploitées sans en être propriétaire concerne la location avec environ 36 % des parcelles, suivie du métayage pour 33 % et du prêt pour 31 %.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay,  le métayage prédomine à hauteur de 52 %, et la location concerne environ 38 % des terrains exploités. Les autres formes de faire-valoir indirect comme le prêt s'établissent à 9.7 %.
+:::
+::::
+
+
 ```{r}
 #| label: fig-fv-exploitee
 #| fig-cap: "Mode de faire-valoir des parcelles exploitées"
@@ -1057,6 +1173,19 @@ dl_fig_variants("fig_fv_exploitee", "07", function(d) {
 ```
 
 Les parcelles exploitées appartiennent le plus souvent à des membres de la famille ou à des voisins (@fig-proprietaire-exploitee), ce qui témoigne du rôle des réseaux de proximité dans l'accès au foncier.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les propriétaires des parcelles exploitées en faire-valoir indirect  montre que concernent en premier lieu les parents du chef de ménage pour environ 33.1%. Viennent ensuite les parents du conjoint à hauteur de 22.4%, les personnes hors famille résidant dans le même fokontany pour 16.8% et les personnes hors famille de la même commune ou d'une commune voisine pour 14.9%. Cette structure met en évidence la prédominance des réseaux familiaux et de proximité géographique dans les mécanismes d'accès aux terres d'autrui au sein de l'observatoire.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la répartition des propriétaires privilégie davantage les liens de voisinage immédiat. Les personnes hors famille résidant dans le même fokontany constituent la catégorie principale avec environ 37.2%. Les parents du chef de ménage occupent la deuxième position avec 32.1%, suivis par les personnes hors famille de la même commune ou d'une commune voisine à hauteur de 16.1%. Enfin, les parents du conjoint représentent 11.5% des propriétaires pour les parcelles exploitées.
+:::
+::::
+
 
 ```{r prop_exploitee_data}
 #| include: false
@@ -1096,6 +1225,17 @@ dl_fig_variants("fig_proprietaire_exploitee", "07", function(d) {
 ```
 
 Le mode d'irrigation des parcelles exploitées diffère-t-il de celui des parcelles possédées ? La @fig-irrigation-exploitee permet d'examiner si les ménages qui exploitent des terres d'autrui accèdent à des parcelles de même qualité irriguée.
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, la catégorie prédominante est l'absence d'irrigation (incluant les parcelles avec diguettes) qui concerne 50.2% des terrains. Elle est suivie par le recours au réseau traditionnel pour 41.3% des parcelles. Concernant le réseau aménagé, il ne représente que 7.6% des modes d'irrigation pour les terres exploitées en faire-valoir indirect dans cet observatoire.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, les modalités d'irrigation des terres exploitées appartenant à autrui montrent une prédominance du réseau traditionnel avec 51.3% des parcelles recensées. La catégorie regroupant les parcelles sans irrigation (incluant celles utilisant des diguettes) arrive en deuxième position avec un taux de 39.3%. Enfin, le recours au réseau aménagé reste marginal et concerne 2.5% des parcelles exploitées dans cet observatoire. 
+:::
+::::
 
 ```{r}
 #| label: fig-irrigation-exploitee
@@ -1128,6 +1268,18 @@ dl_fig_variants("fig_irrigation_exploitee", "07", function(d) {
 ```
 
 Le coût de l'exploitation de terres d'autrui varie selon le mode de faire-valoir (@tbl-rente-exploitee). Les ménages locataires versent une rente en argent ou en nature, tandis que les métayers cèdent une part de la récolte au propriétaire, généralement comprise entre un quart et la moitié de la production.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la location concerne 122 parcelles avec une rente moyenne de 211 Ar et 813 kg de produit, tandis que le métayage touche 113 parcelles avec une rente moyenne de 527 kg. Le prêt concerne également un nombre important de parcelles (105) mais avec des niveaux de rente très faibles, soit 7 kg de produit en moyenne.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le métayage domine avec 189 parcelles concernées, une rente moyenne de 264 kg de produit. La location occupe également une place importante avec 137 parcelles et une rente monétaire moyenne de 202 Ar. Le mode « autre », bien que marginal avec une seule parcelle concernée, présente une rente moyenne de 240 kg de produit .
+:::
+::::
 
 ```{r}
 #| label: tbl-rente-exploitee
@@ -1176,13 +1328,13 @@ L'abandon de la culture de certaines parcelles peut révéler des difficultés s
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** Cette pratique touche `r pct_aband_a` % des ménages.
+**Alaotra.** `r pct_aband_a` % des ménages, soit 53 ménages sur 281, ont cessé d’ exploiter une ou plusieurs de leurs terres..
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay.** Cette pratique touche `r pct_aband_m` % des ménages.
+**Marovoay.**la proportion de ménages ayant abandonné la culture de parcelles  s'établit à `r pct_aband_m` % représentant 45 ménages sur les 268 enquêtés.
 :::
 :::
 
@@ -1221,7 +1373,7 @@ dl_tbl_variants("tbl_abandon", "07", function(d) {
 
 ## Satisfaction à l'égard de la surface possédée {#sec-satisfaction}
 
-Le jugement des ménages sur la suffisance de leur dotation foncière synthétise l'ensemble des contraintes analysées précédemment (@fig-satisfaction). Ce sentiment d'insuffisance foncière constitue un enjeu majeur pour les politiques de développement rural.
+Le jugement des ménages sur la suffisance de leur dotation foncière synthétise l'ensemble des contraintes analysées précédemment (@fig-satisfaction). Ce sentiment d'insuffisance foncière constitue un enjeu majeur pour les politiques de développement rural. Malgré la possession moyenne de 1 à 1.6 hectare, un tiers des familles estime ne pas avoir assez de terre pour assurer ses besoins.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
