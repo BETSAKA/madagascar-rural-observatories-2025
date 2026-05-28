@@ -38,6 +38,8 @@ options(survey.lonely.psu = "adjust")
 
 ## Plan de sondage et poids de base
 
+Les observatoires ruraux reposent sur un plan de sondage à deux degrés dans lequel les hameaux constituent les unités primaires de sondage (UPS) et les ménages les unités secondaires. Au sein de chaque UPS, un tirage systématique est opéré à partir de la liste de dénombrement.
+
 ### Structure de l'échantillon
 
 Les observatoires ruraux reposent sur un plan de sondage à deux degrés dans lequel les hameaux constituent les unités primaires de sondage (UPS) et les ménages les unités secondaires. Au sein de chaque UPS, un tirage systématique est opéré à partir de la liste de dénombrement.
@@ -90,6 +92,22 @@ Le taux de sondage varie d'un site (fokontany) à l'autre. Pour chaque ménage, 
 $$w_i = \frac{N_s}{n_s}$$
 
 où $N_s$ est le nombre de ménages dénombrés dans le site $s$ et $n_s$ le nombre de ménages enquêtés [@kish1965]. L'appariement entre la liste de dénombrement et les données d'enquête se fait au niveau du fokontany : pour Marovoay, le préfixe du site est extrait du nom composé du hameau ; pour Alaotra, une table de correspondance relie chaque hameau d'enquête à son fokontany de rattachement. Les fokontany d'Analamiranga et de Maritampona, situés dans la commune d'Amparafaravola, sont traités comme un seul site (« Ambatoharanana-Maritampona ») car ils ont été couverts par la même équipe d'enquêteurs.
+
+Le taux de sondage (proportion de ménages enquêtés par rapport au nombre total de ménages recensés dans le hameau) varie fortement :
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+**Alaotra :** Il va de 8.1 % à Ambohidrony (poids de base élevé de 12.3) jusqu'à 32.7 % à Ambatoharanana-Maritampona (poids faible de 3.1). 
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+**Marovoay :** Les taux sont plus homogènes, tournant autour de 20 % (de 18.3 % à Maroala à 22.9 % à Madiromiongana).
+:::
+::::
+
+La table @tbl-sampling-rates montre que certains sites de l'Alaotra nécessitent une pondération plus forte pour ne pas être sous-représentés dans les moyennes globales. 
 
 ```{r tbl-sampling-rates}
 #| tbl-cap: "Taux de sondage par site (fokontany)"
@@ -192,6 +210,18 @@ sampling |>
   style_table()
 ```
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, le taux de sondage le plus élevé est enregistré à Ambatoharanana-Maritampôna avec environ 33 %. Le site d’Avaradrano suit avec près de 26 %. Les autres sites présentent des niveaux plus faibles, notamment Mangabe avec environ 18 %, Feramanga Atsimo avec près de 16 %, puis Ambatomanga et Ambohidrony avec des taux inférieurs à 10 %.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les taux de sondage apparaissent relativement équilibrés entre les différents sites. Madiromiongana présente le niveau le plus élevé avec environ 22 %, suivi de Bepako avec près de 21 %. Ampijoroa et Maraola affichent également des valeurs proches, autour de 20 % et 18 %, traduisant une répartition assez homogène des sondages entre les sites de l’observatoire.
+:::
+::::
+
 ```{r fig-sampling-rates}
 #| fig-cap: "Distribution des taux de sondage par site et observatoire"
 #| fig-height: !expr fig_h("fig-sampling-rates")
@@ -212,6 +242,20 @@ sampling |>
 Nous construisons un objet `svydesign` en spécifiant les sites (fokontany) comme strates. Dans la mesure où les sites sont exhaustivement couverts (il ne s'agit pas d'un tirage d'UPS parmi un ensemble plus large), chaque fokontany est traité comme une strate avec un tirage à un seul degré.
 
 L'écart entre les estimations pondérées et non pondérées indique dans quelle mesure les taux de sondage inégaux affectent les statistiques descriptives. Un écart faible suggère un plan approximativement auto-pondéré ; un écart important justifie l'usage systématique des poids.
+
+Pour les deux observatoires, l'écart est quasi nul. Le plan de sondage est alors « auto-pondéré » : les résultats bruts présentés dans les chapitres précédents sont très proches de la réalité statistique corrigée. 
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+**Alaotra :** 3.90 (non pondéré) vs 3.90 (pondéré). 
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+**Marovoay :** 4.43 (non pondéré) vs 4.45 (pondéré). 
+:::
+::::
 
 ```{r svydesign}
 #| include: false
@@ -424,6 +468,21 @@ or_sex_ratio <- res_m_a |>
 ```
 
 ### Indicateurs démographiques de base
+
+L'analyse des indicateurs démographiques de base permet de caractériser la représentativité de l'échantillon en confrontant les structures des ménages de l’enquête aux données du 3ème Recensement Général de la Population et de l’Habitat  (RGPH 3)de 2018.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, La taille moyenne des ménages dans l'échantillon est de 3.9 personnes contre 4.2 personnes lors du recensement de 2018. La part des femmes chefs de ménage s'élève à 21.7 % une proportion très proche des 21.1 % enregistrés par le recensement national. L'âge moyen des chefs de ménage est de 45.4 ans, soit un vieillissement apparent de 2.8 ans par rapport aux 42.6 ans relevés en 2018. Enfin, les femmes représentent 50.1 % de l'ensemble de la population de l'échantillon contre 50.5 % selon les données du dernier RGPH.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la taille moyenne des ménages est de 4.4 personnes qui est quasi identique aux 4.3 membres par ménage rapportés par le recensement de 2018. La proportion de femmes chefs de ménage s'établit à 22.0 %, un taux inférieur aux 26.6 % identifiés par le recensement pour le milieu rural de ces communes. L'écart d'âge pour les chefs de ménage est plus important dans cette zone avec une moyenne de 46.1 ans, soit 4.9 ans de plus que les 41.2 ans mesurés précédemment. Concernant la structure globale par sexe, les femmes forment 50.5 % de la population totale, une donnée conforme aux 50.4 % relevés lors du recensement national.
+:::
+::::
+
 
 ```{r tbl-rgph-comparison}
 #| eval: !expr rgph_available
@@ -689,6 +748,18 @@ La comparaison élargie confirme que l'échantillon OR reproduit raisonnablement
 
 ### Pyramides des âges
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, la pyramide des âges de l'échantillon présente une adéquation remarquable avec les structures de la population issues du recensement de 2018. Les barres pleines illustrant les données de 2025 épousent fidèlement les contours noirs du recensement pour presque toutes les tranches d'âge et pour les deux sexes. On observe une population typiquement jeune, où les membres de moins de 15 ans représentent 37.0 % de l'effectif total. Cette régularité visuelle entre les deux sources confirme que l'échantillon de l'Alaotra est hautement représentatif de la réalité démographique locale.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la structure démographique de l'enquête 2025 suit également les grandes tendances du recensement, tout en révélant quelques disparités spécifiques. La population y est encore plus jeune avec une proportion de membres de moins de 15 ans s'élevant à 40.7 %. La comparaison graphique met toutefois en évidence une sous-représentation des jeunes adultes dans l'échantillon de 2025, particulièrement dans les tranches d'âge de 15 à 24 ans, où les barres de l'enquête sont nettement plus courtes que les contours du recensement de 2018. Malgré ces différences localisées, l'échantillon est considéré comme reproduisant raisonnablement les structures globales de la population de référence.
+:::
+::::
+
 ```{r fig-rgph-age-pyramid}
 #| eval: !expr rgph_available
 #| fig-cap: "Pyramides des âges comparées : OR 2025 vs. RGPH 2018 (milieu rural)"
@@ -755,6 +826,18 @@ ggplot(pyramid_combined, aes(x = Tranche, y = pct)) +
 ### Détail communal
 
 Le tableau ci-dessous présente les caractéristiques démographiques des communes couvertes par les observatoires, d'après le RGPH-3 (échantillon 10 %, milieu rural uniquement) et l'enquête OR 2025. Seules les communes comprenant au moins un site enquêté sont affichées ; la commune d'Amparafaravola (site Ambatoharanana-Maritampona) ne figure pas dans les données rurales du RGPH.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, La taille moyenne des ménages connaît une légère diminution, s’établissant à 4.0 personnes à Ilafy et 3.8 à Feramanga Nord et Ambohiboromanga, contre une moyenne communale de 4.1 lors du recensement précédent. Si la structure par sexe demeure globalement stable, notamment à Morarano Chrome avec 50.2 % de femmes, on observe une petite différence à Ambohiboromanga où la part féminine s'établit à 44.5 % contre 50.3 % dans les données de référence. Le trait le plus saillant demeure l’augmentation systématique de l’âge moyen de la population dans toutes les communes échantillonnées, atteignant par exemple 26.6 ans à Ilafy et 26.2 ans à Feramanga Nord, soit un accroissement significatif par rapport aux relevés de 2018. 
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, on note une stabilité remarquable de la taille des ménages à Antanimasaka avec 4.8 contre 4.7 et à Tsararano avec 4.3 contre 4.4, tandis qu’une réduction est enregistrée à Ankazomborona avec 3.9 personnes par ménage. La composition par sexe montre une conformité étroite à Antanimasaka avec 49.4 % de femmes, contrastant avec une surreprésentation féminine à Tsararano atteignant 54.9 % contre 50.5 % lors du recensement. Le vieillissement démographique est généralisé et particulièrement prononcé dans cette zone, avec un âge moyen entre 23.2 à 28.1 ans à Ankazomborona. 
+:::
+::::
 
 ```{r tbl-communes}
 #| eval: !expr rgph_available
@@ -924,6 +1007,19 @@ Les comparaisons précédentes montrent que l'échantillon OR reproduit raisonna
 
 Nous illustrons la post-stratification avec le sexe du CM. Les marges — effectifs de CM masculins et féminins — proviennent du RGPH (milieu rural, communes couvertes). Si les strates de post-stratification sont corrélées à la variable d'intérêt, la variance de l'estimateur est réduite [@sarndal2003, chap. 7].
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+Pour Alaotra, l'analyse des différents estimateurs révèle une stabilité remarquable de la mesure de la taille moyenne des ménages. L'estimateur s'appuyant sur la pondération de base fournit une moyenne de 3.903 individus avec une erreur standard de 0.083. Le recours à une post-stratification ajustée sur le sexe du chef de ménage n'entraîne qu'une modification infime de cette valeur, laquelle s'établit à 3.906. Cette procédure permet toutefois d'améliorer la précision statistique de l'estimation en réduisant l'erreur standard à 0.080. Une telle convergence entre les méthodes souligne que la structure initiale de l'échantillon reproduisait déjà fidèlement les caractéristiques démographiques de la population de référence locale.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+Pour  Marovoay, la confrontation des méthodes d'estimation indique un ajustement légèrement plus perceptible de la taille moyenne des foyers. L'estimation issue de la pondération de base, calculée à 4.450 membres par ménage avec une erreur standard de 0.097, se trouve corrigée à 4.399 après l'application de la post-stratification. Parallèlement, la robustesse de la mesure est renforcée par une diminution de l'erreur standard, qui passe à 0.094. L'impact limité de cette repondération s'explique par le fait que la distribution par sexe des chefs de ménage au sein de l'échantillon présentait déjà une proximité étroite avec les données issues du recensement national pour ces communes.
+:::
+::::
+
+
 ```{r post-strat}
 #| eval: !expr rgph_available
 #| include: false
@@ -1007,6 +1103,19 @@ La post-stratification modifie très légèrement les estimations ponctuelles et
 
 Nous appliquons le calage linéaire (`survey::calibrate()`) avec le sexe du CM comme seule variable de calage. La méthode minimise la distance chi-deux entre les poids initiaux et les poids calés, sous la contrainte que le total pondéré de femmes CM corresponde exactement à la marge RGPH.
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+Pour Alaotra, l'analyse comparative des différents estimateurs met en lumière une grande stabilité de l'estimation de la taille moyenne des ménages. L'estimateur s'appuyant sur la pondération de base fournit une moyenne de 3.903 individus avec une erreur standard de 0.083. Un ajustement permet d'affiner la précision statistique de la mesure en ramenant l'erreur standard à 0.080, ce qui confirme que la structure initiale de l'échantillon présentait d
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+Pour Marovoay, la confrontation des méthodes d'estimation révèle un ajustement légèrement plus sensible de la taille moyenne des foyers. La pondération de base aboutit à une estimation de 4.450 membres par ménage avec une erreur standard de 0.097. Le recours au calage linéaire sur le sexe du chef de ménage, en minimisant la distance chi-deux pour s'aligner sur les marges du recensement national, permet de corriger cette valeur à 4.399. Parallèlement, la robustesse de l'estimation se trouve renforcée par une diminution de l'erreur standard, qui s'établit à 0.094. L'identité parfaite des résultats entre les procédures de calage et de post-stratification est ici confirmée, soulignant la cohérence des méthodes de repondération employées. 
+:::
+::::
+
+
 ```{r calibration}
 #| eval: !expr rgph_available
 #| include: false
@@ -1060,6 +1169,18 @@ Le modèle de Fay-Herriot [@fay1979] combine les estimations directes au niveau 
 $$\hat{y}_i^{FH} = \gamma_i \hat{y}_i^{dir} + (1 - \gamma_i) \mathbf{x}_i' \hat{\boldsymbol{\beta}}$$
 
 où $\gamma_i = \hat{\sigma}_v^2 / (\hat{\sigma}_v^2 + \hat{\psi}_i)$ est le facteur de retrait (*shrinkage*), $\hat{\sigma}_v^2$ la variance inter-domaines estimée et $\hat{\psi}_i$ la variance d'échantillonnage du domaine $i$.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+Pour Alaotra, l'application du modèle de Fay-Herriot conduit à un ajustement des estimations directes pour les rapprocher des structures démographiques identifiées lors du recensement de 2018. Ce processus est particulièrement marqué dans la commune d'Ilafy, où la taille moyenne des ménages est ramenée à 3.76 personnes contre 4.03 pour l'estimateur direct. L'idée essentielle de cette procédure est d'optimiser la précision des résultats à l'échelle locale, comme en témoigne la réduction systématique des erreurs standard pour l'ensemble des communes de cet observatoire.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la confrontation des méthodes d'estimation met en évidence une grande stabilité des indicateurs de taille des ménages au niveau communal. Antanimasaka maintient la moyenne la plus élevée de la zone avec 4.72 membres après correction par le modèle. En raison d'une variance inter-domaines nulle, le modèle fonctionne ici comme un estimateur synthétique pur, ce qui signifie que les résultats finaux s'appuient entièrement sur la corrélation avec les données de référence du recensement national. Cette approche permet de sécuriser la fiabilité des statistiques pour des zones où les effectifs enquêtés sont limités.
+:::
+::::
 
 ```{r sae-fh}
 #| eval: !expr rgph_available
@@ -1204,9 +1325,11 @@ Les données géospatiales sont accessibles via le catalogue [OpenLandMap](https
 
 ## Dérive du panel et recalibration historique
 
+L’analyse des trajectoires historiques des observatoires d’Alaotra et de Marovoay révèle une dérive démographique systématique liée à la nature même du suivi longitudinal, ce qui nécessite une procédure de recalibration pour maintenir la représentativité des données sur le long term.
+
 ### Structure historique du panel (1995–2015)
 
-Les observatoires ruraux de Marovoay et d'Alaotra ont fonctionné en panel : les mêmes ménages ont été ré-enquêtés chaque année, avec un remplacement progressif des ménages défaillants. Marovoay a été suivi de 1995 à 2014 (sauf 2009 et 2015) ; Alaotra de 1999 à 2014. Après dix ans d'interruption, l'enquête de 2025 a procédé à un **renouvellement complet** de l'échantillon sur la base d'un nouveau dénombrement.
+Les observatoires ruraux de Marovoay et d'Alaotra ont fonctionné en panel : les mêmes ménages ont été ré-enquêtés chaque année, avec un remplacement progressif des ménages défaillants. Marovoay a été suivi de 1995 à 2014 (sauf 2009 et 2015) ; Alaotra de 1999 à 2014. Après dix ans d'interruption, l'enquête de 2025 a procédé à un **renouvellement complet** de l'échantillon sur la base d'un nouveau dénombrement. Les effectifs ont toujours été stables autour de 500 ménages par site, sauf en 2005 à Marovoay avec un échantillon réduit à 273.
 
 ```{r hist-panel}
 #| include: false
@@ -1319,7 +1442,7 @@ hist_summary |>
 
 ### Dérive du panel : vieillissement des chefs de ménage
 
-Un panel de ménages vieillit mécaniquement : si les mêmes ménages sont suivis année après année, l'âge moyen du chef de ménage augmente. Ce **vieillissement structurel** rend l'échantillon progressivement moins représentatif de la population, où de nouveaux ménages (plus jeunes) se forment continuellement.
+Un panel de ménages vieillit mécaniquement : si les mêmes ménages sont suivis année après année, l'âge moyen du chef de ménage augmente. Entre 1999 et 2014, l'âge moyen des chefs de ménage suivis a augmenté de façon linéaire, passant de 45 à 48 ans. Ce **vieillissement structurel** rend l'échantillon progressivement moins représentatif de la population, où de nouveaux ménages (plus jeunes) se forment continuellement. C'est la preuve mathématique de la « dérive » d'un panel : si on ne renouvelle pas l'échantillon, on finit par n'étudier que des personnes âgées. Le renouvellement complet opéré en 2025 a permis de « rajeunir » l'étude et de revenir à une moyenne de 45-46 ans, conforme à la réalité démographique actuelle de Madagascar.
 
 ```{r fig-panel-drift}
 #| fig-cap: "Évolution de l'âge moyen du chef de ménage (1995–2025)"
