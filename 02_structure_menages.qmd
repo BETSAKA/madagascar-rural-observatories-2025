@@ -1157,7 +1157,20 @@ dl_fig_variants("fig_cm_act", "04", function(d) {
 
 #### Activités principales des CM par sexe
 
-A MAROVOAY La différenciation des activités selon le sexe est marquée : les hommes sont majoritairement cultivateurs exploitants, tandis que les femmes sont davantage présentes dans le commerce et la restauration.
+Cette section examine les activités principales des chefs de ménage selon leur genre au sein des deux observatoires.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, près de deux tiers des hommes CM (65.4 %) occupent la fonction de cultivateur exploitant tandis que cette proportion est de 42.2 % chez les femmes CM. Le secteur du commerce et de la restauration constitue la principale voie de diversification pour les femmes avec un taux d'activité de 16.5 % contre seulement 2.5 % pour les hommes. Une présence féminine plus forte est également observée dans la catégorie services et autres concernant16.5 % des femmes contre 3.8 % de leurs homologues masculins.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la différenciation des activités selon le sexe est marquée. Les hommes sont majoritairement cultivateurs exploitants : 65.9 % des hommes CM sont cultivateurs exploitants, alors que seulement 32.5 % des femmes occupent ce statut. Un recours massif au salariat agricole est constaté chez les femmes CM avec 30.7 % contre 14.8 % pour les hommes. Par ailleurs, les femmes sont davantage présentes dans le commerce et la restauration.
+:::
+::::
+
 
 ```{r cm_act_sex}
 #| include: false
@@ -1241,21 +1254,22 @@ dl_fig_variants("fig_cm_act_sex", "04", function(d) {
 Les autres membres du ménage (conjoints, enfants, dépendants) constituent la majorité de la population recensée.
 Leur profil démographique, éducatif et économique complète celui des chefs de ménage et permet de dresser un portrait plus complet du capital humain des familles rurales.
 
-:::: {.content-hidden when-profile="alaotra"}
-::: obs-marovoay
-À Marovoay, les autres membres du ménage forment une population majoritairement féminine et jeune.
-Les indicateurs d'âge révèlent un profil démographique caractéristique des populations rurales en croissance.
-La prédominance des mariages selon la tradition et du célibat (pour les membres de 12 ans et plus) témoigne du maintien des pratiques matrimoniales coutumières.
-:::
-::::
+### Caractéristiques socio-démographiques
+
+Cette section analyse les caractéristiques des conjoints, enfants et dépendants, qui forment la majorité des membres du ménage autres que le CM.
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
-Dans l'Alaotra, les membres non-CM présentent un profil jeune avec une prédominance féminine, conformément à la structure démographique attendue dans les zones rurales malgaches.
+Dans l'Alaotra, les membres non-CM présentent un profil jeune avec une prédominance féminine marquée avec 59.8 % de femmes contre 39.9 % d'hommes, conformément à la structure démographique attendue dans les zones rurales malgaches.La structure par âge révèle une population particulièrement jeune dont la moyenne est de 19 ans et la médiane de 15 ans. Sur le plan matrimonial, le célibat concerne 38.2 % des individus tandis que le mariage traditionnel est pratiqué par 36.6 % des membres. Les unions civiles, religieuses ou polygames représentent 14.9 % des situations, alors que le divorce et le veuvage touchent respectivement 5 % et 2 % de cet effectif.
+:::
+:::: 
+
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, les autres membres du ménage forment une population majoritairement féminine et jeune avec 58.8 % de femmes et 41.1 % d'hommes.Les indicateurs d'âge révèlent un profil démographique caractéristique des populations rurales en croissance. La population affiche une grande jeunesse avec un âge moyen de 18 ans et un âge médian de 14 ans. Pour les membres de 12 ans et plus, la prédominance des mariages selon la tradition (40.3 %) et du célibat (41.3 %)  témoigne du maintien des pratiques matrimoniales coutumières.
 :::
 ::::
-
-### Caractéristiques socio-démographiques
 
 ```{r other_chars}
 others <- members |> filter(m6 != 1)
@@ -1357,6 +1371,22 @@ Les disparités entre sexes et entre observatoires donnent un aperçu des inéga
 
 #### Niveau d'éducation des autres membres
 
+L'analyse du niveau d'éducation des membres des ménages révèle des disparités importantes entre les deux bassins rizicoles notamment en termes d'accès initial à l'école et de poursuite des cycles d'études.
+
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l'instruction primaire constitue le niveau le plus répandu concernant 46.1 % des membres. Le taux de non-scolarisation y est de 18.5 %. Cette zone se démarque par une proportion élevée de membres ayant accédé aux études secondaires ou supérieures qui représentent 29.6 % de l'effectif.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le niveau primaire reste majoritaire avec 48.0 % des membres. Cependant, l'observatoire affiche un retard structurel d'accès à l'école avec un taux de non-scolarisation s'élevant à 27.4 %. Concernant 20.8% des individus, l'accès aux niveaux secondaire et supérieur y est plus limité concernant 20.8 % des individus.
+:::
+::::
+
+
 ```{r other_educ}
 #| include: false
 other_educ <- others |>
@@ -1407,6 +1437,19 @@ dl_fig_variants("fig_other_educ", "04", function(d) {
 ```
 
 #### Niveau d'éducation des autres membres par sexe
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les femmes présentent globalement un meilleur profil de scolarisation que les hommes. Le niveau primaire constitue le socle éducatif pour 46.4 % des femmes et 45.6 % des hommes. L'accès au premier cycle du secondaire est nettement plus marqué pour les femmes, avec 22.2 % contre 15.4 % pour les hommes. L’accès au second cycle du secondaire et à l'enseignement supérieur concerne 10.8 % des membres féminins et 9.2 % des hommes. Enfin, le taux de non-scolarisation est de 15.2 % chez les femmes, alors qu'il s'élève à 23.2 % chez les hommes.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le niveau primaire est atteint par 49.8 % des femmes et 45.6 % des membres masculins. La disparité de genre est particulièrement visible dans l'accès au premier cycle du secondaire qui touche 17.1 % des femmes contre seulement 10.4 % des hommes. Pour les niveaux d'études les plus élevés (second cycle et supérieur), les taux sont plus faibles et relativement proches entre les sexes avec 6.1 % pour les femmes et 6.7 % pour les hommes.
+In fine, les femmes affichent également une meilleure insertion scolaire initiale avec 24.4 % de personnes non scolarisées contre 31.8 % pour les hommes.
+:::
+::::
 
 ```{r other_educ_sex}
 #| include: false
@@ -1477,7 +1520,11 @@ dl_fig_variants("fig_other_educ_sex", "04", function(d) {
 
 #### Alphabétisation des autres membres
 
+Cette section analyse les capacités de lecture et d'écriture des membres du ménage autres que le CM fournissant un indicateur de la qualité du capital humain au sein des familles rurales. L'évaluation distingue les personnes capables de lire ou d'écrire aisément de celles qui le font avec effort ou qui en sont incapables.
+
 ##### Savoir lire
+
+**FIGURE ET INTERPRETATION POUR "APTITUDE A LA LECTURE DES AUTRES MEMBRES"**
 
 ```{r other_read}
 #| include: false
@@ -1495,6 +1542,19 @@ dl_tbl_variants("tbl_other_read", "04", function(d) {
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les femmes affichent une maîtrise de la lecture supérieure à celle des hommes avec une maitrise de 76.5 % contre 69.5 % respectivement. Les personnes lisant avec effort représentent 7.5 % des femmes et 9.0 % des hommes. L'absence totale de capacité de lecture concerne 15.9 % des femmes et 21.6 % des hommes.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, l'aptitude à la lecture est globalement moins répandue. La tendance en faveur des femmes persiste avec 59.3 % lisant sans difficulté contre 52.9 % pour les hommes. Cependant, 13.9 % des femmes et 16.9 % des hommes déclarent lire avec effort. Enfin, le taux de membres ne sachant pas lire du tout s'élève à 26.9 % chez les femmes et atteint 30.1 % chez les hommes.
+:::
+::::
+
 
 ```{r other_read_sex}
 #| include: false
@@ -1520,6 +1580,18 @@ dl_tbl_variants("tbl_other_read_sex", "04", function(d) {
 
 ##### Savoir écrire
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l'aptitude à l'écriture est maîtrisée sans difficulté par 73.9 % des membres des ménages. Une part de 8.2 % déclare écrire avec effort tandis que 18.0 % des individus en sont totalement incapables. 
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le niveau de compétence en écriture est sensiblement plus bas avec 56.8 % des membres capables d'écrire aisément. Les difficultés y sont plus marquées avec 15.0 % des personnes écrivant avec effort et 28.3 % déclarant ne pas savoir écrire du tout. 
+:::
+::::
+
 ```{r other_write}
 literacy_3level(others_site, s1b, "Aptitude à l'écriture des autres membres")
 ```
@@ -1536,6 +1608,19 @@ dl_tbl_variants("tbl_other_write", "04", function(d) {
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les femmes affichent une maîtrise de l'écriture supérieure à celle des hommes avec un taux respectivement de 76.6 % contre 69.3 %. Les personnes pratiquant l'écriture avec effort représentent 7.4 % des femmes et 9.4 % des hommes. Enfin, la part des individus totalement incapables d'écrire est plus faible chez les femmes (16.0 %) que chez les hommes (21.4 %).
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, l'aptitude à l'écriture est globalement moins répandue. Cependant, la tendance en faveur des femmes persiste avec 59.2 % écrivant sans difficulté contre 53.0 % pour les hommes. Les difficultés à l'écrit sont marquées pour les deux sexes avec 13.6 % des femmes et 17.1 % des hommes déclarant écrire avec effort. Le taux de personnes ne possédant aucune compétence en écriture est élevé dans cet observatoire s'élevant à 27.3 % chez les femmes et atteignant 29.9 % chez les hommes.
+:::
+::::
+
 
 ```{r other_write_sex}
 #| include: false
@@ -1563,6 +1648,8 @@ dl_tbl_variants("tbl_other_write_sex", "04", function(d) {
 
 Le taux de scolarisation des enfants de 6 à 14 ans constitue un indicateur clé du développement humain et de l'investissement des ménages dans l'éducation.
 
+#### Taux de scolarisation des enfants de 6 à 14 ans
+
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
 Dans l'Alaotra, le taux de scolarisation s'élève à `r taux_scol_a` %.
@@ -1574,8 +1661,6 @@ Dans l'Alaotra, le taux de scolarisation s'élève à `r taux_scol_a` %.
 Dans Marovoay, le taux de scolarisation s'élève à `r taux_scol_m` %.
 :::
 ::::
-
-#### Taux de scolarisation des enfants de 6 à 14 ans
 
 ```{r schooling}
 school_rate <- members_site |>
@@ -1610,6 +1695,8 @@ dl_tbl_variants("tbl_schooling", "04", function(d) {
 
 ::: {.content-visible when-profile="consolidated"}
 #### Classe suivie 2024-2025
+
+**TABLEAU A REVOIR + INTERPRETATION**
 
 ```{r class_attended}
 class_data <- members_site |>
@@ -1760,6 +1847,19 @@ dl_tbl_variants("tbl_raisons_non_scol", "04", function(d) {
 La répartition sectorielle des activités des autres membres de ménage reflète la diversification économique au sein des familles et le rôle des conjoints et enfants dans l'économie du ménage.
 Les activités sont regroupées selon la même nomenclature sectorielle que pour les CM.
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les activités principales des autres membres sont dominées par les cultivateurs exploitants, qui représentent 53 % des individus. Les ouvriers agricoles ainsi que les activités de commerce et restauration occupent chacun 10 %. Les autres activités restent plus marginales et concernent les élèves et étudiants avec 7 %, les inactifs et retraités avec 6 %, les services et autres activités ainsi que l’élevage, la pêche et les ressources naturelles avec 5 % chacun, et enfin l’artisanat, le BTP et le transport avec 4 %.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les cultivateurs exploitants constituent également l’activité principale la plus fréquente avec 49 %. Les ouvriers agricoles représentent 17 % des autres membres. Les activités restantes occupent des parts plus faibles, avec 9 % pour les élèves et étudiants ainsi que pour les inactifs et retraités, 8 % pour le commerce et la restauration, 4 % pour l’artisanat, le BTP et le transport, puis 2 % chacun pour les services et autres activités ainsi que pour l’élevage, la pêche et les ressources naturelles.
+:::
+::::
+
+
 ```{r other_act_grouped}
 #| include: false
 other_act <- others_site |>
@@ -1812,6 +1912,18 @@ dl_fig_variants("fig_other_act", "04", function(d) {
 ```
 
 #### Activités principales des autres membres par sexe
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l'activité de cultivateur exploitant est majoritaire pour les deux sexes, concernant 54.9 % des femmes et 47.6 % des hommes. La diversification économique est marquée par une présence masculine importante dans le secteur des services et autres activités avec 17.9 % contre 8.7 % pour les femmes. À l'inverse, le secteur du commerce et de la restauration est une spécialisation essentiellement féminine touchant 13.5 % des femmes contre moins de 5 % des hommes. Le salariat agricole comme ouvrier concerne 10.8 % des femmes et 9.0 % des membres masculins. Le statut d'élève ou étudiant est plus fréquent chez les hommes avec 11.8 % contre 4.9 % pour les femmes. Enfin, l'élevage et les ressources naturelles occupent 7.5 % des hommes et 3.6 % des femmes, tandis que l'artisanat concerne 5.2 % des hommes et 3.4 % des femmes.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la fonction de cultivateur exploitant est également prédominante, surtout chez les femmes qui sont 53.5 % contre 39.1 % pour les hommes. Le recours au salariat agricole est plus intense qu'à l'Alaotra, avec 18.6 % d'hommes et 16.7 % de femmes travaillant comme ouvriers agricoles. Une disparité majeure apparaît dans le statut d'élève ou étudiant, qui concerne 17.8 % des membres masculins mais seulement 5.7 % des membres féminins. Le secteur des services et autres activités emploie 14.3 % des hommes et 9.6 % des femmes. Le commerce et la restauration restent portés par les femmes avec un taux de 10.1 % contre moins de 5 % pour les hommes. Les secteurs de l'artisanat, du BTP et du transport occupent 5.4 % des hommes et 2.7 % des femmes. Enfin, l'élevage, la pêche et l'exploitation des ressources naturelles concernent 3.1 % des hommes et 1.7 % des membres féminins.
+:::
+::::
 
 ```{r other_act_sex}
 #| include: false
