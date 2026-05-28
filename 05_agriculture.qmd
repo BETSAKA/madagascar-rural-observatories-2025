@@ -6,6 +6,8 @@ editor_options:
 
 # Agriculture, élevage et pêche
 
+À Madagascar, l’agriculture occupe une place centrale dans l’économie et dans la vie des ménages ruraux, car elle constitue la principale source de revenus, d’emplois et de subsistance pour une grande partie de la population. 
+
 ::: {.content-visible when-profile="consolidated"}
 Ce chapitre analyse les activités agricoles, d'élevage, de chasse et de pêche des ménages des deux observatoires. Le chapitre sur les revenus présente déjà les contributions de ces activités au revenu total ; ici nous nous intéressons aux pratiques, aux facteurs de production et aux performances.
 :::
@@ -308,15 +310,17 @@ La location et le métayage, qui témoignent d'un marché foncier actif, sont pl
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, le mode de faire valoir dominant est le `r top_tenure_a` (`r pct_tenure_a` % des parcelles).
+À Alaotra, le mode de `r top_tenure_a` domine largement l’exploitation des parcelles avec `r pct_tenure_a` % des parcellesconcernées. La prise en location représente également une pratique importante avec 19.8 %, suivie par la prise en métayage qui atteint 12.9 %. Les autres formes d’accès à la terre restent marginales, notamment la mise en location avec 1.4 %, la mise en métayage avec 3.5 %, le prêt gratuit avec 2.2 % et la mise à disposition gratuite avec seulement 0.6 %. 
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, le mode de faire valoir dominant est le `r top_tenure_m` (`r pct_tenure_m` % des parcelles).
+A Marovoay, le `r top_tenure_m` constitue également la principale forme d’exploitation des parcelles avec `r pct_tenure_m` % des parcelles. La prise en métayage occupe une place importante et atteint 24.8 %, tandis que la prise en location représente 18.4 % des parcelles. Les autres modalités restent peu répandues, avec 6.3 % pour la mise en location, 2.2 % pour la mise en métayage et 1.6 % pour le prêt gratuit. Les catégories « autre » et « mise à disposition gratuite » ne représentent chacune que 0.1 % des parcelles.
 :::
 :::
+
+Les formes liées à la mise en gage sont quasiment inexistantes dans les deux observatoires.
 
 ```{r}
 #| label: fig-tenure-riz
@@ -349,6 +353,20 @@ dl_fig_variants("fig_tenure_riz", "08", function(d) {
 ```
 
 La gestion de l'eau est un enjeu central de la riziculture.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, le principal problème de maîtrise de l’eau sur les parcelles rizicoles est le manque d’eau (53%). Une part importante des parcelles ne rencontre toutefois aucun problème particulier, avec 35.2 % des cas. Les problèmes d’inondation concernent 9.6 % des parcelles, tandis que les problèmes de drainage restent limités avec 1.6 %. Les autres difficultés demeurent marginales avec seulement 0.4 %, alors que les situations non renseignées représentent 0.2 %. 
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le manque d’eau constitue également le principal problème de maîtrise de l’eau et concerne 57.9 % des parcelles rizicoles. Les parcelles ne présentant aucun problème représentent 38 % des cas. Les problèmes d’inondation restent relativement faibles avec 3.4 %, tandis que les problèmes de drainage et les autres difficultés ne concernent chacun que 0.3 % des parcelles.
+:::
+::::
+
+Les problèmes d’ensablement apparaissent comme quasiment absents dans les deux observatoires.
 
 ```{r}
 #| label: fig-eau-riz
@@ -386,13 +404,13 @@ Le choix de la technique est étroitement lié aux conditions hydrologiques, à 
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, la technique culturale prédominante est le `r top_tech_a` (`r pct_tech_a` % des parcelles).
+Dans l'Alaotra, le `r top_tech_a` constitue la principale technique de culture rizicole et concerne`r pct_tech_a` % des parcelles. Le repiquage en ligne représente également une pratique importante avec 17.6 %, tandis que le semis à la volée atteint 10.4 %. Le SRI concerne 8.2 % des parcelles et le semis direct poquet représente 7.2 %. La technique SRA reste très marginale avec seulement 0.6 %, tandis que le zéro labour et le semis direct amélioré apparaissent comme quasiment absents dans l’observatoire.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, la technique culturale prédominante est le `r top_tech_m` (`r pct_tech_m` % des parcelles).
+A Marovoay, la culture rizicole repose très largement sur le `r top_tech_m` utilisé sur `r pct_tech_m` % des parcelles. Les autres techniques restent très peu développées, avec seulement 1.8 % pour le repiquage en ligne, 1 % pour le semis direct poquet et 0.1 % pour le SRI. Les techniques telles que le semis à la volée, le SRA, le zéro labour et le semis direct amélioré sont quasiment inexistantes dans l’observatoire.
 :::
 :::
 
@@ -425,6 +443,18 @@ dl_fig_variants("fig_technique_riz", "08", function(d) {
                     facet = FALSE)
 }, res_r)
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, une part importante des parcelles rizicoles ne reçoit aucun engrais, avec 40.4 % des parcelles concernées. L’utilisation exclusive de fumure organique ou de compost représente 27.3 %, tandis que l’usage exclusif d’engrais chimiques atteint 18.2 %. L’association fumure organique et engrais chimiques concerne 12.9 % des parcelles. Les autres pratiques restent très marginales, avec 0.6 % pour l’utilisation de produits chimiques pérennes, 0.2 % pour la jachère et 0.4 % pour les autres formes d’amendement. Les pratiques telles que le compost amélioré ou le guano apparaissent comme quasiment inexistantes dans l’observatoire.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, l’absence d’utilisation d’engrais domine largement et concerne 62.6 % des parcelles rizicoles. L’usage exclusif de fumure organique ou de compost représente 11.7 %, tandis que les engrais chimiques seuls concernent 9.8 % des parcelles. Les produits chimiques pérennes occupent également une place notable avec 15.2 %. L’association fumure organique et engrais chimiques reste très faible avec seulement 0.3 %, tandis que la jachère représente 0.4 % des parcelles. Les autres formes d’amendement demeurent quasiment absentes dans l’observatoire.
+:::
+::::
 
 ```{r}
 #| label: fig-engrais-riz
@@ -507,6 +537,20 @@ dl_tbl_variants("tbl_semences_labour", "08", function(d) {
 }, res_r)
 ```
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, le mode de travail du sol dominant sur les parcelles rizicoles est le labour à la charrue, qui concerne 57.1 % des exploitations. Le recours au tracteur ou motoculteur représente 21.7 %, tandis que l’angady est utilisé par 14.9 % des producteurs. Le piétinage reste peu pratiqué avec 5.3 % des cas. Le nettoyage manuel ou « mikaoka » est presque inexistant, avec seulement 0.2 %, et les autres modes de préparation du sol représentent 0.8 %.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, le travail du sol est principalement réalisé à la charrue, avec une proportion de 78 %. Les autres pratiques restent beaucoup moins fréquentes. Le recours à l’angady concerne 6.7 % des exploitations, tandis que le nettoyage au « mikaoka » représente 6.2 %. Le piétinage est pratiqué par 4.9 % des producteurs et l’utilisation du tracteur ou motoculteur ne concerne que 3.7 % des cas. Les autres modes de travail du sol sont marginaux avec 0.1 %.
+:::
+::::
+
+Aucun cas d’absence de labour n’est signalé dans les deux observatoires.
+
 ```{r fig_semences_labour}
 #| echo: false
 #| fig-cap: "Mode de travail du sol sur les parcelles rizicoles"
@@ -545,13 +589,13 @@ Le rendement rizicole reflète à la fois les conditions agro-écologiques local
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, le rendement rizicole médian s'établit à `r rdt_med_a` t/ha (hors 5 % des valeurs extrêmes).
+Dans l'Alaotra, le rendement rizicole médian s'établit à `r rdt_med_a` t/ha (hors 5 % des valeurs extrêmes). La perception des rendements rizicoles est majoritairement négative. En effet, 41.1 % des riziculteurs considèrent que les rendements sont très mauvais, tandis que 37.7 % les jugent mauvais. Les producteurs ayant une appréciation positive restent minoritaires, avec 20.2 % qui estiment les rendements bons et seulement 1 % qui les qualifient de très bons. Cette perception traduit une forte insatisfaction des producteurs vis-à-vis des performances rizicoles observées.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, le rendement rizicole médian s'établit à `r rdt_med_m` t/ha (hors 5 % des valeurs extrêmes).
+A Marovoay, le rendement rizicole médian s'établit à `r rdt_med_m` t/ha (hors 5 % des valeurs extrêmes). Les rendements rizicoles sont également perçus de manière défavorable par une grande partie des producteurs. La catégorie « mauvais » regroupe 46.4 % des riziculteurs, alors que 40.2 % considèrent les rendements comme très mauvais. Les avis positifs demeurent limités, avec 12.1 % des producteurs qui jugent les rendements bons et 1.3 % qui les estiment très bons. L’ensemble de ces perceptions met en évidence un ressenti globalement pessimiste concernant les niveaux de rendement rizicole dans cet observatoire.
 :::
 :::
 
@@ -579,6 +623,18 @@ dl_fig_variants("fig_rendement_perception", "08", function(d) {
     make_bar_obs(y_label = "% des riziculteurs")
 }, res_r1, width = 10, height = 6)
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les rendements rizicoles présentent une dispersion relativement large, avec des valeurs s’étendant d’environ 0 à plus de 5 t/ha. La médiane se situe autour de 2.3 t/ha, ce qui indique que la moitié des exploitations obtiennent des rendements inférieurs à cette valeur. La majorité des rendements est concentrée entre environ 1.2 et 3.3 t/ha, traduisant une variabilité modérée des performances rizicoles. L’absence de valeurs aberrantes visibles suggère une distribution relativement homogène des rendements au sein de l’observatoire.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les rendements rizicoles sont globalement concentrés à des niveaux plus faibles, avec une médiane proche de 1.2 t/ha. La majorité des exploitations enregistre des rendements compris entre environ 0.7 et 2 t/ha. Quelques valeurs aberrantes apparaissent au-dessus de 4 t/ha et atteignent près de 5 t/ha, indiquant l’existence de rares exploitations obtenant des rendements nettement supérieurs au reste des producteurs. La distribution met ainsi en évidence une forte concentration des rendements autour de faibles niveaux, accompagnée de quelques performances exceptionnellement élevées.
+:::
+::::
 
 ```{r}
 #| label: fig-rendement-riz-tha
@@ -613,6 +669,19 @@ dl_fig_variants("fig_rendement_riz_tha", "08", function(d) {
     theme(legend.position = "none")
 }, res_r)
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la distribution de la production de paddy par parcelle est fortement concentrée sur les faibles niveaux de production. La majorité des parcelles produisent moins de 1 000 kg, avec un pic de fréquence situé dans les premières classes de production. À mesure que la production augmente, le nombre de parcelles diminue progressivement, ce qui traduit une distribution asymétrique vers la droite. Quelques parcelles atteignent des niveaux plus élevés, autour de 2 000 à 3 500 kg, mais ces cas restent peu nombreux. Cette répartition met en évidence une forte hétérogénéité des productions au sein de l’observatoire, avec une prédominance des petites productions.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la distribution montre également une concentration importante des parcelles dans les classes de faibles productions. Les fréquences les plus élevées se situent principalement entre 0 et 1 200 kg, avec plusieurs pics marqués indiquant une forte présence de parcelles dans ces intervalles. Le nombre de parcelles décroît ensuite lorsque la production augmente, bien que certaines atteignent des valeurs supérieures à 2 000 kg et, plus rarement, proches de 3 500 kg. La distribution reste donc étalée, avec une majorité de productions modestes et quelques parcelles affichant des rendements nettement plus élevés.
+:::
+::::
+
 
 ```{r}
 #| label: fig-production-riz
@@ -654,6 +723,18 @@ dl_fig_variants("fig_production_riz", "08", function(d) {
 
 La position topographique de la parcelle (bas-fond, plaine, tanety) détermine en grande partie les possibilités de maîtrise de l'eau et le calendrier cultural. La répartition des saisons de culture reflète les stratégies d'adaptation des riziculteurs à la variabilité pluviométrique.
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la topographie des parcelles agricoles est dominée par les plaines sans inondation, qui représentent 38.5 % des parcelles observées. Les plaines sujettes à des inondations périodiques occupent également une part importante avec 28.5 %, tandis que les zones de bas-fond représentent 20 %. Les parcelles situées sur des tanety correspondent à 6.1 % des observations. Les autres formes topographiques restent très marginales, notamment les réseaux d’eau et les rizières en escalier avec 0.2 % chacune, ainsi que les tay qui représentent 0.4 %. 
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, les parcelles agricoles se concentrent principalement dans les zones de bas-fond, qui représentent 34.0 % des parcelles. Les plaines sans inondation occupent également une place importante avec 30.5 %, suivies des plaines à inondation périodique qui représentent 21.3 %. Les tanety constituent 6.7 % des parcelles observées, tandis que les réseaux d’eau représentent 3.4 %. Les rizières en escalier restent très peu représentées avec 0.6 %, et les tay ne concernent que 0.1 % des parcelles. 
+:::
+::::
+
 ```{r}
 #| label: fig-topographie-riz
 #| fig-cap: "Topographie des parcelles rizicoles"
@@ -683,6 +764,18 @@ dl_fig_variants("fig_topographie_riz", "08", function(d) {
                     facet = FALSE)
 }, res_r)
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la saison principale domine très largement les pratiques de culture rizicole, avec 91.2 % des parcelles cultivées durant cette période. La contre-saison reste marginale et concerne seulement 7.6 % des parcelles, tandis que la saison intermédiaire est très peu pratiquée avec 1.2 %. Cette répartition montre une forte concentration des activités rizicoles sur une seule période culturale, correspondant au calendrier agricole principal de l’observatoire.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la saison principale représente également la période de culture la plus importante avec 72 % des parcelles. Toutefois, la contre-saison occupe une place plus notable, atteignant 23.2 % des parcelles cultivées. La saison intermédiaire reste minoritaire avec 4.7 %. La distribution des saisons culturales traduit ainsi une organisation des cultures principalement centrée sur la saison principale, tout en intégrant une part non négligeable de cultures réalisées en contre-saison.
+:::
+::::
 
 ```{r}
 #| label: fig-saison-riz
@@ -726,6 +819,19 @@ origine_semence <- res_r |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
   expand_sites_for_profile()
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, les semences de riz proviennent principalement de la dernière récolte, qui représente 51 % des parcelles. Les autres agriculteurs constituent la deuxième source d’approvisionnement avec 21.6 %, suivis des commerçants avec 20.2 %. Les coopératives et organismes de développement ne concernent que 3.1 % des parcelles, tandis que les autres sources restent très faibles avec 2.4 %. Les semences fournies par le propriétaire représentent seulement 1.2 %.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la dernière récolte constitue également la principale origine des semences avec 55.1 % des parcelles. Les commerçants arrivent ensuite avec 30.8 %, suivis des semences fournies par le propriétaire qui représentent 11 %. Les autres agriculteurs ne contribuent qu’à 0.7 % des approvisionnements. Les coopératives, organismes de développement et autres sources restent très peu représentés, avec des proportions avoisinant 1 % ou moins.
+:::
+::::
+
 
 ```{r}
 #| label: fig-origine-semence
@@ -797,6 +903,20 @@ dl_tbl_variants("tbl_ventes_riz_taux", "08", function(d) {
 }, res_dc20)
 ```
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra montre une concentration massive des transactions sur une période très courte, principalement en juin avec environ 37 % des ventes, suivi de juillet pour 23 %. Ce pic de commercialisation coïncide directement avec la fin de la période de récolte du riz irrigué, qui se déroule en mai et juin dans la zone du Moyen-Est, et suit de près celle du riz pluvial récolté en avril et mai. Cette forte saisonnalité des ventes suggère que les ménages de l'Alaotra privilégient une mise sur le marché immédiate après la moisson pour répondre à des besoins rapides de liquidités. La quasi-absence de ventes significatives en dehors de cette fenêtre de trois mois souligne une dépendance étroite de l'économie domestique vis-à-vis de la campagne de récolte principale.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le profil des ventes est nettement plus étalé, avec un plateau soutenu entre juin et août où les ventes oscillent entre 16 % et 17 %, suivi d'un sommet en septembre atteignant 23 %. Ce rythme de vente plus régulier s'explique par la multiplicité des cycles de culture dans le Nord-Ouest, où les récoltes des campagnes Atriatry et Asara s'échelonnent entre avril et juin.
+Le pic majeur observé en septembre correspond précisément au déclenchement de la récolte de la campagne Jeby, la plus importante de la zone, qui s'étend de mi-septembre à novembre. Cette répartition témoigne d'une stratégie de commercialisation mieux répartie sur l'année, permise par l'accès à plusieurs récoltes successives qui alimentent le marché de façon continue.
+:::
+::::
+
+
 ```{r}
 #| label: fig-ventes-riz-mois
 #| fig-cap: "Répartition mensuelle des ventes de riz"
@@ -832,6 +952,18 @@ dl_fig_variants("fig_ventes_riz_mois", "08", function(d) {
 }, res_dc21)
 ```
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la distribution des prix de vente du paddy montre une forte concentration des transactions autour de 1300 à 1700 Ar/kg. Le pic principal se situe approximativement autour de 1400 à 1500 Ar/kg, avec un nombre élevé de transactions enregistrées dans cette tranche. Les prix très faibles, inférieurs à 1000 Ar/kg, restent peu fréquents, tout comme les prix élevés dépassant 2000 Ar/kg. La distribution présente ainsi une concentration importante autour des valeurs moyennes, ce qui traduit une relative stabilité des prix observés sur ce marché. Quelques transactions isolées apparaissent néanmoins à des niveaux de prix plus élevés, indiquant l’existence de situations ponctuelles de vente à des tarifs supérieurs.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, les transactions sont principalement regroupées entre 1200 et 1800 Ar/kg. Les fréquences les plus importantes se situent autour de 1400 à 1600 Ar/kg, où l’on observe les barres les plus élevées de l’histogramme. Les transactions à des prix très bas ou très élevés sont relativement rares, ce qui montre que la majorité des ventes s’effectue dans une fourchette de prix bien définie. La distribution reste globalement concentrée autour des valeurs centrales, avec quelques observations dispersées vers les extrémités, traduisant des variations occasionnelles des prix sur le marché local.
+:::
+::::
+
 ```{r}
 #| label: fig-prix-paddy
 #| fig-cap: "Distribution du prix de vente du paddy (Ar/kg)"
@@ -864,6 +996,20 @@ dl_fig_variants("fig_prix_paddy", "08", function(d) {
 #### Bilan rizicole du ménage
 
 Le bilan rizicole reconstitue les flux de paddy au niveau du ménage : stock initial, production, transactions (achat, vente, rente, dons), autoconsommation alimentaire, utilisation en semences, et stock final.
+
+L’ensemble met en évidence une organisation des flux de paddy orientée à la fois vers les besoins alimentaires du ménage et la gestion des réserves après commercialisation.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, le bilan rizicole moyen par ménage montre que la production totale de paddy atteint environ 2100 kg. Une grande partie de cette production est destinée à la vente, avec près de 1218 kg commercialisés. Les ménages conservent également une part importante pour l’autoconsommation, estimée à 444 kg pour l’alimentation du ménage. Le stock restant en fin de campagne s’élève à 513 kg, ce qui traduit une capacité de conservation relativement importante. Les échanges en nature occupent aussi une place notable, avec 200 kg versés et 206 kg perçus sous forme de rente. Les autres utilisations, comme les dons, les semences ou les paiements en nature, représentent des quantités plus faibles dans l’ensemble.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la production totale moyenne par ménage est d’environ 1977 kg de paddy. Sur cette quantité, 759 kg sont vendus, tandis que 490 kg sont destinés à l’alimentation du ménage. Le stock conservé en fin de campagne atteint 626 kg, ce qui montre l’importance de la réserve constituée après récolte. Les rentes versées en nature représentent 152 kg, alors que les rentes perçues restent limitées à 17 kg. Les autres postes, notamment les dons, les achats de paddy, les semences ou les paiements en main-d’œuvre en nature, concernent des volumes relativement réduits.
+:::
+::::
 
 ```{r tbl_bilan_riz_data}
 #| include: false
@@ -942,15 +1088,19 @@ dl_fig_variants("fig_bilan_riz", "08", function(d) {
 
 La diversification culturale est un enjeu central pour la résilience alimentaire et économique des ménages.
 
+Elles sont plus fréquentes à Alaotra qu'à Marovoay.
+
+
+
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, au-delà du riz, `r pct_ac_a` % des ménages pratiquent au moins une culture non rizicole.
+Dans l'Alaotra, au-delà du riz, `r pct_ac_a` % des ménages pratiquent au moins une culture non rizicole avec une prédominance des haricots..
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, au-delà du riz, `r pct_ac_m` % des ménages pratiquent au moins une culture non rizicole.
+A Marovoay, au-delà du riz, `r pct_ac_m` % des ménages pratiquent au moins une culture non rizicole avec une prédominance des maïs.
 :::
 :::
 
@@ -989,13 +1139,13 @@ Le portefeuille de cultures reflète les opportunités de marché et les conditi
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, les ménages cultivent un nombre médian de `r nb_cult_med_a` cultures non rizicoles.
+À Alaotra, la majorité des ménages pratiquent un nombre limité de cultures non rizicoles. Environ 56.2 % des ménages cultivent deux cultures non rizicoles, tandis que 26.2 % en cultivent trois. Les ménages ayant quatre cultures représentent 11.6 % de l’ensemble. Au-delà de ce niveau, les proportions deviennent très faibles, avec seulement quelques ménages pratiquant cinq, six ou davantage de cultures. Cette distribution montre que les systèmes de production restent principalement concentrés sur un petit nombre de cultures complémentaires au riz, traduisant une diversification agricole modérée au sein des exploitations.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, les ménages cultivent un nombre médian de `r nb_cult_med_m` cultures non rizicoles.
+À Marovoay, la distribution indique également une concentration des ménages autour d’un faible nombre de cultures non rizicoles. La majorité des ménages, soit environ 67.8 %, pratiquent deux cultures non rizicoles, tandis que 30.3 % en cultivent trois. Les ménages ayant un nombre plus élevé de cultures demeurent très rares, avec seulement quelques cas observés pour quatre ou six cultures. Cette structure traduit une diversification agricole relativement limitée, où les exploitations privilégient un nombre restreint de spéculations non rizicoles dans leur système de production.
 :::
 :::
 
@@ -1053,6 +1203,19 @@ top_cultures_plot <- top_cult |>
   mutate(pct = round(n / n_total * 100, 1))
 ```
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les cultures non rizicoles les plus pratiquées par les ménages sont principalement le haricot et l’arachide. Le haricot domine largement avec 49.4 % des ménages pratiquants, suivi de l’arachide qui concerne 30.7 % des ménages. Le voanjobory occupe également une place importante avec 7 %, tandis que le maïs représente 4 %. Les autres cultures apparaissent de manière beaucoup plus marginale, notamment le pois du Cap, le soja, la tomate, le voanemba ou encore le manioc, dont les proportions restent généralement inférieures à 2 %. Plusieurs cultures comme le concombre, le piment, la laitue ou la patate douce sont pratiquées par une très faible part des ménages, traduisant une diversification agricole limitée à certaines exploitations.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les cultures non rizicoles les plus fréquentes sont dominées par l’arachide, pratiquée par 61 % des ménages. Le haricot occupe la deuxième position avec 20.6 %, tandis que le voanjobory représente 6.6 % des ménages pratiquants. Le maïs et le pois du Cap enregistrent respectivement 3 % et 3.7 %. D’autres cultures comme le manioc, le voatabia, le melon ou encore l’oignon restent faiblement représentées avec des proportions proches ou inférieures à 2 %. Certaines cultures maraîchères et cultures de diversification ne concernent qu’une minorité très réduite de ménages, ce qui montre une présence plus ponctuelle de ces spéculations dans les systèmes de production locaux.
+:::
+::::
+
+
 ```{r}
 #| label: fig-top-cultures
 #| fig-cap: "Cultures non rizicoles les plus fréquentes (nb de ménages pratiquant)"
@@ -1091,6 +1254,19 @@ L'accès aux engrais (organiques et chimiques) est un facteur déterminant de la
 Les pratiques de fertilisation diffèrent sensiblement entre les deux observatoires en raison de l'accessibilité et du coût des intrants.
 :::
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l’utilisation d’engrais dans les parcelles de cultures non rizicoles reste relativement limitée. Plus de la moitié des parcelles, soit 54.6 %, ne reçoivent aucun apport d’engrais. Parmi les parcelles fertilisées, le fumier-compost constitue le principal type d’engrais utilisé avec 26.3 %. Les engrais chimiques sont employés dans 12.7 % des parcelles, tandis que l’association d’engrais chimique et de fumier représente 6.8 %. L’utilisation de l’aire enfouie demeure très marginale avec seulement 0.2 %. Ces résultats montrent une prédominance des pratiques sans fertilisation ou reposant sur des apports organiques dans les systèmes de production non rizicoles.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, la très grande majorité des parcelles de cultures non rizicoles ne bénéficie d’aucun apport d’engrais. En effet, 91.4 % des parcelles sont exploitées sans fertilisation. Le fumier-compost est utilisé dans 7.1 % des parcelles, alors que les engrais chimiques seuls ne concernent qu’environ 1 % des parcelles. Les autres formes de fertilisation sont quasiment absentes dans cet observatoire. Cette situation traduit une faible intensité d’utilisation des intrants fertilisants dans les cultures non rizicoles pratiquées par les ménages.
+:::
+::::
+
+
 ```{r}
 #| label: fig-engrais-autres
 #| fig-cap: "Utilisation d'engrais sur les parcelles de cultures non rizicoles"
@@ -1120,6 +1296,21 @@ dl_fig_variants("fig_engrais_autres", "08", function(d) {
                     facet = FALSE)
 }, res_c)
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la production et les ventes des principales cultures non rizicoles montrent une forte diversité selon les spéculations. Le haricot **«Tsaramaso»** constitue la culture la plus représentée avec 145 parcelles, une production de 105 t et un taux de vente de 62.3 %, générant une valeur de vente de 234.486 Ar. Le manioc **«Mangahazo, Bala»** affiche également une place importante avec 94 parcelles et une production de 253 t, mais seulement 27.0 % de la production est commercialisée. L’ arachide **«voanjo, kapika»** atteint un taux de vente relativement élevé de 47.8 % pour une production de 167 t, tandis que le **(vomanga, tsoman)** présente une production plus limitée de 160 t avec seulement 27.1 % vendu. Les cultures de **soja** et de **voanjobory** se distinguent par des taux de commercialisation élevés, respectivement 86.5 % et 60.8 %, ce qui traduit une forte orientation marchande de ces productions.
+Certaines cultures présentent des performances commerciales particulièrement marquées. La canne à sucre **«fary»** enregistre le taux de vente le plus élevé avec 87.9 % de la production écoulée et une valeur de vente de 354.286 Ar. Le **«voanemba»** atteint également un bon niveau de commercialisation avec 69.9 % vendu, tandis que la mangue **«manga»** ne commercialise que 15.8 % de sa production malgré un volume de 410 t. Le tabac **«paraky»** affiche un taux de vente de 66.0 %, traduisant une bonne insertion sur le marché. Enfin, le maïs **«katsaka»** produit 351 t mais seulement 29.2 % de cette quantité est vendue, ce qui montre une part importante destinée à l’autoconsommation ou au stockage.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, les cultures non rizicoles occupent également une place importante dans les activités agricoles. Le manioc **«bala»** représente une culture majeure avec 38 parcelles et une production de 272 t, dont 39.0 % est commercialisé. L’ arachide **«voanjo kapika»** affiche une production de 366 t et un taux de vente de 56.7 %, révélant une orientation commerciale assez soutenue. La canne à sucre **«fary»** se démarque particulièrement avec un taux de vente très élevé de 90.8 %, ce qui traduit une forte demande ou une bonne valorisation sur le marché local. Le **lojy** présente aussi un niveau de commercialisation important avec 55.7 % des productions vendues.
+La culture de la patate dans l’observatoire de Marovoay se distingue par la production la plus élevée du tableau avec 7.146 t. Malgré cette quantité importante, seulement 36.7 % de la récolte est écoulé sur le marché. Cette culture génère néanmoins la valeur de vente la plus élevée, estimée à 5.260.000 Ar, ce qui montre son poids économique dans la zone. Dans l’ensemble, les données mettent en évidence des niveaux de commercialisation variables selon les cultures, certaines étant davantage destinées au marché alors que d’autres semblent principalement réservées à la consommation des ménages agricoles.
+:::
+::::
+
 
 ```{r}
 #| label: tbl-production-autres
@@ -1166,6 +1357,19 @@ dl_tbl_variants("tbl_production_autres", "08", function(d) {
 #### Perception des rendements
 
 Au-delà des mesures quantitatives, la perception subjective des rendements par les agriculteurs constitue un indicateur complémentaire de la performance de la campagne. Elle reflète à la fois les résultats objectifs et les attentes des producteurs.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la perception des rendements des cultures non rizicoles au cours de la campagne est globalement mitigée. Une part importante des producteurs considère que les rendements ont été mauvais, avec 46.7 % des pratiquants partageant cet avis. À l’inverse, 35.1 % estiment que les rendements ont été bons, tandis que seulement 2.7 % les jugent très bons. Les perceptions négatives restent néanmoins marquées, puisque 15.4 % des producteurs qualifient les rendements de très mauvais. Ces résultats traduisent des difficultés de production ressenties par une grande partie des exploitants agricoles au cours de la campagne. Par rapport à l’année précédente, les producteurs de ce grenier à riz perçoivent majoritairement une baisse des rendements. En effet, 54.3 % déclarent que les rendements ont diminué, contre 24.4 % qui observent une augmentation. Une proportion de 21.3 % considère que les rendements sont restés inchangés. Cette tendance met en évidence un sentiment général de recul des performances agricoles des cultures non rizicoles dans la zone, malgré l’existence d’une minorité de producteurs ayant constaté une amélioration.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, les perceptions des producteurs concernant les rendements de la campagne sont également dominées par des appréciations négatives. La majorité des pratiquants, soit 53.0 %, juge les rendements mauvais, tandis que 26.2 % les considèrent très mauvais. Les avis positifs restent plus limités, avec 20.1 % des producteurs estimant les rendements bons et seulement 0.7 % les qualifiant de très bons. Ces données montrent que les exploitants agricoles ont majoritairement ressenti des difficultés importantes dans la production des cultures non rizicoles durant cette campagne. Concernant l’évolution des rendements par rapport à l’année précédente, les perceptions y restent principalement orientées vers une baisse. Près de la moitié des producteurs, soit 49.7 %, déclarent une diminution des rendements. Toutefois, une part importante de 41.5 % estime que les rendements sont restés inchangés, tandis que seulement 8.2 % observent une amélioration. Ces résultats traduisent une situation perçue comme relativement stable pour une partie des producteurs, mais marquée dans l’ensemble par une tendance défavorable des performances agricoles.
+:::
+::::
+
 
 ```{r}
 #| label: tbl-rendement-autres
@@ -1224,6 +1428,18 @@ dl_tbl_variants("tbl_rendement_autres", "08", function(d) {
 
 Les jardins potagers et la cueillette de produits sauvages complètent les activités agricoles des ménages. Ils jouent un rôle important dans la diversification alimentaire, en particulier pendant la période de soudure.
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, les activités de jardin potager et d’exploitation forestière occupent une place importante dans les pratiques des ménages. Le jardin potager est pratiqué par 70 % des ménages, ce qui montre une forte implication des populations dans les cultures destinées à l’alimentation familiale et parfois à la commercialisation de proximité. L’exploitation forestière concerne également plus de la moitié des ménages, avec un taux de pratique de 54 %. Cette importance accordée aux ressources forestières traduit le rôle qu’elles jouent dans les moyens d’existence des ménages.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, les pratiques de jardin potager et d’exploitation forestière restent présentes mais concernent une proportion plus limitée de ménages. Le jardin potager est pratiqué par 46 % des ménages, indiquant que cette activité contribue néanmoins à l’alimentation et aux ressources domestiques d’une partie importante de la population. L’exploitation forestière touche quant à elle 36 % des ménages.
+:::
+::::
+
 ```{r}
 #| label: tbl-jardin-pratique
 #| tbl-cap: "Pratique du jardin potager et de la cueillette"
@@ -1268,6 +1484,19 @@ top_jardin_plot <- top_jp |>
   mutate(pct = round(n / n_total * 100, 1))
 ```
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les produits de jardin les plus fréquemment cueillis sont nettement dominés par le **manga**, cité par 58.9 % des ménages. Le **voanazo hazo** occupe également une place importante avec 41.7 %, suivi par l’**anana** à 30.4 % et le **legioma laha** à 21.7 %. Les autres produits sont mentionnés par des proportions plus modestes de ménages, notamment le **goavy** (16.6 %), le haricot vert (16.1 %) et le concombre (10.7 %). Plusieurs produits restent faiblement représentés, comme l’**akondro fontsy** et le **paiso**, chacun autour de 4.2 à 4.8 %, tandis que le **kozety**, le **fary** ou encore l’**ampalibe** sont cités par moins de 3 % des ménages.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, le **manga** apparaît également comme le produit le plus fréquemment cueilli, avec 71.4 % des ménages concernés. Le deuxième produit le plus cité est l’**anana** avec 20.2 %, tandis que le **voatavo** atteint 14.3 % et le concombre 10.9 %. Certains produits restent marginaux dans les pratiques de cueillette, notamment le **voankazo hazo** et le **legioma laha**, qui ne dépassent pas 1.3 %. D’autres produits comme l’**akondro fontsy** représentent 10.1 % des ménages, alors que le **kozety**, le **fary**, l’**ampalibe** et le **pinakena** sont mentionnés par moins de 3 % des ménages.
+:::
+::::
+
+
 ```{r}
 #| label: fig-top-jardin
 #| fig-cap: "Produits de jardin / cueillette les plus fréquents"
@@ -1301,6 +1530,19 @@ dl_fig_variants("fig_top_jardin", "08", function(d) {
 ### Exploitation forestière {#sec-foret}
 
 L'exploitation des ressources forestières (bois de chauffe, charbon, bois d'œuvre, plantes médicinales) constitue une activité complémentaire pour de nombreux ménages. Les produits forestiers sont essentiels à la fois comme source d'énergie domestique et comme revenu d'appoint.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les principaux produits issus de l’exploitation forestière sont très largement dominés par le **kitay**, cité par 99.6 % des ménages. Le **saribao** est également presque systématiquement exploité, avec une proportion de 98.9 %, tandis que le **hazo afok’ampy** concerne 94.6 % des ménages. En revanche, le **hazo ampiasaina** reste très peu mentionné, avec seulement 2.9 % des ménages concernés. Ces résultats montrent que l’exploitation forestière dans cet observatoire repose essentiellement sur quelques produits largement répandus au sein des ménages.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, le **kitay** constitue aussi le principal produit d’exploitation forestière, utilisé par 99.5 % des ménages. Le **saribao** occupe une place tout aussi importante avec 98.9 %, alors que le **hazo afok’ampy** est mentionné par 89.9 % des ménages. Le **hazo ampiasaina** demeure marginal, avec une fréquence de seulement 6.4 %. L’exploitation forestière dans cet observatoire se caractérise ainsi par une forte concentration autour des produits énergétiques et du bois de chauffage.
+:::
+::::
+
 
 ```{r produits_foret_data}
 #| include: false
@@ -1402,17 +1644,17 @@ dl_tbl_variants("tbl_elevage_pratique", "08", function(d) {
 
 Le choix des espèces reflète les conditions agro-écologiques, les traditions locales et les opportunités de marché.
 
-::: {.content-hidden when-profile="marovoay"}
-::: {.obs-alaotra}
-Dans l'Alaotra, L'espèce la plus élevée est le `r top_espece_a`.
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, l’élevage concerne une très grande majorité des ménages pour l’ensemble des espèces considérées. Les **kisoa** représentent l’espèce la plus fréquemment élevée avec 99.7 % des ménages pratiquants, suivis par l’**akoho** et les **omby vavy** et **omby hafa**, tous autour de 99.1 à 99.4 %. Les espèces comme les **gana**, les **gisa** et les **ondry** affichent également des proportions élevées, chacune autour de 98.5 %. Le **voron-tsiloza** et les **osy** restent aussi largement présents avec respectivement 98.2 % et 96.1 % des ménages pratiquants. En revanche, le **trondro** demeure beaucoup moins répandu, avec seulement 12.8 % des ménages concernés.
 :::
-:::
+::::
 
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
-A Marovoay, L'espèce la plus élevée est le `r top_espece_m`.
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les différentes espèces élevées présentent également des fréquences très élevées parmi les ménages pratiquants. Les **`r top_espece_a`** arrivent en tête avec 99.7 %, suivis des **kisoa**, des **omby vavy** et des **omby hafa**, tous proches de 99.5 %. Les **gana**, les **gisa**, les **ondry**, les **voron-tsiloza** et les **osy** affichent aussi des niveaux élevés, compris entre 98.7 % et 99.2 %. Le **trondro** reste l’espèce la moins répandue dans cet observatoire, avec une proportion de 23.6 % des ménages pratiquants.
 :::
-:::
+::::
 
 ```{r especes_elevage_data}
 #| include: false
@@ -1465,6 +1707,14 @@ dl_fig_variants("fig_especes_elevage", "08", function(d) {
 
 L'élevage répond à trois objectifs principaux : l'épargne/assurance (constitution d'un capital mobilisable en cas de choc), l'autoconsommation (lait, œufs, viande) et la vente. La hiérarchie de ces objectifs varie selon l'espèce.
 
+L'épargne/assurance est le motif principal pour les bovidés, tandis que la vente domine pour les porcs et la consommation pour la volaille.
+
+L’épargne/assurance est la modalité qui présente globalement les proportions les plus élevées dans la majorité des observatoires. Elle dépasse souvent 50.0 % des ménages éleveurs et atteint même plus de 80.0 % à Omby Hafa (83.4 %), Omby Miasa (81.0 %) et Omby Vavy (79.8 %). Cela montre que cette fonction constitue l’objectif prioritaire de l’élevage pour la plupart des ménages.
+
+La vente occupe généralement la deuxième position. Les proportions varient entre 13.9 % et 41.0 %, avec les valeurs les plus fortes observées à Kisoa (41.0 %), Gisa (39.8 %) et Osy (38.7 %). Cette modalité reste donc importante, mais elle demeure inférieure à l’épargne/assurance dans la plupart des cas.
+
+L’autoconsommation représente enfin la modalité la moins importante dans presque tous les observatoires. Les proportions sont souvent inférieures à 10.0 %, notamment à Kisoa et Omby Hafa (2.7 %). Les niveaux les plus élevés sont enregistrés à Gisa (25.1 %) et Akobo (25.0 %), mais cette modalité reste globalement secondaire par rapport aux deux autres objectifs.
+
 ```{r}
 #| label: fig-objectifs-elevage
 #| fig-cap: "Objectifs de l'élevage par espèce (% des ménages éleveurs)"
@@ -1513,6 +1763,20 @@ dl_fig_variants("fig_objectifs_elevage", "08", function(d) {
 ### Ventes et pertes d'animaux
 
 La dynamique du cheptel dépend des entrées (naissances, achats) et des sorties (ventes, pertes, abattages). Les pertes d'animaux, liées aux maladies, au vol ou aux catastrophes naturelles, représentent un risque économique majeur pour les éleveurs.
+
+La volaille (Akoho) subit les pertes les plus massives dans les deux observatoires.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les ventes concernent principalement les **Gisa**, avec 269 animaux vendus pour une valeur totale d’environ 89,771 Ar. Les **Akoho** occupent la deuxième position avec 948 animaux vendus et une valeur de 22,055 Ar, suivis des **Kisoa** avec 80 animaux et 25,625 Ar. Les **Gana** représentent 341 animaux vendus pour une valeur de 6,763 Ar. Les autres espèces enregistrent des niveaux plus faibles, notamment les **Ondry** avec 33 animaux et 3,936 Ar, les **Omby Miasa** avec 7 animaux et 9,930 Ar, les **Omby Vavy** avec 3 animaux et 2,580 Ar, les **Omby Hafa** avec 2 animaux et 1,550 Ar, ainsi que les **Voron-Tsilozà** avec 25 animaux et 1,875 Ar. Les transactions sont particulièrement nombreuses pour les **Akoho** avec 112 transactions, suivis des **Kisoa** avec 50 transactions et des **Gisa** avec 29 transactions.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les ventes sont dominées par les **Gana** avec 1,319 animaux vendus pour une valeur totale de 19,398 Ar. Les **Akoho** arrivent ensuite avec 778 animaux et 60,200 Ar, tandis que les **Kisoa** enregistrent 102 animaux vendus pour une valeur de 36,995 Ar. Les **Omby Miasa** représentent 37 animaux vendus pour 45,650 Ar. Les autres espèces affichent des niveaux plus réduits, notamment les **Ondry** avec 30 animaux et 3,080 Ar, les **Voron-Tsilozà** avec 34 animaux et 1,260 Ar, les **Omby Vavy** avec 11 animaux et 9,400 Ar, les **Osy** avec 10 animaux et 1,000 Ar, les **Omby Hafa** avec 5 animaux et 3,859 Ar, ainsi que les **Gisa** avec 10 animaux et seulement 290 Ar. En termes de transactions, les **Akoho** et les **Gana** se distinguent également avec respectivement 112 et 90 transactions, traduisant une activité commerciale particulièrement soutenue pour ces espèces.
+:::
+::::
 
 ```{r}
 #| label: tbl-ventes-elevage
@@ -1565,6 +1829,19 @@ pertes_elevage <- res_ele |>
   expand_sites_for_profile()
 ```
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les pertes de bétail concernent principalement les **Akoho**, avec environ 160 ménages ayant subi des pertes. Les **Gisa** arrivent ensuite avec près de 25 ménages touchés, suivis des **Gana** et des **Kisoa** avec environ 15 ménages chacun. Les **Ondry** enregistrent des pertes plus limitées, autour de 5 ménages. Les autres espèces, notamment les **Omby Miasa**, **Omby Vavy**, **Voron-tsilozà** et **Omby Hafa**, présentent des effectifs très faibles, proches de 1 à 3 ménages concernés.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, les **Akoho** demeurent également l’espèce la plus touchée, avec environ 120 ménages ayant subi des pertes. Les **Gana** occupent la deuxième position avec près de 70 ménages concernés. Les **Kisoa** enregistrent environ 15 ménages touchés, tandis que les autres espèces présentent des niveaux très faibles. Les **Osy, Ondry, Omby Miasa, Omby Vavy et Voron-Tsilozà** concernent seulement quelques ménages, traduisant une fréquence plus réduite des pertes pour ces espèces dans cet observatoire.
+:::
+::::
+
+
 ```{r}
 #| label: fig-pertes-elevage
 #| fig-cap: "Ménages ayant subi des pertes de bétail"
@@ -1597,6 +1874,18 @@ dl_fig_variants("fig_pertes_elevage", "08", function(d) {
 ### Produits de l'élevage
 
 Outre la vente d'animaux sur pied, l'élevage génère des produits dérivés (lait, œufs, miel, fumier) qui contribuent à l'alimentation et aux revenus du ménage.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, les produits de l’élevage les plus fréquemment déclarés par les ménages sont le **ronono** avec 99 %, suivi de l’**atody** à 91.3 %. Le **yaourt/habobo** représente également une part importante avec 85.6 %, tandis que le **hena** atteint 83.7 %. En revanche, les autres produits restent très peu déclarés par les ménages. Le **henan’ondry** ne concerne que 1.9 % des déclarations, alors que le **vorona** et le **henan-kisoa** représentent chacun 1 %.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, le **ronono** et l’**atody** sont déclarés par 99 % des ménages. Le **yaourt/habobo** atteint 93.9 %, ce qui montre également une forte présence de ce produit dans les habitudes des ménages. Le **hena** est déclaré par 88.9 % des ménages. Les autres produits restent marginaux, avec 7.1 % pour le **henan’ondry**, et seulement 1 % pour le **vorona** ainsi que le **trondro nompiana**.
+:::
+::::
 
 ```{r tbl_produits_elevage_data}
 #| include: false
@@ -1668,17 +1957,17 @@ dl_fig_variants("fig_produits_elevage", "08", function(d) {
 
 ## Chasse et pêche {#sec-chasse-peche}
 
-La chasse et la pêche constituent des activités complémentaires, souvent saisonnières, qui contribuent à la diversification alimentaire et au revenu, en particulier dans les zones proches des plans d'eau.
+La chasse et la pêche constituent des activités complémentaires, souvent saisonnières, qui contribuent à la diversification alimentaire et au revenu, en particulier dans les zones proches des plans d'eau. La principale raison de ces activités est pour l’autoconsommation.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, Ces activités sont pratiquées par `r pct_chpe_a` % des ménages.
+A Alaotra, la pratique de la chasse et de la pêche concerne `r pct_chpe_a` % des ménages.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, Ces activités sont pratiquées par `r pct_chpe_m` % des ménages.
+A Marovoay, `r pct_chpe_m` % des ménages déclarent pratiquer la chasse et la pêche. .
 :::
 :::
 
@@ -1712,6 +2001,19 @@ chasse_especes <- res_chph |>
   filter(dense_rank(-total) <= 15) |>
   expand_sites_for_profile()
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, les **trondro** dominent très largement les débarquements avec environ 75 mentions enregistrées, ce qui montre leur place centrale dans l’activité de pêche observée. Les **Tilapia** arrivent loin derrière avec près de 8 mentions, suivis des **Lapia** et des **fibata** et **pirina** qui représentent chacun environ 3 à 4 mentions. 
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, les **trondro** occupent également une place prépondérante avec près de 95 mentions, ce qui en fait l’espèce la plus représentée dans les captures enregistrées. Les **kalapia** et les **filao** suivent avec environ 5 à 7 mentions chacun, alors que certaines espèces démersales, comme les **pirina** et **drakabato**, restent faiblement représentées avec moins de 5 mentions. 
+:::
+::::
+
 
 ```{r}
 #| label: fig-chasse-especes
@@ -1753,6 +2055,19 @@ chasse_raison <- res_chph |>
   expand_sites_for_profile()
 ```
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la principale raison évoquée pour la chasse ou la pêche est la vente, qui représente 52.5 % des mentions enregistrées. L’alimentation constitue également une motivation importante avec 44.6 % des réponses, montrant que les activités de prélèvement servent aussi à satisfaire les besoins alimentaires des ménages. Les autres motivations restent très marginales, notamment l’élimination des destructeurs de récolte qui ne représente que 2 % des mentions, tandis que les usages rituels sont presque inexistants avec seulement 1 %. Les résultats traduisent ainsi une forte orientation économique des activités de chasse et de pêche dans cet observatoire.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, l’alimentation et la vente apparaissent comme les deux motivations dominantes des activités de chasse et de pêche. L’alimentation représente environ 40 % des mentions, tandis que la vente atteint 39.5 %, ce qui montre l’importance simultanée des besoins de subsistance et des revenus tirés de ces activités. Une autre part importante des réponses, estimée à 20.5 %, correspond **7**. Cette répartition met en évidence une utilisation des ressources animales à la fois pour la consommation des ménages et pour les activités économiques locales.
+:::
+::::
+
+
 ```{r}
 #| label: fig-chasse-raison
 #| fig-cap: "Raisons de la chasse/pêche par observatoire"
@@ -1784,6 +2099,18 @@ dl_fig_variants("fig_chasse_raison", "08", function(d) {
 ### Fréquence et saisonnalité
 
 La fréquence de pêche et son calendrier saisonnier dépendent du régime hydrologique local. Les périodes de hautes eaux correspondent généralement à une activité de pêche plus intense.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la fréquence de chasse-pêche la plus souvent mentionnée est la pratique journalière, citée par 31.7 % des répondants. La fréquence hebdomadaire arrive ensuite avec 28.7 % des mentions, traduisant une pratique régulière pour une part importante des enquêtés. Les activités réalisées une fois par mois représentent 13.9 %, tandis que les pratiques plus espacées restent minoritaires. Les fréquences annuelles atteignent 8.9 %, suivies des pratiques effectuées toutes les deux semaines avec 7.9 %, puis tous les six mois avec 5 %. Enfin, la fréquence bimensuelle est la moins représentée avec 4 % des mentions. Ces résultats montrent une prédominance des pratiques fréquentes au sein de cet observatoire.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la fréquence de chasse-pêche quotidienne domine largement avec 41.2 % des mentions. La pratique hebdomadaire occupe également une place importante, représentant 38.7 % des réponses. Les activités mensuelles concernent 13.9 % des enquêtés, alors que les autres fréquences apparaissent beaucoup plus marginales. La pratique toutes les deux semaines représente 4.1 % des mentions, tandis que les fréquences annuelles et bimensuelles ne totalisent chacune que 1 %. Cette distribution met en évidence une forte concentration des activités de chasse-pêche dans des rythmes réguliers et rapprochés.
+:::
+::::
 
 ```{r frequence_peche_data}
 #| include: false
@@ -1819,6 +2146,19 @@ dl_fig_variants("fig_frequence_peche", "08", function(d) {
                     facet = FALSE)
 }, res_chph)
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, une intensification de l'activité de la chasse et de la pêche à partir du mois de janvier, pour atteindre un sommet en avril avec 55 mentions, suivi du mois de mai avec 43 mentions est observée . Ce pic d'activité se situe à la transition entre la fin de la période humide (octobre-avril) et le début de la saison sèche (mai-septembre). Les mois les moins actifs correspondent au cœur de la saison sèche et au début de la saison des pluies, notamment en juillet avec seulement 11 mentions et en novembre où elles tombent à leur niveau le plus bas avec 8 mentions. Cette recrudescence des activités de prélèvement en avril et mai coïncide précisément avec la période de récolte du riz pluvial (avril-mai) et le déclenchement de celle du riz irrigué (mai-juin) documentée dans la zone du Moyen-Est. Le recours à la chasse et à la pêche semble s'intensifier juste avant que la production de la grande saison rizicole ne soit pleinement disponible, jouant potentiellement un rôle de complément alimentaire ou de source de revenus immédiate durant cette phase charnière du calendrier agricole.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la saisonnalité est marquée par une concentration massive des activités de chasse et de pêche durant la période humide, avec un pic exceptionnel en février atteignant 138 mentions mensuelles, suivi de près par le mois de mars avec 131 mentions. L'activité chute de manière spectaculaire dès le début de la saison sèche, passant de 80 mentions en avril à seulement 49 en mai, et reste à un niveau relativement bas et stable jusqu'en octobre où elle s'établit à 40 mentions. Cette dynamique suggère que les conditions de la période humide sont particulièrement nécessaires à la pratique intensive de ces activités dans le Nord-Ouest.
+Le pic observé en février et mars intervient durant une phase de soudure majeure , alors que les récoltes des campagnes de riz Asara et Atriatry ne débutent qu'en avril. L'activité de chasse et de pêche diminue fortement au moment précis où ces récoltes commencent. Elle fonctionne ici comme une stratégie de survie ou de diversification essentielle pendant les mois les plus difficiles de la saison des pluies, s'effaçant dès que les campagne de récolte mobilisent la main-d'œuvre des ménages.
+:::
+::::
 
 ```{r}
 #| label: fig-saisonnalite-peche
@@ -1874,19 +2214,21 @@ if (length(chph6_cols) > 0) {
 
 ## Main d'oeuvre agricole {#sec-main-oeuvre}
 
+L’analyse de la main-d’œuvre agricole permet de caractériser le recours des ménages aux travailleurs extérieurs en examinant les types d'emploi, saisonniers ou permanents, ainsi que les opérations culturales clés mobilisant le salariat ou l'entraide.Le recours à la main-d'œuvre salariée ou à l'entraide est très élevé.
+
 ### Emploi de main d'oeuvre
 
 L'ampleur du recours à la main d'œuvre extérieure dépend de la superficie cultivée, du type de culture et de la disponibilité de main d'œuvre familiale.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, Le recours à la main d'œuvre extérieure (salariée ou par entraide) concerne `r pct_mo_a` % des ménages.
+À Alaotra, le recours à la main-d’œuvre agricole concerne principalement la main-d’œuvre non permanente, mentionnée par  `r pct_mo_a` % des ménages. La main-d’œuvre permanente reste beaucoup moins utilisée, avec seulement 7 % des ménages concernés. Ces résultats traduisent une préférence pour une main-d’œuvre occasionnelle, mobilisée selon les besoins saisonniers des activités agricoles.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, Le recours à la main d'œuvre extérieure (salariée ou par entraide) concerne `r pct_mo_m` % des ménages.
+A Marovoay, Le recours à la main d'œuvre extérieure (salariée ou par entraide) concerne `r pct_mo_m` % des ménages. En revanche, la main-d’œuvre permanente demeure très faiblement mobilisée avec 4 % des mentions. Cette situation montre que les ménages agricoles s’appuient surtout sur une main-d’œuvre temporaire pour assurer les travaux liés aux activités agricoles.
 :::
 :::
 
@@ -1929,6 +2271,18 @@ dl_tbl_variants("tbl_main_oeuvre_pratique", "08", function(d) {
 ### Opérations nécessitant de la main d'oeuvre salariée
 
 Les trois opérations rizicoles principales (travail du sol, sarclage, moisson) mobilisent des volumes de main d'œuvre différents. Le salaire journalier et le recours à l'entraide varient sensiblement selon l'opération et l'observatoire.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, les opérations agricoles reposent majoritairement sur la main-d’œuvre salariée. La moisson présente une proportion de salariat de 79.5 %, tandis que l’entraide représente 14.7 %, avec un salaire moyen de 216,171 Ar. Pour le sarclage, la part de la main-d’œuvre salariée atteint 64.7 %, contre 21.6 % pour l’entraide, et le salaire moyen s’élève à 229,960 Ar. Enfin, dans le cadre du travail du sol, le salariat représente 69.2 % des pratiques observées, alors que l’entraide correspond à 15.8 %, avec un salaire moyen de 194,315 Ar. Ces résultats montrent que les travaux agricoles dans cet observatoire mobilisent largement une main-d’œuvre rémunérée, accompagnée d’un recours plus limité aux formes d’entraide.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, la moisson se caractérise par une forte présence de la main-d’œuvre salariée, qui représente 91.1 % des opérations, alors que l’entraide ne concerne que 8.9 %, avec un salaire moyen de 182,954 Ar. Pour le sarclage, la proportion de salariat atteint 84.6 %, tandis que l’entraide représente 7.2 %, et le salaire moyen est de 150,626 Ar. Concernant le travail du sol, la main-d’œuvre salariée constitue 79.0 % des pratiques observées, contre 6.9 % pour l’entraide, avec un salaire moyen de 193,831 Ar. L’ensemble des données met en évidence une forte prédominance du recours au salariat dans les différentes opérations agricoles de cet observatoire.
+:::
+::::
 
 ```{r}
 #| label: tbl-operations-mo
@@ -1983,6 +2337,18 @@ dl_tbl_variants("tbl_operations_mo", "08", function(d) {
 ### Main d'oeuvre permanente
 
 Le recours à la main d'œuvre permanente (salariés employés à l'année) reste minoritaire et concerne principalement les exploitations les plus grandes. Les conditions d'emploi (salaire, logement, nourriture) reflètent le marché du travail agricole local.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la main-d’œuvre permanente est mobilisée dans plusieurs types d’activités agricoles et para-agricoles. L’élevage emploie 27 travailleurs permanents, avec un salaire moyen en argent de 344,839 Ar et une rémunération en nature de 245,286 Ar. La riziculture compte 18 employés permanents et présente un salaire moyen en argent de 713,368 Ar, auquel s’ajoute une rémunération en nature de 557,625 Ar. Les activités d’aide ménagère mobilisent également 18 employés, avec un salaire moyen monétaire de 306,000 Ar et une rémunération en nature de 426,667 Ar. Les autres cultures regroupent 15 employés permanents, rémunérés en moyenne à hauteur de 707,111 Ar en argent et 380,000 Ar en nature. Enfin, les autres activités emploient 6 travailleurs permanents et enregistrent le salaire moyen en argent le plus élevé, soit 1,166,000 Ar, sans indication de rémunération en nature.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, l’élevage mobilise 15 employés permanents, avec un salaire moyen en argent de 252,500 Ar et une rémunération en nature de 285,714 Ar. Les activités d’aide ménagère comptent 4 employés permanents et affichent un salaire moyen monétaire de 445,000 Ar, sans rémunération en nature déclarée. Les autres activités emploient également 4 travailleurs permanents, avec un salaire moyen en argent de 907,500 Ar et aucune rémunération en nature enregistrée. Enfin, les autres cultures ne regroupent qu’un seul employé permanent, dont le salaire moyen en argent est de 250,000 Ar, sans avantage en nature indiqué. Ces données montrent une diversité des activités concernées par l’emploi permanent au sein de cet observatoire, avec des niveaux de rémunération variables selon les secteurs d’activité.
+:::
+::::
 
 ```{r}
 #| label: tbl-main-oeuvre-perm
@@ -2039,6 +2405,19 @@ dl_tbl_variants("tbl_main_oeuvre_perm", "08", function(d) {
 ### Cultures non rizicoles par quintile de revenu
 
 Les ménages les plus aisés cultivent-ils des cultures différentes ? On croise ici les familles de cultures avec les quintiles de revenu courant du ménage.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la structure des cultures non rizicoles révèle un système agricole relativement diversifié, dominé principalement par les légumineuses et les tubercules, dont les proportions oscillent respectivement entre environ 32 % et 45 % pour les premières, et entre 17 % et 37 % pour les seconds selon les quintiles de revenu. Les légumineuses occupent une place particulièrement importante chez les ménages du premier quintile (ménages très pauvres) et du troisième quintile (ménages intermédiaires), où elles atteignent près de 45 % et 42 % des parcelles cultivées, traduisant à la fois leur rôle alimentaire et leur potentiel marchand. Les tubercules connaissent leur niveau maximal dans le deuxième quintile (ménages pauvres) avec près de 37 %, avant de décroître progressivement chez les ménages plus aisés, notamment dans les quatrième quintile (ménages relativement aisés) et cinquième quintile (ménages très riches), ce qui suggère une transition vers des cultures davantage orientées vers le marché à mesure que le revenu augmente. Les autres céréales demeurent relativement stables, avec des parts comprises entre 17 % et 22 %, indiquant qu’elles constituent une composante structurelle du système de production sans pour autant dominer. Les cultures de rente, les fruits et les légumes restent secondaires, bien qu’une légère progression soit observable dans les quintiles supérieurs, notamment pour les fruits qui atteignent près de 8 % dans le cinquième quintile (ménages très riches), signe d’une diversification progressive des systèmes agricoles liée à une meilleure capacité d’investissement et à une orientation plus commerciale des exploitations.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le paysage agricole apparaît nettement plus spécialisé, avec une domination très marquée des autres céréales qui représentent entre environ 40 % et 57 % des parcelles cultivées selon les niveaux de revenu. Cette prépondérance est particulièrement forte dans le quatrième quintile (ménages relativement aisés) où elle dépasse la moitié des superficies cultivées, traduisant une forte dépendance des ménages à la céréaliculture non rizicole. Les tubercules constituent la seconde catégorie la plus importante avec des proportions variant de 20 % à 37 %, notamment dans les troisième quintile (ménages intermédiaires) et quatrième quintile (ménages relativement aisés) où ils jouent vraisemblablement un rôle de sécurisation alimentaire. Les légumineuses demeurent globalement marginales, sauf dans le troisième quintile (ménages intermédiaires) où elles connaissent une hausse exceptionnelle avoisinant 35 %, ce qui pourrait traduire une stratégie ponctuelle de diversification ou une spécialisation propre à certains ménages intermédiaires. Les cultures industrielles et de rente restent faibles mais progressent dans les quintiles les plus élevés pour atteindre près de 12 % dans le cinquième quintile (ménages très riches), indiquant que les ménages les plus aisés disposent d’une meilleure capacité à investir dans des productions commerciales. Les fruits et les légumes restent quasi inexistants dans l’ensemble des quintiles, avec des proportions généralement inférieures à 2 %, ce qui reflète un système agricole encore largement centré sur les cultures vivrières extensives et peu orienté vers l’horticulture.
+:::
+::::
+
 
 ```{r}
 #| label: fig-cultures-quintile
@@ -2117,6 +2496,19 @@ dl_fig_variants("fig_cultures_quintile", "08", function(d) {
 }, res_c)
 ```
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, le nombre moyen de cultures non rizicoles par ménage met en évidence un niveau relativement élevé de diversification agricole. Le nombre de ménages pratiquant des cultures non rizicoles décroît progressivement selon les quintiles de revenu, passant de 67 ménages dans le premier quintile (ménages très pauvres) à 43 ménages dans le cinquième quintile (ménages très riches). Toutefois, malgré cette diminution des effectifs, le niveau moyen de diversification reste globalement stable et relativement élevé. Le nombre moyen de cultures atteint environ 2.0 dans le cinquième quintile (ménages très riches), contre 1.5 dans les deuxième quintile (ménages pauvres) et quatrième quintile (ménages relativement aisés), tandis que les premier quintile (ménages très pauvres) et troisième quintile (ménages intermédiaires) présentent respectivement des moyennes de 1.7 et 1.8 cultures par ménage. Cette relative homogénéité traduit une pratique agricole diversifiée dans l’ensemble des catégories sociales, même si les ménages les plus aisés semblent disposer d’une capacité légèrement supérieure à diversifier leurs productions, probablement grâce à un meilleur accès aux ressources productives, aux intrants et aux débouchés commerciaux.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, le niveau de diversification apparaît plus faible et plus homogène entre les catégories de revenu. Le nombre de ménages concernés diminue également avec l’élévation du revenu, passant de 39 ménages dans le premier quintile (ménages très pauvres) à 26 ménages dans le cinquième quintile (ménages très riches). Le nombre moyen de cultures non rizicoles reste inférieur oscillant seulement entre 1.2 et 1.6 cultures par ménage selon les quintiles. Les ménages du premier quintile (ménages très pauvres) présentent la moyenne la plus élevée avec environ 1.6 culture, tandis que les deuxième quintile (ménages pauvres), troisième quintile (ménages intermédiaires) et quatrième quintile (ménages relativement aisés) affichent des valeurs proches de 1.2 à 1.3 culture par ménage. Le cinquième quintile (ménages très riches) atteint légèrement 1.4 culture en moyenne, indiquant une faible progression de la diversification chez les ménages les plus aisés. Dans l’ensemble, ces résultats traduisent un système agricole davantage spécialisé et moins diversifié qu’à Alaotra, probablement orienté vers un nombre limité de cultures dominantes.
+:::
+::::
+
+
 ```{r}
 #| label: tbl-cultures-quintile
 #| tbl-cap: "Nombre moyen de cultures non rizicoles par ménage et quintile de revenu"
@@ -2163,6 +2555,18 @@ dl_tbl_variants("tbl_cultures_quintile", "08", function(d) {
 ## Évolution des indicateurs agricoles (1995–2025) {#sec-agro-multiyear}
 
 Les fichiers rizicoles (`res_r`) et d'élevage (`res_el2`) couvrent la quasi-totalité des campagnes depuis 1995. On retrace ici l'évolution de la production rizicole moyenne par ménage, du rendement (lorsque la surface est disponible) et du taux de pratique de l'élevage.
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, l’évolution de la production rizicole moyenne par ménage révèle une dynamique globalement ascendante jusqu’au milieu des années 2000, suivie d’une phase de ralentissement et de relative stabilisation. Entre la fin des années 1990 et le début des années 2000, la production moyenne progresse rapidement, passant d’environ 780 kg/ménage/an en 1999 à plus de 1 600 kg/ménage/an vers 2004. Cette croissance s’intensifie encore entre 2005 et 2007, période durant laquelle la production atteint son niveau maximal avec plus de 2 000 kg/ménage/an en 2007. Cette performance traduit probablement une amélioration des conditions de production, un meilleur accès aux facteurs productifs ou encore une intensification des activités rizicoles. Toutefois, à partir de 2008, la tendance devient décroissante avec une baisse progressive de la production moyenne, qui retombe autour de 1 100 à 1 300 kg/ménage/an entre 2010 et 2014. Malgré ce recul, les niveaux observés restent globalement supérieurs à ceux du début de la période étudiée, ce qui montre que l’observatoire d’Alaotra conserve une capacité productive relativement élevée. La valeur observée en 2025, inférieure à 1 000 kg/ménage/an, semble indiquer une nouvelle contraction de la production, possiblement liée à des contraintes climatiques, économiques ou structurelles affectant les exploitations agricoles.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, l’évolution de la production rizicole moyenne par ménage présente une trajectoire plus instable et globalement orientée à la baisse sur le long terme. À la fin des années 1990, les ménages enregistrent des niveaux de production relativement élevés, oscillant entre environ 1 200 et 1 500 kg/ménage/an, avec un pic proche de 1 550 kg/ménage/an au début des années 2000. Toutefois, cette dynamique demeure irrégulière, marquée par des alternances de hausses et de baisses importantes. Après une reprise autour de 2005 et 2007 où la production dépasse ponctuellement 1 500 kg/ménage/an, une tendance baissière plus nette s’installe à partir de 2008. La production moyenne chute progressivement jusqu’à atteindre environ 550 kg/ménage/an vers 2013, avant de connaître une légère remontée autour de 700 kg/ménage/an en 2014. Les données récentes montrent néanmoins une forte diminution en 2025, avec une production moyenne inférieure à 400 kg/ménage/an, traduisant une dégradation importante des performances rizicoles. Cette zone rizicole apparaît ainsi plus vulnérable aux fluctuations de production et moins capable de maintenir des niveaux élevés et stables de rendement rizicole sur la durée.
+:::
+::::
 
 ```{r agro_trends_compute}
 #| include: false
@@ -2274,6 +2678,18 @@ if ("prod_moy" %in% names(agro_trends)) {
 }
 ```
 
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, le rendement rizicole moyen reste stable entre 2010 et 2014, avec une valeur constante d’environ 0.4 kg/are. Cette stabilité montre que les niveaux de production observés au cours de cette période n’ont pas connu de variation significative. En 2025, le rendement moyen atteint environ 0.8 kg/are, traduisant une progression importante de la productivité rizicole au sein de cet observatoire.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, le rendement rizicole moyen se maintient autour de 0.5 kg/are entre 2010 et 2014. Cette évolution régulière indique une continuité des performances rizicoles durant plusieurs années. En 2025, le rendement reste proche de 0.5 kg/are, ce qui reflète une stabilité de la production rizicole au niveau de cet observatoire.
+:::
+::::
+
 ```{r fig_agro_rdt_riz}
 #| fig-cap: "Évolution du rendement rizicole moyen (kg/are) — années avec données de surface"
 #| fig-width: !expr fig_w("fig_agro_rdt_riz")
@@ -2294,6 +2710,18 @@ if ("rdt_moy" %in% names(agro_trends)) {
   }
 }
 ```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, le taux de ménages pratiquant l’élevage évolue de manière fluctuante entre 1998 et 2015. Les valeurs se situent globalement entre 63 % et 86 %, traduisant des variations modérées au fil des années. Après une baisse observée au début des années 2000, le taux connaît une remontée autour de 2003 et 2004, avant de diminuer de nouveau vers 2008. Entre 2010 et 2015, la pratique de l’élevage se stabilise autour de 75 % à 80 %. En 2025, le taux est estimé à environ 66 %, indiquant une diminution par rapport aux dernières années observées avant cette date.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay, le taux de ménages pratiquant l’élevage reste relativement élevé durant toute la période étudiée. Entre 1998 et 2015, les valeurs oscillent principalement entre 64 % et 86 %, avec plusieurs phases de hausse et de baisse successives. Une progression est visible au début des années 2000, suivie d’un recul autour de 2005, puis d’une nouvelle augmentation vers 2012. Après 2013, le taux se maintient autour de 80 %. En 2025, la proportion de ménages pratiquant l’élevage atteint environ 72 %, traduisant un niveau encore important de cette activité dans l’observatoire.
+:::
+::::
 
 ```{r fig_agro_elevage}
 #| fig-cap: "Évolution du taux de pratique de l'élevage (1998–2025)"
