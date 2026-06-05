@@ -32,15 +32,15 @@ La proximité de la ville de Marovoay et de la route nationale RN4 reliant Antan
 :::
 ::::
 
-:::: {.content-visible when-profile="consolidated"}
-::: obs-technical
-Les indicateurs démographiques présentés dans cette section sont calculés à partir du fichier ménage (`res_deb`) et du fichier des membres (`res_m_a`).
-La classification des activités principales s'appuie sur une nomenclature sectorielle inspirée de la CITI Rév.
-4.
-Les effectifs inférieurs à cinq sont masqués par souci de confidentialité statistique.
-Les comparaisons entre les deux observatoires doivent tenir compte de la différence de taille des échantillons et de la structure spatiale des zones enquêtées.
-:::
-::::
+<!-- :::: {.content-visible when-profile="consolidated"} -->
+<!-- ::: obs-technical -->
+<!-- Les indicateurs démographiques présentés dans cette section sont calculés à partir du fichier ménage (`res_deb`) et du fichier des membres (`res_m_a`). -->
+<!-- La classification des activités principales s'appuie sur une nomenclature sectorielle inspirée de la CITI Rév. -->
+<!-- 4. -->
+<!-- Les effectifs inférieurs à cinq sont masqués par souci de confidentialité statistique. -->
+<!-- Les comparaisons entre les deux observatoires doivent tenir compte de la différence de taille des échantillons et de la structure spatiale des zones enquêtées. -->
+<!-- ::: -->
+<!-- :::: -->
 
 ```{r data_loading}
 library(tidyverse)
@@ -187,7 +187,6 @@ pct_top_raison_m <- non_scol_s |> filter(Observatory == "Marovoay") |>
 
 :::: {.content-visible when-profile="consolidated"}
 ::: obs-technical
-L'enquête a permis de recenser `r n_members` individus répartis dans `r n_men` ménages au sein des deux observatoires.
 Les ménages de Marovoay sont globalement plus larges que ceux de l'Alaotra.
 :::
 ::::
@@ -315,50 +314,49 @@ Cette structure démographique, caractérisée par une base large et un sommet �
 ::::
 
 ```{r age_obs}
-#| include: false
-hh_age <- members_site |>
-  mutate(AgeGroup = classify_age_group(m5)) |>
-  filter(!is.na(AgeGroup)) |>
-  count(Observatory, AgeGroup, name = "n") |>
-  mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory)
-
-obs_gt(hh_age) |>
-  tab_header(title = "Répartition des membres du ménage par tranche d'âge") |>
-  fmt_number(columns = Percent, decimals = 1) |>
-  cols_label(AgeGroup = "Tranche d'âge", Percent = "%") |>
-  cols_hide(n) |>
-  style_table()
+# #| include: false
+# hh_age <- members_site |>
+#   mutate(AgeGroup = classify_age_group(m5)) |>
+#   filter(!is.na(AgeGroup)) |>
+#   count(Observatory, AgeGroup, name = "n") |>
+#   mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory)
+# 
+# obs_gt(hh_age) |>
+#   tab_header(title = "Répartition des membres du ménage par tranche d'âge") |>
+#   fmt_number(columns = Percent, decimals = 1) |>
+#   cols_label(AgeGroup = "Tranche d'âge", Percent = "%") |>
+#   cols_hide(n) |>
+#   style_table()
 ```
 
 ```{r dl_tbl_age_obs}
-#| include: false
-dl_tbl_variants("tbl_age_obs", "04", function(d) {
-  d |>
-    mutate(AgeGroup = classify_age_group(m5)) |>
-    filter(!is.na(AgeGroup)) |>
-    count(Observatory, AgeGroup, name = "Effectif") |>
-    mutate(`%` = round(Effectif / sum(Effectif) * 100, 1), .by = Observatory) |>
-    rename(Site = Observatory, `Tranche d'âge` = AgeGroup)
-}, members)
+# #| include: false
+# dl_tbl_variants("tbl_age_obs", "04", function(d) {
+#   d |>
+#     mutate(AgeGroup = classify_age_group(m5)) |>
+#     filter(!is.na(AgeGroup)) |>
+#     count(Observatory, AgeGroup, name = "Effectif") |>
+#     mutate(`%` = round(Effectif / sum(Effectif) * 100, 1), .by = Observatory) |>
+#     rename(Site = Observatory, `Tranche d'âge` = AgeGroup)
+# }, members)
 ```
 
 ```{r fig_age_obs}
-#| fig-cap: "Répartition des membres des ménages par tranche d'âge selon les observatoires"
-
-hh_age |> ror_bar_v(x = AgeGroup, y = Percent, y_label = "%", x_angle = 45)
+# #| fig-cap: "Répartition des membres des ménages par tranche d'âge selon les observatoires" 
+# hh_age |> ror_bar_v(x = AgeGroup, y = Percent, y_label = "%", x_angle = 45)
 ```
 
 ```{r dl_fig_age_obs}
-#| echo: false
-#| results: asis
-dl_fig_variants("fig_age_obs", "04", function(d) {
-  agg <- d |>
-    mutate(AgeGroup = classify_age_group(m5)) |>
-    filter(!is.na(AgeGroup)) |>
-    count(Observatory, AgeGroup, name = "n") |>
-    mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory)
-  agg |> ror_bar_v(x = AgeGroup, y = Percent, y_label = "%", x_angle = 45)
-}, members)
+# #| echo: false
+# #| results: asis
+# dl_fig_variants("fig_age_obs", "04", function(d) {
+#   agg <- d |>
+#     mutate(AgeGroup = classify_age_group(m5)) |>
+#     filter(!is.na(AgeGroup)) |>
+#     count(Observatory, AgeGroup, name = "n") |>
+#     mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory)
+#   agg |> ror_bar_v(x = AgeGroup, y = Percent, y_label = "%", x_angle = 45)
+# }, members)
 ```
 
 ```{r pyramide_data}
