@@ -800,14 +800,14 @@ dl_fig_variants("fig_destination", "05", function(d) {
 }, res_t2 |> left_join(obs, by = "j5"))
 ```
 
-::: {.content-visible when-profile="consolidated"}
-::: {.obs-technical}
+<!-- ::: {.content-visible when-profile="consolidated"} -->
+<!-- ::: {.obs-technical} -->
 
 ## Revenu
 
 L’analyse des revenus constitue un élément essentiel dans l’étude des conditions de vie des ménages ruraux. Elle permet d’apprécier leur capacité à satisfaire les besoins fondamentaux et à faire face aux différentes contraintes économiques. L’étude des sources et du niveau des revenus offre également une meilleure compréhension des stratégies de subsistance adoptées par les ménages en milieu rural.
 
-Les revenus presentes ici sont des revenus annuels par menage, calcules sur la periode de reference (PR) de la campagne 2025. Le revenu total (`revtot`) se decompose en revenu courant (`revcou`) et revenu exceptionnel (`revexcept`).
+Les revenus presentes ici sont des revenus annuels par menage, calcules sur la periode de reference (PR) de la campagne 2025. Le revenu total se decompose en revenu courant et revenu exceptionnel.
 
 Le revenu courant agrege sept composantes :
 
@@ -1000,50 +1000,50 @@ dl_fig_variants("fig_revcou_shares", "05", function(d) {
 }, inc)
 ```
 
-### Distribution du revenu total
+<!-- ### Distribution du revenu total -->
 
-La distribution du revenu total illustre le degré d'inégalité au sein de chaque observatoire. L'utilisation d'une échelle logarithmique permet de mieux visualiser l'étalement de la distribution et la concentration des ménages à bas revenus.
+<!-- La distribution du revenu total illustre le degré d'inégalité au sein de chaque observatoire. L'utilisation d'une échelle logarithmique permet de mieux visualiser l'étalement de la distribution et la concentration des ménages à bas revenus. -->
 
-:::: {.content-hidden when-profile="marovoay"}
-::: obs-alaotra
-A Alaotra, la distribution du revenu total annuel des ménages dans l’observatoire d’Alaotra montre une forte concentration des revenus autour des valeurs intermédiaires, avec une densité maximale située approximativement entre 1,000,000 et 10,000,000 Ar en échelle logarithmique. La courbe présente une forme relativement asymétrique vers la droite, indiquant que certains ménages disposent de revenus plus élevés mais restent peu nombreux. Les très faibles revenus ainsi que les revenus extrêmement élevés apparaissent avec une faible densité. La distribution traduit donc une concentration majoritaire des ménages autour des revenus moyens.
-:::
-::::
+<!-- :::: {.content-hidden when-profile="marovoay"} -->
+<!-- ::: obs-alaotra -->
+<!-- A Alaotra, la distribution du revenu total annuel des ménages dans l’observatoire d’Alaotra montre une forte concentration des revenus autour des valeurs intermédiaires, avec une densité maximale située approximativement entre 1,000,000 et 10,000,000 Ar en échelle logarithmique. La courbe présente une forme relativement asymétrique vers la droite, indiquant que certains ménages disposent de revenus plus élevés mais restent peu nombreux. Les très faibles revenus ainsi que les revenus extrêmement élevés apparaissent avec une faible densité. La distribution traduit donc une concentration majoritaire des ménages autour des revenus moyens. -->
+<!-- ::: -->
+<!-- :::: -->
 
-:::: {.content-hidden when-profile="alaotra"}
-::: obs-marovoay
-A Marovoay, la distribution du revenu total annuel des ménages suit également une forme unimodale avec une concentration importante des ménages autour des revenus intermédiaires. La densité maximale se situe dans la même plage logarithmique, principalement entre 1,000,000 et 10,000,000 Ar. La courbe présente une légère asymétrie à droite, ce qui montre l’existence de quelques ménages à revenus élevés, mais en effectif limité. Les ménages à très faibles revenus ainsi que ceux ayant des revenus très élevés restent minoritaires dans la distribution globale.
-:::
-::::
+<!-- :::: {.content-hidden when-profile="alaotra"} -->
+<!-- ::: obs-marovoay -->
+<!-- A Marovoay, la distribution du revenu total annuel des ménages suit également une forme unimodale avec une concentration importante des ménages autour des revenus intermédiaires. La densité maximale se situe dans la même plage logarithmique, principalement entre 1,000,000 et 10,000,000 Ar. La courbe présente une légère asymétrie à droite, ce qui montre l’existence de quelques ménages à revenus élevés, mais en effectif limité. Les ménages à très faibles revenus ainsi que ceux ayant des revenus très élevés restent minoritaires dans la distribution globale. -->
+<!-- ::: -->
+<!-- :::: -->
 
-```{r fig_revtot_dist}
-#| fig-cap: "Distribution du revenu total par observatoire (echelle log)"
-#| fig-width: !expr fig_w("fig_revtot_dist")
-#| fig-height: !expr fig_h("fig_revtot_dist")
+<!-- ```{r fig_revtot_dist} -->
+<!-- #| fig-cap: "Distribution du revenu total par observatoire (echelle log)" -->
+<!-- #| fig-width: !expr fig_w("fig_revtot_dist") -->
+<!-- #| fig-height: !expr fig_h("fig_revtot_dist") -->
 
-inc |>
-  filter(revtot > 0) |>
-  ggplot(aes(x = revtot, fill = Observatory)) +
-  geom_density(alpha = 0.5) +
-  scale_x_log10(labels = label_comma()) +
-  labs(x = "Revenu total annuel (Ar, echelle log)", y = "Densite", fill = "Observatoire") +
-  theme_ror()
-```
+<!-- inc |> -->
+<!--   filter(revtot > 0) |> -->
+<!--   ggplot(aes(x = revtot, fill = Observatory)) + -->
+<!--   geom_density(alpha = 0.5) + -->
+<!--   scale_x_log10(labels = label_comma()) + -->
+<!--   labs(x = "Revenu total annuel (Ar, echelle log)", y = "Densite", fill = "Observatoire") + -->
+<!--   theme_ror() -->
+<!-- ``` -->
 
-```{r dl_fig_revtot_dist}
-#| echo: false
-#| results: asis
-dl_fig_variants("fig_revtot_dist", "05", function(d) {
-  d |>
-    filter(revtot > 0) |>
-    ggplot(aes(x = revtot, fill = Observatory)) +
-    geom_density(alpha = 0.5) +
-    scale_x_log10(labels = label_comma()) +
-    labs(x = "Revenu total annuel (Ar, echelle log)", y = "Densite",
-         fill = "Observatoire") +
-    theme_ror()
-}, inc)
-```
+<!-- ```{r dl_fig_revtot_dist} -->
+<!-- #| echo: false -->
+<!-- #| results: asis -->
+<!-- dl_fig_variants("fig_revtot_dist", "05", function(d) { -->
+<!--   d |> -->
+<!--     filter(revtot > 0) |> -->
+<!--     ggplot(aes(x = revtot, fill = Observatory)) + -->
+<!--     geom_density(alpha = 0.5) + -->
+<!--     scale_x_log10(labels = label_comma()) + -->
+<!--     labs(x = "Revenu total annuel (Ar, echelle log)", y = "Densite", -->
+<!--          fill = "Observatoire") + -->
+<!--     theme_ror() -->
+<!-- }, inc) -->
+<!-- ``` -->
 
 ### Revenu courant et revenu exceptionnel
 
@@ -1099,50 +1099,50 @@ dl_tbl_variants("tbl_revcou_revexcept", "05", function(d) {
 }, inc)
 ```
 
-### Menages a revenu negatif ou nul
+<!-- ### Menages a revenu negatif ou nul -->
 
-Certains menages presentent un revenu courant negatif, principalement en raison de charges agricoles superieures aux produits (mauvaises recoltes, couts d'intrants eleves).
+<!-- Certains menages presentent un revenu courant negatif, principalement en raison de charges agricoles superieures aux produits (mauvaises recoltes, couts d'intrants eleves). -->
 
-:::: {.content-hidden when-profile="marovoay"}
-::: obs-alaotra
-À Alaotra, le **tableau??** montre que sur 507 ménages enquêtés, 2.0 % ont un revenu courant inférieur ou égal à 0, tandis que 1 % ont un revenu total inférieur ou égal à 0.
-:::
-::::
+<!-- :::: {.content-hidden when-profile="marovoay"} -->
+<!-- ::: obs-alaotra -->
+<!-- À Alaotra, le **tableau??** montre que sur 507 ménages enquêtés, 2.0 % ont un revenu courant inférieur ou égal à 0, tandis que 1 % ont un revenu total inférieur ou égal à 0. -->
+<!-- ::: -->
+<!-- :::: -->
 
-:::: {.content-hidden when-profile="alaotra"}
-::: obs-marovoay
-À Marovoay, sur 519 ménages enquêtés, 1.9 % présentent un revenu courant inférieur ou égal à 0, et 1 % ont un revenu total inférieur ou égal à 0.
-:::
-::::
+<!-- :::: {.content-hidden when-profile="alaotra"} -->
+<!-- ::: obs-marovoay -->
+<!-- À Marovoay, sur 519 ménages enquêtés, 1.9 % présentent un revenu courant inférieur ou égal à 0, et 1 % ont un revenu total inférieur ou égal à 0. -->
+<!-- ::: -->
+<!-- :::: -->
 
-```{r t_rev_negatif}
-inc |>
-  summarise(
-    `Nb ménages` = n(),
-    `% revenu courant <= 0` = round(mean(revcou <= 0, na.rm = TRUE) * 100, 1),
-    `% revenu total <= 0` = round(mean(revtot <= 0, na.rm = TRUE) * 100, 1),
-    .by = Observatory
-  ) |>
-  gt() |>
-  tab_header(title = "Ménages à revenu courant ou total négatif ou nul") |>
-  style_table()
-```
+<!-- ```{r t_rev_negatif} -->
+<!-- inc |> -->
+<!--   summarise( -->
+<!--     `Nb ménages` = n(), -->
+<!--     `% revenu courant <= 0` = round(mean(revcou <= 0, na.rm = TRUE) * 100, 1), -->
+<!--     `% revenu total <= 0` = round(mean(revtot <= 0, na.rm = TRUE) * 100, 1), -->
+<!--     .by = Observatory -->
+<!--   ) |> -->
+<!--   gt() |> -->
+<!--   tab_header(title = "Ménages à revenu courant ou total négatif ou nul") |> -->
+<!--   style_table() -->
+<!-- ``` -->
 
-```{r dl_t_rev_negatif}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_rev_negatif", "05", function(d) {
-  d |>
-    summarise(
-      `Nb menages` = n(),
-      `Revenu courant <= 0` = sum(revcou <= 0, na.rm = TRUE),
-      `% <= 0` = round(mean(revcou <= 0, na.rm = TRUE) * 100, 1),
-      `Revenu total <= 0` = sum(revtot <= 0, na.rm = TRUE),
-      .by = Observatory
-    ) |>
-    rename(Site = Observatory)
-}, inc)
-```
+<!-- ```{r dl_t_rev_negatif} -->
+<!-- #| echo: false -->
+<!-- #| results: asis -->
+<!-- dl_tbl_variants("tbl_rev_negatif", "05", function(d) { -->
+<!--   d |> -->
+<!--     summarise( -->
+<!--       `Nb menages` = n(), -->
+<!--       `Revenu courant <= 0` = sum(revcou <= 0, na.rm = TRUE), -->
+<!--       `% <= 0` = round(mean(revcou <= 0, na.rm = TRUE) * 100, 1), -->
+<!--       `Revenu total <= 0` = sum(revtot <= 0, na.rm = TRUE), -->
+<!--       .by = Observatory -->
+<!--     ) |> -->
+<!--     rename(Site = Observatory) -->
+<!-- }, inc) -->
+<!-- ``` -->
 
 ## Evolution des revenus nominaux depuis 1995 {#sec-income-multiyear}
 
