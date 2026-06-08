@@ -615,66 +615,66 @@ dl_fig_variants("fig_anciennete", "07", function(d) {
 }, fr30_data)
 ```
 
-### Propriétaire dans le ménage
+<!-- ### Propriétaire dans le ménage -->
 
-La question de l'identité du propriétaire au sein du ménage soulève des enjeux de genre importants (@fig-proprietaire). Le chef de ménage est déclaré propriétaire de la majorité des parcelles, ce qui illustre les inégalités d'accès au foncier qui sont plus marquées encore à Marovoay qu’à Alaotra.
+<!-- La question de l'identité du propriétaire au sein du ménage soulève des enjeux de genre importants (@fig-proprietaire). Le chef de ménage est déclaré propriétaire de la majorité des parcelles, ce qui illustre les inégalités d'accès au foncier qui sont plus marquées encore à Marovoay qu’à Alaotra. -->
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** Le chef de ménage est propriétaire de `r pct_cm_prop_a` % des parcelles ; le ou la conjoint(e) n'apparaît que dans `r pct_conjoint_a` % des cas.
+<!-- **Alaotra.** Le chef de ménage est propriétaire de `r pct_cm_prop_a` % des parcelles ; le ou la conjoint(e) n'apparaît que dans `r pct_conjoint_a` % des cas. -->
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay.** Le chef de ménage est propriétaire de `r pct_cm_prop_m` % des parcelles ; le ou la conjoint(e) n'apparaît que dans `r pct_conjoint_m` % des cas.
+<!-- **Marovoay.** Le chef de ménage est propriétaire de `r pct_cm_prop_m` % des parcelles ; le ou la conjoint(e) n'apparaît que dans `r pct_conjoint_m` % des cas. -->
 :::
 :::
 
 ```{r}
-#| label: fig-proprietaire
-#| fig-cap: "Qui dans le ménage est propriétaire de la parcelle"
-#| fig-width: !expr fig_w("fig-proprietaire")
-#| fig-height: !expr fig_h("fig-proprietaire")
+##| label: fig-proprietaire
+##| fig-cap: "Qui dans le ménage est propriétaire de la parcelle"
+##| fig-width: !expr fig_w("fig-proprietaire")
+##| fig-height: !expr fig_h("fig-proprietaire")
 
-fr30_data |>
-  expand_sites_for_profile() |>
-  filter(!is.na(fr30i)) |>
-  mutate(
-    fr30i_chr = as.character(fr30i),
-    Proprietaire = if_else(
-      fr30i_chr %in% names(prop_labs),
-      prop_labs[fr30i_chr],
-      "Autre"
-    )
-  ) |>
-  count(Observatory, Proprietaire) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  filter(pct >= 1) |>
-  make_bar_obs(x = Proprietaire, y_label = "% des parcelles")
+# fr30_data |>
+#   expand_sites_for_profile() |>
+#   filter(!is.na(fr30i)) |>
+#   mutate(
+#     fr30i_chr = as.character(fr30i),
+#     Proprietaire = if_else(
+#       fr30i_chr %in% names(prop_labs),
+#       prop_labs[fr30i_chr],
+#       "Autre"
+#     )
+#   ) |>
+#   count(Observatory, Proprietaire) |>
+#   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+#   filter(pct >= 1) |>
+#   make_bar_obs(x = Proprietaire, y_label = "% des parcelles")
 ```
 
 ```{r dl_fig_proprietaire}
-#| echo: false
-#| results: asis
-dl_fig_variants("fig_proprietaire", "07", function(d) {
-  d |>
-    filter(!is.na(fr30i)) |>
-    mutate(
-      fr30i_chr = as.character(fr30i),
-      Proprietaire = if_else(
-        fr30i_chr %in% names(prop_labs),
-        prop_labs[fr30i_chr],
-        "Autre"
-      )
-    ) |>
-    count(Observatory, Proprietaire) |>
-    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    filter(pct >= 1) |>
-    ror_bar_grouped(x = Proprietaire, fill = Observatory,
-                    y_label = "% des parcelles", direction = "horizontal",
-                    facet = FALSE)
-}, fr30_data)
+##| echo: false
+##| results: asis
+# dl_fig_variants("fig_proprietaire", "07", function(d) {
+#   d |>
+#     filter(!is.na(fr30i)) |>
+#     mutate(
+#       fr30i_chr = as.character(fr30i),
+#       Proprietaire = if_else(
+#         fr30i_chr %in% names(prop_labs),
+#         prop_labs[fr30i_chr],
+#         "Autre"
+#       )
+#     ) |>
+#     count(Observatory, Proprietaire) |>
+#     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+#     filter(pct >= 1) |>
+#     ror_bar_grouped(x = Proprietaire, fill = Observatory,
+#                     y_label = "% des parcelles", direction = "horizontal",
+#                     facet = FALSE)
+# }, fr30_data)
 ```
 
 
@@ -1267,58 +1267,58 @@ dl_fig_variants("fig_irrigation_exploitee", "07", function(d) {
 }, fr34_data)
 ```
 
-Le coût de l'exploitation de terres d'autrui varie selon le mode de faire-valoir (@tbl-rente-exploitee). Les ménages locataires versent une rente en argent ou en nature, tandis que les métayers cèdent une part de la récolte au propriétaire, généralement comprise entre un quart et la moitié de la production.
+<!-- Le coût de l'exploitation de terres d'autrui varie selon le mode de faire-valoir (@tbl-rente-exploitee). Les ménages locataires versent une rente en argent ou en nature, tandis que les métayers cèdent une part de la récolte au propriétaire, généralement comprise entre un quart et la moitié de la production. -->
 
-:::: {.content-hidden when-profile="marovoay"}
-::: obs-alaotra
-À Alaotra, la location concerne 122 parcelles avec une rente moyenne de 211 Ar et 813 kg de produit, tandis que le métayage touche 113 parcelles avec une rente moyenne de 527 kg. Le prêt concerne également un nombre important de parcelles (105) mais avec des niveaux de rente très faibles, soit 7 kg de produit en moyenne.
-:::
-::::
+<!-- :::: {.content-hidden when-profile="marovoay"} -->
+<!-- ::: obs-alaotra -->
+<!-- À Alaotra, la location concerne 122 parcelles avec une rente moyenne de 211 Ar et 813 kg de produit, tandis que le métayage touche 113 parcelles avec une rente moyenne de 527 kg. Le prêt concerne également un nombre important de parcelles (105) mais avec des niveaux de rente très faibles, soit 7 kg de produit en moyenne. -->
+<!-- ::: -->
+<!-- :::: -->
 
-:::: {.content-hidden when-profile="alaotra"}
-::: obs-marovoay
-À Marovoay, le métayage domine avec 189 parcelles concernées, une rente moyenne de 264 kg de produit. La location occupe également une place importante avec 137 parcelles et une rente monétaire moyenne de 202 Ar. Le mode « autre », bien que marginal avec une seule parcelle concernée, présente une rente moyenne de 240 kg de produit .
-:::
-::::
+<!-- :::: {.content-hidden when-profile="alaotra"} -->
+<!-- ::: obs-marovoay -->
+<!-- À Marovoay, le métayage domine avec 189 parcelles concernées, une rente moyenne de 264 kg de produit. La location occupe également une place importante avec 137 parcelles et une rente monétaire moyenne de 202 Ar. Le mode « autre », bien que marginal avec une seule parcelle concernée, présente une rente moyenne de 240 kg de produit . -->
+<!-- ::: -->
+<!-- :::: -->
 
 ```{r}
-#| label: tbl-rente-exploitee
-#| tbl-cap: "Rentes versées pour les parcelles exploitées"
+##| label: tbl-rente-exploitee
+##| tbl-cap: "Rentes versées pour les parcelles exploitées"
 
-fr34_data |>
-  filter(!is.na(fr34g)) |>
-  mutate(Mode = factor(as.character(fr34g), levels = names(fv_labs), labels = fv_labs)) |>
-  summarise(
-    `Nb parcelles` = n(),
-    `Rente argent moy. (Ar)` = round(mean(fr34n, na.rm = TRUE)),
-    `Rente produit moy. (kg)` = round(mean(fr34o, na.rm = TRUE)),
-    `% métayage moyen` = round(mean(fr34p, na.rm = TRUE), 1),
-    .by = c(Observatory, Mode)
-  ) |>
-  arrange(Observatory, desc(`Nb parcelles`)) |>
-  gt() |>
-  tab_header(title = "Conditions des parcelles exploitées par mode de faire-valoir") |>
-  fmt_number(columns = c(`Rente argent moy. (Ar)`, `Rente produit moy. (kg)`),
-             use_seps = TRUE, decimals = 0)
+# fr34_data |>
+#   filter(!is.na(fr34g)) |>
+#   mutate(Mode = factor(as.character(fr34g), levels = names(fv_labs), labels = fv_labs)) |>
+#   summarise(
+#     `Nb parcelles` = n(),
+#     `Rente argent moy. (Ar)` = round(mean(fr34n, na.rm = TRUE)),
+#     `Rente produit moy. (kg)` = round(mean(fr34o, na.rm = TRUE)),
+#     `% métayage moyen` = round(mean(fr34p, na.rm = TRUE), 1),
+#     .by = c(Observatory, Mode)
+#   ) |>
+#   arrange(Observatory, desc(`Nb parcelles`)) |>
+#   gt() |>
+#   tab_header(title = "Conditions des parcelles exploitées par mode de faire-valoir") |>
+#   fmt_number(columns = c(`Rente argent moy. (Ar)`, `Rente produit moy. (kg)`),
+#              use_seps = TRUE, decimals = 0)
 ```
 
 ```{r dl_tbl_rente_exploitee}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_rente_exploitee", "07", function(d) {
-  d |>
-    filter(!is.na(fr34g)) |>
-    mutate(Mode = factor(as.character(fr34g), levels = names(fv_labs), labels = fv_labs)) |>
-    summarise(
-      `Nb parcelles` = n(),
-      `Rente argent moy. (Ar)` = round(mean(fr34n, na.rm = TRUE)),
-      `Rente produit moy. (kg)` = round(mean(fr34o, na.rm = TRUE)),
-      `% métayage moyen` = round(mean(fr34p, na.rm = TRUE), 1),
-      .by = c(Observatory, Mode)
-    ) |>
-    arrange(Observatory, desc(`Nb parcelles`)) |>
-    rename(Site = Observatory)
-}, fr34_data)
+##| echo: false
+##| results: asis
+# dl_tbl_variants("tbl_rente_exploitee", "07", function(d) {
+#   d |>
+#     filter(!is.na(fr34g)) |>
+#     mutate(Mode = factor(as.character(fr34g), levels = names(fv_labs), labels = fv_labs)) |>
+#     summarise(
+#       `Nb parcelles` = n(),
+#       `Rente argent moy. (Ar)` = round(mean(fr34n, na.rm = TRUE)),
+#       `Rente produit moy. (kg)` = round(mean(fr34o, na.rm = TRUE)),
+#       `% métayage moyen` = round(mean(fr34p, na.rm = TRUE), 1),
+#       .by = c(Observatory, Mode)
+#     ) |>
+#     arrange(Observatory, desc(`Nb parcelles`)) |>
+#     rename(Site = Observatory)
+# }, fr34_data)
 ```
 
 
@@ -1423,10 +1423,10 @@ dl_fig_variants("fig_satisfaction", "07", function(d) {
 
 Les données foncières offrent d'autres possibilités d'analyse qui n'ont pas été développées ici :
 
-- **Raisons de l'abandon de parcelles** (`fr30q_a` à `fr30q_e`) : cinq variables binaires dont les libellés exacts restent à confirmer dans le questionnaire.
+- **Raisons de l'abandon de parcelles** : cinq variables binaires dont les libellés exacts restent à confirmer dans le questionnaire.
 - **Croisement sécurisation × mode d'acquisition** : les parcelles héritées sont-elles moins souvent titrées que les parcelles achetées ?
-- **Superficie possédée vs. superficie exploitée** : reconstituer la surface effectivement cultivée par le ménage en combinant `res_fr30` et `res_fr34`.
-- **Rentes perçues sur les parcelles cédées** (`fr33m1`, `fr33m2`, `fr33n`) : montants moyens des loyers et parts de métayage perçus.
-- **Nom sur le titre/certificat** (`fr30k`, `fr30m`) : la correspondance entre le titulaire du document et le propriétaire déclaré mériterait une analyse genrée.
+- **Superficie possédée vs. superficie exploitée** : reconstituer la surface effectivement cultivée par le ménage en combinant l'inventaire des parcelles possédées par le ménage et les parcelles prises en faire - valoir indirect .
+- **Rentes perçues sur les parcelles cédées** : montants moyens des loyers et parts de métayage perçus.
+- **Nom sur le titre/certificat** : la correspondance entre le titulaire du document et le propriétaire déclaré mériterait une analyse genrée.
 :::
 :::
