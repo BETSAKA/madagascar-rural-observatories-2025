@@ -670,53 +670,53 @@ dl_fig_variants("fig_rendement_riz_tha", "08", function(d) {
 }, res_r)
 ```
 
-:::: {.content-hidden when-profile="marovoay"}
-::: obs-alaotra
-À Alaotra, la distribution de la production de paddy par parcelle est fortement concentrée sur les faibles niveaux de production. La majorité des parcelles produisent moins de 1 000 kg, avec un pic de fréquence situé dans les premières classes de production. À mesure que la production augmente, le nombre de parcelles diminue progressivement, ce qui traduit une distribution asymétrique vers la droite. Quelques parcelles atteignent des niveaux plus élevés, autour de 2 000 à 3 500 kg, mais ces cas restent peu nombreux. Cette répartition met en évidence une forte hétérogénéité des productions au sein de l’observatoire, avec une prédominance des petites productions.
-:::
-::::
+<!-- :::: {.content-hidden when-profile="marovoay"} -->
+<!-- ::: obs-alaotra -->
+<!-- À Alaotra, la distribution de la production de paddy par parcelle est fortement concentrée sur les faibles niveaux de production. La majorité des parcelles produisent moins de 1 000 kg, avec un pic de fréquence situé dans les premières classes de production. À mesure que la production augmente, le nombre de parcelles diminue progressivement, ce qui traduit une distribution asymétrique vers la droite. Quelques parcelles atteignent des niveaux plus élevés, autour de 2 000 à 3 500 kg, mais ces cas restent peu nombreux. Cette répartition met en évidence une forte hétérogénéité des productions au sein de l’observatoire, avec une prédominance des petites productions. -->
+<!-- ::: -->
+<!-- :::: -->
 
-:::: {.content-hidden when-profile="alaotra"}
-::: obs-marovoay
-À Marovoay, la distribution montre également une concentration importante des parcelles dans les classes de faibles productions. Les fréquences les plus élevées se situent principalement entre 0 et 1 200 kg, avec plusieurs pics marqués indiquant une forte présence de parcelles dans ces intervalles. Le nombre de parcelles décroît ensuite lorsque la production augmente, bien que certaines atteignent des valeurs supérieures à 2 000 kg et, plus rarement, proches de 3 500 kg. La distribution reste donc étalée, avec une majorité de productions modestes et quelques parcelles affichant des rendements nettement plus élevés.
-:::
-::::
+<!-- :::: {.content-hidden when-profile="alaotra"} -->
+<!-- ::: obs-marovoay -->
+<!-- À Marovoay, la distribution montre également une concentration importante des parcelles dans les classes de faibles productions. Les fréquences les plus élevées se situent principalement entre 0 et 1 200 kg, avec plusieurs pics marqués indiquant une forte présence de parcelles dans ces intervalles. Le nombre de parcelles décroît ensuite lorsque la production augmente, bien que certaines atteignent des valeurs supérieures à 2 000 kg et, plus rarement, proches de 3 500 kg. La distribution reste donc étalée, avec une majorité de productions modestes et quelques parcelles affichant des rendements nettement plus élevés. -->
+<!-- ::: -->
+<!-- :::: -->
 
 
 ```{r}
-#| label: fig-production-riz
-#| fig-cap: "Distribution de la production de paddy par parcelle (kg)"
-#| fig-width: !expr fig_w("fig-production-riz")
-#| fig-height: !expr fig_h("fig-production-riz")
+##| label: fig-production-riz
+##| fig-cap: "Distribution de la production de paddy par parcelle (kg)"
+##| fig-width: !expr fig_w("fig-production-riz")
+##| fig-height: !expr fig_h("fig-production-riz")
 
-res_r |>
-  filter(!is.na(r23), r23 > 0) |>
-  expand_sites_for_profile() |>
-  ggplot(aes(x = r23)) +
-  geom_histogram(fill = "#2c7bb6", bins = 40) +
-  facet_wrap(~Observatory) +
-  scale_x_continuous(
-    labels = label_comma(),
-    limits = c(0, quantile(res_r[["r23"]][res_r[["r23"]] > 0], 0.95, na.rm = TRUE))
-  ) +
-  labs(x = "Production de paddy (kg)", y = "Nombre de parcelles") +
-  theme_ror() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# res_r |>
+#   filter(!is.na(r23), r23 > 0) |>
+#   expand_sites_for_profile() |>
+#   ggplot(aes(x = r23)) +
+#   geom_histogram(fill = "#2c7bb6", bins = 40) +
+#   facet_wrap(~Observatory) +
+#   scale_x_continuous(
+#     labels = label_comma(),
+#     limits = c(0, quantile(res_r[["r23"]][res_r[["r23"]] > 0], 0.95, na.rm = TRUE))
+#   ) +
+#   labs(x = "Production de paddy (kg)", y = "Nombre de parcelles") +
+#   theme_ror() +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ```{r dl_fig_production_riz}
-#| echo: false
-#| results: asis
-dl_fig_variants("fig_production_riz", "08", function(d) {
-  d |>
-    filter(!is.na(r23), r23 > 0) |>
-    ggplot(aes(x = r23, fill = Observatory)) +
-    geom_histogram(position = "identity", alpha = 0.6, bins = 40) +
-    scale_x_continuous(labels = label_comma(),
-      limits = c(0, quantile(d[["r23"]][d[["r23"]] > 0], 0.95, na.rm = TRUE))) +
-    labs(x = "Production de paddy (kg)", y = "Nombre de parcelles", fill = "Observatoire") +
-    theme_ror()
-}, res_r)
+##| echo: false
+##| results: asis
+# dl_fig_variants("fig_production_riz", "08", function(d) {
+#   d |>
+#     filter(!is.na(r23), r23 > 0) |>
+#     ggplot(aes(x = r23, fill = Observatory)) +
+#     geom_histogram(position = "identity", alpha = 0.6, bins = 40) +
+#     scale_x_continuous(labels = label_comma(),
+#       limits = c(0, quantile(d[["r23"]][d[["r23"]] > 0], 0.95, na.rm = TRUE))) +
+#     labs(x = "Production de paddy (kg)", y = "Nombre de parcelles", fill = "Observatoire") +
+#     theme_ror()
+# }, res_r)
 ```
 
 #### Topographie et saison de culture
@@ -2402,153 +2402,153 @@ dl_tbl_variants("tbl_main_oeuvre_perm", "08", function(d) {
 
 ::: {.content-visible when-profile="consolidated"}
 
-### Cultures non rizicoles par quintile de revenu
+<!-- ### Cultures non rizicoles par quintile de revenu -->
 
-Les ménages les plus aisés cultivent-ils des cultures différentes ? On croise ici les familles de cultures avec les quintiles de revenu courant du ménage.
+<!-- Les ménages les plus aisés cultivent-ils des cultures différentes ? On croise ici les familles de cultures avec les quintiles de revenu courant du ménage. -->
 
-:::: {.content-hidden when-profile="marovoay"}
-::: obs-alaotra
-À Alaotra, la structure des cultures non rizicoles révèle un système agricole relativement diversifié, dominé principalement par les légumineuses et les tubercules, dont les proportions oscillent respectivement entre environ 32 % et 45 % pour les premières, et entre 17 % et 37 % pour les seconds selon les quintiles de revenu. Les légumineuses occupent une place particulièrement importante chez les ménages du premier quintile (ménages très pauvres) et du troisième quintile (ménages intermédiaires), où elles atteignent près de 45 % et 42 % des parcelles cultivées, traduisant à la fois leur rôle alimentaire et leur potentiel marchand. Les tubercules connaissent leur niveau maximal dans le deuxième quintile (ménages pauvres) avec près de 37 %, avant de décroître progressivement chez les ménages plus aisés, notamment dans les quatrième quintile (ménages relativement aisés) et cinquième quintile (ménages très riches), ce qui suggère une transition vers des cultures davantage orientées vers le marché à mesure que le revenu augmente. Les autres céréales demeurent relativement stables, avec des parts comprises entre 17 % et 22 %, indiquant qu’elles constituent une composante structurelle du système de production sans pour autant dominer. Les cultures de rente, les fruits et les légumes restent secondaires, bien qu’une légère progression soit observable dans les quintiles supérieurs, notamment pour les fruits qui atteignent près de 8 % dans le cinquième quintile (ménages très riches), signe d’une diversification progressive des systèmes agricoles liée à une meilleure capacité d’investissement et à une orientation plus commerciale des exploitations.
-:::
-::::
+<!-- :::: {.content-hidden when-profile="marovoay"} -->
+<!-- ::: obs-alaotra -->
+<!-- À Alaotra, la structure des cultures non rizicoles révèle un système agricole relativement diversifié, dominé principalement par les légumineuses et les tubercules, dont les proportions oscillent respectivement entre environ 32 % et 45 % pour les premières, et entre 17 % et 37 % pour les seconds selon les quintiles de revenu. Les légumineuses occupent une place particulièrement importante chez les ménages du premier quintile (ménages très pauvres) et du troisième quintile (ménages intermédiaires), où elles atteignent près de 45 % et 42 % des parcelles cultivées, traduisant à la fois leur rôle alimentaire et leur potentiel marchand. Les tubercules connaissent leur niveau maximal dans le deuxième quintile (ménages pauvres) avec près de 37 %, avant de décroître progressivement chez les ménages plus aisés, notamment dans les quatrième quintile (ménages relativement aisés) et cinquième quintile (ménages très riches), ce qui suggère une transition vers des cultures davantage orientées vers le marché à mesure que le revenu augmente. Les autres céréales demeurent relativement stables, avec des parts comprises entre 17 % et 22 %, indiquant qu’elles constituent une composante structurelle du système de production sans pour autant dominer. Les cultures de rente, les fruits et les légumes restent secondaires, bien qu’une légère progression soit observable dans les quintiles supérieurs, notamment pour les fruits qui atteignent près de 8 % dans le cinquième quintile (ménages très riches), signe d’une diversification progressive des systèmes agricoles liée à une meilleure capacité d’investissement et à une orientation plus commerciale des exploitations. -->
+<!-- ::: -->
+<!-- :::: -->
 
-:::: {.content-hidden when-profile="alaotra"}
-::: obs-marovoay
-À Marovoay, le paysage agricole apparaît nettement plus spécialisé, avec une domination très marquée des autres céréales qui représentent entre environ 40 % et 57 % des parcelles cultivées selon les niveaux de revenu. Cette prépondérance est particulièrement forte dans le quatrième quintile (ménages relativement aisés) où elle dépasse la moitié des superficies cultivées, traduisant une forte dépendance des ménages à la céréaliculture non rizicole. Les tubercules constituent la seconde catégorie la plus importante avec des proportions variant de 20 % à 37 %, notamment dans les troisième quintile (ménages intermédiaires) et quatrième quintile (ménages relativement aisés) où ils jouent vraisemblablement un rôle de sécurisation alimentaire. Les légumineuses demeurent globalement marginales, sauf dans le troisième quintile (ménages intermédiaires) où elles connaissent une hausse exceptionnelle avoisinant 35 %, ce qui pourrait traduire une stratégie ponctuelle de diversification ou une spécialisation propre à certains ménages intermédiaires. Les cultures industrielles et de rente restent faibles mais progressent dans les quintiles les plus élevés pour atteindre près de 12 % dans le cinquième quintile (ménages très riches), indiquant que les ménages les plus aisés disposent d’une meilleure capacité à investir dans des productions commerciales. Les fruits et les légumes restent quasi inexistants dans l’ensemble des quintiles, avec des proportions généralement inférieures à 2 %, ce qui reflète un système agricole encore largement centré sur les cultures vivrières extensives et peu orienté vers l’horticulture.
-:::
-::::
-
-
-```{r}
-#| label: fig-cultures-quintile
-#| fig-cap: "Familles de cultures non rizicoles pratiquées selon le quintile de revenu"
-#| fig-width: !expr fig_w("fig-cultures-quintile")
-#| fig-height: !expr fig_h("fig-cultures-quintile")
-
-# Calcul des revenus pour 2025
-source("utils/calc_incomes_all_years.R")
-inc_agro <- compute_income_year(2025) |>
-  mutate(j5 = as.character(j5))
-
-# Quintiles de revenu courant par observatoire
-quintiles <- inc_agro |>
-  left_join(res_deb |> select(j5, Observatory), by = "j5") |>
-  mutate(
-    Quintile = ntile(revcou, 5),
-    Quintile = paste0("Q", Quintile),
-    .by = Observatory
-  ) |>
-  select(j5, Observatory, Quintile)
-
-# Fonction de regroupement en familles de cultures
-crop_family <- function(code) {
-  code <- as.integer(code)
-  case_when(
-    code %in% 102:199 ~ "Autres céréales",
-    code %in% 200:299 ~ "Tubercules",
-    code %in% 300:399 ~ "Légumes",
-    code %in% 400:499 ~ "Légumineuses",
-    code %in% 500:599 ~ "Fruits",
-    code %in% 600:799 ~ "Cultures industrielles / rente",
-    TRUE ~ "Autre"
-  )
-}
-
-# Croisement cultures × quintile
-cult_quint <- res_c |>
-  filter(!is.na(c1)) |>
-  mutate(j5 = as.character(j5), Famille = crop_family(c1)) |>
-  left_join(quintiles |> select(j5, Quintile), by = "j5") |>
-  filter(!is.na(Quintile)) |>
-  expand_sites_for_profile() |>
-  count(Observatory, Quintile, Famille) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Quintile))
-
-cult_quint |>
-  filter(Famille != "Autre") |>
-  ggplot(aes(x = Quintile, y = pct, fill = Famille)) +
-  geom_col() +
-  facet_wrap(~Observatory) +
-  labs(x = "Quintile de revenu courant", y = "% des parcelles cultivées", fill = "Famille") +
-  theme_ror() +
-  theme(legend.position = "top")
-```
-
-```{r dl_fig_cultures_quintile}
-#| echo: false
-#| results: asis
-dl_fig_variants("fig_cultures_quintile", "08", function(d) {
-  cq <- d |>
-    filter(!is.na(c1)) |>
-    mutate(j5 = as.character(j5), Famille = crop_family(c1)) |>
-    left_join(quintiles |> select(j5, Quintile), by = "j5") |>
-    filter(!is.na(Quintile)) |>
-    count(Observatory, Quintile, Famille) |>
-    mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Quintile))
-  cq |>
-    filter(Famille != "Autre") |>
-    ggplot(aes(x = Quintile, y = pct, fill = Famille)) +
-    geom_col() +
-    facet_wrap(~Observatory) +
-    labs(x = "Quintile de revenu courant", y = "% des parcelles cultivées", fill = "Famille") +
-    theme_ror() +
-    theme(legend.position = "top")
-}, res_c)
-```
-
-:::: {.content-hidden when-profile="marovoay"}
-::: obs-alaotra
-À Alaotra, le nombre moyen de cultures non rizicoles par ménage met en évidence un niveau relativement élevé de diversification agricole. Le nombre de ménages pratiquant des cultures non rizicoles décroît progressivement selon les quintiles de revenu, passant de 67 ménages dans le premier quintile (ménages très pauvres) à 43 ménages dans le cinquième quintile (ménages très riches). Toutefois, malgré cette diminution des effectifs, le niveau moyen de diversification reste globalement stable et relativement élevé. Le nombre moyen de cultures atteint environ 2.0 dans le cinquième quintile (ménages très riches), contre 1.5 dans les deuxième quintile (ménages pauvres) et quatrième quintile (ménages relativement aisés), tandis que les premier quintile (ménages très pauvres) et troisième quintile (ménages intermédiaires) présentent respectivement des moyennes de 1.7 et 1.8 cultures par ménage. Cette relative homogénéité traduit une pratique agricole diversifiée dans l’ensemble des catégories sociales, même si les ménages les plus aisés semblent disposer d’une capacité légèrement supérieure à diversifier leurs productions, probablement grâce à un meilleur accès aux ressources productives, aux intrants et aux débouchés commerciaux.
-:::
-::::
-
-:::: {.content-hidden when-profile="alaotra"}
-::: obs-marovoay
-À Marovoay, le niveau de diversification apparaît plus faible et plus homogène entre les catégories de revenu. Le nombre de ménages concernés diminue également avec l’élévation du revenu, passant de 39 ménages dans le premier quintile (ménages très pauvres) à 26 ménages dans le cinquième quintile (ménages très riches). Le nombre moyen de cultures non rizicoles reste inférieur oscillant seulement entre 1.2 et 1.6 cultures par ménage selon les quintiles. Les ménages du premier quintile (ménages très pauvres) présentent la moyenne la plus élevée avec environ 1.6 culture, tandis que les deuxième quintile (ménages pauvres), troisième quintile (ménages intermédiaires) et quatrième quintile (ménages relativement aisés) affichent des valeurs proches de 1.2 à 1.3 culture par ménage. Le cinquième quintile (ménages très riches) atteint légèrement 1.4 culture en moyenne, indiquant une faible progression de la diversification chez les ménages les plus aisés. Dans l’ensemble, ces résultats traduisent un système agricole davantage spécialisé et moins diversifié qu’à Alaotra, probablement orienté vers un nombre limité de cultures dominantes.
-:::
-::::
+<!-- :::: {.content-hidden when-profile="alaotra"} -->
+<!-- ::: obs-marovoay -->
+<!-- À Marovoay, le paysage agricole apparaît nettement plus spécialisé, avec une domination très marquée des autres céréales qui représentent entre environ 40 % et 57 % des parcelles cultivées selon les niveaux de revenu. Cette prépondérance est particulièrement forte dans le quatrième quintile (ménages relativement aisés) où elle dépasse la moitié des superficies cultivées, traduisant une forte dépendance des ménages à la céréaliculture non rizicole. Les tubercules constituent la seconde catégorie la plus importante avec des proportions variant de 20 % à 37 %, notamment dans les troisième quintile (ménages intermédiaires) et quatrième quintile (ménages relativement aisés) où ils jouent vraisemblablement un rôle de sécurisation alimentaire. Les légumineuses demeurent globalement marginales, sauf dans le troisième quintile (ménages intermédiaires) où elles connaissent une hausse exceptionnelle avoisinant 35 %, ce qui pourrait traduire une stratégie ponctuelle de diversification ou une spécialisation propre à certains ménages intermédiaires. Les cultures industrielles et de rente restent faibles mais progressent dans les quintiles les plus élevés pour atteindre près de 12 % dans le cinquième quintile (ménages très riches), indiquant que les ménages les plus aisés disposent d’une meilleure capacité à investir dans des productions commerciales. Les fruits et les légumes restent quasi inexistants dans l’ensemble des quintiles, avec des proportions généralement inférieures à 2 %, ce qui reflète un système agricole encore largement centré sur les cultures vivrières extensives et peu orienté vers l’horticulture. -->
+<!-- ::: -->
+<!-- :::: -->
 
 
-```{r}
-#| label: tbl-cultures-quintile
-#| tbl-cap: "Nombre moyen de cultures non rizicoles par ménage et quintile de revenu"
+<!-- ```{r} -->
+<!-- #| label: fig-cultures-quintile -->
+<!-- #| fig-cap: "Familles de cultures non rizicoles pratiquées selon le quintile de revenu" -->
+<!-- #| fig-width: !expr fig_w("fig-cultures-quintile") -->
+<!-- #| fig-height: !expr fig_h("fig-cultures-quintile") -->
 
-res_c |>
-  filter(!is.na(c1)) |>
-  mutate(j5 = as.character(j5)) |>
-  count(j5, name = "nb_cultures") |>
-  left_join(quintiles, by = "j5") |>
-  filter(!is.na(Quintile)) |>
-  summarise(
-    n_men = n(),
-    nb_cult_moy = round(mean(nb_cultures), 1),
-    .by = c(Observatory, Quintile)
-  ) |>
-  pivot_wider(names_from = Quintile, values_from = c(n_men, nb_cult_moy)) |>
-  gt() |>
-  tab_header(title = "Diversification des cultures non rizicoles selon le quintile de revenu")
-```
+<!-- # Calcul des revenus pour 2025 -->
+<!-- source("utils/calc_incomes_all_years.R") -->
+<!-- inc_agro <- compute_income_year(2025) |> -->
+<!--   mutate(j5 = as.character(j5)) -->
 
-```{r dl_tbl_cultures_quintile}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_cultures_quintile", "08", function(d) {
-  d |>
-    filter(!is.na(c1)) |>
-    mutate(j5 = as.character(j5)) |>
-    count(j5, Observatory, name = "nb_cultures") |>
-    left_join(quintiles |> select(j5, Quintile), by = "j5") |>
-    filter(!is.na(Quintile)) |>
-    summarise(
-      n_men = n(),
-      nb_cult_moy = round(mean(nb_cultures), 1),
-      .by = c(Observatory, Quintile)
-    ) |>
-    rename(Site = Observatory)
-}, res_c)
-```
+<!-- # Quintiles de revenu courant par observatoire -->
+<!-- quintiles <- inc_agro |> -->
+<!--   left_join(res_deb |> select(j5, Observatory), by = "j5") |> -->
+<!--   mutate( -->
+<!--     Quintile = ntile(revcou, 5), -->
+<!--     Quintile = paste0("Q", Quintile), -->
+<!--     .by = Observatory -->
+<!--   ) |> -->
+<!--   select(j5, Observatory, Quintile) -->
 
-:::
+<!-- # Fonction de regroupement en familles de cultures -->
+<!-- crop_family <- function(code) { -->
+<!--   code <- as.integer(code) -->
+<!--   case_when( -->
+<!--     code %in% 102:199 ~ "Autres céréales", -->
+<!--     code %in% 200:299 ~ "Tubercules", -->
+<!--     code %in% 300:399 ~ "Légumes", -->
+<!--     code %in% 400:499 ~ "Légumineuses", -->
+<!--     code %in% 500:599 ~ "Fruits", -->
+<!--     code %in% 600:799 ~ "Cultures industrielles / rente", -->
+<!--     TRUE ~ "Autre" -->
+<!--   ) -->
+<!-- } -->
+
+<!-- # Croisement cultures × quintile -->
+<!-- cult_quint <- res_c |> -->
+<!--   filter(!is.na(c1)) |> -->
+<!--   mutate(j5 = as.character(j5), Famille = crop_family(c1)) |> -->
+<!--   left_join(quintiles |> select(j5, Quintile), by = "j5") |> -->
+<!--   filter(!is.na(Quintile)) |> -->
+<!--   expand_sites_for_profile() |> -->
+<!--   count(Observatory, Quintile, Famille) |> -->
+<!--   mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Quintile)) -->
+
+<!-- cult_quint |> -->
+<!--   filter(Famille != "Autre") |> -->
+<!--   ggplot(aes(x = Quintile, y = pct, fill = Famille)) + -->
+<!--   geom_col() + -->
+<!--   facet_wrap(~Observatory) + -->
+<!--   labs(x = "Quintile de revenu courant", y = "% des parcelles cultivées", fill = "Famille") + -->
+<!--   theme_ror() + -->
+<!--   theme(legend.position = "top") -->
+<!-- ``` -->
+
+<!-- ```{r dl_fig_cultures_quintile} -->
+<!-- #| echo: false -->
+<!-- #| results: asis -->
+<!-- dl_fig_variants("fig_cultures_quintile", "08", function(d) { -->
+<!--   cq <- d |> -->
+<!--     filter(!is.na(c1)) |> -->
+<!--     mutate(j5 = as.character(j5), Famille = crop_family(c1)) |> -->
+<!--     left_join(quintiles |> select(j5, Quintile), by = "j5") |> -->
+<!--     filter(!is.na(Quintile)) |> -->
+<!--     count(Observatory, Quintile, Famille) |> -->
+<!--     mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Quintile)) -->
+<!--   cq |> -->
+<!--     filter(Famille != "Autre") |> -->
+<!--     ggplot(aes(x = Quintile, y = pct, fill = Famille)) + -->
+<!--     geom_col() + -->
+<!--     facet_wrap(~Observatory) + -->
+<!--     labs(x = "Quintile de revenu courant", y = "% des parcelles cultivées", fill = "Famille") + -->
+<!--     theme_ror() + -->
+<!--     theme(legend.position = "top") -->
+<!-- }, res_c) -->
+<!-- ``` -->
+
+<!-- :::: {.content-hidden when-profile="marovoay"} -->
+<!-- ::: obs-alaotra -->
+<!-- À Alaotra, le nombre moyen de cultures non rizicoles par ménage met en évidence un niveau relativement élevé de diversification agricole. Le nombre de ménages pratiquant des cultures non rizicoles décroît progressivement selon les quintiles de revenu, passant de 67 ménages dans le premier quintile (ménages très pauvres) à 43 ménages dans le cinquième quintile (ménages très riches). Toutefois, malgré cette diminution des effectifs, le niveau moyen de diversification reste globalement stable et relativement élevé. Le nombre moyen de cultures atteint environ 2.0 dans le cinquième quintile (ménages très riches), contre 1.5 dans les deuxième quintile (ménages pauvres) et quatrième quintile (ménages relativement aisés), tandis que les premier quintile (ménages très pauvres) et troisième quintile (ménages intermédiaires) présentent respectivement des moyennes de 1.7 et 1.8 cultures par ménage. Cette relative homogénéité traduit une pratique agricole diversifiée dans l’ensemble des catégories sociales, même si les ménages les plus aisés semblent disposer d’une capacité légèrement supérieure à diversifier leurs productions, probablement grâce à un meilleur accès aux ressources productives, aux intrants et aux débouchés commerciaux. -->
+<!-- ::: -->
+<!-- :::: -->
+
+<!-- :::: {.content-hidden when-profile="alaotra"} -->
+<!-- ::: obs-marovoay -->
+<!-- À Marovoay, le niveau de diversification apparaît plus faible et plus homogène entre les catégories de revenu. Le nombre de ménages concernés diminue également avec l’élévation du revenu, passant de 39 ménages dans le premier quintile (ménages très pauvres) à 26 ménages dans le cinquième quintile (ménages très riches). Le nombre moyen de cultures non rizicoles reste inférieur oscillant seulement entre 1.2 et 1.6 cultures par ménage selon les quintiles. Les ménages du premier quintile (ménages très pauvres) présentent la moyenne la plus élevée avec environ 1.6 culture, tandis que les deuxième quintile (ménages pauvres), troisième quintile (ménages intermédiaires) et quatrième quintile (ménages relativement aisés) affichent des valeurs proches de 1.2 à 1.3 culture par ménage. Le cinquième quintile (ménages très riches) atteint légèrement 1.4 culture en moyenne, indiquant une faible progression de la diversification chez les ménages les plus aisés. Dans l’ensemble, ces résultats traduisent un système agricole davantage spécialisé et moins diversifié qu’à Alaotra, probablement orienté vers un nombre limité de cultures dominantes. -->
+<!-- ::: -->
+<!-- :::: -->
+
+
+<!-- ```{r} -->
+<!-- #| label: tbl-cultures-quintile -->
+<!-- #| tbl-cap: "Nombre moyen de cultures non rizicoles par ménage et quintile de revenu" -->
+
+<!-- res_c |> -->
+<!--   filter(!is.na(c1)) |> -->
+<!--   mutate(j5 = as.character(j5)) |> -->
+<!--   count(j5, name = "nb_cultures") |> -->
+<!--   left_join(quintiles, by = "j5") |> -->
+<!--   filter(!is.na(Quintile)) |> -->
+<!--   summarise( -->
+<!--     n_men = n(), -->
+<!--     nb_cult_moy = round(mean(nb_cultures), 1), -->
+<!--     .by = c(Observatory, Quintile) -->
+<!--   ) |> -->
+<!--   pivot_wider(names_from = Quintile, values_from = c(n_men, nb_cult_moy)) |> -->
+<!--   gt() |> -->
+<!--   tab_header(title = "Diversification des cultures non rizicoles selon le quintile de revenu") -->
+<!-- ``` -->
+
+<!-- ```{r dl_tbl_cultures_quintile} -->
+<!-- #| echo: false -->
+<!-- #| results: asis -->
+<!-- dl_tbl_variants("tbl_cultures_quintile", "08", function(d) { -->
+<!--   d |> -->
+<!--     filter(!is.na(c1)) |> -->
+<!--     mutate(j5 = as.character(j5)) |> -->
+<!--     count(j5, Observatory, name = "nb_cultures") |> -->
+<!--     left_join(quintiles |> select(j5, Quintile), by = "j5") |> -->
+<!--     filter(!is.na(Quintile)) |> -->
+<!--     summarise( -->
+<!--       n_men = n(), -->
+<!--       nb_cult_moy = round(mean(nb_cultures), 1), -->
+<!--       .by = c(Observatory, Quintile) -->
+<!--     ) |> -->
+<!--     rename(Site = Observatory) -->
+<!-- }, res_c) -->
+<!-- ``` -->
+
+<!-- ::: -->
 
 ::: {.content-visible when-profile="consolidated"}
 
