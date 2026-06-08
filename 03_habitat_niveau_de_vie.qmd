@@ -627,7 +627,7 @@ dl_fig_variants("fig_communication", "05", function(d) {
 
 La section consacrée aux transferts sortants recense les aides envoyées par les ménages à des personnes extérieures au foyer, en précisant notamment le type de transfert (argent ou riz), sa valeur et le lieu de résidence du destinataire. 
 
-Le fichier `res_t2` recense les transferts envoyes par les menages a des personnes exterieures au foyer. Chaque ligne correspond a un destinataire. Les variables cles sont le type de transfert (`t21a`), le lieu de residence du destinataire (`t41`), le poids de riz envoye (`t42`, en kg) et la valeur totale (`t21d`, en Ar).
+<!-- Le fichier `res_t2` recense les transferts envoyes par les menages a des personnes exterieures au foyer. Chaque ligne correspond a un destinataire. Les variables cles sont le type de transfert (`t21a`), le lieu de residence du destinataire (`t41`), le poids de riz envoye (`t42`, en kg) et la valeur totale (`t21d`, en Ar). -->
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
@@ -654,7 +654,7 @@ res_t2_obs <- res_t2 |>
     Type = if_else(
       as.character(as.integer(t21a)) %in% names(type_transf_labs),
       type_transf_labs[as.character(as.integer(t21a))],
-      "Non precise"
+      "En nature autre que le riz"
     )
   )
 ```
@@ -701,45 +701,45 @@ dl_fig_variants("fig_transferts", "05", function(d) {
 }, res_t2 |> left_join(obs, by = "j5"))
 ```
 
-:::: {.content-hidden when-profile="marovoay"}
-::: obs-alaotra
-À Alaotra, tous les ménages enquêtés participent à 100% à l’envoi de transferts.
-:::
-::::
+<!-- :::: {.content-hidden when-profile="marovoay"} -->
+<!-- ::: obs-alaotra -->
+<!-- À Alaotra, tous les ménages enquêtés participent à 100% à l’envoi de transferts. -->
+<!-- ::: -->
+<!-- :::: -->
 
-:::: {.content-hidden when-profile="alaotra"}
-::: obs-marovoay
-À Marovoay, la part des ménages envoyeurs est de 100.0 % indiquant que l’ensemble des ménages observés effectuent des transferts.
-:::
-::::
+<!-- :::: {.content-hidden when-profile="alaotra"} -->
+<!-- ::: obs-marovoay -->
+<!-- À Marovoay, la part des ménages envoyeurs est de 100.0 % indiquant que l’ensemble des ménages observés effectuent des transferts. -->
+<!-- ::: -->
+<!-- :::: -->
 
 
 ```{r tbl-transferts-sortants}
-#| tbl-cap: "Transferts sortants : resume par observatoire"
+##| tbl-cap: "Transferts sortants : resume par observatoire"
 
-n_t2 <- res_t2_obs |>
-  summarise(n_envoyeurs = n_distinct(j5), .by = Observatory) |>
-  left_join(res_deb |> count(Observatory, name = "n_total"), by = "Observatory") |>
-  mutate(pct = round(n_envoyeurs / n_total * 100, 1))
-
-n_t2 |>
-  gt() |>
-  tab_header(title = "Menages envoyant des transferts") |>
-  cols_label(n_envoyeurs = "Nb envoyeurs", n_total = "Nb menages total", pct = "% envoyeurs") |>
-  style_table()
+# n_t2 <- res_t2_obs |>
+#   summarise(n_envoyeurs = n_distinct(j5), .by = Observatory) |>
+#   left_join(res_deb |> count(Observatory, name = "n_total"), by = "Observatory") |>
+#   mutate(pct = round(n_envoyeurs / n_total * 100, 1))
+# 
+# n_t2 |>
+#   gt() |>
+#   tab_header(title = "Menages envoyant des transferts") |>
+#   cols_label(n_envoyeurs = "Nb envoyeurs", n_total = "Nb menages total", pct = "% envoyeurs") |>
+#   style_table()
 ```
 
 ```{r dl_tbl_transferts}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_transferts", "05", function(d) {
-  t2_ids <- unique(as.character(res_t2$j5))
-  d |>
-    mutate(envoyeur = j5 %in% t2_ids) |>
-    summarise(Envoyeurs = sum(envoyeur), Total = n(), .by = Observatory) |>
-    mutate(`%` = round(Envoyeurs / Total * 100, 1)) |>
-    rename(Site = Observatory)
-}, res_deb)
+##| echo: false
+##| results: asis
+# dl_tbl_variants("tbl_transferts", "05", function(d) {
+#   t2_ids <- unique(as.character(res_t2$j5))
+#   d |>
+#     mutate(envoyeur = j5 %in% t2_ids) |>
+#     summarise(Envoyeurs = sum(envoyeur), Total = n(), .by = Observatory) |>
+#     mutate(`%` = round(Envoyeurs / Total * 100, 1)) |>
+#     rename(Site = Observatory)
+# }, res_deb)
 ```
 
 :::: {.content-hidden when-profile="marovoay"}
@@ -816,10 +816,10 @@ Le revenu courant agrege sept composantes :
 - les **revenus independants** (`rev_indep`) : revenus des activites liberales et artisanales non-agricoles ;
 - le **revenu net rizicole** (`rev_riz`) : valeur de la production de riz moins les charges ;
 - le **revenu net des autres cultures** (`rev_cu`) : meme logique pour les cultures non-rizicoles ;
-- le **revenu de l'elevage** (`revel`) : ventes d'animaux et produits d'elevage ;
-- la **peche** (`revpeche`).
+- le **revenu de l'elevage** (`revel`) : ventes d'animaux (autre que les animaux considérés comme capitaux comme les bœufs de trait etc…) et produits d'élevage ;
+- la **pêche** (`revpeche`).
 
-Le revenu exceptionnel regroupe les rentes foncieres, les autres revenus, le travail HIMO, la decapitalisation et les transferts recus.
+Le revenu exceptionnel regroupe les rentes foncieres, les autres revenus, le travail HIMO, la décapitalisation (y compris la vente des animaux considerés comme capitaux) et les transferts recus.
 
 ```{r income_compute}
 source("utils/calc_incomes_all_years.R")
@@ -1376,7 +1376,7 @@ cpi_series |>
 
 Cette section examine l'évolution du prix de vente médian du paddy à partir des déclarations des ménages et compare cette tendance à l'indice des prix à la consommation (IPC) national pour mesurer l'inflation locale. 
 
-Le prix de vente median du paddy, calcule a partir des ventes declarees par les menages (`dc24` dans `res_dc21`), fournit un indicateur complementaire de l'inflation locale.
+Le prix de vente median du paddy, calcule a partir des ventes declarees par les menages, fournit un indicateur complementaire de l'inflation locale.
 
 Le prix médian du paddy augmente de manière globale dans les deux observatoires entre 1995 et 2025, malgré quelques fluctuations au cours de certaines années.
 
@@ -1500,9 +1500,9 @@ trends |> make_trend_plot(revcou_real, "Revenu courant reel moyen (Ar constants 
 
 ### Revenus reels (deflates par le prix du paddy)
 
-Le prix du paddy, produit central de ces economies rizicoles, offre un deflateur alternatif plus proche de la realite locale que l'IPC national. Les revenus sont ici exprimes en equivalent-paddy a prix 2010, c'est-a-dire divises par l'indice du prix median du paddy de chaque observatoire (base 2010 = 1). Ce deflateur est propre a chaque observatoire.
+Le prix du paddy, produit central de ces economies rizicoles, offre un déflateur alternatif plus proche de la realite locale que l'IPC national. Les revenus sont ici exprimes en equivalent-paddy a prix 2010, c'est-a-dire divises par l'indice du prix median du paddy de chaque observatoire (base 2010 = 1). Ce déflateur est propre a chaque observatoire. 
 
-Le revenu total réel moyen par ménage exprimé en constants paddy 2010 présente de fortes fluctuations dans les deux observatoires au cours de la période étudiée.
+Le revenu total réel moyen par ménage exprimé en constants paddy 2010 présente de fortes fluctuations dans les deux observatoires au cours de la période étudiée. Cette approche par le déflateur-paddy est d'autant plus cruciale qu'elle met en lumière un appauvrissement réel et structurel des ménages au cours de la dernière décennie. En effet, la baisse des revenus exprimés en équivalent-paddy traduit une érosion directe du pouvoir d'achat sur le bien le plus vital de ces économies ruraux.
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
