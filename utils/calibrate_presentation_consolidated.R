@@ -70,9 +70,9 @@ parse_figure_chunks_full <- function(qmd_path) {
       if (chunk_has_fig && !is.null(chunk_label)) {
         chunks[[chunk_label]] <- list(
           label = chunk_label,
-          code  = chunk_lines,
-          file  = basename(qmd_path),
-          line  = chunk_start
+          code = chunk_lines,
+          file = basename(qmd_path),
+          line = chunk_start
         )
       }
       next
@@ -97,8 +97,11 @@ parse_figure_chunks_full <- function(qmd_path) {
 
 #' Parse all .qmd files and return a combined chunk inventory
 parse_all_fig_chunks <- function(project_dir = PROJECT_ROOT) {
-  qmd_files <- list.files(project_dir, pattern = "^\\d+.*\\.qmd$",
-                           full.names = TRUE)
+  qmd_files <- list.files(
+    project_dir,
+    pattern = "^\\d+.*\\.qmd$",
+    full.names = TRUE
+  )
   all_chunks <- list()
   for (f in qmd_files) {
     all_chunks <- c(all_chunks, parse_figure_chunks_full(f))
@@ -146,14 +149,14 @@ extract_setup_code <- function(qmd_path, target_label) {
 # ── 2. Font override mechanism ──────────────────────────────
 
 DEFAULT_FONTS <- list(
-  base_size = 14,
-  title = 16,
-  axis_text = 12,
-  axis_title = 13,
-  legend_text = 12,
-  legend_title = 13,
-  strip_text = 12,
-  geom_text = 4.5
+  base_size = 20,
+  title = 20,
+  axis_text = 20,
+  axis_title = 20,
+  legend_text = 20,
+  legend_title = 20,
+  strip_text = 20,
+  geom_text = 10
 )
 
 apply_presentation_fonts <- function(p, fonts) {
@@ -196,23 +199,25 @@ get_default_dims <- function(label, profile, report_sizes = NULL) {
   if (is.null(report_sizes)) {
     report_sizes <- load_report_sizes()
   }
-  
+
   # Default width depends on profile (consolidated is wider)
   default_w <- if (profile == "consolidated") 8 else 6.5
-  
+
   w <- report_sizes[[label]][[profile]]$width %||%
     report_sizes[[label]]$default$width %||%
     default_w
-    
+
   h <- report_sizes[[label]][[profile]]$height %||%
     report_sizes[[label]]$default$height %||%
     5
-    
-  if (profile == "alaotra" && is.null(report_sizes[[label]][[profile]]$height)) {
+
+  if (
+    profile == "alaotra" && is.null(report_sizes[[label]][[profile]]$height)
+  ) {
     # Special multiplier for alaotra in the report scaling
     h <- h * 1.25
   }
-  
+
   list(width = w, height = h)
 }
 
@@ -285,15 +290,15 @@ ui <- fluidPage(
             numericInput(
               "font_base",
               "Base size",
-              14,
+              20,
               min = 6,
-              max = 30,
+              max = 40,
               step = 1
             )
           ),
           column(
             6,
-            numericInput("font_title", "Title", 16, min = 6, max = 36, step = 1)
+            numericInput("font_title", "Title", 22, min = 6, max = 50, step = 1)
           )
         )
       ),
@@ -305,9 +310,9 @@ ui <- fluidPage(
             numericInput(
               "font_axis_text",
               "Axis tick labels",
-              12,
+              18,
               min = 4,
-              max = 24,
+              max = 30,
               step = 1
             )
           ),
@@ -316,9 +321,9 @@ ui <- fluidPage(
             numericInput(
               "font_axis_title",
               "Axis titles",
-              13,
+              19,
               min = 4,
-              max = 24,
+              max = 30,
               step = 1
             )
           )
@@ -332,9 +337,9 @@ ui <- fluidPage(
             numericInput(
               "font_legend_text",
               "Legend text",
-              12,
+              18,
               min = 4,
-              max = 24,
+              max = 30,
               step = 1
             )
           ),
@@ -343,9 +348,9 @@ ui <- fluidPage(
             numericInput(
               "font_legend_title",
               "Legend title",
-              13,
+              19,
               min = 4,
-              max = 24,
+              max = 30,
               step = 1
             )
           )
@@ -359,9 +364,9 @@ ui <- fluidPage(
             numericInput(
               "font_strip",
               "Facet labels",
-              12,
+              18,
               min = 4,
-              max = 24,
+              max = 30,
               step = 1
             )
           ),
@@ -369,8 +374,8 @@ ui <- fluidPage(
             6,
             numericInput(
               "font_geom",
-              "Bar labels",
-              4.5,
+              "Geom text",
+              5,
               min = 1,
               max = 12,
               step = 0.5
@@ -501,14 +506,22 @@ server <- function(input, output, session) {
     updateSliderInput(session, "height", value = h)
 
     f <- get_fonts_for(input$figure)
-    updateNumericInput(session, "font_base", value = f$base_size)
-    updateNumericInput(session, "font_title", value = f$title)
-    updateNumericInput(session, "font_axis_text", value = f$axis_text)
-    updateNumericInput(session, "font_axis_title", value = f$axis_title)
-    updateNumericInput(session, "font_legend_text", value = f$legend_text)
-    updateNumericInput(session, "font_legend_title", value = f$legend_title)
-    updateNumericInput(session, "font_strip", value = f$strip_text)
-    updateNumericInput(session, "font_geom", value = f$geom_text)
+    updateNumericInput(session, "font_base", value = f$base_size %||% 20)
+    updateNumericInput(session, "font_title", value = f$title %||% 22)
+    updateNumericInput(session, "font_axis_text", value = f$axis_text %||% 18)
+    updateNumericInput(session, "font_axis_title", value = f$axis_title %||% 19)
+    updateNumericInput(
+      session,
+      "font_legend_text",
+      value = f$legend_text %||% 18
+    )
+    updateNumericInput(
+      session,
+      "font_legend_title",
+      value = f$legend_title %||% 19
+    )
+    updateNumericInput(session, "font_strip", value = f$strip_text %||% 18)
+    updateNumericInput(session, "font_geom", value = f$geom_text %||% 5)
   })
 
   # --- Data loading cache ---
@@ -518,41 +531,65 @@ server <- function(input, output, session) {
   setup_chapter <- function() {
     req(input$chapter, input$profile)
     key <- paste(input$chapter, input$profile, sep = "::")
-    if (key == loaded_chapter()) return(invisible())
+    if (key == loaded_chapter()) {
+      return(invisible())
+    }
 
     Sys.setenv(QUARTO_PROFILE = input$profile)
     saved_wd <- setwd(PROJECT_ROOT)
     on.exit(setwd(saved_wd), add = TRUE)
 
-    tryCatch({
-      suppressPackageStartupMessages({
-        library(haven); library(dplyr); library(tidyr); library(stringr)
-        library(ggplot2); library(gt); library(forcats); library(purrr)
-        library(scales); library(lubridate); library(labelled)
-      })
+    tryCatch(
+      {
+        suppressPackageStartupMessages({
+          library(haven)
+          library(dplyr)
+          library(tidyr)
+          library(stringr)
+          library(ggplot2)
+          library(gt)
+          library(forcats)
+          library(purrr)
+          library(scales)
+          library(lubridate)
+          library(labelled)
+        })
 
-      source(file.path(PROJECT_ROOT, "utils/report_variant.R"), local = FALSE)
-      source(file.path(PROJECT_ROOT, "utils/sites.R"), local = FALSE)
-      source(file.path(PROJECT_ROOT, "utils/plot_theme.R"), local = FALSE)
-      source(file.path(PROJECT_ROOT, "utils/figure_sizes.R"), local = FALSE)
-      
-      tryCatch(source(file.path(PROJECT_ROOT, "utils/helpers_report.R"), local = FALSE), error = function(e) NULL)
-      tryCatch(source(file.path(PROJECT_ROOT, "utils/ror_plots.R"), local = FALSE), error = function(e) NULL)
-      
-      dl <- file.path(PROJECT_ROOT, "utils/downloadable_output.R")
-      if (file.exists(dl)) tryCatch(source(dl, local = FALSE), error = function(e) NULL)
+        source(file.path(PROJECT_ROOT, "utils/report_variant.R"), local = FALSE)
+        source(file.path(PROJECT_ROOT, "utils/sites.R"), local = FALSE)
+        source(file.path(PROJECT_ROOT, "utils/plot_theme.R"), local = FALSE)
+        source(file.path(PROJECT_ROOT, "utils/figure_sizes.R"), local = FALSE)
 
-      idx_in_chapter <- which(chunk_files == input$chapter)
-      first_lbl <- chunk_labels[idx_in_chapter[1]]
-      
-      qmd_path <- file.path(PROJECT_ROOT, input$chapter)
-      setup <- extract_setup_code(qmd_path, first_lbl)
-      if (length(setup) > 0) {
-        setup <- setup[!grepl("^\\s*knitr::", setup)]
-        setup <- setup[!grepl("knit_print|registerS3method", setup)]
-        eval(parse(text = paste(setup, collapse = "\n")), envir = globalenv())
-      }
-    }, error = function(e) message("Setup error: ", e$message))
+        tryCatch(
+          source(
+            file.path(PROJECT_ROOT, "utils/helpers_report.R"),
+            local = FALSE
+          ),
+          error = function(e) NULL
+        )
+        tryCatch(
+          source(file.path(PROJECT_ROOT, "utils/ror_plots.R"), local = FALSE),
+          error = function(e) NULL
+        )
+
+        dl <- file.path(PROJECT_ROOT, "utils/downloadable_output.R")
+        if (file.exists(dl)) {
+          tryCatch(source(dl, local = FALSE), error = function(e) NULL)
+        }
+
+        idx_in_chapter <- which(chunk_files == input$chapter)
+        first_lbl <- chunk_labels[idx_in_chapter[1]]
+
+        qmd_path <- file.path(PROJECT_ROOT, input$chapter)
+        setup <- extract_setup_code(qmd_path, first_lbl)
+        if (length(setup) > 0) {
+          setup <- setup[!grepl("^\\s*knitr::", setup)]
+          setup <- setup[!grepl("knit_print|registerS3method", setup)]
+          eval(parse(text = paste(setup, collapse = "\n")), envir = globalenv())
+        }
+      },
+      error = function(e) message("Setup error: ", e$message)
+    )
 
     loaded_chapter(key)
     loaded_figure("")
@@ -563,30 +600,40 @@ server <- function(input, output, session) {
     setup_chapter()
 
     fig_key <- paste(input$figure, input$profile, input$chapter, sep = "::")
-    if (fig_key == loaded_figure()) return(invisible())
+    if (fig_key == loaded_figure()) {
+      return(invisible())
+    }
 
     idx_in_chapter <- which(chunk_files == input$chapter)
     first_lbl <- chunk_labels[idx_in_chapter[1]]
-    
+
     if (input$figure != first_lbl) {
-      tryCatch({
-        Sys.setenv(QUARTO_PROFILE = input$profile)
-        saved_wd <- setwd(PROJECT_ROOT)
-        on.exit(setwd(saved_wd), add = TRUE)
+      tryCatch(
+        {
+          Sys.setenv(QUARTO_PROFILE = input$profile)
+          saved_wd <- setwd(PROJECT_ROOT)
+          on.exit(setwd(saved_wd), add = TRUE)
 
-        qmd_path <- file.path(PROJECT_ROOT, input$chapter)
-        all_setup <- extract_setup_code(qmd_path, input$figure)
-        base_setup <- extract_setup_code(qmd_path, first_lbl)
+          qmd_path <- file.path(PROJECT_ROOT, input$chapter)
+          all_setup <- extract_setup_code(qmd_path, input$figure)
+          base_setup <- extract_setup_code(qmd_path, first_lbl)
 
-        if (length(all_setup) > length(base_setup)) {
-          new_code <- all_setup[(length(base_setup) + 1):length(all_setup)]
-          new_code <- new_code[!grepl("^\\s*knitr::", new_code)]
-          new_code <- new_code[!grepl("knit_print|registerS3method", new_code)]
-          if (length(new_code) > 0) {
-            eval(parse(text = paste(new_code, collapse = "\n")), envir = globalenv())
+          if (length(all_setup) > length(base_setup)) {
+            new_code <- all_setup[(length(base_setup) + 1):length(all_setup)]
+            new_code <- new_code[!grepl("^\\s*knitr::", new_code)]
+            new_code <- new_code[
+              !grepl("knit_print|registerS3method", new_code)
+            ]
+            if (length(new_code) > 0) {
+              eval(
+                parse(text = paste(new_code, collapse = "\n")),
+                envir = globalenv()
+              )
+            }
           }
-        }
-      }, error = function(e) message("Incremental setup: ", e$message))
+        },
+        error = function(e) message("Incremental setup: ", e$message)
+      )
     }
     loaded_figure(fig_key)
   }
@@ -604,66 +651,120 @@ server <- function(input, output, session) {
     )
   })
 
-  output$fig_preview <- renderPlot({
-    req(input$figure, input$profile)
-    ensure_figure_setup()
+  output$fig_preview <- renderPlot(
+    {
+      req(input$figure, input$profile)
+      ensure_figure_setup()
 
-    chunk <- all_chunks_list[[input$figure]]
-    if (is.null(chunk)) return(NULL)
-
-    code <- paste(chunk$code, collapse = "\n")
-    tryCatch({
-      Sys.setenv(QUARTO_PROFILE = input$profile)
-      saved_wd <- setwd(PROJECT_ROOT)
-      on.exit(setwd(saved_wd), add = TRUE)
-      
-      p <- eval(parse(text = code), envir = globalenv())
-      if (inherits(p, "gg")) {
-        apply_presentation_fonts(p, current_fonts())
+      chunk <- all_chunks_list[[input$figure]]
+      if (is.null(chunk)) {
+        return(NULL)
       }
-    }, error = function(e) {
-      plot.new()
-      text(0.5, 0.5, paste("Error:\n", e$message), cex = 0.9, col = "red")
-    })
-  }, height = function() input$height * 96,
-     width = function() input$width * 96,
-     res = 96)
+
+      code <- paste(chunk$code, collapse = "\n")
+      tryCatch(
+        {
+          Sys.setenv(QUARTO_PROFILE = input$profile)
+          saved_wd <- setwd(PROJECT_ROOT)
+          on.exit(setwd(saved_wd), add = TRUE)
+
+          p <- eval(parse(text = code), envir = globalenv())
+          if (inherits(p, "gg")) {
+            apply_presentation_fonts(p, current_fonts())
+          }
+        },
+        error = function(e) {
+          plot.new()
+          text(0.5, 0.5, paste("Error:\n", e$message), cex = 0.9, col = "red")
+        }
+      )
+    },
+    height = function() input$height * 96,
+    width = function() input$width * 96,
+    res = 96
+  )
 
   output$render_log <- renderPrint({
     req(input$figure)
     f <- current_fonts()
-    cat(sprintf("Label: %s\nProfile: %s\nDimensions: %.1f \u00d7 %.1f in\n\n",
-                input$figure, input$profile, input$width, input$height))
-    cat(sprintf("Fonts:  base=%g  title=%g\n        axis_text=%g  axis_title=%g\n        legend_text=%g  legend_title=%g\n        strip=%g  geom_text=%g\n",
-                f$base_size, f$title, f$axis_text, f$axis_title, f$legend_text, f$legend_title, f$strip_text, f$geom_text))
+    cat(sprintf(
+      "Label: %s\nProfile: %s\nDimensions: %.1f \u00d7 %.1f in\n\n",
+      input$figure,
+      input$profile,
+      input$width,
+      input$height
+    ))
+    cat(sprintf(
+      "Fonts:  base=%g  title=%g\n        axis_text=%g  axis_title=%g\n        legend_text=%g  legend_title=%g\n        strip=%g  geom_text=%g\n",
+      f$base_size,
+      f$title,
+      f$axis_text,
+      f$axis_title,
+      f$legend_text,
+      f$legend_title,
+      f$strip_text,
+      f$geom_text
+    ))
   })
 
   output$chunk_code <- renderPrint({
     req(input$figure)
     chunk <- all_chunks_list[[input$figure]]
-    if (!is.null(chunk)) cat(paste(chunk$code, collapse = "\n")) else cat("Chunk not found")
+    if (!is.null(chunk)) {
+      cat(paste(chunk$code, collapse = "\n"))
+    } else {
+      cat("Chunk not found")
+    }
   })
 
   observeEvent(input$save_btn, {
     s <- pres()
-    if (is.null(s[[input$figure]])) s[[input$figure]] <- list()
-    s[[input$figure]][[input$profile]] <- list(width = input$width, height = input$height)
+    if (is.null(s[[input$figure]])) {
+      s[[input$figure]] <- list()
+    }
+    s[[input$figure]][[input$profile]] <- list(
+      width = input$width,
+      height = input$height
+    )
 
     fonts <- current_fonts()
-    if (isTRUE(input$fonts_global)) s[["_defaults"]]$fonts <- fonts else s[[input$figure]]$fonts <- fonts
+    if (isTRUE(input$fonts_global)) {
+      s[["_defaults"]]$fonts <- fonts
+    } else {
+      s[[input$figure]]$fonts <- fonts
+    }
 
     pres(s)
     yaml::write_yaml(s, PRES_YML)
-    showNotification(sprintf("Saved %s / %s + fonts", input$figure, input$profile), type = "message")
+    showNotification(
+      sprintf("Saved %s / %s + fonts", input$figure, input$profile),
+      type = "message"
+    )
   })
 
   observeEvent(input$reset_fonts_btn, {
     updateNumericInput(session, "font_base", value = DEFAULT_FONTS$base_size)
     updateNumericInput(session, "font_title", value = DEFAULT_FONTS$title)
-    updateNumericInput(session, "font_axis_text", value = DEFAULT_FONTS$axis_text)
-    updateNumericInput(session, "font_axis_title", value = DEFAULT_FONTS$axis_title)
-    updateNumericInput(session, "font_legend_text", value = DEFAULT_FONTS$legend_text)
-    updateNumericInput(session, "font_legend_title", value = DEFAULT_FONTS$legend_title)
+    updateNumericInput(
+      session,
+      "font_axis_text",
+      value = DEFAULT_FONTS$axis_text
+    )
+    updateNumericInput(
+      session,
+      "font_axis_title",
+      value = DEFAULT_FONTS$axis_title
+    )
+    updateNumericInput(
+      session,
+      "font_legend_text",
+      value = DEFAULT_FONTS$legend_text
+    )
+    updateNumericInput(
+      session,
+      "font_legend_title",
+      value = DEFAULT_FONTS$legend_title
+    )
     updateNumericInput(session, "font_strip", value = DEFAULT_FONTS$strip_text)
     updateNumericInput(session, "font_geom", value = DEFAULT_FONTS$geom_text)
   })
@@ -716,23 +817,48 @@ server <- function(input, output, session) {
 
   output$all_figs_table <- DT::renderDataTable({
     s <- pres()
-    df <- data.frame(Chapter = chunk_files, Label = chunk_labels, stringsAsFactors = FALSE)
+    df <- data.frame(
+      Chapter = chunk_files,
+      Label = chunk_labels,
+      stringsAsFactors = FALSE
+    )
     for (p in PROFILES) {
-      df[[paste0(p, "_w")]] <- vapply(chunk_labels, function(lbl) s[[lbl]][[p]]$width %||% NA_real_, numeric(1))
-      df[[paste0(p, "_h")]] <- vapply(chunk_labels, function(lbl) s[[lbl]][[p]]$height %||% NA_real_, numeric(1))
+      df[[paste0(p, "_w")]] <- vapply(
+        chunk_labels,
+        function(lbl) s[[lbl]][[p]]$width %||% NA_real_,
+        numeric(1)
+      )
+      df[[paste0(p, "_h")]] <- vapply(
+        chunk_labels,
+        function(lbl) s[[lbl]][[p]]$height %||% NA_real_,
+        numeric(1)
+      )
     }
-    df$custom_f <- vapply(chunk_labels, function(lbl) !is.null(s[[lbl]]$fonts), logical(1))
-    DT::datatable(df, options = list(pageLength = 20), selection = "single", rownames = FALSE)
+    df$custom_f <- vapply(
+      chunk_labels,
+      function(lbl) !is.null(s[[lbl]]$fonts),
+      logical(1)
+    )
+    DT::datatable(
+      df,
+      options = list(pageLength = 20),
+      selection = "single",
+      rownames = FALSE
+    )
   })
 
+  # Click on table row → navigate to that figure
   observeEvent(input$all_figs_table_rows_selected, {
     row <- input$all_figs_table_rows_selected
     if (length(row) == 1) {
-      if (chunk_files[row] != input$chapter) {
-        nav_target$figure <- chunk_labels[row]
-        updateSelectInput(session, "chapter", selected = chunk_files[row])
+      target_file <- chunk_files[row]
+      target_label <- chunk_labels[row]
+
+      if (target_file != input$chapter) {
+        nav_target$figure <- target_label
+        updateSelectInput(session, "chapter", selected = target_file)
       } else {
-        updateSelectInput(session, "figure", selected = chunk_labels[row])
+        updateSelectInput(session, "figure", selected = target_label)
       }
     }
   })
