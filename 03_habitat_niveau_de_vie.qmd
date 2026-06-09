@@ -959,8 +959,15 @@ inc |>
     .by = Observatory
   ) |>
   pivot_longer(-Observatory, names_to = "Composante", values_to = "Montant") |>
+  mutate(pct = Montant / sum(Montant), .by = Observatory) |>
   ggplot(aes(x = Observatory, y = Montant, fill = Composante)) +
   geom_col(position = "fill") +
+  geom_text(
+    aes(label = ifelse(pct > 0.04, paste0(round(pct * 100), "%"), "")),
+    position = position_fill(vjust = 0.5),
+    color = "white",
+    size = 3
+  ) +
   scale_y_continuous(labels = percent) +
   labs(x = NULL, y = "Part du revenu courant", fill = NULL) +
   theme_ror()
@@ -992,8 +999,15 @@ dl_fig_variants("fig_revcou_shares", "05", function(d) {
     Elevage = mean(revel, na.rm = TRUE),
     .by = Observatory) |>
     pivot_longer(-Observatory, names_to = "Composante", values_to = "Montant") |>
+    mutate(pct = Montant / sum(Montant), .by = Observatory) |>
     ggplot(aes(x = Observatory, y = Montant, fill = Composante)) +
     geom_col(position = "fill") +
+    geom_text(
+      aes(label = ifelse(pct > 0.04, paste0(round(pct * 100), "%"), "")),
+      position = position_fill(vjust = 0.5),
+      color = "white",
+      size = 3
+    ) +
     scale_y_continuous(labels = scales::percent) +
     labs(x = NULL, y = "Part du revenu courant", fill = NULL) +
     theme_ror()

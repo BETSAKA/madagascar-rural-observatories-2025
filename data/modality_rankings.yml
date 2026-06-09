@@ -6,6 +6,15 @@
 
 # --- Shared Rankings (can be reused by multiple plots) ---
 _shared:
+  water_sources:
+    - "Eau courante dans la maison/dans la cour"
+    - "Borne fontaine publique"
+    - "Impluvium"
+    - "Puits (margelle)"
+    - "Source"
+    - "Puits non aménagé (trou d?eau)"
+    - "Cours d?eau"
+    - "Autre "
   age_groups:
     - "71 ans et plus"
     - "61-70 ans"
@@ -15,7 +24,6 @@ _shared:
     - "21-30 ans"
     - "11-20 ans"
     - "0-10 ans"
-
   sanitation_levels:
     - "Dans la nature"
     - "Fosse perdue en commun"
@@ -26,11 +34,18 @@ _shared:
     - "Non scolarisé"
     - "Primaire"
     - "Secondaire 1er cycle"
-    - "Secondaire 2ème cycle & sup"
+    - "Secondaire 2ème cycle & sup."
     - "Inconnu"
+  aptitude_levels:
+    - "Non"
+    - "Avec effort"
+    - "Oui"
 
 # --- Plot-specific Rankings ---
 # Keys should match Quarto chunk labels
+fig-eau:
+  ranking_key: "water_sources"
+
 fig-latrine:
   ranking_key: "sanitation_levels"
 
@@ -42,6 +57,9 @@ fig-statut-logement:
     - "Prête"
     - "Autre"
 
+fig_pyramide:
+  ranking_key: "age_groups"
+
 fig_homeland:
   order:
     - "Dans le fokontany"
@@ -50,6 +68,12 @@ fig_homeland:
 
 fig_cm_educ:
   ranking_key: "education_levels"
-  
-fig_pyramide:
-  ranking_key: "age_groups"
+
+fig_cm_educ_sex:
+  ranking_key: "education_levels"
+
+fig_cm_write_sex:
+  ranking_key: "aptitude_levels"
+
+fig_cm_read_sex:
+  ranking_key: "aptitude_levels"
