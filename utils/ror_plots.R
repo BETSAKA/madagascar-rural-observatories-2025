@@ -386,9 +386,6 @@ ror_bar_v <- function(
   label = NULL
 ) {
   data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
   x_quo <- rlang::enquo(x)
   y_quo <- rlang::enquo(y)
   y_name <- rlang::as_name(y_quo)
@@ -396,6 +393,9 @@ ror_bar_v <- function(
     label <- knitr::opts_current$get("label")
   }
   n_fct <- dplyr::n_distinct(data$Observatory)
+
+  # Apply ranking/ordering
+  data <- .ror_global_order(data, x_quo, y_quo, label = label)
 
   data <- .ror_complete(data, x_quo, y_name, n_fct)
 
@@ -465,9 +465,6 @@ ror_bar_grouped <- function(
   pct_suffix = "%"
 ) {
   data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
   x_quo <- rlang::enquo(x)
   y_quo <- rlang::enquo(y)
   fill_quo <- rlang::enquo(fill)
@@ -476,6 +473,9 @@ ror_bar_grouped <- function(
     label <- knitr::opts_current$get("label")
   }
   n_fct <- dplyr::n_distinct(data$Observatory)
+
+  # Apply ranking/ordering
+  data <- .ror_global_order(data, x_quo, y_quo, label = label)
 
   # Uniform categories across facets
   fill_name <- rlang::as_name(fill_quo)
@@ -586,14 +586,14 @@ ror_bar_stacked <- function(
   min_pct = 5
 ) {
   data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
   x_quo <- rlang::enquo(x)
   y_quo <- rlang::enquo(y)
   fill_quo <- rlang::enquo(fill)
   data <- .ror_fix_obs_order(data)
   n_fct <- dplyr::n_distinct(data$Observatory)
+
+  # Apply ranking/ordering
+  data <- .ror_global_order(data, x_quo, y_quo, label = label)
 
   pos <- if (proportion) "fill" else "stack"
 
@@ -726,6 +726,9 @@ ror_pyramid <- function(
   y_quo <- rlang::enquo(y)
   data <- .ror_fix_obs_order(data)
   n_fct <- dplyr::n_distinct(data$Observatory)
+
+  # Apply ranking/ordering
+  data <- .ror_global_order(data, age_quo, y_quo, label = label)
 
   p <- ggplot2::ggplot(
     data,
