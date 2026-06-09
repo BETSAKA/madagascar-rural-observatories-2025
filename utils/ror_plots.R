@@ -320,7 +320,7 @@ make_bar_obs <- function(
   y_quo <- rlang::enquo(y)
   y_name <- rlang::as_name(y_quo)
   if (is.null(label)) {
-    label <- knitr::opts_current$get("label")
+    label <- knitr::opts_current$get("label") %||% { env_lbl <- Sys.getenv("ROR_CURRENT_LABEL"); if(env_lbl == "") NULL else env_lbl } %||% Sys.getenv("ROR_CURRENT_LABEL", unset = NA) |> (\(x) if(is.na(x)) NULL else x)()
   }
   n_fct <- dplyr::n_distinct(data$Observatory)
 
@@ -386,16 +386,16 @@ ror_bar_v <- function(
   label = NULL
 ) {
   data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
   x_quo <- rlang::enquo(x)
   y_quo <- rlang::enquo(y)
   y_name <- rlang::as_name(y_quo)
   if (is.null(label)) {
-    label <- knitr::opts_current$get("label")
+    label <- knitr::opts_current$get("label") %||% { env_lbl <- Sys.getenv("ROR_CURRENT_LABEL"); if(env_lbl == "") NULL else env_lbl } %||% Sys.getenv("ROR_CURRENT_LABEL", unset = NA) |> (\(x) if(is.na(x)) NULL else x)()
   }
   n_fct <- dplyr::n_distinct(data$Observatory)
+
+  # Apply ranking/ordering
+  data <- .ror_global_order(data, x_quo, y_quo, label = label)
 
   data <- .ror_complete(data, x_quo, y_name, n_fct)
 
@@ -465,17 +465,17 @@ ror_bar_grouped <- function(
   pct_suffix = "%"
 ) {
   data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
   x_quo <- rlang::enquo(x)
   y_quo <- rlang::enquo(y)
   fill_quo <- rlang::enquo(fill)
   y_name <- rlang::as_name(y_quo)
   if (is.null(label)) {
-    label <- knitr::opts_current$get("label")
+    label <- knitr::opts_current$get("label") %||% { env_lbl <- Sys.getenv("ROR_CURRENT_LABEL"); if(env_lbl == "") NULL else env_lbl } %||% Sys.getenv("ROR_CURRENT_LABEL", unset = NA) |> (\(x) if(is.na(x)) NULL else x)()
   }
   n_fct <- dplyr::n_distinct(data$Observatory)
+
+  # Apply ranking/ordering
+  data <- .ror_global_order(data, x_quo, y_quo, label = label)
 
   # Uniform categories across facets
   fill_name <- rlang::as_name(fill_quo)
@@ -586,14 +586,14 @@ ror_bar_stacked <- function(
   min_pct = 5
 ) {
   data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
-  data <- .ror_fix_obs_order(data)
   x_quo <- rlang::enquo(x)
   y_quo <- rlang::enquo(y)
   fill_quo <- rlang::enquo(fill)
   data <- .ror_fix_obs_order(data)
   n_fct <- dplyr::n_distinct(data$Observatory)
+
+  # Apply ranking/ordering
+  data <- .ror_global_order(data, x_quo, y_quo, label = label)
 
   pos <- if (proportion) "fill" else "stack"
 
@@ -724,8 +724,14 @@ ror_pyramid <- function(
   age_quo <- rlang::enquo(age_col)
   sex_quo <- rlang::enquo(sex_col)
   y_quo <- rlang::enquo(y)
+  if (is.null(label)) {
+    label <- knitr::opts_current$get("label") %||% { env_lbl <- Sys.getenv("ROR_CURRENT_LABEL"); if(env_lbl == "") NULL else env_lbl }
+  }
   data <- .ror_fix_obs_order(data)
   n_fct <- dplyr::n_distinct(data$Observatory)
+
+  # Apply ranking/ordering
+  data <- .ror_global_order(data, age_quo, y_quo, label = label)
 
   p <- ggplot2::ggplot(
     data,

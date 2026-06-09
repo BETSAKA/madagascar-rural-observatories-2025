@@ -16,6 +16,7 @@ theme_ror <- function(base_size = 12, n_facets = 1) {
     ggplot2::theme(
       plot.title = ggplot2::element_text(face = "bold", size = sz + 1),
       strip.text = ggplot2::element_text(size = sz - 1, face = "plain"),
+      panel.spacing = ggplot2::unit(1.5, "lines"),
       legend.position = if (n_facets > 1) "bottom" else "right",
       legend.title = ggplot2::element_text(size = sz - 1)
     )
