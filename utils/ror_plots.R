@@ -16,6 +16,24 @@
 }
 
 
+#' Mask non-comparable historical observations in trend plots
+.ror_mask_trend_outliers <- function(data, y_quo) {
+  if (!all(c("year", "Observatory") %in% names(data))) {
+    return(data |> dplyr::mutate(.trend_value = as.numeric(!!y_quo)))
+  }
+
+  data |>
+    dplyr::mutate(
+      .trend_excluded = Observatory == "Marovoay" & year == 2005,
+      .trend_value = dplyr::if_else(
+        .trend_excluded,
+        NA_real_,
+        as.numeric(!!y_quo)
+      )
+    )
+}
+
+
 #' Load modality rankings from YAML
 .load_ror_rankings <- function() {
   if (is.null(.ror_ranking_env$rankings)) {
@@ -703,16 +721,17 @@ ror_bar_stacked <- function(
 #' @param title   Plot title.
 make_trend_plot <- function(data, y_var, y_label, gap_year = 2014, title = "") {
   y_quo <- rlang::enquo(y_var)
+  data <- .ror_mask_trend_outliers(data, y_quo)
 
   solid <- data |> dplyr::filter(year <= gap_year)
   gap <- data |> dplyr::filter(year >= gap_year)
 
   ggplot2::ggplot(
-    mapping = ggplot2::aes(x = year, y = !!y_quo, colour = Observatory)
+    mapping = ggplot2::aes(x = year, y = .trend_value, colour = Observatory)
   ) +
-    ggplot2::geom_line(data = solid, linewidth = 0.8) +
-    ggplot2::geom_line(data = gap, linewidth = 0.8, linetype = "31") +
-    ggplot2::geom_point(data = data, size = 2) +
+    ggplot2::geom_line(data = solid, linewidth = 0.8, na.rm = TRUE) +
+    ggplot2::geom_line(data = gap, linewidth = 0.8, linetype = "31", na.rm = TRUE) +
+    ggplot2::geom_point(data = data, size = 2, na.rm = TRUE) +
     ggplot2::scale_x_continuous(breaks = seq(1995, 2025, 5)) +
     ggplot2::scale_y_continuous(labels = scales::label_comma()) +
     ggplot2::labs(
