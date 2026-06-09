@@ -1700,7 +1700,9 @@ sa_gap   <- sa_trends |> filter(year %in% c(2015, 2025))
 #| fig-width: !expr fig_w("fig_sa_soudure_duration")
 #| fig-height: !expr fig_h("fig_sa_soudure_duration")
 
-sa_trends |> make_trend_plot(y_var = soudure_moy, y_label = "Durée moyenne soudure (mois)", gap_year = 2015)
+sa_trends |>
+  filter(year >= 2004) |>
+  make_trend_plot(y_var = soudure_moy, y_label = "Durée moyenne soudure (mois)", gap_year = 2015)
 ```
 
 :::: {.content-hidden when-profile="marovoay"}
@@ -1720,7 +1722,9 @@ sa_trends |> make_trend_plot(y_var = soudure_moy, y_label = "Durée moyenne soud
 #| fig-width: !expr fig_w("fig_sa_pct_soudure")
 #| fig-height: !expr fig_h("fig_sa_pct_soudure")
 
-sa_trends |> make_trend_plot(y_var = pct_soudure, y_label = "% ménages en soudure", gap_year = 2015)
+sa_trends |>
+  filter(year >= 2004) |>
+  make_trend_plot(y_var = pct_soudure, y_label = "% ménages en soudure", gap_year = 2015)
 ```
 
 :::
