@@ -1227,6 +1227,38 @@ A Marovoay, le revenu total moyen par ménage évolue progressivement entre 1995
 ```{r trends_load}
 #| include: false
 
+
+# Function to get household scales for a specific year and observatory
+# We use the 2025 definition for OECD equivalent scales (m5 is age)
+# For older years, variables might differ, but we try to be consistent.
+get_scales_all_years <- function(yr) {
+  f <- paste0("data/ROS_MDG_microdata/", yr, "/res_m_a.dta")
+  if (!file.exists(f)) return(tibble())
+  
+  d <- read_dta(f) |> mutate(j5 = as.character(j5), year = yr)
+  
+  # Standardizing age variable name if needed (usually m5)
+  age_col <- if ("m5" %in% names(d)) "m5" else if ("am5" %in% names(d)) "am5" else NULL
+  
+  if (is.null(age_col)) {
+    # If age is missing, we approximate hh_size and assume adults
+    return(d |> group_by(j5, year) |> summarise(hh_size = n(), eq_oecd = 1 + (n()-1)*0.5, .groups = "drop"))
+  }
+  
+  d |>
+    group_by(j5, year) |>
+    summarise(
+      hh_size = n(),
+      eq_oecd = sum(case_when(
+        row_number() == 1 ~ 1.0,
+        !!sym(age_col) >= 14 ~ 0.5,
+        !!sym(age_col) < 14 ~ 0.3,
+        TRUE ~ 0.5
+      )),
+      .groups = "drop"
+    )
+}
+
 trends_file <- "output/inc_trends_obs.rds"
 
 if (file.exists(trends_file)) {
@@ -1243,7 +1275,10 @@ if (file.exists(trends_file)) {
       distinct(j5, year, .keep_all = TRUE)
   })
 
+  scales_lookup <- map_dfr(c(1995:2015, 2025), get_scales_all_years)
+
   all_obs <- all_inc |>
+    left_join(scales_lookup, by = c("j5", "year")) |>
     left_join(obs_lookup, by = c("j5", "year")) |>
     filter(j0 %in% c(3, 21)) |>
     mutate(Observatory = if_else(j0 == 3, "Marovoay", "Alaotra"))
@@ -1251,6 +1286,8 @@ if (file.exists(trends_file)) {
   trends <- all_obs |>
     summarise(
       n = n(),
+      hh_size_mean   = mean(hh_size, na.rm = TRUE),
+      eq_oecd_mean   = mean(eq_oecd, na.rm = TRUE),
       revcou_mean    = mean(revcou, na.rm = TRUE),
       revcou_median  = median(revcou, na.rm = TRUE),
       revexcept_mean = mean(revexcept, na.rm = TRUE),
@@ -1302,6 +1339,8 @@ if (file.exists(trends_file)) {
     left_join(cpi_full, by = "year") |>
     mutate(
       deflator       = cpi / 100,
+      revtot_real_pc = (revtot_mean / hh_size_mean) / deflator,
+      revtot_real_eq = (revtot_mean / eq_oecd_mean) / deflator,
       revcou_real    = revcou_mean / deflator,
       revtot_real    = revtot_mean / deflator,
       revexcept_real = revexcept_mean / deflator,
@@ -1733,5 +1772,3 @@ if ("pct_eau_amelioree" %in% names(habitat_trends)) {
     theme_ror()
 }
 ```
-:::
-:::
