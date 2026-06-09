@@ -156,7 +156,7 @@ DEFAULT_FONTS <- list(
   legend_text = 20,
   legend_title = 20,
   strip_text = 20,
-  geom_text = 10
+  geom_text = 5
 )
 
 apply_presentation_fonts <- function(p, fonts) {
@@ -200,8 +200,8 @@ get_default_dims <- function(label, profile, report_sizes = NULL) {
     report_sizes <- load_report_sizes()
   }
 
-  # Default width depends on profile (consolidated is wider)
-  default_w <- if (profile == "consolidated") 8 else 6.5
+  # Default width depends on profile
+  default_w <- if (profile == "consolidated") 18 else 12
 
   w <- report_sizes[[label]][[profile]]$width %||%
     report_sizes[[label]]$default$width %||%
@@ -209,7 +209,7 @@ get_default_dims <- function(label, profile, report_sizes = NULL) {
 
   h <- report_sizes[[label]][[profile]]$height %||%
     report_sizes[[label]]$default$height %||%
-    5
+    6
 
   if (
     profile == "alaotra" && is.null(report_sizes[[label]][[profile]]$height)
@@ -272,8 +272,8 @@ ui <- fluidPage(
 
       hr(),
       h4("Dimensions (inches)"),
-      sliderInput("width", "Width", min = 3, max = 16, value = 8, step = 0.5),
-      sliderInput("height", "Height", min = 2, max = 20, value = 5, step = 0.5),
+      sliderInput("width", "Width", min = 3, max = 24, value = 18, step = 0.5),
+      sliderInput("height", "Height", min = 2, max = 15, value = 6, step = 0.5),
 
       hr(),
       h4("Font sizes"),
