@@ -824,13 +824,39 @@ Le revenu exceptionnel regroupe les rentes foncieres, les autres revenus, le tra
 ```{r income_compute}
 source("utils/calc_incomes_all_years.R")
 
+# Calcul des échelles d'équivalence (OCDE modifiée)
+# 1,0 pour le premier adulte du ménage ;
+# 0,5 pour les autres personnes de 14 ans ou plus ;
+# 0,3 pour les enfants de moins de 14 ans.
+weights <- read_dta("data/ROS_MDG_microdata/2025/res_m_a.dta") |>
+  group_by(j5) |>
+  summarise(
+    hh_size = n(),
+    eq_oecd = sum(case_when(
+      row_number() == 1 ~ 1.0,
+      m5 >= 14 ~ 0.5,
+      m5 < 14 ~ 0.3,
+      TRUE ~ 0.5
+    )),
+    .groups = "drop"
+  ) |>
+  mutate(j5 = as.character(j5))
+
 inc <- compute_income_year(2025) |>
-  left_join(obs, by = "j5")
+  mutate(j5 = as.character(j5)) |>
+  left_join(obs, by = "j5") |>
+  left_join(weights, by = "j5") |>
+  mutate(
+    revtot_pc = revtot / hh_size,
+    revtot_eq = revtot / eq_oecd
+  )
 ```
 
 ### Structure du revenu total
 
 Le revenu total annuel par ménage synthétise l'ensemble des ressources monétaires et non-monétaires. Les écarts entre moyenne et médiane reflètent le degré d'inégalité au sein de chaque observatoire.
+
+Afin de mieux apprécier le niveau de vie, le revenu total est également rapporté à la taille du ménage. On distingue le revenu « par tête » (revenu total divisé par le nombre de membres) et le revenu « par unité de consommation » (UC). Pour ce dernier, nous utilisons l'échelle d'équivalence de l'OCDE modifiée, qui attribue un poids de 1,0 au premier adulte, 0,5 aux autres personnes de 14 ans ou plus, et 0,3 aux enfants de moins de 14 ans. Cette méthode permet de tenir compte des économies d'échelle au sein du ménage (partage du logement, de l'énergie, etc.).
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
@@ -847,17 +873,38 @@ Le revenu total annuel par ménage synthétise l'ensemble des ressources monéta
 ```{r t_revtot_obs}
 inc |>
   summarise(
-    `Nb menages` = n(),
+    `Nb ménages` = n(),
     Moyenne = round(mean(revtot, na.rm = TRUE)),
-    Mediane = round(median(revtot, na.rm = TRUE)),
-    `Ecart-type` = round(sd(revtot, na.rm = TRUE)),
+    Médiane = round(median(revtot, na.rm = TRUE)),
+    `Par tête (moy.)` = round(mean(revtot_pc, na.rm = TRUE)),
+    `Par équivalent (moy.)` = round(mean(revtot_eq, na.rm = TRUE)),
+    .by = Observatory
+  ) |>
+  gt() |>
+  tab_header(
+    title = "Revenu total annuel (Ar/an)",
+    subtitle = "Comparaison par ménage, par tête et par équivalent (OCDE modifiée)"
+  ) |>
+  fmt_number(columns = Moyenne:`Par équivalent (moy.)`, use_seps = TRUE, decimals = 0) |>
+  style_table()
+```
+
+### Détail des revenus par ménage
+
+```{r t_revtot_details}
+inc |>
+  summarise(
+    `Nb ménages` = n(),
+    Moyenne = round(mean(revtot, na.rm = TRUE)),
+    Médiane = round(median(revtot, na.rm = TRUE)),
+    `Écart-type` = round(sd(revtot, na.rm = TRUE)),
     Minimum = round(min(revtot, na.rm = TRUE)),
     Maximum = round(max(revtot, na.rm = TRUE)),
     .by = Observatory
   ) |>
   gt() |>
   tab_header(
-    title = "Revenu total annuel par menage et par observatoire (Ar/an)",
+    title = "Statistiques descriptives du revenu total par ménage",
     subtitle = "Campagne 2025"
   ) |>
   fmt_number(columns = Moyenne:Maximum, use_seps = TRUE, decimals = 0) |>
@@ -1017,6 +1064,8 @@ dl_fig_variants("fig_revcou_shares", "05", function(d) {
 <!-- ### Distribution du revenu total -->
 
 <!-- La distribution du revenu total illustre le degré d'inégalité au sein de chaque observatoire. L'utilisation d'une échelle logarithmique permet de mieux visualiser l'étalement de la distribution et la concentration des ménages à bas revenus. -->
+
+Afin de mieux apprécier le niveau de vie, le revenu total est également rapporté à la taille du ménage. On distingue le revenu « par tête » (revenu total divisé par le nombre de membres) et le revenu « par unité de consommation » (UC). Pour ce dernier, nous utilisons l'échelle d'équivalence de l'OCDE modifiée, qui attribue un poids de 1,0 au premier adulte, 0,5 aux autres personnes de 14 ans ou plus, et 0,3 aux enfants de moins de 14 ans. Cette méthode permet de tenir compte des économies d'échelle au sein du ménage (partage du logement, de l'énergie, etc.).
 
 <!-- :::: {.content-hidden when-profile="marovoay"} -->
 <!-- ::: obs-alaotra -->
