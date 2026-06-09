@@ -153,6 +153,24 @@ pct_riziere_m <- type_stats |> filter(Observatory == "Marovoay", Type == "Riziè
 pct_champs_a <- type_stats |> filter(Observatory == "Alaotra", Type == "Champs") |> pull(pct)
 pct_champs_m <- type_stats |> filter(Observatory == "Marovoay", Type == "Champs") |> pull(pct)
 
+type_surface_stats <- fr30_data |>
+  filter(!is.na(fr30d)) |>
+  mutate(Type = factor(as.character(fr30c), levels = names(type_labs), labels = type_labs)) |>
+  summarise(surface = sum(fr30d, na.rm = TRUE), .by = c(Observatory, Type)) |>
+  mutate(pct = round(surface / sum(surface) * 100, 1), .by = Observatory)
+pct_surface_riziere_a <- type_surface_stats |>
+  filter(Observatory == "Alaotra", Type == "Rizière") |>
+  pull(pct)
+pct_surface_riziere_m <- type_surface_stats |>
+  filter(Observatory == "Marovoay", Type == "Rizière") |>
+  pull(pct)
+pct_surface_champs_a <- type_surface_stats |>
+  filter(Observatory == "Alaotra", Type == "Champs") |>
+  pull(pct)
+pct_surface_champs_m <- type_surface_stats |>
+  filter(Observatory == "Marovoay", Type == "Champs") |>
+  pull(pct)
+
 # Patrimoine – localisation
 loc_stats <- fr30_data |> filter(!is.na(fr30e)) |>
   mutate(Loc = factor(as.character(fr30e), levels = names(loc_labs), labels = loc_labs)) |>
@@ -421,6 +439,51 @@ dl_fig_variants("fig_type_parcelle", "07", function(d) {
                     y_label = "% des parcelles", direction = "horizontal",
                     facet = FALSE)
 }, res_fr30 |> filter(!is.na(fr30c)))
+```
+
+Cette lecture peut être affinée en pondérant chaque parcelle par sa superficie : une grande parcelle contribue alors davantage qu'une petite. La figure suivante ne montre donc plus la part du nombre de parcelles, mais la part de la surface totale détenue par type de parcelle.
+
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+**Alaotra.** Une fois les parcelles pondérées par leur surface, les rizières représentent `r pct_surface_riziere_a` % de la surface totale possédée, contre `r pct_surface_champs_a` % pour les champs. La hiérarchie par type reste donc dominée par la rizière, et cet écart se renforce par rapport au simple comptage des parcelles.
+:::
+:::
+
+::: {.content-hidden when-profile="alaotra"}
+::: {.obs-marovoay}
+**Marovoay.** Une fois les parcelles pondérées par leur surface, les rizières représentent `r pct_surface_riziere_m` % de la surface totale possédée, contre `r pct_surface_champs_m` % pour les champs. La domination foncière de la rizière apparaît ainsi encore plus nettement que dans la répartition en nombre de parcelles.
+:::
+:::
+
+```{r}
+#| label: fig-type-parcelle-surface
+#| fig-cap: "Type des parcelles possédées, pondéré par la surface"
+#| fig-width: !expr fig_w("fig-type-parcelle-surface")
+#| fig-height: !expr fig_h("fig-type-parcelle-surface")
+
+fr30_data |>
+  filter(!is.na(fr30d)) |>
+  expand_sites_for_profile() |>
+  mutate(Type = factor(as.character(fr30c), levels = names(type_labs), labels = type_labs)) |>
+  summarise(surface = sum(fr30d, na.rm = TRUE), .by = c(Observatory, Type)) |>
+  mutate(pct = round(surface / sum(surface) * 100, 1), .by = Observatory) |>
+  make_bar_obs(x = Type, y_label = "% de la surface totale")
+```
+
+```{r dl_fig_type_parcelle_surface}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_type_parcelle_surface", "07", function(d) {
+  d |>
+    filter(!is.na(fr30d)) |>
+    mutate(Type = factor(as.character(fr30c), levels = names(type_labs), labels = type_labs)) |>
+    summarise(surface = sum(fr30d, na.rm = TRUE), .by = c(Observatory, Type)) |>
+    mutate(pct = round(surface / sum(surface) * 100, 1), .by = Observatory) |>
+    ror_bar_grouped(x = Type, fill = Observatory,
+                    y = pct,
+                    y_label = "% de la surface totale", direction = "horizontal",
+                    facet = FALSE)
+}, res_fr30 |> filter(!is.na(fr30c), !is.na(fr30d)))
 ```
 
 La localisation des parcelles reflète les spécificités agro-écologiques de chaque site (@fig-localisation-parcelle).
