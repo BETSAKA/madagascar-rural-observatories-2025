@@ -156,7 +156,7 @@ DEFAULT_FONTS <- list(
   legend_text = 20,
   legend_title = 20,
   strip_text = 20,
-  geom_text = 5
+  geom_text = 6.5
 )
 
 apply_presentation_fonts <- function(p, fonts) {
@@ -196,34 +196,30 @@ load_report_sizes <- function() {
 }
 
 get_default_dims <- function(label, profile, report_sizes = NULL) {
-  if (is.null(report_sizes)) {
-    report_sizes <- load_report_sizes()
+  # Load presentation defaults from the YAML if they exist
+  pres_yml <- file.path(PROJECT_ROOT, "data/presentation_sizes.yml")
+  pres_defaults <- if (file.exists(pres_yml)) {
+    yaml::read_yaml(pres_yml)
+  } else {
+    list()
   }
 
-  # Default width depends on profile
-  default_w <- if (profile == "consolidated") 18 else 12
+  # Width
+  w <- pres_defaults[[label]][[profile]]$width %||%
+    pres_defaults[["_defaults"]][[profile]]$width %||%
+    16
 
-  w <- report_sizes[[label]][[profile]]$width %||%
-    report_sizes[[label]]$default$width %||%
-    default_w
-
-  h <- report_sizes[[label]][[profile]]$height %||%
-    report_sizes[[label]]$default$height %||%
+  # Height
+  h <- pres_defaults[[label]][[profile]]$height %||%
+    pres_defaults[["_defaults"]][[profile]]$height %||%
     6
-
-  if (
-    profile == "alaotra" && is.null(report_sizes[[label]][[profile]]$height)
-  ) {
-    # Special multiplier for alaotra in the report scaling
-    h <- h * 1.25
-  }
 
   list(width = w, height = h)
 }
 
 # ── 4. Paths & constants ───────────────────────────────────
 
-PRES_YML <- file.path(PROJECT_ROOT, "data/presentation_sizes_consolidated.yml")
+PRES_YML <- file.path(PROJECT_ROOT, "data/presentation_sizes.yml")
 PROFILES <- c("consolidated", "marovoay", "alaotra")
 
 # ── 5. UI ───────────────────────────────────────────────────
