@@ -250,7 +250,10 @@ ror_fig_height_n <- function(
         actual_vals <- unique(as.character(dplyr::pull(data, !!x_quo)))
         ordered_levels <- intersect(levels_vec, actual_vals)
         remaining <- setdiff(actual_vals, ordered_levels)
-        final_levels <- c(ordered_levels, remaining)
+        final_levels <- unique(c(
+          as.character(ordered_levels),
+          as.character(remaining)
+        ))
         return(dplyr::mutate(
           data,
           !!x_quo := factor(!!x_quo, levels = rev(final_levels))
@@ -266,11 +269,13 @@ ror_fig_height_n <- function(
       dplyr::filter(Observatory == "Marovoay") |>
       dplyr::summarise(.total = sum(!!y_quo, na.rm = TRUE), .by = !!x_quo) |>
       dplyr::arrange(.total) |>
-      dplyr::pull(!!x_quo)
+      dplyr::pull(!!x_quo) |>
+      as.character() |>
+      unique()
     actual_vals <- unique(as.character(dplyr::pull(data, !!x_quo)))
-    missing <- setdiff(actual_vals, as.character(ref_order))
+    missing <- setdiff(actual_vals, ref_order)
     if (length(missing) > 0) {
-      ref_order <- c(missing, ref_order)
+      ref_order <- unique(c(missing, ref_order))
     }
     return(dplyr::mutate(data, !!x_quo := factor(!!x_quo, levels = ref_order)))
   }
@@ -278,7 +283,9 @@ ror_fig_height_n <- function(
   global_order <- data |>
     dplyr::summarise(.total = sum(!!y_quo, na.rm = TRUE), .by = !!x_quo) |>
     dplyr::arrange(.total) |>
-    dplyr::pull(!!x_quo)
+    dplyr::pull(!!x_quo) |>
+    as.character() |>
+    unique()
   dplyr::mutate(data, !!x_quo := factor(!!x_quo, levels = global_order))
 }
 
@@ -320,7 +327,13 @@ make_bar_obs <- function(
   y_quo <- rlang::enquo(y)
   y_name <- rlang::as_name(y_quo)
   if (is.null(label)) {
-    label <- knitr::opts_current$get("label") %||% { env_lbl <- Sys.getenv("ROR_CURRENT_LABEL"); if(env_lbl == "") NULL else env_lbl } %||% Sys.getenv("ROR_CURRENT_LABEL", unset = NA) |> (\(x) if(is.na(x)) NULL else x)()
+    label <- knitr::opts_current$get("label") %||%
+      {
+        env_lbl <- Sys.getenv("ROR_CURRENT_LABEL")
+        if (env_lbl == "") NULL else env_lbl
+      } %||%
+      Sys.getenv("ROR_CURRENT_LABEL", unset = NA) |>
+      (\(x) if (is.na(x)) NULL else x)()
   }
   n_fct <- dplyr::n_distinct(data$Observatory)
 
@@ -390,7 +403,13 @@ ror_bar_v <- function(
   y_quo <- rlang::enquo(y)
   y_name <- rlang::as_name(y_quo)
   if (is.null(label)) {
-    label <- knitr::opts_current$get("label") %||% { env_lbl <- Sys.getenv("ROR_CURRENT_LABEL"); if(env_lbl == "") NULL else env_lbl } %||% Sys.getenv("ROR_CURRENT_LABEL", unset = NA) |> (\(x) if(is.na(x)) NULL else x)()
+    label <- knitr::opts_current$get("label") %||%
+      {
+        env_lbl <- Sys.getenv("ROR_CURRENT_LABEL")
+        if (env_lbl == "") NULL else env_lbl
+      } %||%
+      Sys.getenv("ROR_CURRENT_LABEL", unset = NA) |>
+      (\(x) if (is.na(x)) NULL else x)()
   }
   n_fct <- dplyr::n_distinct(data$Observatory)
 
@@ -470,7 +489,13 @@ ror_bar_grouped <- function(
   fill_quo <- rlang::enquo(fill)
   y_name <- rlang::as_name(y_quo)
   if (is.null(label)) {
-    label <- knitr::opts_current$get("label") %||% { env_lbl <- Sys.getenv("ROR_CURRENT_LABEL"); if(env_lbl == "") NULL else env_lbl } %||% Sys.getenv("ROR_CURRENT_LABEL", unset = NA) |> (\(x) if(is.na(x)) NULL else x)()
+    label <- knitr::opts_current$get("label") %||%
+      {
+        env_lbl <- Sys.getenv("ROR_CURRENT_LABEL")
+        if (env_lbl == "") NULL else env_lbl
+      } %||%
+      Sys.getenv("ROR_CURRENT_LABEL", unset = NA) |>
+      (\(x) if (is.na(x)) NULL else x)()
   }
   n_fct <- dplyr::n_distinct(data$Observatory)
 
@@ -725,7 +750,11 @@ ror_pyramid <- function(
   sex_quo <- rlang::enquo(sex_col)
   y_quo <- rlang::enquo(y)
   if (is.null(label)) {
-    label <- knitr::opts_current$get("label") %||% { env_lbl <- Sys.getenv("ROR_CURRENT_LABEL"); if(env_lbl == "") NULL else env_lbl }
+    label <- knitr::opts_current$get("label") %||%
+      {
+        env_lbl <- Sys.getenv("ROR_CURRENT_LABEL")
+        if (env_lbl == "") NULL else env_lbl
+      }
   }
   data <- .ror_fix_obs_order(data)
   n_fct <- dplyr::n_distinct(data$Observatory)

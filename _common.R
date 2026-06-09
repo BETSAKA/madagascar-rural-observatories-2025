@@ -8,6 +8,12 @@ source("utils/sites.R")
 source("utils/plot_theme.R")
 source("utils/figure_sizes.R")
 REPORT_MODE <- get_report_mode()
+.ror_render_dir <- normalizePath(getwd(), winslash = "/", mustWork = TRUE)
+
+knitr::knit_hooks$set(document = function(x) {
+  setwd(.ror_render_dir)
+  x
+})
 
 # --- gt LaTeX accent fix ---
 # The comprehensive knit_print.gt_tbl (incl. table-hiding in per-obs mode)

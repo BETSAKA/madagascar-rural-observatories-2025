@@ -824,13 +824,39 @@ Le revenu exceptionnel regroupe les rentes foncieres, les autres revenus, le tra
 ```{r income_compute}
 source("utils/calc_incomes_all_years.R")
 
+# Calcul des échelles d'équivalence (OCDE modifiée)
+# 1,0 pour le premier adulte du ménage ;
+# 0,5 pour les autres personnes de 14 ans ou plus ;
+# 0,3 pour les enfants de moins de 14 ans.
+weights <- read_dta("data/ROS_MDG_microdata/2025/res_m_a.dta") |>
+  group_by(j5) |>
+  summarise(
+    hh_size = n(),
+    eq_oecd = sum(case_when(
+      row_number() == 1 ~ 1.0,
+      m5 >= 14 ~ 0.5,
+      m5 < 14 ~ 0.3,
+      TRUE ~ 0.5
+    )),
+    .groups = "drop"
+  ) |>
+  mutate(j5 = as.character(j5))
+
 inc <- compute_income_year(2025) |>
-  left_join(obs, by = "j5")
+  mutate(j5 = as.character(j5)) |>
+  left_join(obs, by = "j5") |>
+  left_join(weights, by = "j5") |>
+  mutate(
+    revtot_pc = revtot / hh_size,
+    revtot_eq = revtot / eq_oecd
+  )
 ```
 
 ### Structure du revenu total
 
 Le revenu total annuel par ménage synthétise l'ensemble des ressources monétaires et non-monétaires. Les écarts entre moyenne et médiane reflètent le degré d'inégalité au sein de chaque observatoire.
+
+Afin de mieux apprécier le niveau de vie, le revenu total est également rapporté à la taille du ménage. On distingue le revenu « par tête » (revenu total divisé par le nombre de membres) et le revenu « par unité de consommation » (UC). Pour ce dernier, nous utilisons l'échelle d'équivalence de l'OCDE modifiée, qui attribue un poids de 1,0 au premier adulte, 0,5 aux autres personnes de 14 ans ou plus, et 0,3 aux enfants de moins de 14 ans. Cette méthode permet de tenir compte des économies d'échelle au sein du ménage (partage du logement, de l'énergie, etc.).
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
@@ -847,17 +873,38 @@ Le revenu total annuel par ménage synthétise l'ensemble des ressources monéta
 ```{r t_revtot_obs}
 inc |>
   summarise(
-    `Nb menages` = n(),
+    `Nb ménages` = n(),
     Moyenne = round(mean(revtot, na.rm = TRUE)),
-    Mediane = round(median(revtot, na.rm = TRUE)),
-    `Ecart-type` = round(sd(revtot, na.rm = TRUE)),
+    Médiane = round(median(revtot, na.rm = TRUE)),
+    `Par tête (moy.)` = round(mean(revtot_pc, na.rm = TRUE)),
+    `Par équivalent (moy.)` = round(mean(revtot_eq, na.rm = TRUE)),
+    .by = Observatory
+  ) |>
+  gt() |>
+  tab_header(
+    title = "Revenu total annuel (Ar/an)",
+    subtitle = "Comparaison par ménage, par tête et par équivalent (OCDE modifiée)"
+  ) |>
+  fmt_number(columns = Moyenne:`Par équivalent (moy.)`, use_seps = TRUE, decimals = 0) |>
+  style_table()
+```
+
+### Détail des revenus par ménage
+
+```{r t_revtot_details}
+inc |>
+  summarise(
+    `Nb ménages` = n(),
+    Moyenne = round(mean(revtot, na.rm = TRUE)),
+    Médiane = round(median(revtot, na.rm = TRUE)),
+    `Écart-type` = round(sd(revtot, na.rm = TRUE)),
     Minimum = round(min(revtot, na.rm = TRUE)),
     Maximum = round(max(revtot, na.rm = TRUE)),
     .by = Observatory
   ) |>
   gt() |>
   tab_header(
-    title = "Revenu total annuel par menage et par observatoire (Ar/an)",
+    title = "Statistiques descriptives du revenu total par ménage",
     subtitle = "Campagne 2025"
   ) |>
   fmt_number(columns = Moyenne:Maximum, use_seps = TRUE, decimals = 0) |>
@@ -1018,16 +1065,18 @@ dl_fig_variants("fig_revcou_shares", "05", function(d) {
 
 <!-- La distribution du revenu total illustre le degré d'inégalité au sein de chaque observatoire. L'utilisation d'une échelle logarithmique permet de mieux visualiser l'étalement de la distribution et la concentration des ménages à bas revenus. -->
 
-<!-- :::: {.content-hidden when-profile="marovoay"} -->
-<!-- ::: obs-alaotra -->
-<!-- A Alaotra, la distribution du revenu total annuel des ménages dans l’observatoire d’Alaotra montre une forte concentration des revenus autour des valeurs intermédiaires, avec une densité maximale située approximativement entre 1,000,000 et 10,000,000 Ar en échelle logarithmique. La courbe présente une forme relativement asymétrique vers la droite, indiquant que certains ménages disposent de revenus plus élevés mais restent peu nombreux. Les très faibles revenus ainsi que les revenus extrêmement élevés apparaissent avec une faible densité. La distribution traduit donc une concentration majoritaire des ménages autour des revenus moyens. -->
-<!-- ::: -->
-<!-- :::: -->
+Afin de mieux apprécier le niveau de vie, le revenu total est également rapporté à la taille du ménage. On distingue le revenu « par tête » (revenu total divisé par le nombre de membres) et le revenu « par unité de consommation » (UC). Pour ce dernier, nous utilisons l'échelle d'équivalence de l'OCDE modifiée, qui attribue un poids de 1,0 au premier adulte, 0,5 aux autres personnes de 14 ans ou plus, et 0,3 aux enfants de moins de 14 ans. Cette méthode permet de tenir compte des économies d'échelle au sein du ménage (partage du logement, de l'énergie, etc.).
 
-<!-- :::: {.content-hidden when-profile="alaotra"} -->
-<!-- ::: obs-marovoay -->
-<!-- A Marovoay, la distribution du revenu total annuel des ménages suit également une forme unimodale avec une concentration importante des ménages autour des revenus intermédiaires. La densité maximale se situe dans la même plage logarithmique, principalement entre 1,000,000 et 10,000,000 Ar. La courbe présente une légère asymétrie à droite, ce qui montre l’existence de quelques ménages à revenus élevés, mais en effectif limité. Les ménages à très faibles revenus ainsi que ceux ayant des revenus très élevés restent minoritaires dans la distribution globale. -->
-<!-- ::: -->
+<!-- :::: {.content-hidden when-profile="marovoay"} 
+::: obs-alaotra 
+ A Alaotra, la distribution du revenu total annuel des ménages dans l’observatoire d’Alaotra montre une forte concentration des revenus autour des valeurs intermédiaires, avec une densité maximale située approximativement entre 1,000,000 et 10,000,000 Ar en échelle logarithmique. La courbe présente une forme relativement asymétrique vers la droite, indiquant que certains ménages disposent de revenus plus élevés mais restent peu nombreux. Les très faibles revenus ainsi que les revenus extrêmement élevés apparaissent avec une faible densité. La distribution traduit donc une concentration majoritaire des ménages autour des revenus moyens. 
+ ::: 
+ :::: -->
+
+<!-- :::: {.content-hidden when-profile="alaotra"} 
+::: obs-marovoay -
+A Marovoay, la distribution du revenu total annuel des ménages suit également une forme unimodale avec une concentration importante des ménages autour des revenus intermédiaires. La densité maximale se situe dans la même plage logarithmique, principalement entre 1,000,000 et 10,000,000 Ar. La courbe présente une légère asymétrie à droite, ce qui montre l’existence de quelques ménages à revenus élevés, mais en effectif limité. Les ménages à très faibles revenus ainsi que ceux ayant des revenus très élevés restent minoritaires dans la distribution globale. 
+::: -->
 <!-- :::: -->
 
 <!-- ```{r fig_revtot_dist} -->
@@ -1178,6 +1227,38 @@ A Marovoay, le revenu total moyen par ménage évolue progressivement entre 1995
 ```{r trends_load}
 #| include: false
 
+
+# Function to get household scales for a specific year and observatory
+# We use the 2025 definition for OECD equivalent scales (m5 is age)
+# For older years, variables might differ, but we try to be consistent.
+get_scales_all_years <- function(yr) {
+  f <- paste0("data/ROS_MDG_microdata/", yr, "/res_m_a.dta")
+  if (!file.exists(f)) return(tibble())
+  
+  d <- read_dta(f) |> mutate(j5 = as.character(j5), year = yr)
+  
+  # Standardizing age variable name if needed (usually m5)
+  age_col <- if ("m5" %in% names(d)) "m5" else if ("am5" %in% names(d)) "am5" else NULL
+  
+  if (is.null(age_col)) {
+    # If age is missing, we approximate hh_size and assume adults
+    return(d |> group_by(j5, year) |> summarise(hh_size = n(), eq_oecd = 1 + (n()-1)*0.5, .groups = "drop"))
+  }
+  
+  d |>
+    group_by(j5, year) |>
+    summarise(
+      hh_size = n(),
+      eq_oecd = sum(case_when(
+        row_number() == 1 ~ 1.0,
+        !!sym(age_col) >= 14 ~ 0.5,
+        !!sym(age_col) < 14 ~ 0.3,
+        TRUE ~ 0.5
+      )),
+      .groups = "drop"
+    )
+}
+
 trends_file <- "output/inc_trends_obs.rds"
 
 if (file.exists(trends_file)) {
@@ -1194,7 +1275,10 @@ if (file.exists(trends_file)) {
       distinct(j5, year, .keep_all = TRUE)
   })
 
+  scales_lookup <- map_dfr(c(1995:2015, 2025), get_scales_all_years)
+
   all_obs <- all_inc |>
+    left_join(scales_lookup, by = c("j5", "year")) |>
     left_join(obs_lookup, by = c("j5", "year")) |>
     filter(j0 %in% c(3, 21)) |>
     mutate(Observatory = if_else(j0 == 3, "Marovoay", "Alaotra"))
@@ -1202,6 +1286,8 @@ if (file.exists(trends_file)) {
   trends <- all_obs |>
     summarise(
       n = n(),
+      hh_size_mean   = mean(hh_size, na.rm = TRUE),
+      eq_oecd_mean   = mean(eq_oecd, na.rm = TRUE),
       revcou_mean    = mean(revcou, na.rm = TRUE),
       revcou_median  = median(revcou, na.rm = TRUE),
       revexcept_mean = mean(revexcept, na.rm = TRUE),
@@ -1249,24 +1335,52 @@ if (file.exists(trends_file)) {
     tibble(year = 2025L, cpi = cpi_wb$cpi[cpi_wb$year == 2023] * 1.09^2)
   )
 
-  trends <- trends |>
-    left_join(cpi_full, by = "year") |>
-    mutate(
-      deflator       = cpi / 100,
-      revcou_real    = revcou_mean / deflator,
-      revtot_real    = revtot_mean / deflator,
-      revexcept_real = revexcept_mean / deflator,
-      revppal_real   = revppal_mean / deflator,
-      revsec_real    = revsec_mean / deflator,
-      rev_indep_real = rev_indep_mean / deflator,
-      rev_riz_real   = rev_riz_mean / deflator,
-      rev_cu_real    = rev_cu_mean / deflator,
-      revel_real     = revel_mean / deflator,
-      revpeche_real  = revpeche_mean / deflator
-    )
-
   saveRDS(trends, trends_file)
 }
+
+# Recompute derived real-income series even when loading a cached RDS,
+# so newly added columns are always available during render.
+if (!"cpi" %in% names(trends)) {
+  library(jsonlite)
+  wb_raw <- fromJSON(
+    "https://api.worldbank.org/v2/country/MDG/indicator/FP.CPI.TOTL?date=1995:2025&format=json&per_page=50"
+  )
+  cpi_wb <- tibble(
+    year = as.integer(wb_raw[[2]]$date),
+    cpi  = as.numeric(wb_raw[[2]]$value)
+  ) |>
+    filter(!is.na(cpi)) |>
+    arrange(year)
+
+  cpi_full <- bind_rows(
+    cpi_wb,
+    tibble(year = 2024L, cpi = cpi_wb$cpi[cpi_wb$year == 2023] * 1.09),
+    tibble(year = 2025L, cpi = cpi_wb$cpi[cpi_wb$year == 2023] * 1.09^2)
+  )
+
+  trends <- trends |> left_join(cpi_full, by = "year")
+}
+
+trends <- trends |>
+  mutate(
+    deflator       = cpi / 100,
+    revcou_real_pc = (revcou_mean / hh_size_mean) / deflator,
+    revcou_real_eq = (revcou_mean / eq_oecd_mean) / deflator,
+    revtot_real_pc = (revtot_mean / hh_size_mean) / deflator,
+    revtot_real_eq = (revtot_mean / eq_oecd_mean) / deflator,
+    revcou_real    = revcou_mean / deflator,
+    revtot_real    = revtot_mean / deflator,
+    revexcept_real = revexcept_mean / deflator,
+    revppal_real   = revppal_mean / deflator,
+    revsec_real    = revsec_mean / deflator,
+    rev_indep_real = rev_indep_mean / deflator,
+    rev_riz_real   = rev_riz_mean / deflator,
+    rev_cu_real    = rev_cu_mean / deflator,
+    revel_real     = revel_mean / deflator,
+    revpeche_real  = revpeche_mean / deflator
+  )
+
+saveRDS(trends, trends_file)
 
 # Deflation par le prix du paddy
 paddy_base_2010 <- trends |>
@@ -1489,6 +1603,22 @@ Le revenu total réel moyen par ménage présente des fluctuations importantes d
 trends |> make_trend_plot(revtot_real, "Revenu total reel moyen (Ar constants 2010)")
 ```
 
+```{r fig_trends_revtot_real_pc}
+#| fig-cap: "Evolution du revenu total reel moyen par tete (Ar constants 2010, IPC)"
+#| fig-width: !expr fig_w("fig_trends_revtot_real_pc")
+#| fig-height: !expr fig_h("fig_trends_revtot_real_pc")
+
+trends |> make_trend_plot(revtot_real_pc, "Revenu total reel moyen (Ar/tete/an, constants 2010)")
+```
+
+```{r fig_trends_revtot_real_eq}
+#| fig-cap: "Evolution du revenu total reel moyen par unite de consommation (Ar constants 2010, IPC)"
+#| fig-width: !expr fig_w("fig_trends_revtot_real_eq")
+#| fig-height: !expr fig_h("fig_trends_revtot_real_eq")
+
+trends |> make_trend_plot(revtot_real_eq, "Revenu total reel moyen (Ar/UC/an, constants 2010)")
+```
+
 Le revenu courant réel moyen par ménage présente une évolution très fluctuante dans les deux observatoires sur l’ensemble de la période étudiée.
 
 :::: {.content-hidden when-profile="marovoay"}
@@ -1510,6 +1640,22 @@ Le revenu courant réel moyen par ménage présente une évolution très fluctua
 #| fig-height: !expr fig_h("fig_trends_revcou_real")
 
 trends |> make_trend_plot(revcou_real, "Revenu courant reel moyen (Ar constants 2010)")
+```
+
+```{r fig_trends_revcou_real_pc}
+#| fig-cap: "Evolution du revenu courant reel moyen par tete (Ar constants 2010, IPC)"
+#| fig-width: !expr fig_w("fig_trends_revcou_real_pc")
+#| fig-height: !expr fig_h("fig_trends_revcou_real_pc")
+
+trends |> make_trend_plot(revcou_real_pc, "Revenu courant reel moyen (Ar/tete/an, constants 2010)")
+```
+
+```{r fig_trends_revcou_real_eq}
+#| fig-cap: "Evolution du revenu courant reel moyen par unite de consommation (Ar constants 2010, IPC)"
+#| fig-width: !expr fig_w("fig_trends_revcou_real_eq")
+#| fig-height: !expr fig_h("fig_trends_revcou_real_eq")
+
+trends |> make_trend_plot(revcou_real_eq, "Revenu courant reel moyen (Ar/UC/an, constants 2010)")
 ```
 
 ### Revenus reels (deflates par le prix du paddy)
@@ -1684,5 +1830,3 @@ if ("pct_eau_amelioree" %in% names(habitat_trends)) {
     theme_ror()
 }
 ```
-:::
-:::
