@@ -217,6 +217,50 @@ get_default_dims <- function(label, profile, report_sizes = NULL) {
   list(width = w, height = h)
 }
 
+resolve_setup_path <- function(path) {
+  if (!is.character(path) || length(path) != 1 || is.na(path)) {
+    return(path)
+  }
+
+  normalized <- gsub("\\\\", "/", path)
+
+  if (file.exists(normalized)) {
+    return(normalized)
+  }
+
+  project_path <- file.path(PROJECT_ROOT, normalized)
+  if (file.exists(project_path)) {
+    return(project_path)
+  }
+
+  if (grepl("^data/[^/]+\\.dta$", normalized, ignore.case = TRUE)) {
+    legacy_path <- file.path(
+      PROJECT_ROOT,
+      "data/ROS_MDG_microdata/2025",
+      basename(normalized)
+    )
+    if (file.exists(legacy_path)) {
+      return(legacy_path)
+    }
+  }
+
+  path
+}
+
+new_calibration_env <- function() {
+  env <- new.env(parent = globalenv())
+
+  assign(
+    "read_dta",
+    function(file, ...) {
+      haven::read_dta(resolve_setup_path(file), ...)
+    },
+    envir = env
+  )
+
+  env
+}
+
 # ── 4. Paths & constants ───────────────────────────────────
 
 PRES_YML <- file.path(PROJECT_ROOT, "data/presentation_sizes.yml")
@@ -523,6 +567,7 @@ server <- function(input, output, session) {
   # --- Data loading cache ---
   loaded_chapter <- reactiveVal("")
   loaded_figure <- reactiveVal("")
+  chapter_env <- reactiveVal(new_calibration_env())
 
   setup_chapter <- function() {
     req(input$chapter, input$profile)
@@ -537,6 +582,8 @@ server <- function(input, output, session) {
 
     tryCatch(
       {
+        eval_env <- new_calibration_env()
+
         suppressPackageStartupMessages({
           library(haven)
           library(dplyr)
@@ -581,8 +628,10 @@ server <- function(input, output, session) {
         if (length(setup) > 0) {
           setup <- setup[!grepl("^\\s*knitr::", setup)]
           setup <- setup[!grepl("knit_print|registerS3method", setup)]
-          eval(parse(text = paste(setup, collapse = "\n")), envir = globalenv())
+          eval(parse(text = paste(setup, collapse = "\n")), envir = eval_env)
         }
+
+        chapter_env(eval_env)
       },
       error = function(e) message("Setup error: ", e$message)
     )
@@ -606,6 +655,8 @@ server <- function(input, output, session) {
     if (input$figure != first_lbl) {
       tryCatch(
         {
+          eval_env <- chapter_env()
+
           Sys.setenv(QUARTO_PROFILE = input$profile); Sys.setenv(ROR_CURRENT_LABEL = input$figure)
           saved_wd <- setwd(PROJECT_ROOT)
           on.exit({ setwd(saved_wd); Sys.unsetenv("ROR_CURRENT_LABEL") }, add = TRUE)
@@ -623,7 +674,7 @@ server <- function(input, output, session) {
             if (length(new_code) > 0) {
               eval(
                 parse(text = paste(new_code, collapse = "\n")),
-                envir = globalenv()
+                envir = eval_env
               )
             }
           }
@@ -660,11 +711,13 @@ server <- function(input, output, session) {
       code <- paste(chunk$code, collapse = "\n")
       tryCatch(
         {
+          eval_env <- chapter_env()
+
           Sys.setenv(QUARTO_PROFILE = input$profile); Sys.setenv(ROR_CURRENT_LABEL = input$figure)
           saved_wd <- setwd(PROJECT_ROOT)
           on.exit({ setwd(saved_wd); Sys.unsetenv("ROR_CURRENT_LABEL") }, add = TRUE)
 
-          p <- eval(parse(text = code), envir = globalenv())
+          p <- eval(parse(text = code), envir = eval_env)
           if (inherits(p, "gg")) {
             apply_presentation_fonts(p, current_fonts())
           }
