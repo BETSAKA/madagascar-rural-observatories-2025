@@ -576,9 +576,16 @@ server <- function(input, output, session) {
       return(invisible())
     }
 
-    Sys.setenv(QUARTO_PROFILE = input$profile); Sys.setenv(ROR_CURRENT_LABEL = input$figure)
+    Sys.setenv(QUARTO_PROFILE = input$profile)
+    Sys.setenv(ROR_CURRENT_LABEL = input$figure)
     saved_wd <- setwd(PROJECT_ROOT)
-    on.exit({ setwd(saved_wd); Sys.unsetenv("ROR_CURRENT_LABEL") }, add = TRUE)
+    on.exit(
+      {
+        setwd(saved_wd)
+        Sys.unsetenv("ROR_CURRENT_LABEL")
+      },
+      add = TRUE
+    )
 
     tryCatch(
       {
@@ -657,9 +664,16 @@ server <- function(input, output, session) {
         {
           eval_env <- chapter_env()
 
-          Sys.setenv(QUARTO_PROFILE = input$profile); Sys.setenv(ROR_CURRENT_LABEL = input$figure)
+          Sys.setenv(QUARTO_PROFILE = input$profile)
+          Sys.setenv(ROR_CURRENT_LABEL = input$figure)
           saved_wd <- setwd(PROJECT_ROOT)
-          on.exit({ setwd(saved_wd); Sys.unsetenv("ROR_CURRENT_LABEL") }, add = TRUE)
+          on.exit(
+            {
+              setwd(saved_wd)
+              Sys.unsetenv("ROR_CURRENT_LABEL")
+            },
+            add = TRUE
+          )
 
           qmd_path <- file.path(PROJECT_ROOT, input$chapter)
           all_setup <- extract_setup_code(qmd_path, input$figure)
@@ -713,9 +727,16 @@ server <- function(input, output, session) {
         {
           eval_env <- chapter_env()
 
-          Sys.setenv(QUARTO_PROFILE = input$profile); Sys.setenv(ROR_CURRENT_LABEL = input$figure)
+          Sys.setenv(QUARTO_PROFILE = input$profile)
+          Sys.setenv(ROR_CURRENT_LABEL = input$figure)
           saved_wd <- setwd(PROJECT_ROOT)
-          on.exit({ setwd(saved_wd); Sys.unsetenv("ROR_CURRENT_LABEL") }, add = TRUE)
+          on.exit(
+            {
+              setwd(saved_wd)
+              Sys.unsetenv("ROR_CURRENT_LABEL")
+            },
+            add = TRUE
+          )
 
           p <- eval(parse(text = code), envir = eval_env)
           if (inherits(p, "gg")) {
