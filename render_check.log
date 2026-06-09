@@ -1,0 +1,874 @@
+[ 1/13] index.qmd
+[ 2/13] 01_description.qmd
+[ 3/13] 02_structure_menages.qmd
+[ 4/13] 03_habitat_niveau_de_vie.qmd
+
+
+processing file: 03_habitat_niveau_de_vie.qmd
+1/129                             
+2/129 [setup_habitat]             
+3/129                             
+4/129 [stats_habitat]             
+5/129                             
+6/129 [house_status]              
+7/129                             
+8/129 [fig-statut-logement]       
+9/129                             
+10/129 [dl_house_status]           
+11/129                             
+12/129 [latrine]                   
+13/129                             
+14/129 [fig-latrine]               
+15/129                             
+16/129 [dl_latrine]                
+17/129                             
+18/129 [water]                     
+19/129                             
+20/129 [fig-eau]                   
+21/129                             
+22/129 [dl_water]                  
+23/129                             
+24/129 [lighting]                  
+25/129                             
+26/129 [fig-eclairage]             
+27/129                             
+28/129 [dl_fig_lighting]           
+29/129                             
+30/129 [solar_panel_status]        
+31/129                             
+32/129 [dl_lighting]               
+33/129                             
+34/129 [cooking]                   
+35/129                             
+36/129 [fig-cooking]               
+37/129                             
+38/129 [dl_cooking]                
+39/129                             
+40/129 [comfort_goods]             
+41/129                             
+42/129 [fig-comfort]               
+43/129                             
+44/129 [dl_comfort]                
+45/129                             
+46/129 [agri_equipment]            
+47/129                             
+48/129 [fig-table-equip]           
+49/129                             
+50/129 [dl_agri_equipment]         
+51/129                             
+52/129 [communication]             
+53/129                             
+54/129 [fig-comm]                  
+55/129                             
+56/129 [dl_communication]          
+57/129                             
+58/129 [transfers_load]            
+59/129                             
+60/129 [transferts_data]           
+61/129                             
+62/129 [fig-transferts-sortants]   
+63/129                             
+64/129 [dl_fig_transferts]         
+65/129                             
+66/129 [tbl-transferts-sortants]   
+67/129                             
+68/129 [dl_tbl_transferts]         
+69/129                             
+70/129 [destination_data]          
+71/129                             
+72/129 [fig-destination-transferts]
+73/129                             
+74/129 [dl_fig_destination]        
+75/129                             
+76/129 [income_compute]            
+77/129                             
+78/129 [t_revtot_obs]              
+79/129                             
+80/129 [t_revtot_details]          
+81/129                             
+82/129 [dl_revtot]                 
+83/129                             
+84/129 [t_revcou_decomp]           
+85/129                             
+86/129 [fig_revcou_shares]         
+87/129                             
+88/129 [dl_income]                 
+89/129                             
+90/129 [t_revcou_revexcept]        
+91/129                             
+92/129 [dl_t_revcou_revexcept]     
+93/129                             
+94/129 [trends_load]               
+95/129                             
+96/129 [fig_trends_revtot]         
+97/129                             
+98/129 [fig_trends_revcou]         
+99/129                             
+100/129 [fig_trends_decomp]         
+101/129                             
+102/129 [fig_ipc_national]          
+103/129                             
+104/129 [fig_trends_paddy]          
+105/129                             
+106/129 [fig_ipc_vs_paddy]          
+107/129                             
+108/129 [fig_trends_revtot_real]    
+109/129                             
+110/129 [fig_trends_revtot_real_pc] 
+111/129                             
+112/129 [fig_trends_revtot_real_eq] 
+113/129                             
+114/129 [fig_trends_revcou_real]    
+115/129                             
+116/129 [fig_trends_revcou_real_pc] 
+117/129                             
+118/129 [fig_trends_revcou_real_eq] 
+119/129                             
+120/129 [fig_trends_revtot_paddy]   
+121/129                             
+122/129 [fig_trends_revcou_paddy]   
+123/129                             
+124/129 [habitat_trends_compute]    
+125/129                             
+126/129 [fig_habitat_elec]          
+127/129                             
+128/129 [fig_habitat_water]         
+129output file: 03_habitat_niveau_de_vie.knit.md
+
+/129                             
+
+
+processing file: 03_habitat_niveau_de_vie.qmd
+1/129                             
+2/129 [setup_habitat]             
+3/129                             
+4/129 [stats_habitat]             
+5/129                             
+6/129 [house_status]              
+7/129                             
+8/129 [fig-statut-logement]       
+9/129                             
+10/129 [dl_house_status]           
+11/129                             
+12/129 [latrine]                   
+13/129                             
+14/129 [fig-latrine]               
+15/129                             
+16/129 [dl_latrine]                
+17/129                             
+18/129 [water]                     
+19/129                             
+20/129 [fig-eau]                   
+21/129                             
+22/129 [dl_water]                  
+23/129                             
+24/129 [lighting]                  
+25/129                             
+26/129 [fig-eclairage]             
+27/129                             
+28/129 [dl_fig_lighting]           
+29/129                             
+30/129 [solar_panel_status]        
+31/129                             
+32/129 [dl_lighting]               
+33/129                             
+34/129 [cooking]                   
+35/129                             
+36/129 [fig-cooking]               
+37/129                             
+38/129 [dl_cooking]                
+39/129                             
+40/129 [comfort_goods]             
+41/129                             
+42/129 [fig-comfort]               
+43/129                             
+44/129 [dl_comfort]                
+45/129                             
+46/129 [agri_equipment]            
+47/129                             
+48/129 [fig-table-equip]           
+49/129                             
+50/129 [dl_agri_equipment]         
+51/129                             
+52/129 [communication]             
+53/129                             
+54/129 [fig-comm]                  
+55/129                             
+56/129 [dl_communication]          
+57/129                             
+58/129 [transfers_load]            
+59/129                             
+60/129 [transferts_data]           
+61/129                             
+62/129 [fig-transferts-sortants]   
+63/129                             
+64/129 [dl_fig_transferts]         
+65/129                             
+66/129 [tbl-transferts-sortants]   
+67/129                             
+68/129 [dl_tbl_transferts]         
+69/129                             
+70/129 [destination_data]          
+71/129                             
+72/129 [fig-destination-transferts]
+73/129                             
+74/129 [dl_fig_destination]        
+75/129                             
+76/129 [income_compute]            
+77/129                             
+78/129 [t_revtot_obs]              
+79/129                             
+80/129 [t_revtot_details]          
+81/129                             
+82/129 [dl_revtot]                 
+83/129                             
+84/129 [t_revcou_decomp]           
+85/129                             
+86/129 [fig_revcou_shares]         
+87/129                             
+88/129 [dl_income]                 
+89/129                             
+90/129 [t_revcou_revexcept]        
+91/129                             
+92/129 [dl_t_revcou_revexcept]     
+93/129                             
+94/129 [trends_load]               
+95/129                             
+96/129 [fig_trends_revtot]         
+97/129                             
+98/129 [fig_trends_revcou]         
+99/129                             
+100/129 [fig_trends_decomp]         
+101/129                             
+102/129 [fig_ipc_national]          
+103/129                             
+104/129 [fig_trends_paddy]          
+105/129                             
+106/129 [fig_ipc_vs_paddy]          
+107/129                             
+108/129 [fig_trends_revtot_real]    
+109/129                             
+110/129 [fig_trends_revtot_real_pc] 
+111/129                             
+112/129 [fig_trends_revtot_real_eq] 
+113/129                             
+114/129 [fig_trends_revcou_real]    
+115/129                             
+116/129 [fig_trends_revcou_real_pc] 
+117/129                             
+118/129 [fig_trends_revcou_real_eq] 
+119/129                             
+120/129 [fig_trends_revtot_paddy]   
+121/129                             
+122/129 [fig_trends_revcou_paddy]   
+123/129                             
+124/129 [habitat_trends_compute]    
+125/129                             
+126/129 [fig_habitat_elec]          
+127/129                             
+128/129 [fig_habitat_water]         
+129/129                             
+output file: 03_habitat_niveau_de_vie.knit.md
+
+
+
+processing file: 03_habitat_niveau_de_vie.qmd
+1/129                             
+2/129 [setup_habitat]             
+3/129                             
+4/129 [stats_habitat]             
+5/129                             
+6/129 [house_status]              
+7/129                             
+8/129 [fig-statut-logement]       
+9/129                             
+10/129 [dl_house_status]           
+11/129                             
+12/129 [latrine]                   
+13/129                             
+14/129 [fig-latrine]               
+15/129                             
+16/129 [dl_latrine]                
+17/129                             
+18/129 [water]                     
+19/129                             
+20/129 [fig-eau]                   
+21/129                             
+22/129 [dl_water]                  
+23/129                             
+24/129 [lighting]                  
+25/129                             
+26/129 [fig-eclairage]             
+27/129                             
+28/129 [dl_fig_lighting]           
+29/129                             
+30/129 [solar_panel_status]        
+31/129                             
+32/129 [dl_lighting]               
+33/129                             
+34/129 [cooking]                   
+35/129                             
+36/129 [fig-cooking]               
+37/129                             
+38/129 [dl_cooking]                
+39/129                             
+40/129 [comfort_goods]             
+41/129                             
+42/129 [fig-comfort]               
+43/129                             
+44/129 [dl_comfort]                
+45/129                             
+46/129 [agri_equipment]            
+47/129                             
+48/129 [fig-table-equip]           
+49/129                             
+50/129 [dl_agri_equipment]         
+51/129                             
+52/129 [communication]             
+53/129                             
+54/129 [fig-comm]                  
+55/129                             
+56/129 [dl_communication]          
+57/129                             
+58/129 [transfers_load]            
+59/129                             
+60/129 [transferts_data]           
+61/129                             
+62/129 [fig-transferts-sortants]   
+63/129                             
+64/129 [dl_fig_transferts]         
+65/129                             
+66/129 [tbl-transferts-sortants]   
+67/129                             
+68/129 [dl_tbl_transferts]         
+69/129                             
+70/129 [destination_data]          
+71/129                             
+72/129 [fig-destination-transferts]
+73/129                             
+74/129 [dl_fig_destination]        
+75/129                             
+76/129 [income_compute]            
+77/129                             
+78/129 [t_revtot_obs]              
+79/129                             
+80/129 [t_revtot_details]          
+81/129                             
+82/129 [dl_revtot]                 
+83/129                             
+84/129 [t_revcou_decomp]           
+85/129                             
+86/129 [fig_revcou_shares]         
+87/129                             
+88/129 [dl_income]                 
+89/129                             
+90/129 [t_revcou_revexcept]        
+91/129                             
+92/129 [dl_t_revcou_revexcept]     
+93/129                             
+94/129 [trends_load]               
+95/129                             
+96/129 [fig_trends_revtot]         
+97/129                             
+98/129 [fig_trends_revcou]         
+99/129                             
+100/129 [fig_trends_decomp]         
+101/129                             
+102/129 [fig_ipc_national]          
+103/129                             
+104/129 [fig_trends_paddy]          
+105/129                             
+106/129 [fig_ipc_vs_paddy]          
+107/129                             
+108/129 [fig_trends_revtot_real]    
+109/129                             
+110/129 [fig_trends_revtot_real_pc] 
+111/129                             
+112/129 [fig_trends_revtot_real_eq] 
+113/129                             
+114/129 [fig_trends_revcou_real]    
+115/129                             
+116/129 [fig_trends_revcou_real_pc] 
+117/129                             
+118/129 [fig_trends_revcou_real_eq] 
+119/129                             
+120/129 [fig_trends_revtot_paddy]   
+121/129                             
+122/129 [fig_trends_revcou_paddy]   
+123/129                             
+124/129 [habitat_trends_compute]    
+125/129                             
+126/129 [fig_habitat_elec]          
+127/129                             
+128/129 [fig_habitat_water]         
+129/129                             
+output file: 03_habitat_niveau_de_vie.knit.md
+
+[ 5/13] 04_foncier.qmd
+[33mWARNING (C:/Program Files/Quarto/share/filters/main.lua:10085) 
+The following string was found in the document: ::::
+
+This usually indicates a problem with a fenced div in the document. Please check the document for errors.
+[39m[33mWARNING (C:/Program Files/Quarto/share/filters/main.lua:10085) 
+The following string was found in the document: :::
+
+This usually indicates a problem with a fenced div in the document. Please check the document for errors.
+[39m[33mWARNING (C:/Program Files/Quarto/share/filters/main.lua:10085) 
+The following string was found in the document: :::
+
+This usually indicates a problem with a fenced div in the document. Please check the document for errors.
+[39m[33mWARNING (C:/Program Files/Quarto/share/filters/main.lua:10085) 
+The following string was found in the document: ::::
+
+This usually indicates a problem with a fenced div in the document. Please check the document for errors.
+[39m[ 6/13] 05_agriculture.qmd
+[WARNING] Div at line 2404 column 1 unclosed at line 2728 column 1, closing implicitly.
+[ 7/13] 06_securite_alimentaire.qmd
+[ 8/13] 07_rapport_environnement.qmd
+[ 9/13] 08_cataclysme_catastrophe.qmd
+[10/13] 09_insertion_projet.qmd
+[11/13] 10_enquete_qualite.qmd
+[12/13] 11_representativite_ponderation.qmd
+[13/13] 12_bibliographie.qmd
+
+[WARNING] Div at line 4681 column 1 unclosed at line 8429 column 1, closing implicitly.
+pandoc 
+  to: latex
+  output-file: index.tex
+  standalone: true
+  toc: true
+  number-sections: true
+  top-level-division: chapter
+  pdf-engine: xelatex
+  variables:
+    graphics: true
+    tables: true
+  default-image-extension: pdf
+  
+metadata
+  crossref:
+    chapters: true
+  documentclass: report
+  papersize: letter
+  block-headings: true
+  bibliography:
+    - references.bib
+  engines:
+    - path: C:\Program Files\Quarto\share\extension-subtrees\julia-engine\_extensions\julia-engine\julia-engine.js
+  lang: fr
+  fig-cap-location: top
+  geometry:
+    - margin=2.2cm
+  subtitle: Rapport consolidé d'enquêtes
+  title: Campagne 2025 des Observatoires ruraux d'Alaotra et Marovoay
+  author:
+    - name: Veromanitra Ramizason
+    - name: Bezaka Rivolala
+    - name: Thierry Razanakoto
+    - name: Holimalala Randriamanampisoa
+    - name: Florent Bédécarrats
+  date: '2026-06-09T00:00:00+03:00'
+  
+[WARNING] Div at line 4681 column 1 unclosed at line 8429 column 1, closing implicitly.
+[33mWARNING (C:/Program Files/Quarto/share/filters/main.lua:10085) 
+The following string was found in the document: ::::
+
+This usually indicates a problem with a fenced div in the document. Please check the document for errors.
+[39m[33mWARNING (C:/Program Files/Quarto/share/filters/main.lua:10085) 
+The following string was found in the document: :::
+
+This usually indicates a problem with a fenced div in the document. Please check the document for errors.
+[39m[33mWARNING (C:/Program Files/Quarto/share/filters/main.lua:10085) 
+The following string was found in the document: :::
+
+This usually indicates a problem with a fenced div in the document. Please check the document for errors.
+[39m[33mWARNING (C:/Program Files/Quarto/share/filters/main.lua:10085) 
+The following string was found in the document: ::::
+
+This usually indicates a problem with a fenced div in the document. Please check the document for errors.
+[39m[33mWARNING (C:/Program Files/Quarto/share/filters/main.lua:23611) FloatRefTarget with no content: tbl-transferts-sortants
+[39m
+Rendering PDF
+running xelatex - 1
+  This is XeTeX, Version 3.141592653-2.6-0.999998 (TeX Live 2026) (preloaded format=xelatex)
+   restricted \write18 enabled.
+  entering extended mode
+  
+running xelatex - 2
+  This is XeTeX, Version 3.141592653-2.6-0.999998 (TeX Live 2026) (preloaded format=xelatex)
+   restricted \write18 enabled.
+  entering extended mode
+  
+
+pandoc 
+  to: docx
+  output-file: rapport-consolide.docx
+  toc: true
+  number-sections: true
+  default-image-extension: png
+  reference-doc: images/Modele_format_rapport.docx
+  variables: {}
+  
+metadata
+  crossref:
+    chapters: true
+  bibliography:
+    - references.bib
+  engines:
+    - path: C:\Program Files\Quarto\share\extension-subtrees\julia-engine\_extensions\julia-engine\julia-engine.js
+  lang: fr
+  fig-cap-location: top
+  subtitle: Rapport consolidé d'enquêtes
+  title: Campagne 2025 des Observatoires ruraux d'Alaotra et Marovoay
+  author:
+    - name: Veromanitra Ramizason
+    - name: Bezaka Rivolala
+    - name: Thierry Razanakoto
+    - name: Holimalala Randriamanampisoa
+    - name: Florent Bédécarrats
+  date: '2026-06-09T00:00:00+03:00'
+  
+[WARNING] Div at line 5651 column 1 unclosed at line 10590 column 1, closing implicitly.
+[33mWARNING (C:/Program Files/Quarto/share/filters/main.lua:10085) 
+The following string was found in the document: ::::
+
+This usually indicates a problem with a fenced div in the document. Please check the document for errors.
+[39m[33mWARNING (C:/Program Files/Quarto/share/filters/main.lua:10085) 
+The following string was found in the document: :::
+
+This usually indicates a problem with a fenced div in the document. Please check the document for errors.
+[39m[33mWARNING (C:/Program Files/Quarto/share/filters/main.lua:10085) 
+The following string was found in the document: :::
+
+This usually indicates a problem with a fenced div in the document. Please check the document for errors.
+[39m[33mWARNING (C:/Program Files/Quarto/share/filters/main.lua:10085) 
+The following string was found in the document: ::::
+
+This usually indicates a problem with a fenced div in the document. Please check the document for errors.
+[39m[33mWARNING (C:/Program Files/Quarto/share/filters/main.lua:23955) FloatRefTarget with no content: tbl-transferts-sortants
+[39mRunning script 'utils/add_cover_docx.R'
+add_cover_docx: Processing docs\rapport-consolide.docx (profile: default)
+  adding: [Content_Types].xml (deflated 94%)
+  adding: _rels/.rels (deflated 68%)
+  adding: docProps/app.xml (deflated 50%)
+  adding: docProps/core.xml (deflated 45%)
+  adding: docProps/custom.xml (deflated 79%)
+  adding: word/_rels/document.xml.rels (deflated 94%)
+  adding: word/_rels/footnotes.xml.rels (deflated 82%)
+  adding: word/comments.xml (deflated 65%)
+  adding: word/document.xml (deflated 92%)
+  adding: word/fontTable.xml (deflated 78%)
+  adding: word/footnotes.xml (deflated 67%)
+  adding: word/media/cover_page.jpg (deflated 0%)
+  adding: word/media/image1.jpg (deflated 0%)
+  adding: word/media/image10.png (deflated 11%)
+  adding: word/media/image100.png (deflated 23%)
+  adding: word/media/image101.png (deflated 22%)
+  adding: word/media/image102.png (deflated 18%)
+  adding: word/media/image103.png (deflated 31%)
+  adding: word/media/image104.png (deflated 29%)
+  adding: word/media/image105.png (deflated 34%)
+  adding: word/media/image106.png (deflated 14%)
+  adding: word/media/image107.png (deflated 28%)
+  adding: word/media/image108.png (deflated 36%)
+  adding: word/media/image109.png (deflated 29%)
+  adding: word/media/image11.png (deflated 23%)
+  adding: word/media/image110.png (deflated 27%)
+  adding: word/media/image111.png (deflated 26%)
+  adding: word/media/image112.png (deflated 35%)
+  adding: word/media/image113.png (deflated 24%)
+  adding: word/media/image114.png (deflated 8%)
+  adding: word/media/image115.png (deflated 30%)
+  adding: word/media/image116.png (deflated 13%)
+  adding: word/media/image117.png (deflated 7%)
+  adding: word/media/image118.png (deflated 30%)
+  adding: word/media/image119.png (deflated 24%)
+  adding: word/media/image12.png (deflated 6%)
+  adding: word/media/image120.png (deflated 31%)
+  adding: word/media/image121.png (deflated 14%)
+  adding: word/media/image122.png (deflated 38%)
+  adding: word/media/image123.png (deflated 24%)
+  adding: word/media/image124.png (deflated 34%)
+  adding: word/media/image125.png (deflated 36%)
+  adding: word/media/image126.png (deflated 24%)
+  adding: word/media/image127.png (deflated 5%)
+  adding: word/media/image128.png (deflated 12%)
+  adding: word/media/image129.png (deflated 9%)
+  adding: word/media/image13.png (deflated 18%)
+  adding: word/media/image130.png (deflated 5%)
+  adding: word/media/image131.png (deflated 17%)
+  adding: word/media/image132.png (deflated 41%)
+  adding: word/media/image133.png (deflated 29%)
+  adding: word/media/image134.png (deflated 45%)
+  adding: word/media/image135.png (deflated 38%)
+  adding: word/media/image136.png (deflated 36%)
+  adding: word/media/image137.png (deflated 33%)
+  adding: word/media/image138.png (deflated 27%)
+  adding: word/media/image139.png (deflated 42%)
+  adding: word/media/image14.png (deflated 19%)
+  adding: word/media/image140.png (deflated 28%)
+  adding: word/media/image141.png (deflated 10%)
+  adding: word/media/image142.png (deflated 16%)
+  adding: word/media/image143.png (stored 0%)
+  adding: word/media/image144.png (deflated 12%)
+  adding: word/media/image15.png (deflated 15%)
+  adding: word/media/image16.png (deflated 11%)
+  adding: word/media/image17.png (deflated 17%)
+  adding: word/media/image18.png (deflated 18%)
+  adding: word/media/image19.png (deflated 41%)
+  adding: word/media/image2.png (deflated 6%)
+  adding: word/media/image20.png (deflated 12%)
+  adding: word/media/image21.png (deflated 8%)
+  adding: word/media/image22.png (deflated 1%)
+  adding: word/media/image23.png (deflated 18%)
+  adding: word/media/image24.png (deflated 13%)
+  adding: word/media/image25.png (deflated 17%)
+  adding: word/media/image26.png (deflated 12%)
+  adding: word/media/image27.png (deflated 14%)
+  adding: word/media/image28.png (deflated 8%)
+  adding: word/media/image29.png (deflated 5%)
+  adding: word/media/image3.png (stored 0%)
+  adding: word/media/image30.png (deflated 6%)
+  adding: word/media/image31.png (deflated 17%)
+  adding: word/media/image32.png (deflated 3%)
+  adding: word/media/image33.png (deflated 3%)
+  adding: word/media/image34.png (deflated 9%)
+  adding: word/media/image35.png (deflated 57%)
+  adding: word/media/image36.png (deflated 37%)
+  adding: word/media/image37.png (deflated 40%)
+  adding: word/media/image38.png (deflated 10%)
+  adding: word/media/image39.png (deflated 9%)
+  adding: word/media/image4.png (stored 0%)
+  adding: word/media/image40.png (deflated 8%)
+  adding: word/media/image41.png (deflated 16%)
+  adding: word/media/image42.png (deflated 9%)
+  adding: word/media/image43.png (deflated 13%)
+  adding: word/media/image44.png (deflated 9%)
+  adding: word/media/image45.png (deflated 8%)
+  adding: word/media/image46.png (deflated 8%)
+  adding: word/media/image47.png (deflated 6%)
+  adding: word/media/image48.png (deflated 6%)
+  adding: word/media/image49.png (deflated 16%)
+  adding: word/media/image5.png (deflated 0%)
+  adding: word/media/image50.png (deflated 19%)
+  adding: word/media/image51.png (deflated 31%)
+  adding: word/media/image52.png (deflated 34%)
+  adding: word/media/image53.png (deflated 35%)
+  adding: word/media/image54.png (deflated 41%)
+  adding: word/media/image55.png (deflated 39%)
+  adding: word/media/image56.png (deflated 29%)
+  adding: word/media/image57.png (deflated 34%)
+  adding: word/media/image58.png (deflated 32%)
+  adding: word/media/image59.png (deflated 38%)
+  adding: word/media/image6.png (deflated 11%)
+  adding: word/media/image60.png (deflated 15%)
+  adding: word/media/image61.png (deflated 21%)
+  adding: word/media/image62.png (deflated 44%)
+  adding: word/media/image63.png (deflated 33%)
+  adding: word/media/image64.png (deflated 31%)
+  adding: word/media/image65.png (deflated 38%)
+  adding: word/media/image66.png (deflated 44%)
+  adding: word/media/image67.png (deflated 24%)
+  adding: word/media/image68.png (deflated 28%)
+  adding: word/media/image69.png (deflated 31%)
+  adding: word/media/image7.png (deflated 41%)
+  adding: word/media/image70.png (deflated 29%)
+  adding: word/media/image71.png (deflated 33%)
+  adding: word/media/image72.png (deflated 32%)
+  adding: word/media/image73.png (deflated 39%)
+  adding: word/media/image74.png (deflated 31%)
+  adding: word/media/image75.png (deflated 30%)
+  adding: word/media/image76.png (deflated 33%)
+  adding: word/media/image77.png (deflated 28%)
+  adding: word/media/image78.png (deflated 39%)
+  adding: word/media/image79.png (deflated 14%)
+  adding: word/media/image8.png (deflated 13%)
+  adding: word/media/image80.png (deflated 37%)
+  adding: word/media/image81.png (deflated 15%)
+  adding: word/media/image82.png (deflated 40%)
+  adding: word/media/image83.png (deflated 31%)
+  adding: word/media/image84.png (deflated 35%)
+  adding: word/media/image85.png (deflated 28%)
+  adding: word/media/image86.png (deflated 19%)
+  adding: word/media/image87.png (deflated 37%)
+  adding: word/media/image88.png (deflated 32%)
+  adding: word/media/image89.png (deflated 39%)
+  adding: word/media/image9.png (deflated 12%)
+  adding: word/media/image90.png (deflated 27%)
+  adding: word/media/image91.png (deflated 9%)
+  adding: word/media/image92.png (deflated 27%)
+  adding: word/media/image93.png (deflated 21%)
+  adding: word/media/image94.png (deflated 12%)
+  adding: word/media/image95.png (deflated 6%)
+  adding: word/media/image96.png (deflated 5%)
+  adding: word/media/image97.png (deflated 7%)
+  adding: word/media/image98.png (deflated 5%)
+  adding: word/media/image99.png (deflated 11%)
+  adding: word/media/rId1012.png (stored 0%)
+  adding: word/media/rId1019.png (deflated 15%)
+  adding: word/media/rId169.png (deflated 6%)
+  adding: word/media/rId173.png (stored 0%)
+  adding: word/media/rId177.png (stored 0%)
+  adding: word/media/rId181.png (deflated 0%)
+  adding: word/media/rId199.png (deflated 12%)
+  adding: word/media/rId204.png (deflated 8%)
+  adding: word/media/rId208.png (deflated 11%)
+  adding: word/media/rId212.png (deflated 5%)
+  adding: word/media/rId218.png (deflated 20%)
+  adding: word/media/rId222.png (deflated 8%)
+  adding: word/media/rId227.png (deflated 10%)
+  adding: word/media/rId231.png (deflated 10%)
+  adding: word/media/rId236.png (deflated 7%)
+  adding: word/media/rId240.png (deflated 6%)
+  adding: word/media/rId247.png (deflated 20%)
+  adding: word/media/rId251.png (deflated 10%)
+  adding: word/media/rId255.png (deflated 8%)
+  adding: word/media/rId259.png (deflated 8%)
+  adding: word/media/rId267.png (deflated 10%)
+  adding: word/media/rId273.png (deflated 5%)
+  adding: word/media/rId278.png (deflated 6%)
+  adding: word/media/rId284.png (deflated 1%)
+  adding: word/media/rId287.png (deflated 2%)
+  adding: word/media/rId290.png (deflated 5%)
+  adding: word/media/rId293.png (deflated 4%)
+  adding: word/media/rId296.png (deflated 5%)
+  adding: word/media/rId303.png (deflated 14%)
+  adding: word/media/rId308.png (deflated 14%)
+  adding: word/media/rId313.png (deflated 11%)
+  adding: word/media/rId318.png (deflated 11%)
+  adding: word/media/rId323.png (deflated 9%)
+  adding: word/media/rId330.png (deflated 4%)
+  adding: word/media/rId336.png (deflated 5%)
+  adding: word/media/rId342.png (deflated 5%)
+  adding: word/media/rId349.png (deflated 10%)
+  adding: word/media/rId353.png (deflated 11%)
+  adding: word/media/rId360.png (deflated 7%)
+  adding: word/media/rId366.png (deflated 7%)
+  adding: word/media/rId369.png (deflated 6%)
+  adding: word/media/rId372.png (deflated 8%)
+  adding: word/media/rId377.png (deflated 6%)
+  adding: word/media/rId381.png (deflated 4%)
+  adding: word/media/rId384.png (deflated 4%)
+  adding: word/media/rId388.png (deflated 6%)
+  adding: word/media/rId391.png (deflated 7%)
+  adding: word/media/rId394.png (deflated 5%)
+  adding: word/media/rId397.png (deflated 5%)
+  adding: word/media/rId400.png (deflated 6%)
+  adding: word/media/rId403.png (deflated 5%)
+  adding: word/media/rId407.png (deflated 5%)
+  adding: word/media/rId410.png (deflated 4%)
+  adding: word/media/rId415.png (deflated 6%)
+  adding: word/media/rId418.png (deflated 7%)
+  adding: word/media/rId425.png (deflated 9%)
+  adding: word/media/rId431.png (deflated 13%)
+  adding: word/media/rId435.png (deflated 14%)
+  adding: word/media/rId440.png (deflated 12%)
+  adding: word/media/rId445.png (deflated 14%)
+  adding: word/media/rId449.png (deflated 10%)
+  adding: word/media/rId455.png (deflated 18%)
+  adding: word/media/rId459.png (deflated 7%)
+  adding: word/media/rId465.png (deflated 15%)
+  adding: word/media/rId469.png (deflated 7%)
+  adding: word/media/rId473.png (deflated 10%)
+  adding: word/media/rId479.png (deflated 16%)
+  adding: word/media/rId483.png (deflated 12%)
+  adding: word/media/rId487.png (deflated 13%)
+  adding: word/media/rId491.png (deflated 9%)
+  adding: word/media/rId498.png (deflated 13%)
+  adding: word/media/rId508.png (deflated 16%)
+  adding: word/media/rId512.png (deflated 15%)
+  adding: word/media/rId517.png (deflated 10%)
+  adding: word/media/rId521.png (deflated 12%)
+  adding: word/media/rId525.png (deflated 7%)
+  adding: word/media/rId529.png (deflated 24%)
+  adding: word/media/rId532.png (deflated 21%)
+  adding: word/media/rId537.png (deflated 8%)
+  adding: word/media/rId541.png (deflated 8%)
+  adding: word/media/rId545.png (deflated 11%)
+  adding: word/media/rId551.png (deflated 10%)
+  adding: word/media/rId555.png (deflated 11%)
+  adding: word/media/rId560.png (deflated 6%)
+  adding: word/media/rId566.png (deflated 10%)
+  adding: word/media/rId570.png (deflated 10%)
+  adding: word/media/rId575.png (deflated 13%)
+  adding: word/media/rId585.png (deflated 7%)
+  adding: word/media/rId590.png (deflated 8%)
+  adding: word/media/rId598.png (deflated 6%)
+  adding: word/media/rId603.png (deflated 6%)
+  adding: word/media/rId609.png (deflated 14%)
+  adding: word/media/rId614.png (deflated 6%)
+  adding: word/media/rId620.png (deflated 12%)
+  adding: word/media/rId624.png (deflated 35%)
+  adding: word/media/rId628.png (deflated 10%)
+  adding: word/media/rId632.png (deflated 16%)
+  adding: word/media/rId645.png (deflated 3%)
+  adding: word/media/rId648.png (deflated 12%)
+  adding: word/media/rId651.png (deflated 8%)
+  adding: word/media/rId660.png (deflated 8%)
+  adding: word/media/rId664.png (deflated 8%)
+  adding: word/media/rId668.png (deflated 5%)
+  adding: word/media/rId675.png (deflated 4%)
+  adding: word/media/rId683.png (deflated 10%)
+  adding: word/media/rId690.png (deflated 4%)
+  adding: word/media/rId694.png (deflated 26%)
+  adding: word/media/rId697.png (deflated 24%)
+  adding: word/media/rId700.png (deflated 20%)
+  adding: word/media/rId705.png (deflated 10%)
+  adding: word/media/rId709.png (deflated 8%)
+  adding: word/media/rId712.png (deflated 6%)
+  adding: word/media/rId719.png (deflated 6%)
+  adding: word/media/rId724.png (deflated 6%)
+  adding: word/media/rId729.png (deflated 10%)
+  adding: word/media/rId735.png (deflated 5%)
+  adding: word/media/rId739.png (deflated 6%)
+  adding: word/media/rId745.png (deflated 6%)
+  adding: word/media/rId749.png (deflated 11%)
+  adding: word/media/rId754.png (deflated 9%)
+  adding: word/media/rId763.png (deflated 9%)
+  adding: word/media/rId768.png (deflated 5%)
+  adding: word/media/rId772.png (deflated 6%)
+  adding: word/media/rId777.png (deflated 4%)
+  adding: word/media/rId783.png (deflated 9%)
+  adding: word/media/rId789.png (deflated 8%)
+  adding: word/media/rId793.png (deflated 2%)
+  adding: word/media/rId798.png (deflated 11%)
+  adding: word/media/rId802.png (deflated 10%)
+  adding: word/media/rId806.png (deflated 16%)
+  adding: word/media/rId813.png (deflated 20%)
+  adding: word/media/rId817.png (deflated 8%)
+  adding: word/media/rId822.png (deflated 9%)
+  adding: word/media/rId827.png (deflated 5%)
+  adding: word/media/rId832.png (deflated 6%)
+  adding: word/media/rId837.png (deflated 9%)
+  adding: word/media/rId847.png (deflated 10%)
+  adding: word/media/rId853.png (deflated 13%)
+  adding: word/media/rId858.png (deflated 4%)
+  adding: word/media/rId862.png (deflated 14%)
+  adding: word/media/rId867.png (deflated 5%)
+  adding: word/media/rId871.png (deflated 7%)
+  adding: word/media/rId875.png (deflated 5%)
+  adding: word/media/rId879.png (deflated 6%)
+  adding: word/media/rId883.png (deflated 8%)
+  adding: word/media/rId888.png (deflated 8%)
+  adding: word/media/rId897.png (deflated 10%)
+  adding: word/media/rId902.png (deflated 8%)
+  adding: word/media/rId907.png (deflated 9%)
+  adding: word/media/rId912.png (deflated 11%)
+  adding: word/media/rId918.png (deflated 30%)
+  adding: word/media/rId922.png (deflated 10%)
+  adding: word/media/rId927.png (deflated 12%)
+  adding: word/media/rId935.png (deflated 20%)
+  adding: word/media/rId943.png (deflated 11%)
+  adding: word/media/rId950.png (deflated 15%)
+  adding: word/media/rId955.png (deflated 10%)
+  adding: word/media/rId972.png (deflated 13%)
+  adding: word/media/rId986.png (deflated 15%)
+  adding: word/numbering.xml (deflated 93%)
+  adding: word/settings.xml (deflated 65%)
+  adding: word/styles.xml (deflated 92%)
+  adding: word/theme/theme1.xml (deflated 80%)
+  adding: word/webSettings.xml (deflated 64%)
+  Cover added to docs\rapport-consolide.docx
+
+Output created: docs\index.html
+

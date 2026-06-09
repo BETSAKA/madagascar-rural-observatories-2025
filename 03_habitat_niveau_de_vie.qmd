@@ -1335,26 +1335,52 @@ if (file.exists(trends_file)) {
     tibble(year = 2025L, cpi = cpi_wb$cpi[cpi_wb$year == 2023] * 1.09^2)
   )
 
-  trends <- trends |>
-    left_join(cpi_full, by = "year") |>
-    mutate(
-      deflator       = cpi / 100,
-      revtot_real_pc = (revtot_mean / hh_size_mean) / deflator,
-      revtot_real_eq = (revtot_mean / eq_oecd_mean) / deflator,
-      revcou_real    = revcou_mean / deflator,
-      revtot_real    = revtot_mean / deflator,
-      revexcept_real = revexcept_mean / deflator,
-      revppal_real   = revppal_mean / deflator,
-      revsec_real    = revsec_mean / deflator,
-      rev_indep_real = rev_indep_mean / deflator,
-      rev_riz_real   = rev_riz_mean / deflator,
-      rev_cu_real    = rev_cu_mean / deflator,
-      revel_real     = revel_mean / deflator,
-      revpeche_real  = revpeche_mean / deflator
-    )
-
   saveRDS(trends, trends_file)
 }
+
+# Recompute derived real-income series even when loading a cached RDS,
+# so newly added columns are always available during render.
+if (!"cpi" %in% names(trends)) {
+  library(jsonlite)
+  wb_raw <- fromJSON(
+    "https://api.worldbank.org/v2/country/MDG/indicator/FP.CPI.TOTL?date=1995:2025&format=json&per_page=50"
+  )
+  cpi_wb <- tibble(
+    year = as.integer(wb_raw[[2]]$date),
+    cpi  = as.numeric(wb_raw[[2]]$value)
+  ) |>
+    filter(!is.na(cpi)) |>
+    arrange(year)
+
+  cpi_full <- bind_rows(
+    cpi_wb,
+    tibble(year = 2024L, cpi = cpi_wb$cpi[cpi_wb$year == 2023] * 1.09),
+    tibble(year = 2025L, cpi = cpi_wb$cpi[cpi_wb$year == 2023] * 1.09^2)
+  )
+
+  trends <- trends |> left_join(cpi_full, by = "year")
+}
+
+trends <- trends |>
+  mutate(
+    deflator       = cpi / 100,
+    revcou_real_pc = (revcou_mean / hh_size_mean) / deflator,
+    revcou_real_eq = (revcou_mean / eq_oecd_mean) / deflator,
+    revtot_real_pc = (revtot_mean / hh_size_mean) / deflator,
+    revtot_real_eq = (revtot_mean / eq_oecd_mean) / deflator,
+    revcou_real    = revcou_mean / deflator,
+    revtot_real    = revtot_mean / deflator,
+    revexcept_real = revexcept_mean / deflator,
+    revppal_real   = revppal_mean / deflator,
+    revsec_real    = revsec_mean / deflator,
+    rev_indep_real = rev_indep_mean / deflator,
+    rev_riz_real   = rev_riz_mean / deflator,
+    rev_cu_real    = rev_cu_mean / deflator,
+    revel_real     = revel_mean / deflator,
+    revpeche_real  = revpeche_mean / deflator
+  )
+
+saveRDS(trends, trends_file)
 
 # Deflation par le prix du paddy
 paddy_base_2010 <- trends |>
@@ -1577,6 +1603,22 @@ Le revenu total réel moyen par ménage présente des fluctuations importantes d
 trends |> make_trend_plot(revtot_real, "Revenu total reel moyen (Ar constants 2010)")
 ```
 
+```{r fig_trends_revtot_real_pc}
+#| fig-cap: "Evolution du revenu total reel moyen par tete (Ar constants 2010, IPC)"
+#| fig-width: !expr fig_w("fig_trends_revtot_real_pc")
+#| fig-height: !expr fig_h("fig_trends_revtot_real_pc")
+
+trends |> make_trend_plot(revtot_real_pc, "Revenu total reel moyen (Ar/tete/an, constants 2010)")
+```
+
+```{r fig_trends_revtot_real_eq}
+#| fig-cap: "Evolution du revenu total reel moyen par unite de consommation (Ar constants 2010, IPC)"
+#| fig-width: !expr fig_w("fig_trends_revtot_real_eq")
+#| fig-height: !expr fig_h("fig_trends_revtot_real_eq")
+
+trends |> make_trend_plot(revtot_real_eq, "Revenu total reel moyen (Ar/UC/an, constants 2010)")
+```
+
 Le revenu courant réel moyen par ménage présente une évolution très fluctuante dans les deux observatoires sur l’ensemble de la période étudiée.
 
 :::: {.content-hidden when-profile="marovoay"}
@@ -1598,6 +1640,22 @@ Le revenu courant réel moyen par ménage présente une évolution très fluctua
 #| fig-height: !expr fig_h("fig_trends_revcou_real")
 
 trends |> make_trend_plot(revcou_real, "Revenu courant reel moyen (Ar constants 2010)")
+```
+
+```{r fig_trends_revcou_real_pc}
+#| fig-cap: "Evolution du revenu courant reel moyen par tete (Ar constants 2010, IPC)"
+#| fig-width: !expr fig_w("fig_trends_revcou_real_pc")
+#| fig-height: !expr fig_h("fig_trends_revcou_real_pc")
+
+trends |> make_trend_plot(revcou_real_pc, "Revenu courant reel moyen (Ar/tete/an, constants 2010)")
+```
+
+```{r fig_trends_revcou_real_eq}
+#| fig-cap: "Evolution du revenu courant reel moyen par unite de consommation (Ar constants 2010, IPC)"
+#| fig-width: !expr fig_w("fig_trends_revcou_real_eq")
+#| fig-height: !expr fig_h("fig_trends_revcou_real_eq")
+
+trends |> make_trend_plot(revcou_real_eq, "Revenu courant reel moyen (Ar/UC/an, constants 2010)")
 ```
 
 ### Revenus reels (deflates par le prix du paddy)
