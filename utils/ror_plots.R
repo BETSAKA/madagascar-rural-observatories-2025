@@ -1,3 +1,34 @@
+# ── Modality Ranking helpers ──────────────────────────────────
+.ror_ranking_env <- new.env(parent = emptyenv())
+
+#' Ensure Observatory is a factor with Marovoay first
+.ror_fix_obs_order <- function(data) {
+  if ("Observatory" %in% names(data)) {
+    obs_levels = unique(as.character(data$Observatory))
+    # Desired order: Marovoay then Alaotra then others
+    preferred = c("Marovoay", "Alaotra")
+    existing_pref = intersect(preferred, obs_levels)
+    others = setdiff(obs_levels, existing_pref)
+    final_levels = c(existing_pref, others)
+    data$Observatory <- factor(data$Observatory, levels = final_levels)
+  }
+  data
+}
+
+
+#' Load modality rankings from YAML
+.load_ror_rankings <- function() {
+  if (is.null(.ror_ranking_env$rankings)) {
+    path = "data/modality_rankings.yml"
+    if (file.exists(path)) {
+      .ror_ranking_env$rankings <- yaml::read_yaml(path)
+    } else {
+      .ror_ranking_env$rankings <- list()
+    }
+  }
+  .ror_ranking_env$rankings
+}
+
 # utils/ror_plots.R
 # ─────────────────────────────────────────────────────────────────
 # Generic plot functions for the ROR observatory report.
@@ -172,7 +203,14 @@ ror_fig_height_n <- function(
 
 #' Auto-compute facet ncol
 .ror_ncol <- function(n_fct, ncol = NULL) {
-  ncol %||% (if (n_fct > 6) 3L else if (n_fct > 3) 2L else n_fct)
+  ncol %||%
+    (if (n_fct > 6) {
+      3L
+    } else if (n_fct > 3) {
+      2L
+    } else {
+      n_fct
+    })
 }
 
 #' Ensure all Observatory × category combinations exist (fills missing with 0)
@@ -188,7 +226,55 @@ ror_fig_height_n <- function(
 }
 
 #' Reorder a column globally by sum of y
-.ror_global_order <- function(data, x_quo, y_quo) {
+
+#' Reorder a column globally by sum of y, or by a predefined ranking.
+.ror_global_order <- function(data, x_quo, y_quo, label = NULL) {
+  # 1. Try predefined ranking if label is provided
+  if (!is.null(label)) {
+    rankings <- .load_ror_rankings()
+    conf <- rankings[[label]]
+    if (is.null(conf) && grepl("^fig_", label)) {
+      alt_label <- gsub("_", "-", label)
+      conf <- rankings[[alt_label]]
+    }
+
+    if (!is.null(conf)) {
+      levels_vec <- NULL
+      if (!is.null(conf$order)) {
+        levels_vec <- unlist(conf$order)
+      } else if (!is.null(conf$ranking_key)) {
+        levels_vec <- unlist(rankings[["_shared"]][[conf$ranking_key]])
+      }
+
+      if (!is.null(levels_vec)) {
+        actual_vals <- unique(as.character(dplyr::pull(data, !!x_quo)))
+        ordered_levels <- intersect(levels_vec, actual_vals)
+        remaining <- setdiff(actual_vals, ordered_levels)
+        final_levels <- c(ordered_levels, remaining)
+        return(dplyr::mutate(
+          data,
+          !!x_quo := factor(!!x_quo, levels = rev(final_levels))
+        ))
+      }
+    }
+  }
+
+  # 2. Case-specific reference ordering
+  obs_levels <- unique(data$Observatory)
+  if (all(c("Marovoay", "Alaotra") %in% obs_levels)) {
+    ref_order <- data |>
+      dplyr::filter(Observatory == "Marovoay") |>
+      dplyr::summarise(.total = sum(!!y_quo, na.rm = TRUE), .by = !!x_quo) |>
+      dplyr::arrange(.total) |>
+      dplyr::pull(!!x_quo)
+    actual_vals <- unique(as.character(dplyr::pull(data, !!x_quo)))
+    missing <- setdiff(actual_vals, as.character(ref_order))
+    if (length(missing) > 0) {
+      ref_order <- c(missing, ref_order)
+    }
+    return(dplyr::mutate(data, !!x_quo := factor(!!x_quo, levels = ref_order)))
+  }
+
   global_order <- data |>
     dplyr::summarise(.total = sum(!!y_quo, na.rm = TRUE), .by = !!x_quo) |>
     dplyr::arrange(.total) |>
@@ -226,16 +312,21 @@ make_bar_obs <- function(
   fill_color = ROR_BLUE,
   show_pct = TRUE,
   pct_suffix = "%",
-  ncol = NULL
+  ncol = NULL,
+  label = NULL
 ) {
+  data <- .ror_fix_obs_order(data)
   x_quo <- rlang::enquo(x)
   y_quo <- rlang::enquo(y)
   y_name <- rlang::as_name(y_quo)
+  if (is.null(label)) {
+    label <- knitr::opts_current$get("label")
+  }
   n_fct <- dplyr::n_distinct(data$Observatory)
 
   # Uniform categories + global ordering
   data <- .ror_complete(data, x_quo, y_name, n_fct)
-  data <- .ror_global_order(data, x_quo, y_quo)
+  data <- .ror_global_order(data, x_quo, y_quo, label = label)
 
   label_sz <- if (n_fct > 3) 2.5 else 3.8
 
@@ -291,11 +382,19 @@ ror_bar_v <- function(
   fill_color = ROR_BLUE,
   show_pct = TRUE,
   x_angle = 0,
-  ncol = NULL
+  ncol = NULL,
+  label = NULL
 ) {
+  data <- .ror_fix_obs_order(data)
+  data <- .ror_fix_obs_order(data)
+  data <- .ror_fix_obs_order(data)
+  data <- .ror_fix_obs_order(data)
   x_quo <- rlang::enquo(x)
   y_quo <- rlang::enquo(y)
   y_name <- rlang::as_name(y_quo)
+  if (is.null(label)) {
+    label <- knitr::opts_current$get("label")
+  }
   n_fct <- dplyr::n_distinct(data$Observatory)
 
   data <- .ror_complete(data, x_quo, y_name, n_fct)
@@ -359,15 +458,23 @@ ror_bar_grouped <- function(
   direction = "vertical",
   x_angle = 45,
   ncol = NULL,
+  label = NULL,
   palette = NULL,
   facet = TRUE,
   show_pct = TRUE,
   pct_suffix = "%"
 ) {
+  data <- .ror_fix_obs_order(data)
+  data <- .ror_fix_obs_order(data)
+  data <- .ror_fix_obs_order(data)
+  data <- .ror_fix_obs_order(data)
   x_quo <- rlang::enquo(x)
   y_quo <- rlang::enquo(y)
   fill_quo <- rlang::enquo(fill)
   y_name <- rlang::as_name(y_quo)
+  if (is.null(label)) {
+    label <- knitr::opts_current$get("label")
+  }
   n_fct <- dplyr::n_distinct(data$Observatory)
 
   # Uniform categories across facets
@@ -473,13 +580,19 @@ ror_bar_stacked <- function(
   direction = "horizontal",
   x_angle = 0,
   ncol = NULL,
+  label = NULL,
   palette = NULL,
   show_pct = TRUE,
   min_pct = 5
 ) {
+  data <- .ror_fix_obs_order(data)
+  data <- .ror_fix_obs_order(data)
+  data <- .ror_fix_obs_order(data)
+  data <- .ror_fix_obs_order(data)
   x_quo <- rlang::enquo(x)
   y_quo <- rlang::enquo(y)
   fill_quo <- rlang::enquo(fill)
+  data <- .ror_fix_obs_order(data)
   n_fct <- dplyr::n_distinct(data$Observatory)
 
   pos <- if (proportion) "fill" else "stack"
@@ -605,11 +718,13 @@ ror_pyramid <- function(
   y = pct,
   title = "",
   ncol = NULL,
+  label = NULL,
   palette = c("Homme" = "#4682B4", "Femme" = "#CD5C5C")
 ) {
   age_quo <- rlang::enquo(age_col)
   sex_quo <- rlang::enquo(sex_col)
   y_quo <- rlang::enquo(y)
+  data <- .ror_fix_obs_order(data)
   n_fct <- dplyr::n_distinct(data$Observatory)
 
   p <- ggplot2::ggplot(

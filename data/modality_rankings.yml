@@ -1,0 +1,27 @@
+# data/modality_rankings.yml
+# This file centralizes the logical ordering of categorical modalities for report plots.
+# If a plot label or a shared ranking key is defined here, the plotting functions
+# (make_bar_obs, ror_bar_grouped, etc.) will use this order instead of the default
+# decreasing frequency.
+
+# --- Shared Rankings (can be reused by multiple plots) ---
+_shared:
+  sanitation_levels:
+    - "Fosse septique en individuel"
+    - "Fosse septique en commun"
+    - "Fosse perdue en individuel"
+    - "Fosse perdue en commun"
+    - "Dans la nature"
+
+# --- Plot-specific Rankings ---
+# Keys should match Quarto chunk labels
+fig-latrine:
+  ranking_key: "sanitation_levels"
+
+fig-statut-logement:
+  order:
+    - "Propriétaire"
+    - "Locataire"
+    - "Logé gratuitement"
+    - "Prête"
+    - "Autre"
