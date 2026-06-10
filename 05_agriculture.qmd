@@ -864,44 +864,41 @@ La commercialisation du paddy est une source de revenu majeure. Le calendrier et
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, `r pct_vente_a` % des ménages déclarent avoir vendu du riz au cours de la campagne.
+Dans l'Alaotra, `r pct_vente_a` % des ménages riziculteurs déclarent avoir vendu du riz au cours de la campagne.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, `r pct_vente_m` % des ménages déclarent avoir vendu du riz au cours de la campagne.
+A Marovoay, `r pct_vente_m` % des ménages riziculteurs déclarent avoir vendu du riz au cours de la campagne.
 :::
 :::
 
 ```{r}
-#| label: tbl-ventes-riz-taux
-#| tbl-cap: "Taux de vente de riz par observatoire"
+#| label: fig-ventes-riz-taux
+#| fig-cap: "Taux de vente de riz par observatoire"
+#| fig-width: !expr fig_w("fig-ventes-riz-taux")
+#| fig-height: !expr fig_h("fig-ventes-riz-taux")
 
 res_dc20 |>
   filter(j5 %in% res_r1$j5) |>
-  summarise(
-    `Nb ménages riziculteurs` = n(),
-    `Ont vendu (nb)` = sum(dcva == 1, na.rm = TRUE),
-    `Ont vendu (%)` = round(sum(dcva == 1, na.rm = TRUE) / n() * 100, 1),
-    .by = Observatory
-  ) |>
-  gt() |>
-  tab_header(title = "Vente de riz (paddy ou blanc)")
+  mutate(Vente = if_else(dcva == 1, "Vendu", "Non vendu")) |>
+  count(Observatory, Vente) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  expand_sites_for_profile() |>
+  make_bar_obs(x = Vente, y_label = "% des riziculteurs")
 ```
 
-```{r dl_tbl_ventes_riz_taux}
+```{r dl_fig_ventes_riz_taux}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_ventes_riz_taux", "08", function(d) {
+dl_fig_variants("fig_ventes_riz_taux", "08", function(d) {
   d |>
     filter(j5 %in% res_r1$j5) |>
-    summarise(
-      `Nb ménages riziculteurs` = n(),
-      `Ont vendu (nb)` = sum(dcva == 1, na.rm = TRUE),
-      `Ont vendu (%)` = round(sum(dcva == 1, na.rm = TRUE) / n() * 100, 1),
-      .by = Observatory
-    ) |> rename(Site = Observatory)
+    mutate(Vente = if_else(dcva == 1, "Vendu", "Non vendu")) |>
+    count(Observatory, Vente) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    make_bar_obs(x = Vente, y_label = "% des riziculteurs")
 }, res_dc20)
 ```
 
@@ -1017,18 +1014,18 @@ L’ensemble met en évidence une organisation des flux de paddy orientée à la
 #| include: false
 
 bilan_vars <- c(
-  dc01 = "Stock début campagne",
-  dc02b = "Production totale",
-  dc03b = "Rente perçue en nature",
-  dc04 = "Achat de paddy",
-  dc05 = "Paddy reçu (dons, héritage…)",
-  dc06 = "Vente de paddy",
-  dc07 = "Rente versée en nature",
-  dc08 = "Paddy donné / cédé",
-  dc09 = "Alimentation du ménage",
-  dc10 = "Paiement MO en nature",
-  dc11 = "Semences utilisées",
-  dc17 = "Stock fin campagne"
+  dc01 = "Stock début",
+  dc02b = "Production",
+  dc03b = "Rente perçue",
+  dc04 = "Achat",
+  dc05 = "Paddy reçu",
+  dc06 = "Vente",
+  dc07 = "Rente versée",
+  dc08 = "Paddy cédé",
+  dc09 = "Alimentation",
+  dc10 = "Paiement MO",
+  dc11 = "Semences",
+  dc17 = "Stock fin"
 )
 
 # Only keep variables that exist in the data
@@ -1061,11 +1058,15 @@ res_dc1 |>
     across(all_of(names(bv)), \(x) round(mean(x, na.rm = TRUE))),
     .by = Observatory
   ) |>
-  pivot_longer(-Observatory, names_to = "Variable", values_to = "Moyenne") |>
-  mutate(Type = bilan_vars[Variable]) |>
-  select(-Variable) |>
-  rename(pct = Moyenne) |>
-  make_bar_obs(show_pct = TRUE, pct_suffix = " kg")
+  pivot_longer(-Observatory, names_to = "Variable", values_to = "kg") |>
+  mutate(
+    Poste = bilan_vars[Variable],
+    Flux = if_else(Variable %in% c("dc01", "dc02b", "dc03b", "dc04", "dc05"), "Ressources", "Emplois"),
+    Flux = factor(Flux, levels = c("Ressources", "Emplois"))
+  ) |>
+  ror_bar_stacked(x = Flux, y = kg, fill = Poste, 
+                  proportion = FALSE, direction = "vertical", show_pct = FALSE,
+                  y_label = "kg de paddy")
 ```
 
 ```{r dl_fig_bilan_riz}
@@ -1078,11 +1079,15 @@ dl_fig_variants("fig_bilan_riz", "08", function(d) {
       across(all_of(names(bv)), \(x) round(mean(x, na.rm = TRUE))),
       .by = Observatory
     ) |>
-    pivot_longer(-Observatory, names_to = "Variable", values_to = "Moyenne") |>
-    mutate(Type = bilan_vars[Variable]) |>
-    select(-Variable) |>
-    rename(pct = Moyenne) |>
-    make_bar_obs(show_pct = TRUE, pct_suffix = " kg")
+    pivot_longer(-Observatory, names_to = "Variable", values_to = "kg") |>
+    mutate(
+      Poste = bilan_vars[Variable],
+      Flux = if_else(Variable %in% c("dc01", "dc02b", "dc03b", "dc04", "dc05"), "Ressources", "Emplois"),
+      Flux = factor(Flux, levels = c("Ressources", "Emplois"))
+    ) |>
+    ror_bar_stacked(x = Flux, y = kg, fill = Poste, 
+                    proportion = FALSE, direction = "vertical", show_pct = FALSE,
+                    y_label = "kg de paddy")
 }, res_dc1, width = 10, height = 6)
 ```
 
@@ -1313,48 +1318,6 @@ La culture de la patate dans l’observatoire de Marovoay se distingue par la pr
 :::
 ::::
 
-
-```{r}
-#| label: tbl-production-autres
-#| tbl-cap: "Production et ventes des principales cultures non rizicoles"
-
-res_c |>
-  filter(c0 != "", !is.na(c0), !is.na(c2), c2 > 0) |>
-  mutate(Culture = str_to_title(c0)) |>
-  summarise(
-    `Nb parcelles` = n(),
-    `Production moy. (kg)` = round(mean(c2, na.rm = TRUE)),
-    `% vendu (moy.)` = round(mean(c4a, na.rm = TRUE), 1),
-    `Montant vente moy. (Ar)` = round(mean(c6b[c6b > 0], na.rm = TRUE)),
-    .by = c(Observatory, Culture)
-  ) |>
-  filter(`Nb parcelles` >= 5) |>
-  arrange(Observatory, desc(`Nb parcelles`)) |>
-  gt() |>
-  tab_header(title = "Production et ventes des principales cultures non rizicoles") |>
-  fmt_number(columns = c(`Production moy. (kg)`, `Montant vente moy. (Ar)`),
-             use_seps = TRUE, decimals = 0)
-```
-
-```{r dl_tbl_production_autres}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_production_autres", "08", function(d) {
-  d |>
-    filter(c0 != "", !is.na(c0), !is.na(c2), c2 > 0) |>
-    mutate(Culture = str_to_title(c0)) |>
-    summarise(
-      `Nb parcelles` = n(),
-      `Production moy. (kg)` = round(mean(c2, na.rm = TRUE)),
-      `% vendu (moy.)` = round(mean(c4a, na.rm = TRUE), 1),
-      `Montant vente moy. (Ar)` = round(mean(c6b[c6b > 0], na.rm = TRUE)),
-      .by = c(Observatory, Culture)
-    ) |>
-    filter(`Nb parcelles` >= 5) |>
-    arrange(Observatory, desc(`Nb parcelles`)) |>
-    rename(Site = Observatory)
-}, res_c)
-```
 
 #### Perception des rendements
 
