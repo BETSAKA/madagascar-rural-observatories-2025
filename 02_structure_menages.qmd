@@ -1295,27 +1295,14 @@ age_table2 <- others |>
   mutate(Caractéristique = "Âge", .before = Statistique) |>
   rename(Catégorie = Statistique)
 
-# --- Statut matrimonial (exclusion des moins de 12 ans) ---
-statut_table2 <- others |>
-  filter(m5 >= 12) |>
-  mutate(Statut = classify_marital(m7)) |>
-  filter(!is.na(Statut)) |>
-  count(Observatory, Statut) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  select(Observatory, Statut, pct) |>
-  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0) |>
-  mutate(across(any_of(c("Alaotra", "Marovoay")), \(x) paste0(x, "%"))) |>
-  mutate(Caractéristique = "Statut matrimonial", .before = Statut) |>
-  rename(Catégorie = Statut)
-
 # --- Combined table ---
-hh_combined2 <- bind_rows(sexe_table2, age_table2, statut_table2)
+hh_combined2 <- bind_rows(sexe_table2, age_table2)
 
 gt(hh_combined2, groupname_col = "Caractéristique") |>
   tab_header(title = "Caractéristiques des autres membres de ménage") |>
   safe_cols_label(Catégorie = "Catégorie", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
   tab_footnote(
-    footnote = "Sexe et Statut matrimonial : pourcentages (statut matrimonial calculé pour les membres de 12 ans et plus). Âge : statistiques descriptives.",
+    footnote = "Sexe : pourcentages. Âge : statistiques descriptives.",
     locations = cells_title(groups = "title")
   ) |>
   style_table()
@@ -1339,16 +1326,35 @@ dl_tbl_variants("tbl_other_chars", "04", function(d) {
     pivot_longer(-Observatory, names_to = "Catégorie", values_to = "Effectif") |>
     mutate(Variable = "Âge", `%` = NA_real_) |>
     rename(Site = Observatory)
-  statut <- oth |>
-    filter(m5 >= 12) |>
-    mutate(Catégorie = classify_marital(m7)) |>
-    filter(!is.na(Catégorie)) |>
-    count(Observatory, Catégorie) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    mutate(Variable = "Statut matrimonial (12 ans et +)") |>
-    rename(Site = Observatory, Effectif = n)
-  bind_rows(sexe, age, statut) |>
+  bind_rows(sexe, age) |>
     select(Site, Variable, Catégorie, Effectif, `%`)
+}, members)
+```
+
+```{r fig_other_statut}
+#| echo: false
+#| fig-cap: "Statut matrimonial des autres membres (12 ans et plus)"
+#| fig-height: !expr fig_h("fig_other_statut")
+others_site |>
+  filter(m5 >= 12) |>
+  mutate(Type = classify_marital(m7)) |>
+  filter(!is.na(Type)) |>
+  count(Observatory, Type) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  make_bar_obs(label = "fig_other_statut")
+```
+
+```{r dl_fig_other_statut}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_other_statut", "04", function(d) {
+  d |>
+    filter(m6 != 1, m5 >= 12) |>
+    mutate(Type = classify_marital(m7)) |>
+    filter(!is.na(Type)) |>
+    count(Observatory, Type) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    make_bar_obs()
 }, members)
 ```
 
