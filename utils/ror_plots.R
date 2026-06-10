@@ -307,6 +307,22 @@ ror_fig_height_n <- function(
   dplyr::mutate(data, !!x_quo := factor(!!x_quo, levels = global_order))
 }
 
+.ror_age_pyramid_order <- function(data, age_quo) {
+  rankings <- .load_ror_rankings()
+  age_levels <- rankings[["_shared"]][["age_groups"]]
+
+  if (is.null(age_levels)) {
+    return(data)
+  }
+
+  actual_vals <- unique(as.character(dplyr::pull(data, !!age_quo)))
+  ordered_levels <- intersect(rev(unlist(age_levels)), actual_vals)
+  remaining <- setdiff(actual_vals, ordered_levels)
+  final_levels <- unique(c(ordered_levels, remaining))
+
+  dplyr::mutate(data, !!age_quo := factor(!!age_quo, levels = final_levels))
+}
+
 
 # ── make_bar_obs ──────────────────────────────────────────────
 #' Horizontal bar chart, optionally faceted by Observatory
@@ -730,7 +746,12 @@ make_trend_plot <- function(data, y_var, y_label, gap_year = 2014, title = "") {
     mapping = ggplot2::aes(x = year, y = .trend_value, colour = Observatory)
   ) +
     ggplot2::geom_line(data = solid, linewidth = 0.8, na.rm = TRUE) +
-    ggplot2::geom_line(data = gap, linewidth = 0.8, linetype = "31", na.rm = TRUE) +
+    ggplot2::geom_line(
+      data = gap,
+      linewidth = 0.8,
+      linetype = "31",
+      na.rm = TRUE
+    ) +
     ggplot2::geom_point(data = data, size = 2, na.rm = TRUE) +
     ggplot2::scale_x_continuous(breaks = seq(1995, 2025, 5)) +
     ggplot2::scale_y_continuous(labels = scales::label_comma()) +
@@ -779,7 +800,11 @@ ror_pyramid <- function(
   n_fct <- dplyr::n_distinct(data$Observatory)
 
   # Apply ranking/ordering
-  data <- .ror_global_order(data, age_quo, y_quo, label = label)
+  if (is.null(label)) {
+    data <- .ror_age_pyramid_order(data, age_quo)
+  } else {
+    data <- .ror_global_order(data, age_quo, y_quo, label = label)
+  }
 
   p <- ggplot2::ggplot(
     data,

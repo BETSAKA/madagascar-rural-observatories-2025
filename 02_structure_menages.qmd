@@ -652,25 +652,14 @@ age_table <- cm |>
   mutate(Caractéristique = "Âge", .before = Statistique) |>
   rename(Catégorie = Statistique)
 
-# --- Statut matrimonial ---
-statut_table <- cm |>
-  mutate(Statut = classify_marital(m7)) |>
-  count(Observatory, Statut) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  select(Observatory, Statut, pct) |>
-  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0) |>
-  mutate(across(any_of(c("Alaotra", "Marovoay")), \(x) paste0(x, "%"))) |>
-  mutate(Caractéristique = "Statut matrimonial", .before = Statut) |>
-  rename(Catégorie = Statut)
-
 # --- Combined table ---
-hh_combined <- bind_rows(sexe_table, age_table, statut_table)
+hh_combined <- bind_rows(sexe_table, age_table)
 
 gt(hh_combined, groupname_col = "Caractéristique") |>
   tab_header(title = "Caractéristiques des chefs de ménage") |>
   safe_cols_label(Catégorie = "Catégorie", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
   tab_footnote(
-    footnote = "Sexe et Statut matrimonial : effectifs et pourcentages. Âge : statistiques descriptives.",
+    footnote = "Sexe : effectifs et pourcentages. Âge : statistiques descriptives.",
     locations = cells_title(groups = "title")
   ) |>
   style_table()
@@ -694,14 +683,32 @@ dl_tbl_variants("tbl_cm_chars", "04", function(d) {
     pivot_longer(-Observatory, names_to = "Catégorie", values_to = "Effectif") |>
     mutate(Variable = "Âge", `%` = NA_real_) |>
     rename(Site = Observatory)
-  statut <- cm |>
-    mutate(Catégorie = classify_marital(m7)) |>
-    count(Observatory, Catégorie) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    mutate(Variable = "Statut matrimonial") |>
-    rename(Site = Observatory, Effectif = n)
-  bind_rows(sexe, age, statut) |>
+  bind_rows(sexe, age) |>
     select(Site, Variable, Catégorie, Effectif, `%`)
+}, members)
+```
+
+```{r fig_cm_statut}
+#| echo: false
+#| fig-cap: "Statut matrimonial des chefs de ménage"
+#| fig-height: !expr fig_h("fig_cm_statut")
+cm_site |>
+  mutate(Type = classify_marital(m7)) |>
+  count(Observatory, Type) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  make_bar_obs(label = "fig_cm_statut")
+```
+
+```{r dl_fig_cm_statut}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_cm_statut", "04", function(d) {
+  d |>
+    filter(m6 == 1) |>
+    mutate(Type = classify_marital(m7)) |>
+    count(Observatory, Type) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    make_bar_obs()
 }, members)
 ```
 
