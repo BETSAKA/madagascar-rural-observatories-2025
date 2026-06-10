@@ -1337,55 +1337,56 @@ Au-delà des mesures quantitatives, la perception subjective des rendements par 
 
 
 ```{r}
-#| label: tbl-rendement-autres
-#| tbl-cap: "Perception des rendements des cultures non rizicoles"
-
-perc <- res_c0 |>
+#| label: fig-rendement-perception-autres
+#| fig-cap: "Perception des rendements des cultures non rizicoles"
+#| fig-width: !expr fig_w("fig-rendement-perception-autres")
+#| fig-height: !expr fig_h("fig-rendement-perception-autres")
+res_c0 |>
   filter(c1a == 1, !is.na(c20)) |>
   mutate(Perception = safe_to_char(c20)) |>
   count(Observatory, Perception) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  select(-n) |>
-  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0) |>
-  mutate(Indicateur = "Rendement cette campagne", .before = 1) |>
-  rename(Modalite = Perception)
-
-evol <- res_c0 |>
-  filter(c1a == 1, !is.na(c21)) |>
-  mutate(Evolution = safe_to_char(c21)) |>
-  count(Observatory, Evolution) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  select(-n) |>
-  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0) |>
-  mutate(Indicateur = "Par rapport a l'an dernier", .before = 1) |>
-  rename(Modalite = Evolution)
-
-bind_rows(perc, evol) |>
-  gt() |>
-  tab_header(title = "Perception des rendements des cultures non rizicoles (% des pratiquants)")
+  expand_sites_for_profile() |>
+  make_bar_obs(x = Perception, y_label = "% des pratiquants")
 ```
 
-```{r dl_tbl_rendement_autres}
+```{r dl_fig_rendement_perception_autres}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_rendement_autres", "08", function(d) {
-  perc <- d |>
+dl_fig_variants("fig_rendement_perception_autres", "08", function(d) {
+  d |>
     filter(c1a == 1, !is.na(c20)) |>
     mutate(Perception = safe_to_char(c20)) |>
     count(Observatory, Perception) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    select(-n) |>
-    mutate(Indicateur = "Rendement cette campagne")
-  evol <- d |>
+    make_bar_obs(x = Perception, y_label = "% des pratiquants")
+}, res_c0)
+```
+
+```{r}
+#| label: fig-rendement-evolution-autres
+#| fig-cap: "Évolution des rendements des cultures non rizicoles par rapport à l'an dernier"
+#| fig-width: !expr fig_w("fig-rendement-evolution-autres")
+#| fig-height: !expr fig_h("fig-rendement-evolution-autres")
+res_c0 |>
+  filter(c1a == 1, !is.na(c21)) |>
+  mutate(Evolution = safe_to_char(c21)) |>
+  count(Observatory, Evolution) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  expand_sites_for_profile() |>
+  make_bar_obs(x = Evolution, y_label = "% des pratiquants")
+```
+
+```{r dl_fig_rendement_evolution_autres}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_rendement_evolution_autres", "08", function(d) {
+  d |>
     filter(c1a == 1, !is.na(c21)) |>
     mutate(Evolution = safe_to_char(c21)) |>
     count(Observatory, Evolution) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    select(-n) |>
-    mutate(Indicateur = "Par rapport a l'an dernier") |>
-    rename(Perception = Evolution)
-  bind_rows(perc, evol) |>
-    select(Site = Observatory, Indicateur, Perception, `%` = pct)
+    make_bar_obs(x = Evolution, y_label = "% des pratiquants")
 }, res_c0)
 ```
 
