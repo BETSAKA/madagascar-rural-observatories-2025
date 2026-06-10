@@ -1497,15 +1497,50 @@ dl_fig_variants("fig_top_jardin", "08", function(d) {
 
 L'exploitation des ressources forestières (bois de chauffe, charbon, bois d'œuvre, plantes médicinales) constitue une activité complémentaire pour de nombreux ménages. Les produits forestiers sont essentiels à la fois comme source d'énergie domestique et comme revenu d'appoint.
 
+```{r pratique_foret_data}
+#| include: false
+pratique_foret <- res_jpchphef |>
+  summarise(
+    pct = round(sum(efa == 1, na.rm = TRUE) / n() * 100, 1),
+    .by = Observatory
+  ) |>
+  mutate(Type = "Pratiquent") |>
+  expand_sites_for_profile()
+```
+
+```{r}
+#| label: fig-pratique-foret
+#| fig-cap: "Part des ménages pratiquant l'exploitation forestière"
+#| fig-width: !expr fig_w("fig-pratique-foret")
+#| fig-height: !expr fig_h("fig-pratique-foret")
+
+pratique_foret |>
+  make_bar_obs(x = Type, y_label = "% des ménages")
+```
+
+```{r dl_fig_pratique_foret}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_pratique_foret", "08", function(d) {
+  d |>
+    summarise(
+      pct = round(sum(efa == 1, na.rm = TRUE) / n() * 100, 1),
+      .by = Observatory
+    ) |>
+    mutate(Type = "Pratiquent") |>
+    make_bar_obs(x = Type, y_label = "% des ménages")
+}, res_jpchphef)
+```
+
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
-A Alaotra, les principaux produits issus de l’exploitation forestière sont très largement dominés par le **kitay**, cité par 99.6 % des ménages. Le **saribao** est également presque systématiquement exploité, avec une proportion de 98.9 %, tandis que le **hazo afok’ampy** concerne 94.6 % des ménages. En revanche, le **hazo ampiasaina** reste très peu mentionné, avec seulement 2.9 % des ménages concernés. Ces résultats montrent que l’exploitation forestière dans cet observatoire repose essentiellement sur quelques produits largement répandus au sein des ménages.
+A Alaotra, parmi les ménages pratiquant l’exploitation forestière, les principaux produits sont très largement dominés par le **kitay**, cité par 99.6 % d’entre eux. Le **saribao** est également presque systématiquement exploité, avec une proportion de 98.9 %, tandis que le **hazo afok’ampy** concerne 94.6 % de ces ménages. En revanche, le **hazo ampiasaina** reste très peu mentionné, avec seulement 2.9 % des ménages concernés. Ces résultats montrent que l’exploitation forestière dans cet observatoire repose essentiellement sur quelques produits largement répandus parmi les ménages exploitants.
 :::
 ::::
 
 :::: {.content-hidden when-profile="alaotra"}
 ::: obs-marovoay
-A Marovoay, le **kitay** constitue aussi le principal produit d’exploitation forestière, utilisé par 99.5 % des ménages. Le **saribao** occupe une place tout aussi importante avec 98.9 %, alors que le **hazo afok’ampy** est mentionné par 89.9 % des ménages. Le **hazo ampiasaina** demeure marginal, avec une fréquence de seulement 6.4 %. L’exploitation forestière dans cet observatoire se caractérise ainsi par une forte concentration autour des produits énergétiques et du bois de chauffage.
+A Marovoay, parmi les ménages pratiquant l’exploitation forestière, le **kitay** constitue aussi le principal produit, utilisé par 99.5 % d’entre eux. Le **saribao** occupe une place tout aussi importante avec 98.9 %, alors que le **hazo afok’ampy** est mentionné par 89.9 % de ces ménages. Le **hazo ampiasaina** demeure marginal, avec une fréquence de seulement 6.4 %. L’exploitation forestière dans cet observatoire se caractérise ainsi par une forte concentration autour des produits énergétiques et du bois de chauffage.
 :::
 ::::
 
@@ -1533,12 +1568,12 @@ produits_foret <- res_ef |>
 
 ```{r}
 #| label: fig-produits-foret
-#| fig-cap: "Principaux produits de l'exploitation forestière"
+#| fig-cap: "Principaux produits de l'exploitation forestière (% des ménages pratiquant l'exploitation forestière)"
 #| fig-width: !expr fig_w("fig-produits-foret")
 #| fig-height: !expr fig_h("fig-produits-foret")
 
 produits_foret |>
-  make_bar_obs(x = Produit, y_label = "% des ménages")
+  make_bar_obs(x = Produit, y_label = "% des ménages pratiquant l'exploitation forestière")
 ```
 
 ```{r dl_fig_produits_foret}
@@ -1554,7 +1589,7 @@ dl_fig_variants("fig_produits_foret", "08", function(d) {
     mutate(total = sum(n)) |>
     ungroup() |>
     ror_bar_grouped(x = Produit, y = n, fill = Observatory,
-                    y_label = "Nombre de ménages", direction = "horizontal",
+                    y_label = "Nombre de ménages pratiquant l'exploitation forestière", direction = "horizontal",
                     facet = FALSE, show_pct = FALSE)
 }, res_ef)
 ```
