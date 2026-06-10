@@ -185,12 +185,6 @@ pct_top_raison_m <- non_scol_s |> filter(Observatory == "Marovoay") |>
 
 ## Description des ménages
 
-:::: {.content-visible when-profile="consolidated"}
-::: obs-technical
-Les ménages de Marovoay sont globalement plus larges que ceux de l'Alaotra.
-:::
-::::
-
 <!-- ::: {.content-hidden when-profile="marovoay"} -->
 
 <!-- ::: {.obs-alaotra} -->
@@ -211,9 +205,9 @@ Les ménages de Marovoay sont globalement plus larges que ceux de l'Alaotra.
 
 <!-- ::: -->
 
-### Taille des ménages par observatoire
+### Taille des ménages
 
-La taille des ménages correspond au nombre total d’individus qui composent et vivent au sein d'une même ménage.
+Le ménage est un ensemble de personnes avec ou sans lien de parenté, vivant sous le même toit ou dans la même concession, prenant leur repas ensemble ou par petits groupes, mettant une partie ou la totalité de leurs revenus en commun pour la bonne marche du groupe.
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
@@ -227,20 +221,55 @@ A Marovoay, on a recensé 2297 individus répartis dans 519 ménages. La taille 
 :::
 ::::
 
+```{r fig_men_hameau}
+#| fig-cap: "Taille moyenne des ménages par hameau selon les observatoires"
+#| fig-height: !expr fig_h("fig_men_hameau", 5)
+hh_size_hameau <- members |>
+  mutate(j4bis = fix_hameau(j4)) |>
+  summarise(hh_size = n(), .by = c(Observatory, j4bis, j5))
 
+hh_size_hameau_plot <- hh_size_hameau |>
+  summarise(mean_hh_size = mean(hh_size), .by = c(Observatory, j4bis)) |>
+  mutate(Observatory = factor(Observatory, levels = c("Marovoay", "Alaotra")))
 
-```{r tbl-men-obs}
-#| tbl-cap: "Taille moyenne des ménages par observatoire"
+hh_size_obs_mean <- hh_size_hameau |>
+  summarise(obs_mean_hh_size = mean(hh_size), .by = Observatory) |>
+  mutate(Observatory = factor(Observatory, levels = c("Marovoay", "Alaotra")))
 
-hh_size_obs <- members_site |>
-  summarise(hh_size = n(), .by = c(Observatory, j5)) |>
-  summarise(mean_hh_size = mean(hh_size), .by = Observatory)
+hh_size_obs_label <- hh_size_hameau_plot |>
+  summarise(label_hameau = dplyr::last(sort(unique(j4bis))), .by = Observatory) |>
+  left_join(hh_size_obs_mean, by = "Observatory")
 
-obs_gt(hh_size_obs) |>
-  tab_header(title = obs_title("Taille moyenne des ménages")) |>
-  fmt_number(columns = mean_hh_size, decimals = 2) |>
-  cols_label(mean_hh_size = "Taille moyenne") |>
-  style_table()
+n_obs_hameau <- dplyr::n_distinct(hh_size_hameau_plot$Observatory)
+
+ggplot(hh_size_hameau_plot, aes(x = j4bis, y = mean_hh_size)) +
+  geom_col(fill = ROR_BLUE, width = 0.7) +
+  geom_hline(
+    data = hh_size_obs_mean,
+    aes(yintercept = obs_mean_hh_size)
+  ) +
+  geom_text(aes(label = round(mean_hh_size, 2)), vjust = -0.3, size = 3.3) +
+  geom_text(
+    data = hh_size_obs_label,
+    aes(x = label_hameau, y = obs_mean_hh_size, label = round(obs_mean_hh_size, 2)),
+    hjust = -1.5,
+    vjust = -0.3,
+    size = 4,
+  ) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(
+    title = obs_title("Taille moyenne des ménages par hameau"),
+    subtitle = "La ligne horizontale indique la taille moyenne de l'observatoire.",
+    x = "Hameau",
+    y = "Taille moyenne"
+  ) +
+  theme_ror(n_facets = n_obs_hameau) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.margin = margin(5.5, 22, 5.5, 5.5)
+  ) +
+  coord_cartesian(clip = "off") +
+  obs_facet(hh_size_hameau_plot, ncol = n_obs_hameau, scales = "free_x")
 ```
 
 ```{r dl_tbl_men_obs}
@@ -252,40 +281,6 @@ dl_tbl_variants("tbl_men_obs", "04", function(d) {
     summarise(`Taille moyenne` = round(mean(taille), 2), .by = Observatory) |>
     rename(Site = Observatory)
 }, members)
-```
-
-### Taille des ménages par hameau et par observatoire
-
-Pour Marovoay, Ampijoroa se distingue par les ménages les plus nombreux de l'échantillon tandis que les hameaux de l'Alaotra présentent une homogénéité plus forte autour de 4 personnes par foyer.
-
-:::: {.content-hidden when-profile="marovoay"} 
-::: obs-alaotra 
-A Alaotra, les tailles varient peu : de 3.76 (Avaradrano) à 4.03 (Ambatoharanana, Ambatomanga, Mangabe).
-::: 
-::::
-
-:::: {.content-hidden when-profile="alaotra"}
-::: obs-marovoay
-A Marovoay , les contrastes sont plus marqués allant de 3.86 (Madiromiongana) à 4.81 (Ampijoroa).
-:::
-::::
-
-```{r tbl_men_hameau}
-hh_size_hameau <- members |>
-  mutate(j4bis = fix_hameau(j4)) |>
-  summarise(hh_size = n(), .by = c(Observatory, j4bis, j5)) |>
-  summarise(
-    n_hh = n(),
-    mean_hh_size = mean(hh_size),
-    .by = c(Observatory, j4bis)
-  )
-
-obs_gt(hh_size_hameau) |>
-  tab_header(title = obs_title("Taille moyenne des ménages par hameau")) |>
-  fmt_number(columns = mean_hh_size, decimals = 2) |>
-  cols_hide(columns = n_hh) |>
-  cols_label(mean_hh_size = "Taille moyenne", j4bis = "Hameau") |>
-  style_table()
 ```
 
 ### Structure par âge
@@ -374,7 +369,8 @@ hh_age_sex <- members_site |>
 ```{r fig_pyramide}
 #| fig-cap: "Pyramide des âges des membres des ménages enquêtés par observatoire"
 #| fig-height: !expr fig_h("fig_pyramide")
-hh_age_sex |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent)
+hh_age_sex |> 
+  ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent, label = "fig_pyramide")
 ```
 
 ```{r dl_fig_pyramide}
@@ -390,7 +386,7 @@ dl_fig_variants("fig_pyramide", "04", function(d) {
       Percent = if_else(Sexe == "Homme", -Percent, Percent),
       .by = c(Observatory, Sexe)
     )
-  agg |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent)
+  agg |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent, label = "fig_pyramide")
 }, members)
 ```
 
