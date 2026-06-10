@@ -1688,13 +1688,20 @@ dl_tbl_variants("tbl_schooling", "04", function(d) {
 ```
 
 ::: {.content-visible when-profile="consolidated"}
+
 #### Classe suivie 2024-2025
 
-**TABLEAU A REVOIR + INTERPRETATION**
 
 ```{r class_attended}
+age_levels <- c("3-5 ans", "6-10 ans", "11-14 ans", "15-17 ans", "18-25 ans")
+class_levels <- c(
+  "Prescolaire", "CP1", "CP2", "CE", "CM1", "CM2",
+  "6e", "5e", "4e", "3e", "2nde", "1ere", "Terminale",
+  "Superieur BAC+1", "Superieur BAC+2", "Superieur licence+", "Inconnu"
+)
+
 class_data <- members_site |>
-  filter(m5 >= 3, m5 <= 25, s2 == 1, !is.na(s3a)) |>
+  filter(m5 >= 3, m5 <= 25, s2 == 1, !is.na(sco2)) |>
   mutate(
     Cat_age = case_when(
       m5 <= 5  ~ "3-5 ans",
@@ -1702,15 +1709,16 @@ class_data <- members_site |>
       m5 <= 14 ~ "11-14 ans",
       m5 <= 17 ~ "15-17 ans",
       TRUE     ~ "18-25 ans"
-    ),
-    Niv_educ = classify_education(s3a) |> replace_na("Inconnu")
+    ) |> factor(levels = age_levels),
+    Classe = classify_school_class(sco2) |> replace_na("Inconnu") |> factor(levels = class_levels)
   ) |>
-  count(Observatory, Cat_age, Niv_educ) |>
+  count(Observatory, Cat_age, Classe) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Cat_age))
 
 class_wide <- class_data |>
-  select(Observatory, Cat_age, Niv_educ, pct) |>
-  pivot_wider(names_from = Niv_educ, values_from = pct, values_fill = 0) |>
+  select(Observatory, Cat_age, Classe, pct) |>
+  pivot_wider(names_from = Classe, values_from = pct, values_fill = 0) |>
+  select(Observatory, Cat_age, any_of(class_levels)) |>
   arrange(Observatory, Cat_age)
 
 obs_gt(class_wide) |>
@@ -1723,18 +1731,28 @@ obs_gt(class_wide) |>
 #| echo: false
 #| results: asis
 dl_tbl_variants("tbl_class", "04", function(d) {
+  age_levels <- c("3-5 ans", "6-10 ans", "11-14 ans", "15-17 ans", "18-25 ans")
+  class_levels <- c(
+    "Prescolaire", "CP1", "CP2", "CE", "CM1", "CM2",
+    "6e", "5e", "4e", "3e", "2nde", "1ere", "Terminale",
+    "Superieur BAC+1", "Superieur BAC+2", "Superieur licence+", "Inconnu"
+  )
+
   d |>
-    filter(m5 >= 3, m5 <= 25, s2 == 1, !is.na(s3a)) |>
+    filter(m5 >= 3, m5 <= 25, s2 == 1, !is.na(sco2)) |>
     mutate(Cat_age = case_when(
       m5 <= 5  ~ "3-5 ans", m5 <= 10 ~ "6-10 ans",
-      m5 <= 14 ~ "11-14 ans", m5 <= 17 ~ "15-17 ans", TRUE ~ "18-25 ans"),
-      Niv_educ = classify_education(s3a) |> replace_na("Inconnu")) |>
-    count(Observatory, Cat_age, Niv_educ) |>
+      m5 <= 14 ~ "11-14 ans", m5 <= 17 ~ "15-17 ans", TRUE ~ "18-25 ans") |> factor(levels = age_levels),
+      Classe = classify_school_class(sco2) |> replace_na("Inconnu") |> factor(levels = class_levels)) |>
+    count(Observatory, Cat_age, Classe) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Cat_age)) |>
+    arrange(Observatory, Cat_age, Classe) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
 :::
+
+La progression scolaire suit globalement la structure attendue par âge. Entre 3 et 5 ans, les enfants sont majoritairement en préscolaire, avec une part déjà entrée en CP1. Chez les 6-10 ans, les classes du primaire dominent nettement, en particulier le CP2, le CE et le CM1-CM2. Entre 11 et 14 ans, la répartition se déplace vers la fin du primaire et le premier cycle du secondaire, surtout la 6e et la 5e. Enfin, les 15-17 ans se concentrent davantage dans les classes du secondaire, tandis que les niveaux supérieurs n’apparaissent que parmi les 18-25 ans.
 
 #### Raisons de non fréquentation de l'école pour les 6 à 15 ans
 
