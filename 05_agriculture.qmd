@@ -213,9 +213,9 @@ rdt_med_m <- res_r |> filter(Observatory == "Marovoay", !is.na(r23), r23 > 0, !i
   summarise(m = round(median(rdt), 2)) |> pull(m)
 
 # Vente de riz : taux de vente
-pct_vente_a <- res_dc20 |> filter(Observatory == "Alaotra") |>
+pct_vente_a <- res_dc20 |> filter(j5 %in% res_r1$j5, Observatory == "Alaotra") |>
   summarise(p = round(mean(dcva == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
-pct_vente_m <- res_dc20 |> filter(Observatory == "Marovoay") |>
+pct_vente_m <- res_dc20 |> filter(j5 %in% res_r1$j5, Observatory == "Marovoay") |>
   summarise(p = round(mean(dcva == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
 
 # Autres cultures : taux de pratique
@@ -310,13 +310,13 @@ La location et le métayage, qui témoignent d'un marché foncier actif, sont pl
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-À Alaotra, le mode de `r top_tenure_a` domine largement l’exploitation des parcelles avec `r pct_tenure_a` % des parcellesconcernées. La prise en location représente également une pratique importante avec 19.8 %, suivie par la prise en métayage qui atteint 12.9 %. Les autres formes d’accès à la terre restent marginales, notamment la mise en location avec 1.4 %, la mise en métayage avec 3.5 %, le prêt gratuit avec 2.2 % et la mise à disposition gratuite avec seulement 0.6 %. 
+À Alaotra, le mode de `r top_tenure_a` domine largement l’exploitation des parcelles avec `r pct_tenure_a` % des parcelles concernées (en nombre). La prise en location représente également une pratique importante avec 19.8 %, suivie par la prise en métayage qui atteint 12.9 %. Les autres formes d’accès à la terre restent marginales, notamment la mise en location avec 1.4 %, la mise en métayage avec 3.5 %, le prêt gratuit avec 2.2 % et la mise à disposition gratuite avec seulement 0.6 %. 
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, le `r top_tenure_m` constitue également la principale forme d’exploitation des parcelles avec `r pct_tenure_m` % des parcelles. La prise en métayage occupe une place importante et atteint 24.8 %, tandis que la prise en location représente 18.4 % des parcelles. Les autres modalités restent peu répandues, avec 6.3 % pour la mise en location, 2.2 % pour la mise en métayage et 1.6 % pour le prêt gratuit. Les catégories « autre » et « mise à disposition gratuite » ne représentent chacune que 0.1 % des parcelles.
+A Marovoay, le `r top_tenure_m` constitue également la principale forme d’exploitation des parcelles avec `r pct_tenure_m` % des parcelles (en nombre). La prise en métayage occupe une place importante et atteint 24.8 %, tandis que la prise en location représente 18.4 % des parcelles. Les autres modalités restent peu répandues, avec 6.3 % pour la mise en location, 2.2 % pour la mise en métayage et 1.6 % pour le prêt gratuit. Les catégories « autre » et « mise à disposition gratuite » ne représentent chacune que 0.1 % des parcelles.
 :::
 :::
 
@@ -879,8 +879,9 @@ A Marovoay, `r pct_vente_m` % des ménages déclarent avoir vendu du riz au cour
 #| tbl-cap: "Taux de vente de riz par observatoire"
 
 res_dc20 |>
+  filter(j5 %in% res_r1$j5) |>
   summarise(
-    `Nb ménages` = n(),
+    `Nb ménages riziculteurs` = n(),
     `Ont vendu (nb)` = sum(dcva == 1, na.rm = TRUE),
     `Ont vendu (%)` = round(sum(dcva == 1, na.rm = TRUE) / n() * 100, 1),
     .by = Observatory
@@ -894,8 +895,9 @@ res_dc20 |>
 #| results: asis
 dl_tbl_variants("tbl_ventes_riz_taux", "08", function(d) {
   d |>
+    filter(j5 %in% res_r1$j5) |>
     summarise(
-      `Nb ménages` = n(),
+      `Nb ménages riziculteurs` = n(),
       `Ont vendu (nb)` = sum(dcva == 1, na.rm = TRUE),
       `Ont vendu (%)` = round(sum(dcva == 1, na.rm = TRUE) / n() * 100, 1),
       .by = Observatory
@@ -2722,6 +2724,43 @@ A Alaotra, le taux de ménages pratiquant l’élevage évolue de manière fluct
 A Marovoay, le taux de ménages pratiquant l’élevage reste relativement élevé durant toute la période étudiée. Entre 1998 et 2015, les valeurs oscillent principalement entre 64 % et 86 %, avec plusieurs phases de hausse et de baisse successives. Une progression est visible au début des années 2000, suivie d’un recul autour de 2005, puis d’une nouvelle augmentation vers 2012. Après 2013, le taux se maintient autour de 80 %. En 2025, la proportion de ménages pratiquant l’élevage atteint environ 72 %, traduisant un niveau encore important de cette activité dans l’observatoire.
 :::
 ::::
+
+```{r fig_agro_elevage}
+#| fig-cap: "Évolution du taux de pratique de l'élevage (1998–2025)"
+#| fig-width: !expr fig_w("fig_agro_elevage")
+#| fig-height: !expr fig_h("fig_agro_elevage")
+")
+#| fig-height: !expr fig_h("fig_agro_elevage")
+moy)), linewidth = 0.8) +
+    geom_line(data = agro_gap |> filter(!is.na(prod_moy)), linewidth = 0.8, linetype = "31") +
+    geom_point(data = agro_trends |> filter(!is.na(prod_moy)), size = 2) +
+    scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+    scale_y_continuous(labels = scales::label_comma()) +
+    labs(x = NULL, y = "Production rizicole moyenne (kg/ménage)", colour = "Observatoire") +
+    theme_ror()
+}
+```
+
+```{r fig_agro_rdt_riz}
+#| fig-cap: "Évolution du rendement rizicole moyen (kg/are) — années avec données de surface"
+#| fig-width: !expr fig_w("fig_agro_rdt_riz")
+#| fig-height: !expr fig_h("fig_agro_rdt_riz")
+
+if ("rdt_moy" %in% names(agro_trends)) {
+  rdt_data <- agro_trends |> filter(!is.na(rdt_moy))
+  if (nrow(rdt_data) > 1) {
+    rdt_solid <- rdt_data |> filter(year <= 2015)
+    rdt_gap   <- rdt_data |> filter(year %in% c(2015, 2025))
+    ggplot(mapping = aes(x = year, y = rdt_moy, colour = Observatory)) +
+      geom_line(data = rdt_solid, linewidth = 0.8) +
+      geom_line(data = rdt_gap, linewidth = 0.8, linetype = "31") +
+      geom_point(data = rdt_data, size = 2) +
+      scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+      labs(x = NULL, y = "Rendement moyen (kg/are)", colour = "Observatoire") +
+      theme_ror()
+  }
+}
+```
 
 ```{r fig_agro_elevage}
 #| fig-cap: "Évolution du taux de pratique de l'élevage (1998–2025)"
