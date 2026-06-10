@@ -1647,13 +1647,13 @@ Le choix des espèces reflète les conditions agro-écologiques, les traditions 
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
-A Alaotra, l’élevage concerne une très grande majorité des ménages pour l’ensemble des espèces considérées. Les **kisoa** représentent l’espèce la plus fréquemment élevée avec 99.7 % des ménages pratiquants, suivis par l’**akoho** et les **omby vavy** et **omby hafa**, tous autour de 99.1 à 99.4 %. Les espèces comme les **gana**, les **gisa** et les **ondry** affichent également des proportions élevées, chacune autour de 98.5 %. Le **voron-tsiloza** et les **osy** restent aussi largement présents avec respectivement 98.2 % et 96.1 % des ménages pratiquants. En revanche, le **trondro** demeure beaucoup moins répandu, avec seulement 12.8 % des ménages concernés.
+A Alaotra, l’espèce la plus fréquemment élevée parmi les ménages pratiquant l’élevage est l’**akoho**, présente chez 69.2 % d’entre eux. Les **kisoa** arrivent ensuite avec 29.6 %, suivis des **gisa** (22.4 %) et des **gana** (16.9 %). Les bovins restent moins répandus, avec 14.8 % pour les **omby miasa**, 11.8 % pour les **omby vavy** et 7.3 % pour les **omby hafa**. Les **ondry** concernent 4.8 % des ménages pratiquants, tandis que le **voron-tsiloza** demeure marginal avec 1.2 %. Les **osy** et le **trondro** sont absents des déclarations dans cet observatoire.
 :::
 ::::
 
 :::: {.content-hidden when-profile="alaotra"}
 ::: obs-marovoay
-A Marovoay, les différentes espèces élevées présentent également des fréquences très élevées parmi les ménages pratiquants. Les **`r top_espece_a`** arrivent en tête avec 99.7 %, suivis des **kisoa**, des **omby vavy** et des **omby hafa**, tous proches de 99.5 %. Les **gana**, les **gisa**, les **ondry**, les **voron-tsiloza** et les **osy** affichent aussi des niveaux élevés, compris entre 98.7 % et 99.2 %. Le **trondro** reste l’espèce la moins répandue dans cet observatoire, avec une proportion de 23.6 % des ménages pratiquants.
+A Marovoay, l’**akoho** est également l’espèce la plus fréquemment élevée parmi les ménages pratiquants, avec 53.5 %. Les **gana** occupent la deuxième position avec 44.7 %, suivis des **omby miasa** (36.1 %) et des **kisoa** (27.3 %). Les **omby vavy** concernent 19.0 % des ménages pratiquants, tandis que les **omby hafa** représentent 12.8 % et les **ondry** 7.5 %. Les autres espèces restent marginales, notamment les **gisa** (2.4 %), les **voron-tsiloza** (2.1 %) et les **osy** (1.3 %). Le **trondro** n’est pas déclaré dans cet observatoire.
 :::
 ::::
 
@@ -1662,14 +1662,15 @@ A Marovoay, les différentes espèces élevées présentent également des fréq
 especes_elevage <- res_ele |>
   filter(ele_lig0 != "", !is.na(ele_lig0)) |>
   mutate(Espece = str_to_title(ele_lig0)) |>
-  distinct(j5, Observatory, Espece) |>
-  count(Observatory, Espece) |>
+  mutate(Present = !is.na(ele3) | !is.na(ele4)) |>
+  distinct(j5, Observatory, Espece, Present) |>
+  summarise(n = n_distinct(j5[Present]), .by = c(Observatory, Espece)) |>
   group_by(Espece) |>
   mutate(total = sum(n)) |>
   ungroup() |>
   expand_sites_for_profile() |>
   left_join(
-    res_ele |> filter(ele_lig0 != "", !is.na(ele_lig0)) |> distinct(j5, Observatory) |>
+    res_el2 |> filter(el2 == 1) |> distinct(j5, Observatory) |>
       expand_sites_for_profile() |> count(Observatory, name = "n_total"),
     by = "Observatory"
   ) |>
@@ -1683,7 +1684,7 @@ especes_elevage <- res_ele |>
 #| fig-height: !expr fig_h("fig-especes-elevage")
 
 especes_elevage |>
-  make_bar_obs(x = Espece, y_label = "% des ménages")
+  make_bar_obs(x = Espece, y_label = "% des ménages pratiquant l'élevage")
 ```
 
 ```{r dl_fig_especes_elevage}
@@ -1693,8 +1694,9 @@ dl_fig_variants("fig_especes_elevage", "08", function(d) {
   d |>
     filter(ele_lig0 != "", !is.na(ele_lig0)) |>
     mutate(Espece = str_to_title(ele_lig0)) |>
-    distinct(j5, Observatory, Espece) |>
-    count(Observatory, Espece) |>
+    mutate(Present = !is.na(ele3) | !is.na(ele4)) |>
+    distinct(j5, Observatory, Espece, Present) |>
+    summarise(n = n_distinct(j5[Present]), .by = c(Observatory, Espece)) |>
     group_by(Espece) |>
     mutate(total = sum(n)) |>
     ungroup() |>
