@@ -631,30 +631,36 @@ La section consacrée aux transferts sortants recense les aides envoyées par le
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
-A Alaotra, les transferts en argent atteignent une valeur moyenne de 100 000 Ar. Les transferts en riz et non précis suivent avec une valeur moyenne de 80 000 Ar.
+À Alaotra, environ 33,5 % des ménages participent à l’envoi de transferts. Les transferts en riz atteignent une valeur moyenne de 97 000 Ar, suivis des transferts en argent avec une moyenne de 79 000 Ar.
 :::
 ::::
 
 :::: {.content-hidden when-profile="alaotra"}
 ::: obs-marovoay
-A Marovoay, les transferts en argent présentent une valeur moyenne de 470 000 Ar. Les transferts non précisée enregistrent une valeur moyenne de 80 000Ar.
+À Marovoay, la part des ménages envoyeurs est de 13,7 %. Les transferts en riz présentent une valeur moyenne de 335 000 Ar, tandis que les transferts en argent enregistrent une valeur moyenne de 86 000 Ar.
 :::
 ::::
 
 ```{r transfers_load}
 res_t2 <- read_dta("data/ROS_MDG_microdata/2025/res_t2.dta") |> mutate(j5 = as.character(j5))
 
+# Actual labels from data: 0=Argent, 1=Riz, 2=Autres aliments, etc.
 type_transf_labs <- c(
-  "1" = "Argent", "2" = "Riz", "3" = "Autres produits", "99" = "Autre"
+  "0" = "Argent",
+  "1" = "Riz",
+  "2" = "Produits alimentaires",
+  "5" = "Habillements",
+  "9" = "Autre"
 )
 
 res_t2_obs <- res_t2 |>
   left_join(obs, by = "j5") |>
+  filter(!is.na(t21a)) |> 
   mutate(
     Type = if_else(
       as.character(as.integer(t21a)) %in% names(type_transf_labs),
       type_transf_labs[as.character(as.integer(t21a))],
-      "En nature autre que le riz"
+      "Produits alimentaires"
     )
   )
 ```
@@ -701,63 +707,66 @@ dl_fig_variants("fig_transferts", "05", function(d) {
 }, res_t2 |> left_join(obs, by = "j5"))
 ```
 
-<!-- :::: {.content-hidden when-profile="marovoay"} -->
-<!-- ::: obs-alaotra -->
-<!-- À Alaotra, tous les ménages enquêtés participent à 100% à l’envoi de transferts. -->
-<!-- ::: -->
-<!-- :::: -->
-
-<!-- :::: {.content-hidden when-profile="alaotra"} -->
-<!-- ::: obs-marovoay -->
-<!-- À Marovoay, la part des ménages envoyeurs est de 100.0 % indiquant que l’ensemble des ménages observés effectuent des transferts. -->
-<!-- ::: -->
-<!-- :::: -->
-
-
-```{r tbl-transferts-sortants}
-##| tbl-cap: "Transferts sortants : resume par observatoire"
-
-# n_t2 <- res_t2_obs |>
-#   summarise(n_envoyeurs = n_distinct(j5), .by = Observatory) |>
-#   left_join(res_deb |> count(Observatory, name = "n_total"), by = "Observatory") |>
-#   mutate(pct = round(n_envoyeurs / n_total * 100, 1))
-# 
-# n_t2 |>
-#   gt() |>
-#   tab_header(title = "Menages envoyant des transferts") |>
-#   cols_label(n_envoyeurs = "Nb envoyeurs", n_total = "Nb menages total", pct = "% envoyeurs") |>
-#   style_table()
-```
-
-```{r dl_tbl_transferts}
-##| echo: false
-##| results: asis
-# dl_tbl_variants("tbl_transferts", "05", function(d) {
-#   t2_ids <- unique(as.character(res_t2$j5))
-#   d |>
-#     mutate(envoyeur = j5 %in% t2_ids) |>
-#     summarise(Envoyeurs = sum(envoyeur), Total = n(), .by = Observatory) |>
-#     mutate(`%` = round(Envoyeurs / Total * 100, 1)) |>
-#     rename(Site = Observatory)
-# }, res_deb)
-```
-
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
-À Alaotra, la majorité des destinataires des transferts résident dans un lieu non précisé avec une proportion de 78.4 %. Les destinataires vivant dans la même commune représentent 10.6 %. Ceux résidant dans une autre commune de la même région constituent 6.4 %. Les transferts destinés vers une autre région représentent 4.7 %.
+À Alaotra, environ un tiers des ménages enquêtés (33,5 %) participent à l’envoi de transferts.
 :::
 ::::
 
 :::: {.content-hidden when-profile="alaotra"}
 ::: obs-marovoay
-À Marovoay, le lieu de résidence de 63.9 % des ménages destinataires des transferts n’est pas précis. Les destinataires vivant dans la même commune constituent 13.3 %. Ceux installés dans une autre commune de la même région représentent 10.8 %. Les transferts destinés vers une autre région atteignent 12.0 %.
+À Marovoay, la part des ménages envoyeurs est plus faible, s'élevant à 13,7 % de l'échantillon.
+:::
+::::
+
+
+```{r tbl-transferts-sortants}
+#| tbl-cap: "Transferts sortants : resume par observatoire"
+
+n_t2 <- res_t2_obs |>
+  summarise(n_envoyeurs = n_distinct(j5), .by = Observatory) |>
+  left_join(res_deb |> count(Observatory, name = "n_total"), by = "Observatory") |>
+  mutate(pct = round(n_envoyeurs / n_total * 100, 1))
+
+n_t2 |>
+  gt() |>
+  tab_header(title = "Menages envoyant des transferts") |>
+  cols_label(n_envoyeurs = "Nb envoyeurs", n_total = "Nb menages total", pct = "% envoyeurs") |>
+  style_table()
+```
+
+```{r dl_tbl_transferts}
+#| echo: false
+#| results: asis
+dl_tbl_variants("tbl_transferts", "05", function(d) {
+  t2_ids <- unique(as.character(res_t2$j5))
+  d |>
+    mutate(envoyeur = j5 %in% t2_ids) |>
+    summarise(Envoyeurs = sum(envoyeur), Total = n(), .by = Observatory) |>
+    mutate(`%` = round(Envoyeurs / Total * 100, 1)) |>
+    rename(Site = Observatory)
+}, res_deb)
+```
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+À Alaotra, la grande majorité des destinataires des transferts résident dans la même commune avec une proportion de 89 %. Les destinataires résidant dans une autre commune de la même région constituent 6,4 %, tandis que les transferts destinés vers une autre région représentent 4,7 %.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+À Marovoay, 77,1 % des transferts sont destinés à des personnes vivant dans la même commune. Ceux installés dans une autre commune de la même région représentent 10,8 %, et les transferts vers une autre région atteignent 12,0 %.
 :::
 ::::
 
 ```{r destination_data}
 dest_labs <- c(
-  "1" = "Meme commune", "2" = "Autre commune, meme region",
-  "3" = "Autre region", "4" = "Etranger"
+  "0" = "Même commune",
+  "1" = "Même commune",
+  "2" = "Autre commune, même région",
+  "3" = "Autre région",
+  "4" = "Étranger"
 )
 
 dest_data <- res_t2_obs |>
@@ -767,7 +776,7 @@ dest_data <- res_t2_obs |>
     Destination = if_else(
       as.character(as.integer(t41)) %in% names(dest_labs),
       dest_labs[as.character(as.integer(t41))],
-      "Non precise"
+      "Non précise"
     )
   ) |>
   count(Observatory, Destination) |>
@@ -786,12 +795,17 @@ dest_data |>
 #| echo: false
 #| results: asis
 dl_fig_variants("fig_destination", "05", function(d) {
-  dest_labs <- c("1" = "Meme commune", "2" = "Autre commune, meme region",
-                 "3" = "Autre region", "4" = "Etranger")
+  dest_labs <- c(
+    "0" = "Même commune",
+    "1" = "Même commune",
+    "2" = "Autre commune, même région",
+    "3" = "Autre région",
+    "4" = "Étranger"
+  )
   d |> filter(!is.na(t41)) |>
     mutate(Destination = if_else(
       as.character(as.integer(t41)) %in% names(dest_labs),
-      dest_labs[as.character(as.integer(t41))], "Non precise")) |>
+      dest_labs[as.character(as.integer(t41))], "Non précise")) |>
     count(Observatory, Destination) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
     ror_bar_grouped(x = Destination, fill = Observatory,
@@ -1061,52 +1075,52 @@ dl_fig_variants("fig_revcou_shares", "05", function(d) {
 }, inc)
 ```
 
-<!-- ### Distribution du revenu total -->
+### Distribution du revenu total
 
-<!-- La distribution du revenu total illustre le degré d'inégalité au sein de chaque observatoire. L'utilisation d'une échelle logarithmique permet de mieux visualiser l'étalement de la distribution et la concentration des ménages à bas revenus. -->
+La distribution du revenu total illustre le degré d'inégalité au sein de chaque observatoire. L'utilisation d'une échelle logarithmique permet de mieux visualiser l'étalement de la distribution et la concentration des ménages à bas revenus.
 
 Afin de mieux apprécier le niveau de vie, le revenu total est également rapporté à la taille du ménage. On distingue le revenu « par tête » (revenu total divisé par le nombre de membres) et le revenu « par unité de consommation » (UC). Pour ce dernier, nous utilisons l'échelle d'équivalence de l'OCDE modifiée, qui attribue un poids de 1,0 au premier adulte, 0,5 aux autres personnes de 14 ans ou plus, et 0,3 aux enfants de moins de 14 ans. Cette méthode permet de tenir compte des économies d'échelle au sein du ménage (partage du logement, de l'énergie, etc.).
 
-<!-- :::: {.content-hidden when-profile="marovoay"} 
+:::: {.content-hidden when-profile="marovoay"} 
 ::: obs-alaotra 
  A Alaotra, la distribution du revenu total annuel des ménages dans l’observatoire d’Alaotra montre une forte concentration des revenus autour des valeurs intermédiaires, avec une densité maximale située approximativement entre 1,000,000 et 10,000,000 Ar en échelle logarithmique. La courbe présente une forme relativement asymétrique vers la droite, indiquant que certains ménages disposent de revenus plus élevés mais restent peu nombreux. Les très faibles revenus ainsi que les revenus extrêmement élevés apparaissent avec une faible densité. La distribution traduit donc une concentration majoritaire des ménages autour des revenus moyens. 
  ::: 
- :::: -->
+ ::::
 
-<!-- :::: {.content-hidden when-profile="alaotra"} 
+:::: {.content-hidden when-profile="alaotra"} 
 ::: obs-marovoay -
 A Marovoay, la distribution du revenu total annuel des ménages suit également une forme unimodale avec une concentration importante des ménages autour des revenus intermédiaires. La densité maximale se situe dans la même plage logarithmique, principalement entre 1,000,000 et 10,000,000 Ar. La courbe présente une légère asymétrie à droite, ce qui montre l’existence de quelques ménages à revenus élevés, mais en effectif limité. Les ménages à très faibles revenus ainsi que ceux ayant des revenus très élevés restent minoritaires dans la distribution globale. 
-::: -->
-<!-- :::: -->
+:::
+::::
 
-<!-- ```{r fig_revtot_dist} -->
-<!-- #| fig-cap: "Distribution du revenu total par observatoire (echelle log)" -->
-<!-- #| fig-width: !expr fig_w("fig_revtot_dist") -->
-<!-- #| fig-height: !expr fig_h("fig_revtot_dist") -->
+```{r fig_revtot_dist}
+#| fig-cap: "Distribution du revenu total par observatoire (echelle log)"
+#| fig-width: !expr fig_w("fig_revtot_dist")
+#| fig-height: !expr fig_h("fig_revtot_dist")
 
-<!-- inc |> -->
-<!--   filter(revtot > 0) |> -->
-<!--   ggplot(aes(x = revtot, fill = Observatory)) + -->
-<!--   geom_density(alpha = 0.5) + -->
-<!--   scale_x_log10(labels = label_comma()) + -->
-<!--   labs(x = "Revenu total annuel (Ar, echelle log)", y = "Densite", fill = "Observatoire") + -->
-<!--   theme_ror() -->
-<!-- ``` -->
+inc |>
+  filter(revtot > 0) |>
+  ggplot(aes(x = revtot, fill = Observatory)) +
+  geom_density(alpha = 0.5) +
+  scale_x_log10(labels = label_comma()) +
+  labs(x = "Revenu total annuel (Ar, echelle log)", y = "Densite", fill = "Observatoire") +
+  theme_ror()
+```
 
-<!-- ```{r dl_fig_revtot_dist} -->
-<!-- #| echo: false -->
-<!-- #| results: asis -->
-<!-- dl_fig_variants("fig_revtot_dist", "05", function(d) { -->
-<!--   d |> -->
-<!--     filter(revtot > 0) |> -->
-<!--     ggplot(aes(x = revtot, fill = Observatory)) + -->
-<!--     geom_density(alpha = 0.5) + -->
-<!--     scale_x_log10(labels = label_comma()) + -->
-<!--     labs(x = "Revenu total annuel (Ar, echelle log)", y = "Densite", -->
-<!--          fill = "Observatoire") + -->
-<!--     theme_ror() -->
-<!-- }, inc) -->
-<!-- ``` -->
+```{r dl_fig_revtot_dist}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_revtot_dist", "05", function(d) {
+  d |>
+    filter(revtot > 0) |>
+    ggplot(aes(x = revtot, fill = Observatory)) +
+    geom_density(alpha = 0.5) +
+    scale_x_log10(labels = label_comma()) +
+    labs(x = "Revenu total annuel (Ar, echelle log)", y = "Densite",
+         fill = "Observatoire") +
+    theme_ror()
+}, inc)
+```
 
 ### Revenu courant et revenu exceptionnel
 
@@ -1708,21 +1722,7 @@ trends |> make_trend_plot(revcou_paddy, "Revenu courant reel moyen (Ar constants
 
 ## Evolution des conditions d'habitat (1997-2025) {#sec-habitat-multiyear}
 
-Les donnees sur l'habitat permettent de suivre l'evolution de la source d'eclairage (acces a l'electricite) et de la source d'eau principale sur la periode couverte.
-
-L’accès à l’électricité reste très faible dans les deux observatoires sur l’ensemble de la période étudiée.
-
-:::: {.content-hidden when-profile="marovoay"}
-::: obs-alaotra
-À Alaotra, la proportion de ménages ayant accès à l’électricité est quasiment nulle durant la majorité des années observées. Les niveaux restent proches de 0.0 % entre 1997 et 2004, avec seulement une légère hausse autour de 2000 où la proportion atteint environ 0.2 %. Une augmentation exceptionnelle apparaît en 2005 avec un niveau proche de 1.6 %, correspondant au maximum observé dans la série. Après cette année, les valeurs retombent rapidement autour de 0.0 % et demeurent très faibles jusqu’en 2015. En 2025, la proportion atteint environ 0.2 %, montrant une amélioration limitée de l’accès à l’électricité.
-:::
-::::
-
-:::: {.content-hidden when-profile="alaotra"}
-::: obs-marovoay
-À Marovoay, l’évolution de l’accès à l’électricité reste également faible mais présente quelques variations plus régulières. La proportion de ménages concernés augmente progressivement entre 1995 et 2000, passant de 0.0 % à environ 0.2 %. Une hausse plus marquée apparaît autour de 2001 avec un niveau proche de 0.6 %, avant une diminution progressive jusqu’à près de 0.0 % en 2004 et 2005. Entre 2006 et 2009, les niveaux se stabilisent autour de 0.2 %, puis diminuent de nouveau vers 0.0 % entre 2012 et 2013. Une nouvelle hausse apparaît en 2014 avec une proportion proche de 0.6 %, avant de revenir à environ 0.0 % en 2025.
-:::
-::::
+Les donnees sur l'habitat permettent de suivre l'evolution de la source d'eau principale sur la periode couverte.
 
 ```{r habitat_trends_compute}
 #| include: false
@@ -1781,25 +1781,6 @@ if (file.exists(habitat_file)) {
 hab_solid <- habitat_trends |> filter(year <= 2015)
 hab_gap   <- habitat_trends |> filter(year %in% c(2015, 2025))
 ```
-
-```{r fig_habitat_elec}
-#| fig-cap: "Evolution de l'acces a l'electricite (1997-2025)"
-#| fig-width: !expr fig_w("fig_habitat_elec")
-#| fig-height: !expr fig_h("fig_habitat_elec")
-
-if ("pct_elec" %in% names(habitat_trends)) {
-  ggplot(mapping = aes(x = year, y = pct_elec, colour = Observatory)) +
-    geom_line(data = hab_solid |> filter(!is.na(pct_elec)), linewidth = 0.8) +
-    geom_line(data = hab_gap |> filter(!is.na(pct_elec)), linewidth = 0.8, linetype = "31") +
-    geom_point(data = habitat_trends |> filter(!is.na(pct_elec)), size = 2) +
-    scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-    scale_y_continuous(limits = c(0, NA)) +
-    labs(x = NULL, y = "% de menages avec electricite", colour = "Observatoire") +
-    theme_ror()
-}
-```
-
-L’accès à une source d’eau améliorée présente des évolutions contrastées dans les deux observatoires au cours de la période étudiée.
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra

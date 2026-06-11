@@ -385,18 +385,6 @@ dl_tbl_variants("tbl_parcelles_stats", "07", function(d) {
 }, res_fr30)
 ```
 
-::: {.content-hidden when-profile="marovoay"}
-::: {.obs-alaotra}
-**Alaotra.** La superficie moyenne par parcelle est de `r sup_parc_moy_a` ares, et la surface totale possédée par ménage atteint en moyenne `r sup_men_moy_a` ares.
-:::
-:::
-
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
-**Marovoay.** La superficie moyenne par parcelle est de `r sup_parc_moy_m` ares, et la surface totale possédée par ménage atteint en moyenne `r sup_men_moy_m` ares.
-:::
-:::
-
 ### Type et localisation des parcelles possédées
 
 Le patrimoine foncier des ménages se compose principalement de rizières et de champs de cultures pluviales (@fig-type-parcelle).
@@ -560,11 +548,11 @@ Malgré le statut de « greniers à riz », une part importante des terres dépe
 
 fr30_data |>
   expand_sites_for_profile() |>
-  filter(!is.na(fr30f)) |>
+  filter(!is.na(fr30f), !is.na(fr30d)) |>
   mutate(Irrigation = factor(as.character(fr30f), levels = names(irrig_labs), labels = irrig_labs)) |>
-  count(Observatory, Irrigation) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  make_bar_obs(x = Irrigation, y_label = "% des parcelles")
+  summarise(surface = sum(fr30d, na.rm = TRUE), .by = c(Observatory, Irrigation)) |>
+  mutate(pct = round(surface / sum(surface) * 100, 1), .by = Observatory) |>
+  make_bar_obs(x = Irrigation, y_label = "% des parcelles exploitées (surface)")
 ```
 
 ```{r dl_fig_irrigation_possedee}
@@ -572,12 +560,12 @@ fr30_data |>
 #| results: asis
 dl_fig_variants("fig_irrigation_possedee", "07", function(d) {
   d |>
-    filter(!is.na(fr30f)) |>
+    filter(!is.na(fr30f), !is.na(fr30d)) |>
     mutate(Irrigation = factor(as.character(fr30f), levels = names(irrig_labs), labels = irrig_labs)) |>
-    count(Observatory, Irrigation) |>
-    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    summarise(surface = sum(fr30d, na.rm = TRUE), .by = c(Observatory, Irrigation)) |>
+    mutate(pct = round(surface / sum(surface) * 100, 1), .by = Observatory) |>
     ror_bar_grouped(x = Irrigation, fill = Observatory,
-                    y_label = "% des parcelles", direction = "horizontal",
+                    y_label = "% des parcelles exploitées (surface)", direction = "horizontal",
                     facet = FALSE)
 }, fr30_data)
 ```
@@ -588,13 +576,13 @@ Le mode d'acquisition des parcelles renseigne sur la dynamique du marché foncie
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** Le marché foncier est plus dynamique avec une dominance de l’achat. L'héritage concerne `r pct_heritage_a` % des parcelles, l'achat `r pct_achat_a` % et la mise en valeur `r pct_mev_a` %.
+**Alaotra.** Le marché foncier est plus dynamique avec une dominance de l’achat. L'héritage concerne `r pct_heritage_a` % des parcelles (en nombre), l'achat `r pct_achat_a` % et la mise en valeur `r pct_mev_a` %.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay** reste marqué par la transmission familiale. L'héritage concerne `r pct_heritage_m` % des parcelles, l'achat `r pct_achat_m` % et la mise en valeur `r pct_mev_m` %.
+**Marovoay** reste marqué par la transmission familiale. L'héritage concerne `r pct_heritage_m` % des parcelles (en nombre), l'achat `r pct_achat_m` % et la mise en valeur `r pct_mev_m` %.
 :::
 :::
 
@@ -682,17 +670,17 @@ dl_fig_variants("fig_anciennete", "07", function(d) {
 
 <!-- La question de l'identité du propriétaire au sein du ménage soulève des enjeux de genre importants (@fig-proprietaire). Le chef de ménage est déclaré propriétaire de la majorité des parcelles, ce qui illustre les inégalités d'accès au foncier qui sont plus marquées encore à Marovoay qu’à Alaotra. -->
 
-::: {.content-hidden when-profile="marovoay"}
-::: {.obs-alaotra}
+<!-- ::: {.content-hidden when-profile="marovoay"} -->
+<!-- ::: {.obs-alaotra} -->
 <!-- **Alaotra.** Le chef de ménage est propriétaire de `r pct_cm_prop_a` % des parcelles ; le ou la conjoint(e) n'apparaît que dans `r pct_conjoint_a` % des cas. -->
-:::
-:::
+<!-- ::: -->
+<!-- ::: -->
 
-::: {.content-hidden when-profile="alaotra"}
-::: {.obs-marovoay}
+<!-- ::: {.content-hidden when-profile="alaotra"} -->
+<!-- ::: {.obs-marovoay} -->
 <!-- **Marovoay.** Le chef de ménage est propriétaire de `r pct_cm_prop_m` % des parcelles ; le ou la conjoint(e) n'apparaît que dans `r pct_conjoint_m` % des cas. -->
-:::
-:::
+<!-- ::: -->
+<!-- ::: -->
 
 ```{r}
 ##| label: fig-proprietaire
@@ -747,13 +735,13 @@ La sécurisation foncière est un enjeu majeur à Madagascar. Les ménages peuve
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-**Alaotra.** Seules `r pct_titre_a` % des parcelles disposent d'un titre foncier. Les certificats fonciers ne couvrent que `r pct_cert_a` % des parcelles.
+**Alaotra.** Seules `r pct_titre_a` % des parcelles disposent d'un titre foncier. Les certificats fonciers ne couvrent que `r pct_cert_a` % des parcelles (en nombre).
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-**Marovoay.** Seules `r pct_titre_m` % des parcelles disposent d'un titre foncier. Les certificats fonciers ne couvrent que `r pct_cert_m` % des parcelles.
+**Marovoay.** Seules `r pct_titre_m` % des parcelles disposent d'un titre foncier. Les certificats fonciers ne couvrent que `r pct_cert_m` % des parcelles (en nombre).
 :::
 :::
 
@@ -808,7 +796,7 @@ dl_tbl_variants("tbl_securisation", "07", function(d) {
 }, fr30_data)
 ```
 
-```{r fig_securisation}
+```{r}
 #| echo: false
 #| label: fig-securisation
 #| fig-cap: "Sécurisation foncière des parcelles possédées"
@@ -1164,7 +1152,7 @@ fr34_data <- res_fr34 |> filter(!is.na(fr30c1))
 
 ```{r}
 #| label: fig-type-exploitee
-#| fig-cap: "Type des parcelles exploitées (non possédées)"
+#| fig-cap: "Type des parcelles exploitées (non possédées, en nombre)"
 #| fig-width: !expr fig_w("fig-type-exploitee")
 #| fig-height: !expr fig_h("fig-type-exploitee")
 
@@ -1207,7 +1195,7 @@ A Alaotra, la majorité des parcelles exploitées sans en être propriétaire co
 
 ```{r}
 #| label: fig-fv-exploitee
-#| fig-cap: "Mode de faire-valoir des parcelles exploitées"
+#| fig-cap: "Mode de faire-valoir des parcelles exploitées (en nombre)"
 #| fig-width: !expr fig_w("fig-fv-exploitee")
 #| fig-height: !expr fig_h("fig-fv-exploitee")
 
@@ -1288,6 +1276,7 @@ dl_fig_variants("fig_proprietaire_exploitee", "07", function(d) {
 ```
 
 Le mode d'irrigation des parcelles exploitées diffère-t-il de celui des parcelles possédées ? La @fig-irrigation-exploitee permet d'examiner si les ménages qui exploitent des terres d'autrui accèdent à des parcelles de même qualité irriguée.
+
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
 A Alaotra, la catégorie prédominante est l'absence d'irrigation (incluant les parcelles avec diguettes) qui concerne 50.2% des terrains. Elle est suivie par le recours au réseau traditionnel pour 41.3% des parcelles. Concernant le réseau aménagé, il ne représente que 7.6% des modes d'irrigation pour les terres exploitées en faire-valoir indirect dans cet observatoire.
@@ -1302,17 +1291,17 @@ A Alaotra, la catégorie prédominante est l'absence d'irrigation (incluant les 
 
 ```{r}
 #| label: fig-irrigation-exploitee
-#| fig-cap: "Mode d'irrigation des parcelles exploitées"
+#| fig-cap: "Mode d'irrigation des parcelles exploitées (surface)"
 #| fig-width: !expr fig_w("fig-irrigation-exploitee")
 #| fig-height: !expr fig_h("fig-irrigation-exploitee")
 
 fr34_data |>
   expand_sites_for_profile() |>
-  filter(!is.na(fr34f)) |>
+  filter(!is.na(fr34f), !is.na(fr34d)) |>
   mutate(Irrigation = factor(as.character(fr34f), levels = names(irrig_labs), labels = irrig_labs)) |>
-  count(Observatory, Irrigation) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  make_bar_obs(x = Irrigation, y_label = "% des parcelles exploitées")
+  summarise(surface = sum(fr34d, na.rm = TRUE), .by = c(Observatory, Irrigation)) |>
+  mutate(pct = round(surface / sum(surface) * 100, 1), .by = Observatory) |>
+  make_bar_obs(x = Irrigation, y_label = "% des parcelles exploitées (surface)")
 ```
 
 ```{r dl_fig_irrigation_exploitee}
@@ -1320,12 +1309,12 @@ fr34_data |>
 #| results: asis
 dl_fig_variants("fig_irrigation_exploitee", "07", function(d) {
   d |>
-    filter(!is.na(fr34f)) |>
+    filter(!is.na(fr34f), !is.na(fr34d)) |>
     mutate(Irrigation = factor(as.character(fr34f), levels = names(irrig_labs), labels = irrig_labs)) |>
-    count(Observatory, Irrigation) |>
-    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    summarise(surface = sum(fr34d, na.rm = TRUE), .by = c(Observatory, Irrigation)) |>
+    mutate(pct = round(surface / sum(surface) * 100, 1), .by = Observatory) |>
     ror_bar_grouped(x = Irrigation, fill = Observatory,
-                    y_label = "% des parcelles exploitées", direction = "horizontal",
+                    y_label = "% des parcelles exploitées (surface)", direction = "horizontal",
                     facet = FALSE)
 }, fr34_data)
 ```
@@ -1480,9 +1469,9 @@ dl_fig_variants("fig_satisfaction", "07", function(d) {
 }, res_fr30a)
 ```
 
-::: {.content-visible when-profile="consolidated"}
-::: {.obs-technical}
-## Pistes d'analyse complémentaires {#sec-pistes-foncier}
+<!-- ::: {.content-visible when-profile="consolidated"} -->
+<!-- ::: {.obs-technical} -->
+<!-- ## Pistes d'analyse complémentaires {#sec-pistes-foncier}
 
 Les données foncières offrent d'autres possibilités d'analyse qui n'ont pas été développées ici :
 
@@ -1490,6 +1479,6 @@ Les données foncières offrent d'autres possibilités d'analyse qui n'ont pas �
 - **Croisement sécurisation × mode d'acquisition** : les parcelles héritées sont-elles moins souvent titrées que les parcelles achetées ?
 - **Superficie possédée vs. superficie exploitée** : reconstituer la surface effectivement cultivée par le ménage en combinant l'inventaire des parcelles possédées par le ménage et les parcelles prises en faire - valoir indirect .
 - **Rentes perçues sur les parcelles cédées** : montants moyens des loyers et parts de métayage perçus.
-- **Nom sur le titre/certificat** : la correspondance entre le titulaire du document et le propriétaire déclaré mériterait une analyse genrée.
-:::
-:::
+- **Nom sur le titre/certificat** : la correspondance entre le titulaire du document et le propriétaire déclaré mériterait une analyse genrée. -->
+<!-- ::: -->
+<!-- ::: -->

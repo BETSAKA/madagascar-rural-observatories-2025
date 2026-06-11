@@ -185,12 +185,6 @@ pct_top_raison_m <- non_scol_s |> filter(Observatory == "Marovoay") |>
 
 ## Description des ménages
 
-:::: {.content-visible when-profile="consolidated"}
-::: obs-technical
-Les ménages de Marovoay sont globalement plus larges que ceux de l'Alaotra.
-:::
-::::
-
 <!-- ::: {.content-hidden when-profile="marovoay"} -->
 
 <!-- ::: {.obs-alaotra} -->
@@ -211,9 +205,9 @@ Les ménages de Marovoay sont globalement plus larges que ceux de l'Alaotra.
 
 <!-- ::: -->
 
-### Taille des ménages par observatoire
+### Taille des ménages
 
-La taille des ménages correspond au nombre total d’individus qui composent et vivent au sein d'une même ménage.
+Le ménage est un ensemble de personnes avec ou sans lien de parenté, vivant sous le même toit ou dans la même concession, prenant leur repas ensemble ou par petits groupes, mettant une partie ou la totalité de leurs revenus en commun pour la bonne marche du groupe.
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
@@ -227,20 +221,55 @@ A Marovoay, on a recensé 2297 individus répartis dans 519 ménages. La taille 
 :::
 ::::
 
+```{r fig_men_hameau}
+#| fig-cap: "Taille moyenne des ménages par hameau selon les observatoires"
+#| fig-height: !expr fig_h("fig_men_hameau", 5)
+hh_size_hameau <- members |>
+  mutate(j4bis = fix_hameau(j4)) |>
+  summarise(hh_size = n(), .by = c(Observatory, j4bis, j5))
 
+hh_size_hameau_plot <- hh_size_hameau |>
+  summarise(mean_hh_size = mean(hh_size), .by = c(Observatory, j4bis)) |>
+  mutate(Observatory = factor(Observatory, levels = c("Marovoay", "Alaotra")))
 
-```{r tbl-men-obs}
-#| tbl-cap: "Taille moyenne des ménages par observatoire"
+hh_size_obs_mean <- hh_size_hameau |>
+  summarise(obs_mean_hh_size = mean(hh_size), .by = Observatory) |>
+  mutate(Observatory = factor(Observatory, levels = c("Marovoay", "Alaotra")))
 
-hh_size_obs <- members_site |>
-  summarise(hh_size = n(), .by = c(Observatory, j5)) |>
-  summarise(mean_hh_size = mean(hh_size), .by = Observatory)
+hh_size_obs_label <- hh_size_hameau_plot |>
+  summarise(label_hameau = dplyr::last(sort(unique(j4bis))), .by = Observatory) |>
+  left_join(hh_size_obs_mean, by = "Observatory")
 
-obs_gt(hh_size_obs) |>
-  tab_header(title = obs_title("Taille moyenne des ménages")) |>
-  fmt_number(columns = mean_hh_size, decimals = 2) |>
-  cols_label(mean_hh_size = "Taille moyenne") |>
-  style_table()
+n_obs_hameau <- dplyr::n_distinct(hh_size_hameau_plot$Observatory)
+
+ggplot(hh_size_hameau_plot, aes(x = j4bis, y = mean_hh_size)) +
+  geom_col(fill = ROR_BLUE, width = 0.7) +
+  geom_hline(
+    data = hh_size_obs_mean,
+    aes(yintercept = obs_mean_hh_size)
+  ) +
+  geom_text(aes(label = round(mean_hh_size, 2)), vjust = -0.3, size = 3.3) +
+  geom_text(
+    data = hh_size_obs_label,
+    aes(x = label_hameau, y = obs_mean_hh_size, label = round(obs_mean_hh_size, 2)),
+    hjust = -1.5,
+    vjust = -0.3,
+    size = 4,
+  ) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(
+    title = obs_title("Taille moyenne des ménages par hameau"),
+    subtitle = "La ligne horizontale indique la taille moyenne de l'observatoire.",
+    x = "Hameau",
+    y = "Taille moyenne"
+  ) +
+  theme_ror(n_facets = n_obs_hameau) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.margin = margin(5.5, 22, 5.5, 5.5)
+  ) +
+  coord_cartesian(clip = "off") +
+  obs_facet(hh_size_hameau_plot, ncol = n_obs_hameau, scales = "free_x")
 ```
 
 ```{r dl_tbl_men_obs}
@@ -252,40 +281,6 @@ dl_tbl_variants("tbl_men_obs", "04", function(d) {
     summarise(`Taille moyenne` = round(mean(taille), 2), .by = Observatory) |>
     rename(Site = Observatory)
 }, members)
-```
-
-### Taille des ménages par hameau et par observatoire
-
-Pour Marovoay, Ampijoroa se distingue par les ménages les plus nombreux de l'échantillon tandis que les hameaux de l'Alaotra présentent une homogénéité plus forte autour de 4 personnes par foyer.
-
-:::: {.content-hidden when-profile="marovoay"} 
-::: obs-alaotra 
-A Alaotra, les tailles varient peu : de 3.76 (Avaradrano) à 4.03 (Ambatoharanana, Ambatomanga, Mangabe).
-::: 
-::::
-
-:::: {.content-hidden when-profile="alaotra"}
-::: obs-marovoay
-A Marovoay , les contrastes sont plus marqués allant de 3.86 (Madiromiongana) à 4.81 (Ampijoroa).
-:::
-::::
-
-```{r tbl_men_hameau}
-hh_size_hameau <- members |>
-  mutate(j4bis = fix_hameau(j4)) |>
-  summarise(hh_size = n(), .by = c(Observatory, j4bis, j5)) |>
-  summarise(
-    n_hh = n(),
-    mean_hh_size = mean(hh_size),
-    .by = c(Observatory, j4bis)
-  )
-
-obs_gt(hh_size_hameau) |>
-  tab_header(title = obs_title("Taille moyenne des ménages par hameau")) |>
-  fmt_number(columns = mean_hh_size, decimals = 2) |>
-  cols_hide(columns = n_hh) |>
-  cols_label(mean_hh_size = "Taille moyenne", j4bis = "Hameau") |>
-  style_table()
 ```
 
 ### Structure par âge
@@ -374,7 +369,8 @@ hh_age_sex <- members_site |>
 ```{r fig_pyramide}
 #| fig-cap: "Pyramide des âges des membres des ménages enquêtés par observatoire"
 #| fig-height: !expr fig_h("fig_pyramide")
-hh_age_sex |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent)
+hh_age_sex |> 
+  ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent, label = "fig_pyramide")
 ```
 
 ```{r dl_fig_pyramide}
@@ -390,7 +386,7 @@ dl_fig_variants("fig_pyramide", "04", function(d) {
       Percent = if_else(Sexe == "Homme", -Percent, Percent),
       .by = c(Observatory, Sexe)
     )
-  agg |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent)
+  agg |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent, label = "fig_pyramide")
 }, members)
 ```
 
@@ -656,25 +652,14 @@ age_table <- cm |>
   mutate(Caractéristique = "Âge", .before = Statistique) |>
   rename(Catégorie = Statistique)
 
-# --- Statut matrimonial ---
-statut_table <- cm |>
-  mutate(Statut = classify_marital(m7)) |>
-  count(Observatory, Statut) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  select(Observatory, Statut, pct) |>
-  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0) |>
-  mutate(across(any_of(c("Alaotra", "Marovoay")), \(x) paste0(x, "%"))) |>
-  mutate(Caractéristique = "Statut matrimonial", .before = Statut) |>
-  rename(Catégorie = Statut)
-
 # --- Combined table ---
-hh_combined <- bind_rows(sexe_table, age_table, statut_table)
+hh_combined <- bind_rows(sexe_table, age_table)
 
 gt(hh_combined, groupname_col = "Caractéristique") |>
   tab_header(title = "Caractéristiques des chefs de ménage") |>
   safe_cols_label(Catégorie = "Catégorie", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
   tab_footnote(
-    footnote = "Sexe et Statut matrimonial : effectifs et pourcentages. Âge : statistiques descriptives.",
+    footnote = "Sexe : effectifs et pourcentages. Âge : statistiques descriptives.",
     locations = cells_title(groups = "title")
   ) |>
   style_table()
@@ -698,14 +683,32 @@ dl_tbl_variants("tbl_cm_chars", "04", function(d) {
     pivot_longer(-Observatory, names_to = "Catégorie", values_to = "Effectif") |>
     mutate(Variable = "Âge", `%` = NA_real_) |>
     rename(Site = Observatory)
-  statut <- cm |>
-    mutate(Catégorie = classify_marital(m7)) |>
-    count(Observatory, Catégorie) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    mutate(Variable = "Statut matrimonial") |>
-    rename(Site = Observatory, Effectif = n)
-  bind_rows(sexe, age, statut) |>
+  bind_rows(sexe, age) |>
     select(Site, Variable, Catégorie, Effectif, `%`)
+}, members)
+```
+
+```{r fig_cm_statut}
+#| echo: false
+#| fig-cap: "Statut matrimonial des chefs de ménage"
+#| fig-height: !expr fig_h("fig_cm_statut")
+cm_site |>
+  mutate(Type = classify_marital(m7)) |>
+  count(Observatory, Type) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  make_bar_obs(label = "fig_cm_statut")
+```
+
+```{r dl_fig_cm_statut}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_cm_statut", "04", function(d) {
+  d |>
+    filter(m6 == 1) |>
+    mutate(Type = classify_marital(m7)) |>
+    count(Observatory, Type) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    make_bar_obs()
 }, members)
 ```
 
@@ -1292,27 +1295,14 @@ age_table2 <- others |>
   mutate(Caractéristique = "Âge", .before = Statistique) |>
   rename(Catégorie = Statistique)
 
-# --- Statut matrimonial (exclusion des moins de 12 ans) ---
-statut_table2 <- others |>
-  filter(m5 >= 12) |>
-  mutate(Statut = classify_marital(m7)) |>
-  filter(!is.na(Statut)) |>
-  count(Observatory, Statut) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  select(Observatory, Statut, pct) |>
-  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0) |>
-  mutate(across(any_of(c("Alaotra", "Marovoay")), \(x) paste0(x, "%"))) |>
-  mutate(Caractéristique = "Statut matrimonial", .before = Statut) |>
-  rename(Catégorie = Statut)
-
 # --- Combined table ---
-hh_combined2 <- bind_rows(sexe_table2, age_table2, statut_table2)
+hh_combined2 <- bind_rows(sexe_table2, age_table2)
 
 gt(hh_combined2, groupname_col = "Caractéristique") |>
   tab_header(title = "Caractéristiques des autres membres de ménage") |>
   safe_cols_label(Catégorie = "Catégorie", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
   tab_footnote(
-    footnote = "Sexe et Statut matrimonial : pourcentages (statut matrimonial calculé pour les membres de 12 ans et plus). Âge : statistiques descriptives.",
+    footnote = "Sexe : pourcentages. Âge : statistiques descriptives.",
     locations = cells_title(groups = "title")
   ) |>
   style_table()
@@ -1336,16 +1326,35 @@ dl_tbl_variants("tbl_other_chars", "04", function(d) {
     pivot_longer(-Observatory, names_to = "Catégorie", values_to = "Effectif") |>
     mutate(Variable = "Âge", `%` = NA_real_) |>
     rename(Site = Observatory)
-  statut <- oth |>
-    filter(m5 >= 12) |>
-    mutate(Catégorie = classify_marital(m7)) |>
-    filter(!is.na(Catégorie)) |>
-    count(Observatory, Catégorie) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    mutate(Variable = "Statut matrimonial (12 ans et +)") |>
-    rename(Site = Observatory, Effectif = n)
-  bind_rows(sexe, age, statut) |>
+  bind_rows(sexe, age) |>
     select(Site, Variable, Catégorie, Effectif, `%`)
+}, members)
+```
+
+```{r fig_other_statut}
+#| echo: false
+#| fig-cap: "Statut matrimonial des autres membres (12 ans et plus)"
+#| fig-height: !expr fig_h("fig_other_statut")
+others_site |>
+  filter(m5 >= 12) |>
+  mutate(Type = classify_marital(m7)) |>
+  filter(!is.na(Type)) |>
+  count(Observatory, Type) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  make_bar_obs(label = "fig_other_statut")
+```
+
+```{r dl_fig_other_statut}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_other_statut", "04", function(d) {
+  d |>
+    filter(m6 != 1, m5 >= 12) |>
+    mutate(Type = classify_marital(m7)) |>
+    filter(!is.na(Type)) |>
+    count(Observatory, Type) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    make_bar_obs()
 }, members)
 ```
 
@@ -1679,13 +1688,20 @@ dl_tbl_variants("tbl_schooling", "04", function(d) {
 ```
 
 ::: {.content-visible when-profile="consolidated"}
+
 #### Classe suivie 2024-2025
 
-**TABLEAU A REVOIR + INTERPRETATION**
 
 ```{r class_attended}
+age_levels <- c("3-5 ans", "6-10 ans", "11-14 ans", "15-17 ans", "18-25 ans")
+class_levels <- c(
+  "Prescolaire", "CP1", "CP2", "CE", "CM1", "CM2",
+  "6e", "5e", "4e", "3e", "2nde", "1ere", "Terminale",
+  "Superieur BAC+1", "Superieur BAC+2", "Superieur licence+", "Inconnu"
+)
+
 class_data <- members_site |>
-  filter(m5 >= 3, m5 <= 25, s2 == 1, !is.na(s3a)) |>
+  filter(m5 >= 3, m5 <= 25, s2 == 1, !is.na(sco2)) |>
   mutate(
     Cat_age = case_when(
       m5 <= 5  ~ "3-5 ans",
@@ -1693,15 +1709,16 @@ class_data <- members_site |>
       m5 <= 14 ~ "11-14 ans",
       m5 <= 17 ~ "15-17 ans",
       TRUE     ~ "18-25 ans"
-    ),
-    Niv_educ = classify_education(s3a) |> replace_na("Inconnu")
+    ) |> factor(levels = age_levels),
+    Classe = classify_school_class(sco2) |> replace_na("Inconnu") |> factor(levels = class_levels)
   ) |>
-  count(Observatory, Cat_age, Niv_educ) |>
+  count(Observatory, Cat_age, Classe) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Cat_age))
 
 class_wide <- class_data |>
-  select(Observatory, Cat_age, Niv_educ, pct) |>
-  pivot_wider(names_from = Niv_educ, values_from = pct, values_fill = 0) |>
+  select(Observatory, Cat_age, Classe, pct) |>
+  pivot_wider(names_from = Classe, values_from = pct, values_fill = 0) |>
+  select(Observatory, Cat_age, any_of(class_levels)) |>
   arrange(Observatory, Cat_age)
 
 obs_gt(class_wide) |>
@@ -1714,18 +1731,28 @@ obs_gt(class_wide) |>
 #| echo: false
 #| results: asis
 dl_tbl_variants("tbl_class", "04", function(d) {
+  age_levels <- c("3-5 ans", "6-10 ans", "11-14 ans", "15-17 ans", "18-25 ans")
+  class_levels <- c(
+    "Prescolaire", "CP1", "CP2", "CE", "CM1", "CM2",
+    "6e", "5e", "4e", "3e", "2nde", "1ere", "Terminale",
+    "Superieur BAC+1", "Superieur BAC+2", "Superieur licence+", "Inconnu"
+  )
+
   d |>
-    filter(m5 >= 3, m5 <= 25, s2 == 1, !is.na(s3a)) |>
+    filter(m5 >= 3, m5 <= 25, s2 == 1, !is.na(sco2)) |>
     mutate(Cat_age = case_when(
       m5 <= 5  ~ "3-5 ans", m5 <= 10 ~ "6-10 ans",
-      m5 <= 14 ~ "11-14 ans", m5 <= 17 ~ "15-17 ans", TRUE ~ "18-25 ans"),
-      Niv_educ = classify_education(s3a) |> replace_na("Inconnu")) |>
-    count(Observatory, Cat_age, Niv_educ) |>
+      m5 <= 14 ~ "11-14 ans", m5 <= 17 ~ "15-17 ans", TRUE ~ "18-25 ans") |> factor(levels = age_levels),
+      Classe = classify_school_class(sco2) |> replace_na("Inconnu") |> factor(levels = class_levels)) |>
+    count(Observatory, Cat_age, Classe) |>
     mutate(`%` = round(n / sum(n) * 100, 1), .by = c(Observatory, Cat_age)) |>
+    arrange(Observatory, Cat_age, Classe) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
 :::
+
+La progression scolaire suit globalement la structure attendue par âge. Entre 3 et 5 ans, les enfants sont majoritairement en préscolaire, avec une part déjà entrée en CP1. Chez les 6-10 ans, les classes du primaire dominent nettement, en particulier le CP2, le CE et le CM1-CM2. Entre 11 et 14 ans, la répartition se déplace vers la fin du primaire et le premier cycle du secondaire, surtout la 6e et la 5e. Enfin, les 15-17 ans se concentrent davantage dans les classes du secondaire, tandis que les niveaux supérieurs n’apparaissent que parmi les 18-25 ans.
 
 #### Raisons de non fréquentation de l'école pour les 6 à 15 ans
 

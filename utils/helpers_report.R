@@ -67,12 +67,6 @@ obs_title <- function(base_title) {
     base_title
   }
 }
-
-#' Conditionally add facet_wrap(~Observatory) to a ggplot
-#'
-#' Adds faceting only when data has multiple observatories.
-#' @param data The data used in the plot (to check n observatories)
-#' @param ... Additional arguments passed to facet_wrap
 obs_facet <- function(data, ...) {
   n_fct <- dplyr::n_distinct(data$Observatory)
   if (n_fct > 1) {
@@ -90,16 +84,13 @@ obs_facet <- function(data, ...) {
 #' @param .data A gt object
 #' @param ... Name-value pairs passed to cols_label
 safe_cols_label <- function(.data, ...) {
-  labs <- list(...)
-  existing_cols <- colnames(.data[["_data"]])
-  valid_labs <- labs[names(labs) %in% existing_cols]
-  if (length(valid_labs) > 0) {
-    gt::cols_label(.data, .list = valid_labs)
-  } else {
-    .data
+  args <- rlang::list2(...)
+  existing <- intersect(names(args), colnames(.data[["_data"]]))
+  if (length(existing) == 0) {
+    return(.data)
   }
+  gt::cols_label(.data, !!!args[existing])
 }
-
 #' Safely add a tab_spanner — skips if no matching columns exist
 #'
 #' When an observatory-specific report filters out one observatory,
@@ -361,22 +352,22 @@ style_table <- function(gt_obj) {
 #' Classify education level from s3a code
 classify_education <- function(s3a, s2 = NULL, age = NULL) {
   niv <- dplyr::case_when(
-    (s3a >= 1 & s3a <= 5) | s3a == 99 ~ "Primaire",
+    s3a %in% c(0, 98, 99) ~ "Primaire",
+    s3a >= 1 & s3a <= 5 ~ "Primaire",
     s3a >= 6 & s3a <= 9 ~ "Secondaire 1er cycle",
-    s3a >= 10 ~ "Secondaire 2\u00e8me cycle & sup.",
+    s3a >= 10 ~ "Secondaire 2ème cycle & sup.",
     TRUE ~ NA_character_
   )
-  # When s2 (school attendance) is available, recode NA as "Non scolarisé"
 
-  # for those who never attended school (s2==2) or are too young (age < 3)
   if (!is.null(s2)) {
     niv <- dplyr::case_when(
       !is.na(niv) ~ niv,
-      s2 == 2 ~ "Non scolaris\u00e9",
-      !is.null(age) & !is.na(age) & age < 3 ~ "Non scolaris\u00e9",
+      s2 == 2 ~ "Non scolarisé",
+      !is.null(age) & !is.na(age) & age < 3 ~ "Non scolarisé",
       TRUE ~ NA_character_
     )
   }
+
   niv
 }
 
@@ -390,9 +381,33 @@ classify_literacy <- function(x) {
     x == 3 ~ "Non",
     TRUE ~ NA_character_
   )
+
   factor(lbl, levels = c("Oui", "Avec effort", "Non"))
 }
 
+
+#' Classify current school class from sco2 code
+classify_school_class <- function(sco2) {
+  dplyr::case_when(
+    sco2 == 99 ~ "Prescolaire",
+    sco2 == 1 ~ "CP1",
+    sco2 == 2 ~ "CP2",
+    sco2 == 3 ~ "CE",
+    sco2 == 4 ~ "CM1",
+    sco2 == 5 ~ "CM2",
+    sco2 == 6 ~ "6e",
+    sco2 == 7 ~ "5e",
+    sco2 == 8 ~ "4e",
+    sco2 == 9 ~ "3e",
+    sco2 == 10 ~ "2nde",
+    sco2 == 11 ~ "1ere",
+    sco2 == 12 ~ "Terminale",
+    sco2 == 13 ~ "Superieur BAC+1",
+    sco2 == 14 ~ "Superieur BAC+2",
+    sco2 == 15 ~ "Superieur licence+",
+    TRUE ~ NA_character_
+  )
+}
 #' Classify marital status from m7 code
 classify_marital <- function(m7) {
   dplyr::case_when(
