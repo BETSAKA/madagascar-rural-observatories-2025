@@ -439,7 +439,7 @@ Table&nbsp;4.1: Statistiques sur le patrimoine foncier possédé
 </figcaption>
 <div aria-describedby="tbl-parcelles-stats-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="pldiojnjpt" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="tjnrmloqck" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -670,11 +670,11 @@ Figure&nbsp;4.4: Localisation des parcelles possédées
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fr30_data <span class="sc">|&gt;</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30f)) <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr30f), <span class="sc">!</span><span class="fu">is.na</span>(fr30d)) <span class="sc">|&gt;</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Irrigation =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr30f), <span class="at">levels =</span> <span class="fu">names</span>(irrig_labs), <span class="at">labels =</span> irrig_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Irrigation) <span class="sc">|&gt;</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Irrigation, <span class="at">y_label =</span> <span class="st">"% des parcelles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">surface =</span> <span class="fu">sum</span>(fr30d, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Irrigation)) <span class="sc">|&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(surface <span class="sc">/</span> <span class="fu">sum</span>(surface) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Irrigation, <span class="at">y_label =</span> <span class="st">"% des parcelles exploitées (surface)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-irrigation-possedee" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -707,10 +707,10 @@ Figure&nbsp;4.5: Mode d’irrigation des parcelles possédées
 <h3 data-number="4.1.4" class="anchored" data-anchor-id="mode-dacquisition-et-ancienneté"><span class="header-section-number">4.1.4</span> Mode d’acquisition et ancienneté</h3>
 <p>Le mode d’acquisition des parcelles renseigne sur la dynamique du marché foncier et le poids des transmissions familiales (<a href="#fig-acquisition" class="quarto-xref">Figure&nbsp;<span>4.6</span></a>). L’héritage domine largement.</p>
 <div class="obs-alaotra">
-<p><strong>Alaotra.</strong> Le marché foncier est plus dynamique avec une dominance de l’achat. L’héritage concerne 46.5 % des parcelles, l’achat 49.1 % et la mise en valeur 1.1 %.</p>
+<p><strong>Alaotra.</strong> Le marché foncier est plus dynamique avec une dominance de l’achat. L’héritage concerne 46.5 % des parcelles (en nombre), l’achat 49.1 % et la mise en valeur 1.1 %.</p>
 </div>
 <div class="obs-marovoay">
-<p><strong>Marovoay</strong> reste marqué par la transmission familiale. L’héritage concerne 59.4 % des parcelles, l’achat 39 % et la mise en valeur 0.2 %.</p>
+<p><strong>Marovoay</strong> reste marqué par la transmission familiale. L’héritage concerne 59.4 % des parcelles (en nombre), l’achat 39 % et la mise en valeur 0.2 %.</p>
 </div>
 <div class="cell">
 <details class="code-fold">
@@ -801,12 +801,16 @@ Figure&nbsp;4.7: Ancienneté de possession des parcelles
 </details>
 <!-- ### Propriétaire dans le ménage -->
 <!-- La question de l'identité du propriétaire au sein du ménage soulève des enjeux de genre importants (@fig-proprietaire). Le chef de ménage est déclaré propriétaire de la majorité des parcelles, ce qui illustre les inégalités d'accès au foncier qui sont plus marquées encore à Marovoay qu’à Alaotra. -->
-<div class="obs-alaotra">
+<!-- ::: {.content-hidden when-profile="marovoay"} -->
+<!-- ::: {.obs-alaotra} -->
 <!-- **Alaotra.** Le chef de ménage est propriétaire de 63.5 % des parcelles ; le ou la conjoint(e) n'apparaît que dans 15.6 % des cas. -->
-</div>
-<div class="obs-marovoay">
+<!-- ::: -->
+<!-- ::: -->
+<!-- ::: {.content-hidden when-profile="alaotra"} -->
+<!-- ::: {.obs-marovoay} -->
 <!-- **Marovoay.** Le chef de ménage est propriétaire de 76.3 % des parcelles ; le ou la conjoint(e) n'apparaît que dans 8.8 % des cas. -->
-</div>
+<!-- ::: -->
+<!-- ::: -->
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -863,10 +867,10 @@ Figure&nbsp;4.7: Ancienneté de possession des parcelles
 <h2 data-number="4.2" class="anchored" data-anchor-id="sec-securisation"><span class="header-section-number">4.2</span> Sécurisation foncière</h2>
 <p>La sécurisation foncière est un enjeu majeur à Madagascar. Les ménages peuvent détenir un titre foncier, un certificat foncier (délivré par le guichet foncier communal), ou divers documents informels. Les résultats de l’enquête révèlent un niveau de sécurisation formelle encore très faible. Les ménages s’appuient massivement sur des documents informels comme le « Taratasy visa Fokontany » ou le « Visa Mairie » (<a href="#fig-securisation" class="quarto-xref">Figure&nbsp;<span>4.8</span></a>).</p>
 <div class="obs-alaotra">
-<p><strong>Alaotra.</strong> Seules 16.2 % des parcelles disposent d’un titre foncier. Les certificats fonciers ne couvrent que 27.5 % des parcelles.</p>
+<p><strong>Alaotra.</strong> Seules 16.2 % des parcelles disposent d’un titre foncier. Les certificats fonciers ne couvrent que 27.5 % des parcelles (en nombre).</p>
 </div>
 <div class="obs-marovoay">
-<p><strong>Marovoay.</strong> Seules 21.5 % des parcelles disposent d’un titre foncier. Les certificats fonciers ne couvrent que 28.3 % des parcelles.</p>
+<p><strong>Marovoay.</strong> Seules 21.5 % des parcelles disposent d’un titre foncier. Les certificats fonciers ne couvrent que 28.3 % des parcelles (en nombre).</p>
 </div>
 <details class="dl-variants">
 <summary>
@@ -983,7 +987,7 @@ Table&nbsp;4.2: Ménages cédant des parcelles à des tiers
 </figcaption>
 <div aria-describedby="tbl-cession-pratique-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="zkodqsazwc" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="mjhobwhbln" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1186,7 +1190,7 @@ Table&nbsp;4.3: Ménages exploitant des parcelles non possédées
 </figcaption>
 <div aria-describedby="tbl-exploitation-autres-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="tzzsfgrfzx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="yywcouoqcu" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1260,7 +1264,7 @@ Table&nbsp;4.3: Ménages exploitant des parcelles non possédées
 <img src="04_foncier_files/figure-html/fig-type-exploitee-1.png" class="img-fluid figure-img" width="768">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-type-exploitee-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.13: Type des parcelles exploitées (non possédées)
+Figure&nbsp;4.13: Type des parcelles exploitées (non possédées, en nombre)
 </figcaption>
 </figure>
 </div>
@@ -1304,7 +1308,7 @@ Figure&nbsp;4.13: Type des parcelles exploitées (non possédées)
 <img src="04_foncier_files/figure-html/fig-fv-exploitee-1.png" class="img-fluid figure-img" width="768">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-fv-exploitee-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.14: Mode de faire-valoir des parcelles exploitées
+Figure&nbsp;4.14: Mode de faire-valoir des parcelles exploitées (en nombre)
 </figcaption>
 </figure>
 </div>
@@ -1371,11 +1375,11 @@ Figure&nbsp;4.15: Propriétaire des parcelles exploitées
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fr34_data <span class="sc">|&gt;</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34f)) <span class="sc">|&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(fr34f), <span class="sc">!</span><span class="fu">is.na</span>(fr34d)) <span class="sc">|&gt;</span></span>
 <span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Irrigation =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(fr34f), <span class="at">levels =</span> <span class="fu">names</span>(irrig_labs), <span class="at">labels =</span> irrig_labs)) <span class="sc">|&gt;</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Irrigation) <span class="sc">|&gt;</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Irrigation, <span class="at">y_label =</span> <span class="st">"% des parcelles exploitées"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">surface =</span> <span class="fu">sum</span>(fr34d, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">.by =</span> <span class="fu">c</span>(Observatory, Irrigation)) <span class="sc">|&gt;</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(surface <span class="sc">/</span> <span class="fu">sum</span>(surface) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory) <span class="sc">|&gt;</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Irrigation, <span class="at">y_label =</span> <span class="st">"% des parcelles exploitées (surface)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-irrigation-exploitee" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1384,7 +1388,7 @@ Figure&nbsp;4.15: Propriétaire des parcelles exploitées
 <img src="04_foncier_files/figure-html/fig-irrigation-exploitee-1.png" class="img-fluid figure-img" width="768">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-irrigation-exploitee-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;4.16: Mode d’irrigation des parcelles exploitées
+Figure&nbsp;4.16: Mode d’irrigation des parcelles exploitées (surface)
 </figcaption>
 </figure>
 </div>
@@ -1489,7 +1493,7 @@ Table&nbsp;4.4: Ménages ayant abandonné la culture de parcelles
 </figcaption>
 <div aria-describedby="tbl-abandon-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="uduhrcuwnp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="msowjvodlm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">

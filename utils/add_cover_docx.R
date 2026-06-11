@@ -67,10 +67,25 @@
 }
 
 # ---------------------------------------------------------------------------
-add_cover_to_docx <- function(docx_path, cover_img, credit_text) {
+add_cover_to_docx <- function(docx_path, cover_img, credit_text = NULL) {
   if (!file.exists(docx_path)) {
     message("  Not found: ", docx_path, " — skipping.")
     return(invisible(FALSE))
+  }
+
+  if (is.null(credit_text)) {
+    credit_text <- if (grepl("marovoay", basename(docx_path), ignore.case = TRUE)) {
+      paste0(
+        "Plaine de Marovoay ",
+        "(Copyright Cédrick Rakotoniaina - Projet BETSAKA 2025)"
+      )
+    } else {
+      paste0(
+        "Rizière dans la région d’Alaotra Mangoro. ",
+        "Photo : Leja Mitarika / NJProduction, ",
+        "CC BY-SA 4.0, via Wikimedia Commons."
+      )
+    }
   }
 
   saved_wd <- getwd()
