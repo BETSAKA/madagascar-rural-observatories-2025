@@ -2557,7 +2557,7 @@ dl_tbl_variants("tbl_main_oeuvre_perm", "08", function(d) {
 
 ## Évolution des indicateurs agricoles (1995–2025) {#sec-agro-multiyear}
 
-Les fichiers rizicoles (`res_r`) et d'élevage (`res_el2`) couvrent la quasi-totalité des campagnes depuis 1995. On retrace ici l'évolution de la production rizicole moyenne par ménage, du rendement (lorsque la surface est disponible) et du taux de pratique de l'élevage.
+On retrace ici l'évolution de la production rizicole moyenne par ménage, du rendement (lorsque la surface est disponible) et du taux de pratique de l'élevage.
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
@@ -2681,37 +2681,37 @@ if ("prod_moy" %in% names(agro_trends)) {
 }
 ```
 
-:::: {.content-hidden when-profile="marovoay"}
-::: obs-alaotra
-A Alaotra, le rendement rizicole moyen reste stable entre 2010 et 2014, avec une valeur constante d’environ 0.4 kg/are. Cette stabilité montre que les niveaux de production observés au cours de cette période n’ont pas connu de variation significative. En 2025, le rendement moyen atteint environ 0.8 kg/are, traduisant une progression importante de la productivité rizicole au sein de cet observatoire.
-:::
-::::
+<!-- :::: {.content-hidden when-profile="marovoay"} -->
+<!-- ::: obs-alaotra -->
+<!-- A Alaotra, le rendement rizicole moyen reste stable entre 2010 et 2014, avec une valeur constante d’environ 0.4 kg/are. Cette stabilité montre que les niveaux de production observés au cours de cette période n’ont pas connu de variation significative. En 2025, le rendement moyen atteint environ 0.8 kg/are, traduisant une progression importante de la productivité rizicole au sein de cet observatoire. -->
+<!-- ::: -->
+<!-- :::: -->
 
-:::: {.content-hidden when-profile="alaotra"}
-::: obs-marovoay
-A Marovoay, le rendement rizicole moyen se maintient autour de 0.5 kg/are entre 2010 et 2014. Cette évolution régulière indique une continuité des performances rizicoles durant plusieurs années. En 2025, le rendement reste proche de 0.5 kg/are, ce qui reflète une stabilité de la production rizicole au niveau de cet observatoire.
-:::
-::::
+<!-- :::: {.content-hidden when-profile="alaotra"} -->
+<!-- ::: obs-marovoay -->
+<!-- A Marovoay, le rendement rizicole moyen se maintient autour de 0.5 kg/are entre 2010 et 2014. Cette évolution régulière indique une continuité des performances rizicoles durant plusieurs années. En 2025, le rendement reste proche de 0.5 kg/are, ce qui reflète une stabilité de la production rizicole au niveau de cet observatoire. -->
+<!-- ::: -->
+<!-- :::: -->
 
 ```{r fig_agro_rdt_riz}
-#| fig-cap: "Évolution du rendement rizicole moyen (kg/are) — années avec données de surface"
-#| fig-width: !expr fig_w("fig_agro_rdt_riz")
-#| fig-height: !expr fig_h("fig_agro_rdt_riz")
+# #| fig-cap: "Évolution du rendement rizicole moyen (kg/are) — années avec données de surface"
+# #| fig-width: !expr fig_w("fig_agro_rdt_riz")
+# #| fig-height: !expr fig_h("fig_agro_rdt_riz")
 
-if ("rdt_moy" %in% names(agro_trends)) {
-  rdt_data <- agro_trends |> filter(!is.na(rdt_moy))
-  if (nrow(rdt_data) > 1) {
-    rdt_solid <- rdt_data |> filter(year <= 2015)
-    rdt_gap   <- rdt_data |> filter(year %in% c(2015, 2025))
-    ggplot(mapping = aes(x = year, y = rdt_moy, colour = Observatory)) +
-      geom_line(data = rdt_solid, linewidth = 0.8) +
-      geom_line(data = rdt_gap, linewidth = 0.8, linetype = "31") +
-      geom_point(data = rdt_data, size = 2) +
-      scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-      labs(x = NULL, y = "Rendement moyen (kg/are)", colour = "Observatoire") +
-      theme_ror()
-  }
-}
+# if ("rdt_moy" %in% names(agro_trends)) {
+#   rdt_data <- agro_trends |> filter(!is.na(rdt_moy))
+#   if (nrow(rdt_data) > 1) {
+#     rdt_solid <- rdt_data |> filter(year <= 2015)
+#     rdt_gap   <- rdt_data |> filter(year %in% c(2015, 2025))
+#     ggplot(mapping = aes(x = year, y = rdt_moy, colour = Observatory)) +
+#       geom_line(data = rdt_solid, linewidth = 0.8) +
+#       geom_line(data = rdt_gap, linewidth = 0.8, linetype = "31") +
+#       geom_point(data = rdt_data, size = 2) +
+#       scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+#       labs(x = NULL, y = "Rendement moyen (kg/are)", colour = "Observatoire") +
+#       theme_ror()
+#   }
+# }
 ```
 
 :::: {.content-hidden when-profile="marovoay"}
