@@ -2730,43 +2730,6 @@ A Marovoay, le taux de ménages pratiquant l’élevage reste relativement élev
 #| fig-cap: "Évolution du taux de pratique de l'élevage (1998–2025)"
 #| fig-width: !expr fig_w("fig_agro_elevage")
 #| fig-height: !expr fig_h("fig_agro_elevage")
-")
-#| fig-height: !expr fig_h("fig_agro_elevage")
-moy)), linewidth = 0.8) +
-    geom_line(data = agro_gap |> filter(!is.na(prod_moy)), linewidth = 0.8, linetype = "31") +
-    geom_point(data = agro_trends |> filter(!is.na(prod_moy)), size = 2) +
-    scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-    scale_y_continuous(labels = scales::label_comma()) +
-    labs(x = NULL, y = "Production rizicole moyenne (kg/ménage)", colour = "Observatoire") +
-    theme_ror()
-}
-```
-
-```{r fig_agro_rdt_riz}
-#| fig-cap: "Évolution du rendement rizicole moyen (kg/are) — années avec données de surface"
-#| fig-width: !expr fig_w("fig_agro_rdt_riz")
-#| fig-height: !expr fig_h("fig_agro_rdt_riz")
-
-if ("rdt_moy" %in% names(agro_trends)) {
-  rdt_data <- agro_trends |> filter(!is.na(rdt_moy))
-  if (nrow(rdt_data) > 1) {
-    rdt_solid <- rdt_data |> filter(year <= 2015)
-    rdt_gap   <- rdt_data |> filter(year %in% c(2015, 2025))
-    ggplot(mapping = aes(x = year, y = rdt_moy, colour = Observatory)) +
-      geom_line(data = rdt_solid, linewidth = 0.8) +
-      geom_line(data = rdt_gap, linewidth = 0.8, linetype = "31") +
-      geom_point(data = rdt_data, size = 2) +
-      scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-      labs(x = NULL, y = "Rendement moyen (kg/are)", colour = "Observatoire") +
-      theme_ror()
-  }
-}
-```
-
-```{r fig_agro_elevage}
-#| fig-cap: "Évolution du taux de pratique de l'élevage (1998–2025)"
-#| fig-width: !expr fig_w("fig_agro_elevage")
-#| fig-height: !expr fig_h("fig_agro_elevage")
 
 if ("pct_elevage" %in% names(agro_trends)) {
   el_data <- agro_trends |> filter(!is.na(pct_elevage))
