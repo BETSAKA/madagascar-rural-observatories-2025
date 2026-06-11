@@ -74,7 +74,9 @@ add_cover_to_docx <- function(docx_path, cover_img, credit_text = NULL) {
   }
 
   if (is.null(credit_text)) {
-    credit_text <- if (grepl("marovoay", basename(docx_path), ignore.case = TRUE)) {
+    credit_text <- if (
+      grepl("marovoay", basename(docx_path), ignore.case = TRUE)
+    ) {
       paste0(
         "Plaine de Marovoay ",
         "(Copyright Cédrick Rakotoniaina - Projet BETSAKA 2025)"
