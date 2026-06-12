@@ -8,6 +8,24 @@
 
 render_errors <- character(0)
 
+ensure_output_dirs <- function() {
+  required_dirs <- c(
+    "docs",
+    "docs/downloads",
+    "docs-marovoay",
+    "docs-alaotra"
+  )
+
+  for (dir_path in required_dirs) {
+    if (!dir.exists(dir_path)) {
+      dir.create(dir_path, recursive = TRUE, showWarnings = FALSE)
+      cat("Created output directory:", dir_path, "\n")
+    }
+  }
+
+  invisible(required_dirs)
+}
+
 run_render <- function(label, cmd) {
   cat(paste0("\n=== ", label, " ===\n"))
   rc <- system(cmd, intern = FALSE)
@@ -80,6 +98,7 @@ source("utils/add_cover_docx.R")
 # Render HTML first (fast, no xelatex cleanup issues).
 # First render cleans output-dir; subsequent passes use --no-clean
 # so they don't wipe previously rendered formats.
+ensure_output_dirs()
 clean_stale_files()
 run_render("1a/3  Consolidated — HTML", "quarto render --to html")
 clean_stale_files()

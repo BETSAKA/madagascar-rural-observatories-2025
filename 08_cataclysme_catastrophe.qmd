@@ -345,98 +345,9 @@ dl_fig_variants("fig_cata_prevalence_type", "11", function(d) {
 }, events_full, width = 10, height = 6)
 ```
 
-### Nombre moyen de catastrophes par ménage
-
-Un ménage peut être touché par plusieurs types de catastrophes au cours de la même campagne. Le tableau suivant indique le nombre moyen de catastrophes subies.
-
-:::: {.content-hidden when-profile="marovoay"}
-::: obs-alaotra
-À l'Alaotra, les hameaux d'Avaradrano et de Mangabe sont les plus exposés avec respectivement 1.7 et 1.5 catastrophe en moyenne par ménage.
-:::
-::::
-
-:::: {.content-hidden when-profile="alaotra"}
-::: obs-marovoay
-À Marovoay, Madiromiongana et Maroala sont les sites les plus touchés (1.5 et 1.1 catastrophe en moyenne).
-:::
-::::
-
-Dans la quasi-totalité des 8 hameaux de l'Alaotra, les ménages subissent en moyenne au moins un sinistre par an à l'exception d'Ambatomanga qui est à 0.9.
-
-```{r t3_nb_moyen_catastrophes}
-# T3 : Nombre moyen de catastrophes par ménage, par hameau et observatoire
-nb_cata <- events %>%
-  group_by(j5) %>%
-  summarise(nb_events = n(), .groups = "drop") %>%
-  right_join(res_deb %>% select(j5, Observatory, j4bis), by = "j5") %>%
-  mutate(nb_events = replace_na(nb_events, 0))
-
-nb_cata_hameau <- nb_cata %>%
-  group_by(Observatory, j4bis) %>%
-  summarise(
-    n_hh = n(),
-    mean_events = round(mean(nb_events), 1),
-    .groups = "drop"
-  )
-
-# Lignes "Ensemble"
-nb_cata_combined <- nb_cata_hameau %>%
-  group_by(Observatory) %>%
-  summarise(
-    j4bis = "Ensemble",
-    mean_events = round(weighted.mean(mean_events, n_hh), 1),
-    n_hh = sum(n_hh),
-    .groups = "drop"
-  ) %>%
-  bind_rows(nb_cata_hameau, .) %>%
-  arrange(Observatory, j4bis == "Ensemble", j4bis)
-
-nb_cata_combined %>%
-  expand_sites_for_profile() %>%
-  obs_gt() %>%
-  tab_header(
-    title = "Nombre moyen de catastrophes subies par ménage",
-    subtitle = "Par hameau et observatoire"
-  ) %>%
-  cols_label(
-    j4bis = "Hameau",
-    n_hh = "Nb ménages",
-    mean_events = "Nb moyen de catastrophes"
-  ) %>%
-  cols_hide(columns = n_hh) %>%
-  tab_style(
-    style = list(cell_text(weight = "bold"), cell_fill(color = "#F0F0F0")),
-    locations = cells_body(rows = j4bis == "Ensemble")
-  ) %>%
-  tab_options(row_group.font.weight = "bold") %>%
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_column_labels()
-  )
-```
-
-```{r dl_t3_nb_moyen_catastrophes}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_cata_nb_moyen", "11", function(d) {
-  d %>%
-    group_by(Observatory) %>%
-    summarise(
-      `Nb ménages` = n(),
-      `Nb moyen de catastrophes` = round(mean(nb_events), 1),
-      .groups = "drop"
-    )
-}, hh_cata)
-```
-
 ## Sévérité des dégâts
 
 Au-delà de la simple survenance, il est essentiel d'évaluer l'ampleur des dégâts causés. Trois domaines sont documentés : le logement, l'élevage et les conséquences sur les personnes du ménage.
-
-Les niveaux de dégâts sont codés ainsi :
-
-- **Logement et élevage** : 1 = Rien, 2 = Un peu, 3 = Beaucoup (plus de la moitié), 4 = Destruction totale
-- **Personnes** : 1 = Aucun, 2 = Blessure/Maladie, 3 = Décès/Porté disparu, 4 = Manque de vivres
 
 ### Dégâts sur le logement
 

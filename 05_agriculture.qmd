@@ -213,9 +213,9 @@ rdt_med_m <- res_r |> filter(Observatory == "Marovoay", !is.na(r23), r23 > 0, !i
   summarise(m = round(median(rdt), 2)) |> pull(m)
 
 # Vente de riz : taux de vente
-pct_vente_a <- res_dc20 |> filter(Observatory == "Alaotra") |>
+pct_vente_a <- res_dc20 |> filter(j5 %in% res_r1$j5, Observatory == "Alaotra") |>
   summarise(p = round(mean(dcva == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
-pct_vente_m <- res_dc20 |> filter(Observatory == "Marovoay") |>
+pct_vente_m <- res_dc20 |> filter(j5 %in% res_r1$j5, Observatory == "Marovoay") |>
   summarise(p = round(mean(dcva == 1, na.rm = TRUE) * 100, 1)) |> pull(p)
 
 # Autres cultures : taux de pratique
@@ -310,13 +310,13 @@ La location et le métayage, qui témoignent d'un marché foncier actif, sont pl
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-À Alaotra, le mode de `r top_tenure_a` domine largement l’exploitation des parcelles avec `r pct_tenure_a` % des parcellesconcernées. La prise en location représente également une pratique importante avec 19.8 %, suivie par la prise en métayage qui atteint 12.9 %. Les autres formes d’accès à la terre restent marginales, notamment la mise en location avec 1.4 %, la mise en métayage avec 3.5 %, le prêt gratuit avec 2.2 % et la mise à disposition gratuite avec seulement 0.6 %. 
+À Alaotra, le mode de `r top_tenure_a` domine largement l’exploitation des parcelles avec `r pct_tenure_a` % des parcelles concernées (en nombre). La prise en location représente également une pratique importante avec 19.8 %, suivie par la prise en métayage qui atteint 12.9 %. Les autres formes d’accès à la terre restent marginales, notamment la mise en location avec 1.4 %, la mise en métayage avec 3.5 %, le prêt gratuit avec 2.2 % et la mise à disposition gratuite avec seulement 0.6 %. 
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, le `r top_tenure_m` constitue également la principale forme d’exploitation des parcelles avec `r pct_tenure_m` % des parcelles. La prise en métayage occupe une place importante et atteint 24.8 %, tandis que la prise en location représente 18.4 % des parcelles. Les autres modalités restent peu répandues, avec 6.3 % pour la mise en location, 2.2 % pour la mise en métayage et 1.6 % pour le prêt gratuit. Les catégories « autre » et « mise à disposition gratuite » ne représentent chacune que 0.1 % des parcelles.
+A Marovoay, le `r top_tenure_m` constitue également la principale forme d’exploitation des parcelles avec `r pct_tenure_m` % des parcelles (en nombre). La prise en métayage occupe une place importante et atteint 24.8 %, tandis que la prise en location représente 18.4 % des parcelles. Les autres modalités restent peu répandues, avec 6.3 % pour la mise en location, 2.2 % pour la mise en métayage et 1.6 % pour le prêt gratuit. Les catégories « autre » et « mise à disposition gratuite » ne représentent chacune que 0.1 % des parcelles.
 :::
 :::
 
@@ -864,42 +864,41 @@ La commercialisation du paddy est une source de revenu majeure. Le calendrier et
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, `r pct_vente_a` % des ménages déclarent avoir vendu du riz au cours de la campagne.
+Dans l'Alaotra, `r pct_vente_a` % des ménages riziculteurs déclarent avoir vendu du riz au cours de la campagne.
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, `r pct_vente_m` % des ménages déclarent avoir vendu du riz au cours de la campagne.
+A Marovoay, `r pct_vente_m` % des ménages riziculteurs déclarent avoir vendu du riz au cours de la campagne.
 :::
 :::
 
 ```{r}
-#| label: tbl-ventes-riz-taux
-#| tbl-cap: "Taux de vente de riz par observatoire"
+#| label: fig-ventes-riz-taux
+#| fig-cap: "Taux de vente de riz par observatoire"
+#| fig-width: !expr fig_w("fig-ventes-riz-taux")
+#| fig-height: !expr fig_h("fig-ventes-riz-taux")
 
 res_dc20 |>
-  summarise(
-    `Nb ménages` = n(),
-    `Ont vendu (nb)` = sum(dcva == 1, na.rm = TRUE),
-    `Ont vendu (%)` = round(sum(dcva == 1, na.rm = TRUE) / n() * 100, 1),
-    .by = Observatory
-  ) |>
-  gt() |>
-  tab_header(title = "Vente de riz (paddy ou blanc)")
+  filter(j5 %in% res_r1$j5) |>
+  mutate(Vente = if_else(dcva == 1, "Vendu", "Non vendu")) |>
+  count(Observatory, Vente) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  expand_sites_for_profile() |>
+  make_bar_obs(x = Vente, y_label = "% des riziculteurs")
 ```
 
-```{r dl_tbl_ventes_riz_taux}
+```{r dl_fig_ventes_riz_taux}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_ventes_riz_taux", "08", function(d) {
+dl_fig_variants("fig_ventes_riz_taux", "08", function(d) {
   d |>
-    summarise(
-      `Nb ménages` = n(),
-      `Ont vendu (nb)` = sum(dcva == 1, na.rm = TRUE),
-      `Ont vendu (%)` = round(sum(dcva == 1, na.rm = TRUE) / n() * 100, 1),
-      .by = Observatory
-    ) |> rename(Site = Observatory)
+    filter(j5 %in% res_r1$j5) |>
+    mutate(Vente = if_else(dcva == 1, "Vendu", "Non vendu")) |>
+    count(Observatory, Vente) |>
+    mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    make_bar_obs(x = Vente, y_label = "% des riziculteurs")
 }, res_dc20)
 ```
 
@@ -1015,18 +1014,18 @@ L’ensemble met en évidence une organisation des flux de paddy orientée à la
 #| include: false
 
 bilan_vars <- c(
-  dc01 = "Stock début campagne",
-  dc02b = "Production totale",
-  dc03b = "Rente perçue en nature",
-  dc04 = "Achat de paddy",
-  dc05 = "Paddy reçu (dons, héritage…)",
-  dc06 = "Vente de paddy",
-  dc07 = "Rente versée en nature",
-  dc08 = "Paddy donné / cédé",
-  dc09 = "Alimentation du ménage",
-  dc10 = "Paiement MO en nature",
-  dc11 = "Semences utilisées",
-  dc17 = "Stock fin campagne"
+  dc01 = "Stock début",
+  dc02b = "Production",
+  dc03b = "Rente perçue",
+  dc04 = "Achat",
+  dc05 = "Paddy reçu",
+  dc06 = "Vente",
+  dc07 = "Rente versée",
+  dc08 = "Paddy cédé",
+  dc09 = "Alimentation",
+  dc10 = "Paiement MO",
+  dc11 = "Semences",
+  dc17 = "Stock fin"
 )
 
 # Only keep variables that exist in the data
@@ -1059,11 +1058,15 @@ res_dc1 |>
     across(all_of(names(bv)), \(x) round(mean(x, na.rm = TRUE))),
     .by = Observatory
   ) |>
-  pivot_longer(-Observatory, names_to = "Variable", values_to = "Moyenne") |>
-  mutate(Type = bilan_vars[Variable]) |>
-  select(-Variable) |>
-  rename(pct = Moyenne) |>
-  make_bar_obs(show_pct = TRUE, pct_suffix = " kg")
+  pivot_longer(-Observatory, names_to = "Variable", values_to = "kg") |>
+  mutate(
+    Poste = bilan_vars[Variable],
+    Flux = if_else(Variable %in% c("dc01", "dc02b", "dc03b", "dc04", "dc05"), "Ressources", "Emplois"),
+    Flux = factor(Flux, levels = c("Ressources", "Emplois"))
+  ) |>
+  ror_bar_stacked(x = Flux, y = kg, fill = Poste, 
+                  proportion = FALSE, direction = "vertical", show_pct = FALSE,
+                  y_label = "kg de paddy")
 ```
 
 ```{r dl_fig_bilan_riz}
@@ -1076,11 +1079,15 @@ dl_fig_variants("fig_bilan_riz", "08", function(d) {
       across(all_of(names(bv)), \(x) round(mean(x, na.rm = TRUE))),
       .by = Observatory
     ) |>
-    pivot_longer(-Observatory, names_to = "Variable", values_to = "Moyenne") |>
-    mutate(Type = bilan_vars[Variable]) |>
-    select(-Variable) |>
-    rename(pct = Moyenne) |>
-    make_bar_obs(show_pct = TRUE, pct_suffix = " kg")
+    pivot_longer(-Observatory, names_to = "Variable", values_to = "kg") |>
+    mutate(
+      Poste = bilan_vars[Variable],
+      Flux = if_else(Variable %in% c("dc01", "dc02b", "dc03b", "dc04", "dc05"), "Ressources", "Emplois"),
+      Flux = factor(Flux, levels = c("Ressources", "Emplois"))
+    ) |>
+    ror_bar_stacked(x = Flux, y = kg, fill = Poste, 
+                    proportion = FALSE, direction = "vertical", show_pct = FALSE,
+                    y_label = "kg de paddy")
 }, res_dc1, width = 10, height = 6)
 ```
 
@@ -1312,48 +1319,6 @@ La culture de la patate dans l’observatoire de Marovoay se distingue par la pr
 ::::
 
 
-```{r}
-#| label: tbl-production-autres
-#| tbl-cap: "Production et ventes des principales cultures non rizicoles"
-
-res_c |>
-  filter(c0 != "", !is.na(c0), !is.na(c2), c2 > 0) |>
-  mutate(Culture = str_to_title(c0)) |>
-  summarise(
-    `Nb parcelles` = n(),
-    `Production moy. (kg)` = round(mean(c2, na.rm = TRUE)),
-    `% vendu (moy.)` = round(mean(c4a, na.rm = TRUE), 1),
-    `Montant vente moy. (Ar)` = round(mean(c6b[c6b > 0], na.rm = TRUE)),
-    .by = c(Observatory, Culture)
-  ) |>
-  filter(`Nb parcelles` >= 5) |>
-  arrange(Observatory, desc(`Nb parcelles`)) |>
-  gt() |>
-  tab_header(title = "Production et ventes des principales cultures non rizicoles") |>
-  fmt_number(columns = c(`Production moy. (kg)`, `Montant vente moy. (Ar)`),
-             use_seps = TRUE, decimals = 0)
-```
-
-```{r dl_tbl_production_autres}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_production_autres", "08", function(d) {
-  d |>
-    filter(c0 != "", !is.na(c0), !is.na(c2), c2 > 0) |>
-    mutate(Culture = str_to_title(c0)) |>
-    summarise(
-      `Nb parcelles` = n(),
-      `Production moy. (kg)` = round(mean(c2, na.rm = TRUE)),
-      `% vendu (moy.)` = round(mean(c4a, na.rm = TRUE), 1),
-      `Montant vente moy. (Ar)` = round(mean(c6b[c6b > 0], na.rm = TRUE)),
-      .by = c(Observatory, Culture)
-    ) |>
-    filter(`Nb parcelles` >= 5) |>
-    arrange(Observatory, desc(`Nb parcelles`)) |>
-    rename(Site = Observatory)
-}, res_c)
-```
-
 #### Perception des rendements
 
 Au-delà des mesures quantitatives, la perception subjective des rendements par les agriculteurs constitue un indicateur complémentaire de la performance de la campagne. Elle reflète à la fois les résultats objectifs et les attentes des producteurs.
@@ -1372,55 +1337,56 @@ Au-delà des mesures quantitatives, la perception subjective des rendements par 
 
 
 ```{r}
-#| label: tbl-rendement-autres
-#| tbl-cap: "Perception des rendements des cultures non rizicoles"
-
-perc <- res_c0 |>
+#| label: fig-rendement-perception-autres
+#| fig-cap: "Perception des rendements des cultures non rizicoles"
+#| fig-width: !expr fig_w("fig-rendement-perception-autres")
+#| fig-height: !expr fig_h("fig-rendement-perception-autres")
+res_c0 |>
   filter(c1a == 1, !is.na(c20)) |>
   mutate(Perception = safe_to_char(c20)) |>
   count(Observatory, Perception) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  select(-n) |>
-  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0) |>
-  mutate(Indicateur = "Rendement cette campagne", .before = 1) |>
-  rename(Modalite = Perception)
-
-evol <- res_c0 |>
-  filter(c1a == 1, !is.na(c21)) |>
-  mutate(Evolution = safe_to_char(c21)) |>
-  count(Observatory, Evolution) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  select(-n) |>
-  pivot_wider(names_from = Observatory, values_from = pct, values_fill = 0) |>
-  mutate(Indicateur = "Par rapport a l'an dernier", .before = 1) |>
-  rename(Modalite = Evolution)
-
-bind_rows(perc, evol) |>
-  gt() |>
-  tab_header(title = "Perception des rendements des cultures non rizicoles (% des pratiquants)")
+  expand_sites_for_profile() |>
+  make_bar_obs(x = Perception, y_label = "% des pratiquants")
 ```
 
-```{r dl_tbl_rendement_autres}
+```{r dl_fig_rendement_perception_autres}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_rendement_autres", "08", function(d) {
-  perc <- d |>
+dl_fig_variants("fig_rendement_perception_autres", "08", function(d) {
+  d |>
     filter(c1a == 1, !is.na(c20)) |>
     mutate(Perception = safe_to_char(c20)) |>
     count(Observatory, Perception) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    select(-n) |>
-    mutate(Indicateur = "Rendement cette campagne")
-  evol <- d |>
+    make_bar_obs(x = Perception, y_label = "% des pratiquants")
+}, res_c0)
+```
+
+```{r}
+#| label: fig-rendement-evolution-autres
+#| fig-cap: "Évolution des rendements des cultures non rizicoles par rapport à l'an dernier"
+#| fig-width: !expr fig_w("fig-rendement-evolution-autres")
+#| fig-height: !expr fig_h("fig-rendement-evolution-autres")
+res_c0 |>
+  filter(c1a == 1, !is.na(c21)) |>
+  mutate(Evolution = safe_to_char(c21)) |>
+  count(Observatory, Evolution) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  expand_sites_for_profile() |>
+  make_bar_obs(x = Evolution, y_label = "% des pratiquants")
+```
+
+```{r dl_fig_rendement_evolution_autres}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_rendement_evolution_autres", "08", function(d) {
+  d |>
     filter(c1a == 1, !is.na(c21)) |>
     mutate(Evolution = safe_to_char(c21)) |>
     count(Observatory, Evolution) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    select(-n) |>
-    mutate(Indicateur = "Par rapport a l'an dernier") |>
-    rename(Perception = Evolution)
-  bind_rows(perc, evol) |>
-    select(Site = Observatory, Indicateur, Perception, `%` = pct)
+    make_bar_obs(x = Evolution, y_label = "% des pratiquants")
 }, res_c0)
 ```
 
@@ -1531,15 +1497,50 @@ dl_fig_variants("fig_top_jardin", "08", function(d) {
 
 L'exploitation des ressources forestières (bois de chauffe, charbon, bois d'œuvre, plantes médicinales) constitue une activité complémentaire pour de nombreux ménages. Les produits forestiers sont essentiels à la fois comme source d'énergie domestique et comme revenu d'appoint.
 
+```{r pratique_foret_data}
+#| include: false
+pratique_foret <- res_jpchphef |>
+  summarise(
+    pct = round(sum(efa == 1, na.rm = TRUE) / n() * 100, 1),
+    .by = Observatory
+  ) |>
+  mutate(Type = "Pratiquent") |>
+  expand_sites_for_profile()
+```
+
+```{r}
+#| label: fig-pratique-foret
+#| fig-cap: "Part des ménages pratiquant l'exploitation forestière"
+#| fig-width: !expr fig_w("fig-pratique-foret")
+#| fig-height: !expr fig_h("fig-pratique-foret")
+
+pratique_foret |>
+  make_bar_obs(x = Type, y_label = "% des ménages")
+```
+
+```{r dl_fig_pratique_foret}
+#| echo: false
+#| results: asis
+dl_fig_variants("fig_pratique_foret", "08", function(d) {
+  d |>
+    summarise(
+      pct = round(sum(efa == 1, na.rm = TRUE) / n() * 100, 1),
+      .by = Observatory
+    ) |>
+    mutate(Type = "Pratiquent") |>
+    make_bar_obs(x = Type, y_label = "% des ménages")
+}, res_jpchphef)
+```
+
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
-A Alaotra, les principaux produits issus de l’exploitation forestière sont très largement dominés par le **kitay**, cité par 99.6 % des ménages. Le **saribao** est également presque systématiquement exploité, avec une proportion de 98.9 %, tandis que le **hazo afok’ampy** concerne 94.6 % des ménages. En revanche, le **hazo ampiasaina** reste très peu mentionné, avec seulement 2.9 % des ménages concernés. Ces résultats montrent que l’exploitation forestière dans cet observatoire repose essentiellement sur quelques produits largement répandus au sein des ménages.
+A Alaotra, parmi les ménages pratiquant l’exploitation forestière, les principaux produits sont très largement dominés par le **kitay**, cité par 99.6 % d’entre eux. Le **saribao** est également presque systématiquement exploité, avec une proportion de 98.9 %, tandis que le **hazo afok’ampy** concerne 94.6 % de ces ménages. En revanche, le **hazo ampiasaina** reste très peu mentionné, avec seulement 2.9 % des ménages concernés. Ces résultats montrent que l’exploitation forestière dans cet observatoire repose essentiellement sur quelques produits largement répandus parmi les ménages exploitants.
 :::
 ::::
 
 :::: {.content-hidden when-profile="alaotra"}
 ::: obs-marovoay
-A Marovoay, le **kitay** constitue aussi le principal produit d’exploitation forestière, utilisé par 99.5 % des ménages. Le **saribao** occupe une place tout aussi importante avec 98.9 %, alors que le **hazo afok’ampy** est mentionné par 89.9 % des ménages. Le **hazo ampiasaina** demeure marginal, avec une fréquence de seulement 6.4 %. L’exploitation forestière dans cet observatoire se caractérise ainsi par une forte concentration autour des produits énergétiques et du bois de chauffage.
+A Marovoay, parmi les ménages pratiquant l’exploitation forestière, le **kitay** constitue aussi le principal produit, utilisé par 99.5 % d’entre eux. Le **saribao** occupe une place tout aussi importante avec 98.9 %, alors que le **hazo afok’ampy** est mentionné par 89.9 % de ces ménages. Le **hazo ampiasaina** demeure marginal, avec une fréquence de seulement 6.4 %. L’exploitation forestière dans cet observatoire se caractérise ainsi par une forte concentration autour des produits énergétiques et du bois de chauffage.
 :::
 ::::
 
@@ -1567,12 +1568,12 @@ produits_foret <- res_ef |>
 
 ```{r}
 #| label: fig-produits-foret
-#| fig-cap: "Principaux produits de l'exploitation forestière"
+#| fig-cap: "Principaux produits de l'exploitation forestière (% des ménages pratiquant l'exploitation forestière)"
 #| fig-width: !expr fig_w("fig-produits-foret")
 #| fig-height: !expr fig_h("fig-produits-foret")
 
 produits_foret |>
-  make_bar_obs(x = Produit, y_label = "% des ménages")
+  make_bar_obs(x = Produit, y_label = "% des ménages pratiquant l'exploitation forestière")
 ```
 
 ```{r dl_fig_produits_foret}
@@ -1588,7 +1589,7 @@ dl_fig_variants("fig_produits_foret", "08", function(d) {
     mutate(total = sum(n)) |>
     ungroup() |>
     ror_bar_grouped(x = Produit, y = n, fill = Observatory,
-                    y_label = "Nombre de ménages", direction = "horizontal",
+                    y_label = "Nombre de ménages pratiquant l'exploitation forestière", direction = "horizontal",
                     facet = FALSE, show_pct = FALSE)
 }, res_ef)
 ```
@@ -1646,13 +1647,13 @@ Le choix des espèces reflète les conditions agro-écologiques, les traditions 
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
-A Alaotra, l’élevage concerne une très grande majorité des ménages pour l’ensemble des espèces considérées. Les **kisoa** représentent l’espèce la plus fréquemment élevée avec 99.7 % des ménages pratiquants, suivis par l’**akoho** et les **omby vavy** et **omby hafa**, tous autour de 99.1 à 99.4 %. Les espèces comme les **gana**, les **gisa** et les **ondry** affichent également des proportions élevées, chacune autour de 98.5 %. Le **voron-tsiloza** et les **osy** restent aussi largement présents avec respectivement 98.2 % et 96.1 % des ménages pratiquants. En revanche, le **trondro** demeure beaucoup moins répandu, avec seulement 12.8 % des ménages concernés.
+A Alaotra, l’espèce la plus fréquemment élevée parmi les ménages pratiquant l’élevage est l’**akoho**, présente chez 69.2 % d’entre eux. Les **kisoa** arrivent ensuite avec 29.6 %, suivis des **gisa** (22.4 %) et des **gana** (16.9 %). Les bovins restent moins répandus, avec 14.8 % pour les **omby miasa**, 11.8 % pour les **omby vavy** et 7.3 % pour les **omby hafa**. Les **ondry** concernent 4.8 % des ménages pratiquants, tandis que le **voron-tsiloza** demeure marginal avec 1.2 %. Les **osy** et le **trondro** sont absents des déclarations dans cet observatoire.
 :::
 ::::
 
 :::: {.content-hidden when-profile="alaotra"}
 ::: obs-marovoay
-A Marovoay, les différentes espèces élevées présentent également des fréquences très élevées parmi les ménages pratiquants. Les **`r top_espece_a`** arrivent en tête avec 99.7 %, suivis des **kisoa**, des **omby vavy** et des **omby hafa**, tous proches de 99.5 %. Les **gana**, les **gisa**, les **ondry**, les **voron-tsiloza** et les **osy** affichent aussi des niveaux élevés, compris entre 98.7 % et 99.2 %. Le **trondro** reste l’espèce la moins répandue dans cet observatoire, avec une proportion de 23.6 % des ménages pratiquants.
+A Marovoay, l’**akoho** est également l’espèce la plus fréquemment élevée parmi les ménages pratiquants, avec 53.5 %. Les **gana** occupent la deuxième position avec 44.7 %, suivis des **omby miasa** (36.1 %) et des **kisoa** (27.3 %). Les **omby vavy** concernent 19.0 % des ménages pratiquants, tandis que les **omby hafa** représentent 12.8 % et les **ondry** 7.5 %. Les autres espèces restent marginales, notamment les **gisa** (2.4 %), les **voron-tsiloza** (2.1 %) et les **osy** (1.3 %). Le **trondro** n’est pas déclaré dans cet observatoire.
 :::
 ::::
 
@@ -1661,14 +1662,15 @@ A Marovoay, les différentes espèces élevées présentent également des fréq
 especes_elevage <- res_ele |>
   filter(ele_lig0 != "", !is.na(ele_lig0)) |>
   mutate(Espece = str_to_title(ele_lig0)) |>
-  distinct(j5, Observatory, Espece) |>
-  count(Observatory, Espece) |>
+  mutate(Present = !is.na(ele3) | !is.na(ele4)) |>
+  distinct(j5, Observatory, Espece, Present) |>
+  summarise(n = n_distinct(j5[Present]), .by = c(Observatory, Espece)) |>
   group_by(Espece) |>
   mutate(total = sum(n)) |>
   ungroup() |>
   expand_sites_for_profile() |>
   left_join(
-    res_ele |> filter(ele_lig0 != "", !is.na(ele_lig0)) |> distinct(j5, Observatory) |>
+    res_el2 |> filter(el2 == 1) |> distinct(j5, Observatory) |>
       expand_sites_for_profile() |> count(Observatory, name = "n_total"),
     by = "Observatory"
   ) |>
@@ -1682,7 +1684,7 @@ especes_elevage <- res_ele |>
 #| fig-height: !expr fig_h("fig-especes-elevage")
 
 especes_elevage |>
-  make_bar_obs(x = Espece, y_label = "% des ménages")
+  make_bar_obs(x = Espece, y_label = "% des ménages pratiquant l'élevage")
 ```
 
 ```{r dl_fig_especes_elevage}
@@ -1692,8 +1694,9 @@ dl_fig_variants("fig_especes_elevage", "08", function(d) {
   d |>
     filter(ele_lig0 != "", !is.na(ele_lig0)) |>
     mutate(Espece = str_to_title(ele_lig0)) |>
-    distinct(j5, Observatory, Espece) |>
-    count(Observatory, Espece) |>
+    mutate(Present = !is.na(ele3) | !is.na(ele4)) |>
+    distinct(j5, Observatory, Espece, Present) |>
+    summarise(n = n_distinct(j5[Present]), .by = c(Observatory, Espece)) |>
     group_by(Espece) |>
     mutate(total = sum(n)) |>
     ungroup() |>
@@ -2508,6 +2511,8 @@ dl_tbl_variants("tbl_main_oeuvre_perm", "08", function(d) {
 <!-- ::: -->
 <!-- :::: -->
 
+:::
+
 
 <!-- ```{r} -->
 <!-- #| label: tbl-cultures-quintile -->
@@ -2554,7 +2559,7 @@ dl_tbl_variants("tbl_main_oeuvre_perm", "08", function(d) {
 
 ## Évolution des indicateurs agricoles (1995–2025) {#sec-agro-multiyear}
 
-Les fichiers rizicoles (`res_r`) et d'élevage (`res_el2`) couvrent la quasi-totalité des campagnes depuis 1995. On retrace ici l'évolution de la production rizicole moyenne par ménage, du rendement (lorsque la surface est disponible) et du taux de pratique de l'élevage.
+On retrace ici l'évolution de la production rizicole moyenne par ménage, du rendement (lorsque la surface est disponible) et du taux de pratique de l'élevage.
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
@@ -2678,37 +2683,37 @@ if ("prod_moy" %in% names(agro_trends)) {
 }
 ```
 
-:::: {.content-hidden when-profile="marovoay"}
-::: obs-alaotra
-A Alaotra, le rendement rizicole moyen reste stable entre 2010 et 2014, avec une valeur constante d’environ 0.4 kg/are. Cette stabilité montre que les niveaux de production observés au cours de cette période n’ont pas connu de variation significative. En 2025, le rendement moyen atteint environ 0.8 kg/are, traduisant une progression importante de la productivité rizicole au sein de cet observatoire.
-:::
-::::
+<!-- :::: {.content-hidden when-profile="marovoay"} -->
+<!-- ::: obs-alaotra -->
+<!-- A Alaotra, le rendement rizicole moyen reste stable entre 2010 et 2014, avec une valeur constante d’environ 0.4 kg/are. Cette stabilité montre que les niveaux de production observés au cours de cette période n’ont pas connu de variation significative. En 2025, le rendement moyen atteint environ 0.8 kg/are, traduisant une progression importante de la productivité rizicole au sein de cet observatoire. -->
+<!-- ::: -->
+<!-- :::: -->
 
-:::: {.content-hidden when-profile="alaotra"}
-::: obs-marovoay
-A Marovoay, le rendement rizicole moyen se maintient autour de 0.5 kg/are entre 2010 et 2014. Cette évolution régulière indique une continuité des performances rizicoles durant plusieurs années. En 2025, le rendement reste proche de 0.5 kg/are, ce qui reflète une stabilité de la production rizicole au niveau de cet observatoire.
-:::
-::::
+<!-- :::: {.content-hidden when-profile="alaotra"} -->
+<!-- ::: obs-marovoay -->
+<!-- A Marovoay, le rendement rizicole moyen se maintient autour de 0.5 kg/are entre 2010 et 2014. Cette évolution régulière indique une continuité des performances rizicoles durant plusieurs années. En 2025, le rendement reste proche de 0.5 kg/are, ce qui reflète une stabilité de la production rizicole au niveau de cet observatoire. -->
+<!-- ::: -->
+<!-- :::: -->
 
 ```{r fig_agro_rdt_riz}
-#| fig-cap: "Évolution du rendement rizicole moyen (kg/are) — années avec données de surface"
-#| fig-width: !expr fig_w("fig_agro_rdt_riz")
-#| fig-height: !expr fig_h("fig_agro_rdt_riz")
+# #| fig-cap: "Évolution du rendement rizicole moyen (kg/are) — années avec données de surface"
+# #| fig-width: !expr fig_w("fig_agro_rdt_riz")
+# #| fig-height: !expr fig_h("fig_agro_rdt_riz")
 
-if ("rdt_moy" %in% names(agro_trends)) {
-  rdt_data <- agro_trends |> filter(!is.na(rdt_moy))
-  if (nrow(rdt_data) > 1) {
-    rdt_solid <- rdt_data |> filter(year <= 2015)
-    rdt_gap   <- rdt_data |> filter(year %in% c(2015, 2025))
-    ggplot(mapping = aes(x = year, y = rdt_moy, colour = Observatory)) +
-      geom_line(data = rdt_solid, linewidth = 0.8) +
-      geom_line(data = rdt_gap, linewidth = 0.8, linetype = "31") +
-      geom_point(data = rdt_data, size = 2) +
-      scale_x_continuous(breaks = seq(1995, 2025, 5)) +
-      labs(x = NULL, y = "Rendement moyen (kg/are)", colour = "Observatoire") +
-      theme_ror()
-  }
-}
+# if ("rdt_moy" %in% names(agro_trends)) {
+#   rdt_data <- agro_trends |> filter(!is.na(rdt_moy))
+#   if (nrow(rdt_data) > 1) {
+#     rdt_solid <- rdt_data |> filter(year <= 2015)
+#     rdt_gap   <- rdt_data |> filter(year %in% c(2015, 2025))
+#     ggplot(mapping = aes(x = year, y = rdt_moy, colour = Observatory)) +
+#       geom_line(data = rdt_solid, linewidth = 0.8) +
+#       geom_line(data = rdt_gap, linewidth = 0.8, linetype = "31") +
+#       geom_point(data = rdt_data, size = 2) +
+#       scale_x_continuous(breaks = seq(1995, 2025, 5)) +
+#       labs(x = NULL, y = "Rendement moyen (kg/are)", colour = "Observatoire") +
+#       theme_ror()
+#   }
+# }
 ```
 
 :::: {.content-hidden when-profile="marovoay"}
@@ -2747,18 +2752,18 @@ Les séries longues mettent en évidence des tendances structurelles : évolutio
 
 :::
 
-::: {.content-visible when-profile="consolidated"}
-::: {.obs-technical}
-
+<!-- ::: {.content-visible when-profile="consolidated"} -->
+<!-- ::: {.obs-technical} -->
+<!-- 
 ## Pistes d'analyse complémentaires {#sec-pistes-agro}
 
 Les données collectées offrent des possibilités d'analyse supplémentaires qui n'ont pas été développées dans ce chapitre, faute de certitude sur leur pertinence ou par manque de recul sur la qualité des variables concernées. On peut notamment mentionner :
 
--   **Détail des ventes de riz** (`res_dc20`) : les variables `vs1` à `vs3` semblent décomposent les usages du riz vendu (semence, consommation, paiement de main d'œuvre), mais leur codage est un peu complexe/à préciser.
--   **Forme des produits vendus** (cultures non rizicoles, `c37`) : la variable indique si le produit est vendu brut, transformé ou autre — potentiellement utile pour un tableau croisé avec les types de culture.
--   **Coûts détaillés de la main d'œuvre par opération rizicole** (`res_mor`, `mor12`) : le salaire total par opération (Asa tany, Mijinja, Manetsa) pourrait être présenté sous forme de tableau comparatif, mais les valeurs présentent une forte dispersion.
--   **Pratiques de nourriture de la main d'oeuvre** (`res_mor`, `mor3`) : la variable indique si les salariés ou l'entraide sont nourris pendant le travail.
--   **Effectifs et variations du cheptel** (`res_ele`) : les variables `ele1` (effectif début), `ele2` (naissances), `ele3` (achats), `ele_i1` (ventes), `ele_p3` (pertes) permettraient de reconstituer un bilan démographique du cheptel par espèce (difficile à exploiter à première vue).
+-   **Détail des ventes de riz** : les variables décomposent les usages du riz vendu (semence, consommation, paiement de main d'œuvre), mais leur codage est un peu complexe/à préciser.
+-   **Forme des produits vendus** (cultures non rizicoles) : la variable indique si le produit est vendu brut, transformé ou autre — potentiellement utile pour un tableau croisé avec les types de culture.
+-   **Coûts détaillés de la main d'œuvre par opération rizicole** : le salaire total par opération (Asa tany, Mijinja, Manetsa) pourrait être présenté sous forme de tableau comparatif, mais les valeurs présentent une forte dispersion.
+-   **Pratiques de nourriture de la main d'oeuvre** : la variable indique si les salariés ou l'entraide sont nourris pendant le travail.
+-   **Effectifs et variations du cheptel** : les variables permettraient de reconstituer un bilan démographique du cheptel par espèce (difficile à exploiter à première vue). -->
 
-:::
-:::
+<!-- ::: -->
+<!-- ::: -->

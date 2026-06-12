@@ -285,13 +285,7 @@ res_m_a <- res_m_a |>
   left_join(res_deb |> select(j5, Observatory), by = "j5")
 ```
 
-<!-- Au total, `r nrow(res_deb)` ménages ont été enquêtés : `r sum(res_deb$j0 == "3")` à Marovoay et `r sum(res_deb$j0 == "21")` à Alaotra.  -->
-
-L'échantillon est équilibré en nombre de ménages entre les deux observatoires. 
-
-- Alaotra : 507 ménages enquêtés pour 1 975 individus.
-
-- Marovoay : 519 ménages enquêtés pour 2 297 individus.
+Au total, 507 ménages enquêtés à Alaotra, pour 1 975 individus. A Marovoay, 519 ménages ont été enquêtés pour 2 297 individus.
 
 Voir @tbl-men-obs.
 
@@ -465,47 +459,39 @@ gt(tab_ham, groupname_col = "Observatory") |>
 
 ## Déroulement de l'enquête
 
-Le déroulement de l'enquête s'articule autour de la période de collecte des données et de la composition des équipes mobilisées.
-Les entretiens se sont déroulés entre début octobre et mi-novembre 2025.
 
-<!-- ### Période de collecte -->
-
-<!-- Les entretiens se sont déroulés entre début octobre et mi-novembre 2025. Le @fig-chronogramme présente l'évolution cumulée du nombre d'entretiens réalisés à partir du 1^er^ octobre 2025. -->
-
-<!-- ::: callout-note -->
-<!-- Une erreur de saisie de la date d'interview a été identifiée pour un entretien à Marovoay (03/09/2025 au lieu de 03/10/2025). Cette date a été corrigée dans les données avant analyse. -->
-<!-- ::: -->
+Les entretiens se sont déroulés entre début octobre et mi-novembre 2025. Le @fig-chronogramme présente l'évolution cumulée du nombre d'entretiens réalisés à partir du 1^er^ octobre 2025.
 
 ```{r}
-# #| fig-cap: "Fréquences cumulées des entretiens par observatoire (à partir du 1er octobre 2025)"
-# #| fig-width: !expr fig_w("fig-chronogramme")
-# #| fig-height: !expr fig_h("fig-chronogramme")
-# #| label: fig-chronogramme
-# 
-# chrono <- res_deb |>
-#   mutate(
-#     j14_str = sprintf("%08d", as.integer(j14)),
-#     date_interview = dmy(j14_str)
-#   ) |>
-#   filter(!is.na(date_interview)) |>
-#   count(Observatory, date_interview) |>
-#   arrange(Observatory, date_interview) |>
-#   mutate(cumul = cumsum(n), .by = Observatory)
-# 
-# ggplot(chrono, aes(x = date_interview, y = cumul, color = Observatory)) +
-#   geom_line(linewidth = 0.8) +
-#   geom_point(size = 1.5) +
-#   coord_cartesian(xlim = c(as.Date("2025-10-01"), NA)) +
-#   scale_x_date(
-#     date_breaks = "1 week", date_labels = "%d %b",
-#     expand = expansion(mult = c(0.01, 0.01))
-#   ) +
-#   labs(x = NULL, y = "Nombre cumulé d'entretiens", color = "Observatoire") +
-#   theme_ror() +
-#   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+#| fig-cap: "Fréquences cumulées des entretiens par observatoire (à partir du 1er octobre 2025)"
+#| fig-width: !expr fig_w("fig-chronogramme")
+#| fig-height: !expr fig_h("fig-chronogramme")
+#| label: fig-chronogramme
+
+chrono <- res_deb |>
+  mutate(
+    j14_str = sprintf("%08d", as.integer(j14)),
+    date_interview = dmy(j14_str)
+  ) |>
+  filter(!is.na(date_interview)) |>
+  count(Observatory, date_interview) |>
+  arrange(Observatory, date_interview) |>
+  mutate(cumul = cumsum(n), .by = Observatory)
+
+ggplot(chrono, aes(x = date_interview, y = cumul, color = Observatory)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 1.5) +
+  coord_cartesian(xlim = c(as.Date("2025-10-01"), NA)) +
+  scale_x_date(
+    date_breaks = "1 week", date_labels = "%d %b",
+    expand = expansion(mult = c(0.01, 0.01))
+  ) +
+  labs(x = NULL, y = "Nombre cumulé d'entretiens", color = "Observatoire") +
+  theme_ror() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-<!-- Une cohérence temporelle des données recueillies est observée pour les deux observatoires. Les courbes sont presque parfaitement linéaires et superposées à partir du 13 octobre 2025. Les deux sites atteignent leur cible respective (507 ménages pour Alaotra et 519 pour Marovoay) de manière quasi simultanée. Les enquêteurs ont réalisé un nombre de questionnaires quotidien très stable sans interruption majeure ni ralentissement dû à des problèmes techniques ou climatiques durant cette phase principale d'octobre. -->
+Les enquêteurs ont réalisé un nombre de questionnaires quotidien très stable sans interruption majeure ni ralentissement.
 
 ```{r}
 #| tbl-cap: "Période de collecte par observatoire"
@@ -535,82 +521,4 @@ res_deb |>
   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 ```
 
-<!-- La durée effective de collecte est quasiment identique entre les deux sites.  -->
-- À l’Alaotra, l’enquête a duré 45 jours, du 1er octobre au 14 novembre 2025, pour 507 ménages.
-- À Marovoay, elle a duré 42 jours, s'achevant le 10 novembre 2025 pour 519 ménages.
-
 L'enquête a mobilisé 20 enquêteurs (10 par observatoire), encadrés par 6 superviseurs (3 par observatoire). La saisie des questionnaires a été assurée par 4 opérateurs.
-
-<!-- :::: {.content-visible when-profile="consolidated"} -->
-<!-- ::: obs-technical -->
-<!-- ### Équipe d'enquête -->
-
-<!-- L'enquête a mobilisé 20 enquêteurs (10 par observatoire), encadrés par 6 superviseurs (3 par observatoire). La saisie des questionnaires a été assurée par 4 opérateurs. Le @fig-enqueteurs présente le nombre de questionnaires réalisés par chaque enquêteur (identifié par un code anonyme). La progression constante témoigne d'un rythme de travail homogène des équipes sur le terrain. Il n'y a pas eu d'interruption majeure ou de ralentissement logistique pendant la phase principale de collecte. -->
-
-```{r enq_data}
-# enq <- res_deb |>
-# mutate(Enquêteur = paste0("E", sprintf("%02d", j1))) |>
-# count(Observatory, Enquêteur)
-```
-
-```{r}
-# #| fig-cap: "Nombre de questionnaires par enquêteur et observatoire"
-# #| fig-width: !expr fig_w("fig-enqueteurs") 
-# #| fig-height: !expr fig_h("fig-enqueteurs")
-# #| label: fig-enqueteurs
-# enq |> 
-# ror_bar_grouped(x = Enquêteur, y = n, fill = Observatory, 
-#                     y_label = "Questionnaires réalisés", 
-#                    direction = "horizontal", facet = FALSE, 
-#                    show_pct = FALSE) -->
-```
-
-<!-- La majorité des enquêteurs a réalisé entre 45 et 55 questionnaires chacun. Cette répartition équilibrée de la charge de travail est un gage de qualité. Elle limite les risques de biais systématiques qu'un seul enquêteur pourrait introduire s'il traitait une part disproportionnée de l'échantillon. Selon Table 1.5, Le dispositif de contrôle est robuste avec un ratio moyen d'un superviseur pour environ 170 à 210 ménages. Ce taux d'encadrement élevé permet une vérification rigoureuse des questionnaires dès leur sortie du terrain. Les questionnaires ont été contrôlés par 6 superviseurs (S01 à S03 par site). -->
-
-<!-- :::: {.content-hidden when-profile="marovoay"} -->
-<!-- ::: obs-alaotra -->
-<!-- À l'Alaotra, les trois superviseurs ont une charge égale (166 à 172 questionnaires chacun). -->
-<!-- ::: -->
-<!-- :::: -->
-
-<!-- :::: {.content-hidden when-profile="alaotra"} -->
-<!-- ::: obs-marovoay -->
-<!-- À Marovoay, la supervision est plus concentrée sur S02 (217) et S03 (216), tandis que S01 n'en a supervisé que 86. -->
-<!-- ::: -->
-<!-- :::: -->
-
-
-```{r}
-# #| tbl-cap: "Nombre de questionnaires supervisés par superviseur" 
-# #| label: tbl-superviseurs 
-# 
-# res_deb |> 
-# mutate(Superviseur = paste0("S", sprintf("%02d", j3))) |> 
-# count(Observatory, Superviseur) |> 
-# pivot_wider(names_from = Observatory, values_from = n, values_fill = 0) |> 
-#    gt() |> 
-#    tab_style( 
-#      style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")), 
-#      locations = cells_column_labels(columns = everything()) -->
-#    ) |> 
-#    tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**")) 
-```
-
-<!-- La répartition est extrêmement homogène, chaque opérateur ayant traité entre 252 et 260 questionnaires. Cette organisation standardisée garantit que le traitement informatique des 1 026 ménages a été effectué de manière fluide et rapide après la phase de collecte. Quatre opérateurs (OP01 à OP04) ont assuré la saisie informatique. (Table 1.6) -->
-
-```{r}
-# #| tbl-cap: "Nombre de questionnaires saisis par opérateur de saisie" 
-#  #| label: tbl-saisie 
-# 
-#  res_deb |> 
-#    mutate(Opérateur = paste0("OP", sprintf("%02d", j2))) |> 
-#    count(Opérateur, name = "Questionnaires") |> 
-#    gt() |> 
-#    tab_style( 
-#      style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")), 
-#      locations = cells_column_labels(columns = everything()) 
-#    ) |> 
-#    tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**")) 
-```
-<!-- ::: -->
-<!-- :::: -->
