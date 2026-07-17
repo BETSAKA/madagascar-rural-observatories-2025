@@ -874,9 +874,8 @@ Afin de mieux apprécier le niveau de vie, le revenu total est également rappor
 
 ::: {.content-visible when-profile="consolidated"}
 Pour les deux observatoires, le fait que la moyenne soit nettement supérieure à la médiane (environ 66 % de plus à Marovoay et 67 % à l'Alaotra) confirme qu'une minorité de ménages disposant de revenus très élevés tire la moyenne vers le haut, illustrant les inégalités de richesse dans ces bassins rizicoles. Aussi, le revenu par équivalent est supérieur au revenu par tête, ce qui montre que l'ajustement pour la composition du ménage améliore le niveau de vie économique estimé des membres du ménage.
-L'Alaotra présente des niveaux de vie nettement supérieurs à ceux de Marovoay, quelle que soit l'unité de mesure choisie
-.
-.
+L'Alaotra présente des niveaux de vie nettement supérieurs à ceux de Marovoay, quelle que soit l'unité de mesure choisie.
+
 :::
 
 :::: {.content-hidden when-profile="marovoay"}
@@ -913,39 +912,39 @@ inc |>
   style_table()
 ```
 
-### Détail des revenus par ménage
+<!-- ### Détail des revenus par ménage -->
 
 ```{r t_revtot_details}
-inc |>
-  summarise(
-    `Nb ménages` = n(),
-    Moyenne = round(mean(revtot, na.rm = TRUE)),
-    Médiane = round(median(revtot, na.rm = TRUE)),
-    `Écart-type` = round(sd(revtot, na.rm = TRUE)),
-    # Minimum = round(min(revtot, na.rm = TRUE)),
-    # Maximum = round(max(revtot, na.rm = TRUE)),
-    .by = Observatory
-  ) |>
-  gt() |>
-  tab_header(
-    title = "Statistiques descriptives du revenu total par ménage",
-    subtitle = "Campagne 2025"
-  ) |>
-  fmt_number(columns = Moyenne: `Écart-type`, use_seps = TRUE, decimals = 0) |>
-  style_table()
+# inc |>
+#   summarise(
+#     `Nb ménages` = n(),
+#     Moyenne = round(mean(revtot, na.rm = TRUE)),
+#     Médiane = round(median(revtot, na.rm = TRUE)),
+#     `Écart-type` = round(sd(revtot, na.rm = TRUE)),
+#     # Minimum = round(min(revtot, na.rm = TRUE)),
+#     # Maximum = round(max(revtot, na.rm = TRUE)),
+#     .by = Observatory
+#   ) |>
+#   gt() |>
+#   tab_header(
+#     title = "Statistiques descriptives du revenu total par ménage",
+#     subtitle = "Campagne 2025"
+#   ) |>
+#   fmt_number(columns = Moyenne: `Écart-type`, use_seps = TRUE, decimals = 0) |>
+#   style_table()
 ```
 
 ```{r dl_revtot}
-#| echo: false
-#| results: asis
-dl_tbl_variants("tbl_revtot", "05", function(d) {
-  d |> summarise(`Nb menages` = n(),
-    Moyenne = round(mean(revtot, na.rm = TRUE)),
-    Mediane = round(median(revtot, na.rm = TRUE)),
-    `Ecart-type` = round(sd(revtot, na.rm = TRUE)),
-    .by = Observatory) |>
-    rename(Site = Observatory)
-}, inc)
+# #| echo: false
+# #| results: asis
+# dl_tbl_variants("tbl_revtot", "05", function(d) {
+#   d |> summarise(`Nb menages` = n(),
+#     Moyenne = round(mean(revtot, na.rm = TRUE)),
+#     Mediane = round(median(revtot, na.rm = TRUE)),
+#     `Ecart-type` = round(sd(revtot, na.rm = TRUE)),
+#     .by = Observatory) |>
+#     rename(Site = Observatory)
+# }, inc)
 ```
 
 ### Decomposition du revenu courant
@@ -954,13 +953,13 @@ La décomposition du revenu courant en ses sept composantes met en lumière la s
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
-A Alaotra, les revenus nets rizicoles constituent la principale composante du revenu courant moyen par ménage avec 38.0 % du total, soit 1,654,368 Ar/an. Les revenus indépendants arrivent en deuxième position avec 24.0 %, représentant 1,043,037 Ar/an. Les salaires agricoles occupent la troisième place avec 19.8 %, soit 860,748 Ar/an.L’élevage contribue à hauteur de 7.0 % du revenu courant moyen, correspondant à 302,73 5 Ar/an. Les salaires non agricoles représentent 6.8 %, soit 297,052 Ar/an. Les revenus nets issus des autres cultures participent pour 4.4 %, équivalant à 191,317 Ar/an.  Le revenu courant moyen total par ménage dans l’observatoire d’Alaotra est de 4,349,257 Ar/an.
+A Alaotra, les revenus nets rizicoles constituent la principale composante du revenu courant moyen par ménage avec 38 % du total, soit 1 654 368 Ar/an. Les revenus indépendants arrivent en deuxième position avec 24.0 %, représentant 1 043 037 Ar/an. Les salaires agricoles occupent la troisième place avec 19.8 %, soit 860 748 Ar/an.L’élevage contribue à hauteur de 7% du revenu courant moyen, correspondant à 302 735 Ar/an. Les salaires non agricoles représentent 6.8 %, soit 297 052 Ar/an. Les revenus nets issus des autres cultures participent pour 4.4 %, équivalant à 191 317 Ar/an.  Le revenu courant moyen total par ménage dans l’observatoire d’Alaotra est de 4 349 257 Ar/an.
 :::
 ::::
 
 :::: {.content-hidden when-profile="alaotra"}
 ::: obs-marovoay
-A Marovoay, les revenus nets rizicoles représentent la plus grande part du revenu courant moyen par ménage avec 39.2 % du total, soit 1,287,310 Ar/an. Les revenus indépendants se placent en deuxième position avec 23.2 %, correspondant à 759,874 Ar/an. Les salaires agricoles arrivent ensuite avec 18.4 %, soit 604,846 Ar/an. L’élevage contribue pour 7.7 % du revenu courant moyen, représentant 253,697 Ar/an. Les salaires non agricoles participent à hauteur de 6.2 %, soit 204,131 Ar/an. Les revenus nets des autres cultures représentent 5.2 %, correspondant à 170,901 Ar/an. Le revenu courant moyen total par ménage dans l’observatoire de Marovoay est de 3,280,758 Ar/an.
+A Marovoay, les revenus nets rizicoles représentent la plus grande part du revenu courant moyen par ménage avec 39.2 % du total, soit 1 287 310 Ar/an. Les revenus indépendants se placent en deuxième position avec 23.2 %, correspondant à 759 874 Ar/an. Les salaires agricoles arrivent ensuite avec 18.4 %, soit 604 846 Ar/an. L’élevage contribue pour 7.7 % du revenu courant moyen, représentant 253 697 Ar/an. Les salaires non agricoles participent à hauteur de 6.2 %, soit 204 131 Ar/an. Les revenus nets des autres cultures représentent 5.2 %, correspondant à 170 901 Ar/an. Le revenu courant moyen total par ménage dans l’observatoire de Marovoay est de 3 280 758 Ar/an.
 :::
 ::::
 
