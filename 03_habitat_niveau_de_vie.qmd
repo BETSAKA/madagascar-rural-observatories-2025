@@ -1,42 +1,21 @@
-### Détail des revenus par ménage
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
 
-:::: {.content-hidden when-profile="marovoay"}
-::: obs-alaotra
-À Alaotra, le revenu annuel moyen par ménage est estimé à 4 488 029 Ar, tandis que le revenu médian s'élève à 2 692 468 Ar. La distribution des revenus est asymétrique avec un nombre limité de ménages disposant de revenus élevés. Ainsi, la moitié des ménages de l'observatoire perçoivent un revenu annuel inférieur ou égal à 2 692 468 Ar, tandis que l'autre moitié bénéficie d'un revenu supérieur à cette valeur.
+# Habitat et niveau de vie
+
+Cette section decrit les conditions d'habitat, les equipements des menages, leurs transferts et revenus.
+
+::: {.callout-warning}
+## Travail de vérification en cours
+Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales.
 :::
-::::
 
-:::: {.content-hidden when-profile="alaotra"}
-::: obs-marovoay
-À Marovoay, le revenu annuel moyen par ménage est de 3 480 646 Ar, alors que le revenu médian est de 2 094 749 Ar. La moyenne est supérieure à la médiane, ce qui traduit une distribution inégale des revenus caractérisée par la présence de quelques ménages aux revenus relativement élevés. En conséquence, 50 % des ménages ont un revenu annuel inférieur ou égal à 2 094 749 Ar, tandis que les 50 % restants disposent d'un revenu supérieur à ce montant.
-:::
-::::
-
-
-```{r t_revtot_details1}
-inc |>
-  summarise(
-    `Nb ménages` = n(),
-    Moyenne = round(mean(revtot, na.rm = TRUE)),
-    Médiane = round(median(revtot, na.rm = TRUE)),
-    `Écart-type` = round(sd(revtot, na.rm = TRUE)),
-    Minimum = round(min(revtot, na.rm = TRUE)),
-    Maximum = round(max(revtot, na.rm = TRUE)),
-    .by = Observatory
-  ) |>
-  dplyr::select(-dplyr::any_of(c("Minimum", "Maximum"))) |>
-  gt() |>
-  tab_header(
-    title = "Statistiques descriptives du revenu total par ménage",
-    subtitle = "Campagne 2025"
-  ) |>
-  fmt_number(columns = c(Moyenne, Médiane, `Écart-type`), use_seps = TRUE, decimals = 0) |>
-  style_table()
-```
-cart-type"), use_seps = TRUE, decimals = 0) |>
-  style_table()
-```
-# ...existing code...bénéficient de la relative prospérité du premier bassin rizicole du pays. L'accès à l'eau est facilité par la proximité du lac et du réseau d'irrigation, mais la qualité de l'eau potable reste un enjeu sanitaire. Les ménages des fokontany proches des périmètres irrigués (Avaradrano, Feramanga Atsimo, Mangabe) disposent en moyenne d'un meilleur équipement agricole que ceux des zones périphériques. La possession de biens de confort courants y est plus répandue que dans d'autres observatoires ruraux de Madagascar.
+::: {.content-hidden when-profile="marovoay"}
+::: {.obs-alaotra}
+Dans l'Alaotra, les conditions d'habitat bénéficient de la relative prospérité du premier bassin rizicole du pays. L'accès à l'eau est facilité par la proximité du lac et du réseau d'irrigation, mais la qualité de l'eau potable reste un enjeu sanitaire. Les ménages des fokontany proches des périmètres irrigués (Avaradrano, Feramanga Atsimo, Mangabe) disposent en moyenne d'un meilleur équipement agricole que ceux des zones périphériques. La possession de biens de confort courants y est plus répandue que dans d'autres observatoires ruraux de Madagascar.
 :::
 :::
 
@@ -936,7 +915,7 @@ inc |>
 
 ### Détail des revenus par ménage
 
-```{r t_revtot_details2}
+```{r t_revtot_details}
 inc |>
   summarise(
     `Nb ménages` = n(),
