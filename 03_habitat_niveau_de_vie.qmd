@@ -875,7 +875,7 @@ Afin de mieux apprécier le niveau de vie, le revenu total est également rappor
 ::: {.content-visible when-profile="consolidated"}
 Pour les deux observatoires, le fait que la moyenne soit nettement supérieure à la médiane (environ 66 % de plus à Marovoay et 67 % à l'Alaotra) confirme qu'une minorité de ménages disposant de revenus très élevés tire la moyenne vers le haut, illustrant les inégalités de richesse dans ces bassins rizicoles. Aussi, le revenu par équivalent est supérieur au revenu par tête, ce qui montre que l'ajustement pour la composition du ménage améliore le niveau de vie économique estimé des membres du ménage.
 L'Alaotra présente des niveaux de vie nettement supérieurs à ceux de Marovoay, quelle que soit l'unité de mesure choisie
-
+.
 .
 :::
 
@@ -890,7 +890,7 @@ En tenant compte de la taille et de la composition des ménages selon l'échelle
 ::: obs-marovoay
 À Marovoay, le revenu annuel moyen par ménage est de 3 480 646 Ar et la médiane est de 2 094 749 Ar. L’écart-type est de 5 475 598 Ar indiquant une variation importante des revenus au sein des ménages enquêtés.
 Chaque individu dispose en moyenne d'un revenu annuel de 870.716 Ar, soit environ 72.560 Ar par mois.
-Après ajustement selon l'échelle d'équivalence de l'OCDE modifiée, le revenu annuel moyen atteint 1.473.963 Ar par unité de consommation, soit environ 122.830 Ar par mois 
+Après ajustement selon l'échelle d'équivalence de l'OCDE modifiée, le revenu annuel moyen atteint 1.473.963 Ar par unité de consommation, soit environ 122.830 Ar par mois. 
 :::
 ::::
 
@@ -922,8 +922,8 @@ inc |>
     Moyenne = round(mean(revtot, na.rm = TRUE)),
     Médiane = round(median(revtot, na.rm = TRUE)),
     `Écart-type` = round(sd(revtot, na.rm = TRUE)),
-    Minimum = round(min(revtot, na.rm = TRUE)),
-    Maximum = round(max(revtot, na.rm = TRUE)),
+    # Minimum = round(min(revtot, na.rm = TRUE)),
+    # Maximum = round(max(revtot, na.rm = TRUE)),
     .by = Observatory
   ) |>
   gt() |>
@@ -931,7 +931,7 @@ inc |>
     title = "Statistiques descriptives du revenu total par ménage",
     subtitle = "Campagne 2025"
   ) |>
-  fmt_number(columns = Moyenne:Maximum, use_seps = TRUE, decimals = 0) |>
+  fmt_number(columns = Moyenne: `Écart-type`, use_seps = TRUE, decimals = 0) |>
   style_table()
 ```
 
