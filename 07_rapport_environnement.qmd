@@ -400,24 +400,24 @@ menaces <- menace_items |>
 resps <- resp_items |>
   pmap_dfr(\(var, label) pct_oui(op_menace, var, label))
 
-bind_rows(
-  menace_global |> mutate(Section = "Perception globale"),
-  menaces |> mutate(Section = "Principales menaces (parmi ceux qui déclarent menacé)"),
-  resps |> mutate(Section = "Principaux responsables")
-) |>
-  select(Section, Item, any_of(c("Alaotra", "Marovoay"))) |>
-  gt(groupname_col = "Section") |>
-  safe_cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
-  fmt_number(columns = any_of(c("Alaotra", "Marovoay")), decimals = 0, pattern = "{x} %") |>
-  tab_style(
-    style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
-    locations = cells_column_labels(columns = everything())
-  ) |>
-  tab_style(
-    style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
-    locations = cells_row_groups()
-  ) |>
-  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+# bind_rows(
+#   menace_global |> mutate(Section = "Perception globale"),
+#   menaces |> mutate(Section = "Principales menaces (parmi ceux qui déclarent menacé)"),
+#   resps |> mutate(Section = "Principaux responsables")
+# ) |>
+#   select(Section, Item, any_of(c("Alaotra", "Marovoay"))) |>
+#   gt(groupname_col = "Section") |>
+#   safe_cols_label(Item = "", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
+#   fmt_number(columns = any_of(c("Alaotra", "Marovoay")), decimals = 0, pattern = "{x} %") |>
+#   tab_style(
+#     style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
+#     locations = cells_column_labels(columns = everything())
+#   ) |>
+#   tab_style(
+#     style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
+#     locations = cells_row_groups()
+#   ) |>
+#   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 ```
 
 ```{r fig_menaces}
