@@ -6,11 +6,11 @@ editor_options:
 
 # Description de l'enquête
 
-::: callout-warning
-## Travail de vérification en cours
+<!-- ::: callout-warning -->
+<!-- ## Travail de vérification en cours -->
 
-Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales.
-:::
+<!-- Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales. -->
+<!-- ::: -->
 
 ```{r setup_desc}
 #| include: false
@@ -39,13 +39,13 @@ Deux OR font l'objet de cette campagne d'enquête en 2025 :
 
 :::: {.content-hidden when-profile="alaotra"}
 ::: obs-marovoay
-- **Marovoay** , situé dans la région Boeny, dans le district de Marovoay. Marovoay constitue le deuxième pôle rizicole du pays, avec une production reposant sur l'irrigation par les eaux du fleuve Betsiboka. L'observatoire de Marovoay est situé dans la plaine alluviale du fleuve Betsiboka, au nord-ouest de Madagascar. La zone d'enquête s'organise autour de quatre fokontany — Ampijoroa et Maroala sur la rive gauche, Bepako et Madiromiongana sur la rive droite — séparés par le fleuve. La proximité du Parc national d'Ankarafantsika, dont les limites ont été étendues en 2002, confère à cette zone un intérêt particulier pour l'étude des interactions entre conservation et développement rural. L'économie locale repose principalement sur la riziculture irriguée, complétée par l'élevage bovin et les cultures de rente.
+- **Marovoay** constitue le deuxième pôle rizicole du pays, avec une production reposant sur l'irrigation par les eaux du fleuve Betsiboka. L'observatoire de Marovoay est situé dans la plaine alluviale du fleuve Betsiboka, dans le district de Marovoay de la région Boeny, au nord-ouest de Madagascar. La zone d'enquête s'organise autour de quatre fokontany — Ampijoroa et Maroala sur la rive gauche, Bepako et Madiromiongana sur la rive droite — séparés par le fleuve. La proximité du Parc national d'Ankarafantsika, dont les limites ont été étendues en 2002, confère à cette zone un intérêt particulier pour l'étude des interactions entre conservation et développement rural. L'économie locale repose principalement sur la riziculture irriguée, complétée par l'élevage bovin et les cultures de rente.
 :::
 ::::
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
-- **Alaotra**, situé dans la région Alaotra-Mangoro, dans les districts d'Ambatondrazaka et d'Amparafaravola. L'Alaotra est le premier grenier à riz de Madagascar, caractérisé par de vastes plaines irriguées et des périmètres aménagés. L'observatoire de l'Alaotra se situe dans la cuvette du lac Alaotra, le plus grand lac de Madagascar, au centre-est de l'île. La zone d'enquête couvre sept fokontany répartis dans les districts d'Ambatondrazaka et d'Amparafaravola : Avaradrano, Feramanga Atsimo et Mangabe au sud du lac, Analamiranga, Maritampona, Ambohidrony et Ambatomanga à l'ouest. Le lac Alaotra est une nouvelle aire protégée établie temporairement en 2007, puis définitivement en 2015. Il est entouré de marais et de zones humides qui abritent des espèces endémiques. Premier bassin rizicole du pays, la région est aussi caractérisée par une pression foncière croissante et une dynamique de déforestation des bassins versants.
+- **Alaotra** est le premier grenier à riz de Madagascar caractérisé par de vastes plaines irriguées et des périmètres aménagés. L'observatoire de l'Alaotra se situe dans la cuvette du lac Alaotra, le plus grand lac de Madagascar, dans la région Alaotra-Mangoro, dans les districts d'Ambatondrazaka et d'Amparafaravola, au centre-est de l'île. La zone d'enquête couvre sept fokontany répartis dans les districts d'Ambatondrazaka et d'Amparafaravola : Avaradrano, Feramanga Atsimo et Mangabe au sud du lac, Analamiranga, Maritampona, Ambohidrony et Ambatomanga à l'ouest. Le lac Alaotra est une nouvelle aire protégée établie temporairement en 2007, puis définitivement en 2015. Il est entouré de marais et de zones humides qui abritent des espèces endémiques. Premier bassin rizicole du pays, la région est aussi caractérisée par une pression foncière croissante et une dynamique de déforestation des bassins versants.
 :::
 ::::
 
@@ -71,7 +71,8 @@ La période de référence couvre les douze mois précédant l'interview, soit d
 
 :::: {.content-visible when-profile="consolidated"}
 ::: obs-technical
-*Note méthodologique.* Après plus de dix ans d'interruption (la dernière campagne régulière date de 2014), la reconstitution du panel de ménages constitue un défi majeur. Le suivi longitudinal est affecté par l'attrition (décès, migration, éclatement des ménages). Ce qui a conduit à compléter le panel historique par un nouveau tirage aléatoire. Les comparaisons inter-temporelles doivent donc être interprétées avec prudence, en tenant compte de ce renouvellement partiel de l'échantillon. Un chapitre d'approfondissement est consacré à cette question, voir @sec-representativite.
+**Note méthodologique.**  Après plus de dix ans d'interruption (la dernière campagne régulière date de 2014), la reconstitution du panel de ménages constitue un défi majeur. Le suivi longitudinal est affecté par l'attrition (décès, migration, éclatement des ménages). Ce qui a conduit à compléter le panel historique par un nouveau tirage aléatoire. Les comparaisons inter-temporelles doivent donc être interprétées avec prudence, en tenant compte de ce renouvellement partiel de l'échantillon. Un chapitre d'approfondissement est consacré à cette question. 
+<!-- voir @sec-representativite. -->
 :::
 ::::
 
@@ -280,18 +281,18 @@ res_deb <- res_deb |>
 res_m_a <- res_m_a |>
   left_join(res_deb |> select(j5, Observatory), by = "j5")
 ```
+
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
 A Alaotra, 507 ménages sont enquêtés pour 1 975 individus.
 :::
 ::::
- :::: {.content-hidden when-profile="alaotra"}
+
+:::: {.content-hidden when-profile="alaotra"}
 ::: obs-marovoay
 A Marovoay, 519 ménages ont été enquêtés pour 2 297 individus.
 :::
 ::::
- 
- 
 
 Voir @tbl-men-obs.
 
