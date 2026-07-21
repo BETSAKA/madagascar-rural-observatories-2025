@@ -112,13 +112,13 @@ La période de soudure désigne les mois durant lesquels les stocks alimentaires
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, La soudure dure en moyenne `r soud_moy_a` mois (médiane : `r soud_med_a`).
+Dans l'Alaotra, la soudure dure en moyenne `r soud_moy_a` mois (médiane : `r soud_med_a`).
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, La soudure dure en moyenne `r soud_moy_m` mois (médiane : `r soud_med_m`).
+A Marovoay, la soudure dure en moyenne `r soud_moy_m` mois (médiane : `r soud_med_m`).
 :::
 :::
 
@@ -143,11 +143,11 @@ soudure_stats <- res_sa %>%
   group_by(Observatory) %>%
   summarise(
     `Nombre de ménages` = n(),
-    Minimum = min(sal2d, na.rm = TRUE),
+    # Minimum = min(sal2d, na.rm = TRUE),
     Médiane = median(sal2d, na.rm = TRUE),
     Moyenne = round(mean(sal2d, na.rm = TRUE), 1),
-    Maximum = max(sal2d, na.rm = TRUE),
-    `Écart-type` = round(sd(sal2d, na.rm = TRUE), 1),
+    # Maximum = max(sal2d, na.rm = TRUE),
+    # `Écart-type` = round(sd(sal2d, na.rm = TRUE), 1),
     .groups = "drop"
   )
 
@@ -171,11 +171,11 @@ dl_tbl_variants("t1_soudure_obs", "09", function(d) {
     group_by(Observatory) %>%
     summarise(
       `Nombre de ménages` = n(),
-      Minimum = min(sal2d, na.rm = TRUE),
+      # Minimum = min(sal2d, na.rm = TRUE),
       Médiane = median(sal2d, na.rm = TRUE),
       Moyenne = round(mean(sal2d, na.rm = TRUE), 1),
-      Maximum = max(sal2d, na.rm = TRUE),
-      `Écart-type` = round(sd(sal2d, na.rm = TRUE), 1),
+      # Maximum = max(sal2d, na.rm = TRUE),
+      # `Écart-type` = round(sd(sal2d, na.rm = TRUE), 1),
       .groups = "drop"
     ) %>% rename(Site = Observatory)
 }, sa_full)
@@ -284,13 +284,13 @@ dl_fig_variants("fig_soudure_hameau", "09", function(d) {
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
-À Alaotra, la distribution est étalée : 25 % des ménages ont 2 mois de soudure, mais plus de 20 % subissent entre 5 et 7 mois de manque. 
+A Alaotra, la période de soudure est relativement longue pour une part importante des ménages. La distribution montre une concentration des ménages autour de 2 à 5 mois de soudure avec un pic à 2 mois pour 25% des ménages, 21 % en déclarent 3 mois, 16 % en déclarent 4 mois, 14 % en déclarent 5 mois et 11 % connaissent 11 mois de soudure.
 :::
 ::::
 
 :::: {.content-hidden when-profile="alaotra"}
 ::: obs-marovoay
-À Marovoay, la concentration est forte sur les durées courtes : 37 % n'ont qu'un seul mois de soudure. 
+A Marovoay, la distribution met en évidence qu'une large majorité des ménages subissent une période de soudure relativement limitée avec une fréquence maximale de 1 mois puis une diminution progressive lorsque la durée de la soudure augmente. La durée de la soudure est davantage concentrée sur des périodes courtes à modérées : 36 % des ménages déclarent 1 mois de soudure, 27 % en déclarent 2 mois et 17 % en déclarent 3 mois. 
 :::
 ::::
 
@@ -468,11 +468,11 @@ stress_stats <- res_sa %>%
   group_by(Observatory) %>%
   summarise(
     `Nombre de ménages` = n(),
-    Minimum = min(sal15a, na.rm = TRUE),
+    # Minimum = min(sal15a, na.rm = TRUE),
     Médiane = median(sal15a, na.rm = TRUE),
     Moyenne = round(mean(sal15a, na.rm = TRUE), 1),
-    Maximum = max(sal15a, na.rm = TRUE),
-    `Écart-type` = round(sd(sal15a, na.rm = TRUE), 1),
+    # Maximum = max(sal15a, na.rm = TRUE),
+    # `Écart-type` = round(sd(sal15a, na.rm = TRUE), 1),
     .groups = "drop"
   )
 
@@ -496,11 +496,11 @@ dl_tbl_variants("t4_stress_obs", "09", function(d) {
     group_by(Observatory) %>%
     summarise(
       `Nombre de ménages` = n(),
-      Minimum = min(sal15a, na.rm = TRUE),
+      # Minimum = min(sal15a, na.rm = TRUE),
       Médiane = median(sal15a, na.rm = TRUE),
       Moyenne = round(mean(sal15a, na.rm = TRUE), 1),
-      Maximum = max(sal15a, na.rm = TRUE),
-      `Écart-type` = round(sd(sal15a, na.rm = TRUE), 1),
+      # Maximum = max(sal15a, na.rm = TRUE),
+      # `Écart-type` = round(sd(sal15a, na.rm = TRUE), 1),
       .groups = "drop"
     ) %>% rename(Site = Observatory)
 }, sa_full)
@@ -508,11 +508,31 @@ dl_tbl_variants("t4_stress_obs", "09", function(d) {
 
 #### Calendrier du stress alimentaire
 
-**A VOIR CODE R CAR LE CALENDRIER N'APPARRAIT PAS +> FIGURE +INTERPRETATION**
+
+:::: {.content-hidden when-profile="marovoay"}
+::: obs-alaotra
+A Alaotra, le pic massif de stress alimentaire enregistré en mars est de 75%, marquant le point critique de la période de soudure juste avant les récoltes de la grande saison. Le stress diminue drastiquement après la récolte pour atteindre son niveau le plus bas en juin (0.0 %) et juillet (2.0 %), témoignant d'une période de relative abondance suite à la mise en marché du riz. Les difficultés commencent à réapparaître progressivement dès le mois de septembre (17.0 %) et octobre (24.0 %), illustrant l'épuisement rapide des stocks pour une partie des foyers.
+:::
+::::
+
+:::: {.content-hidden when-profile="alaotra"}
+::: obs-marovoay
+A Marovoay,  le niveau maximal de stress alimentaire est atteint en février à 68 %. Ce plateau de difficultés se prolonge en mars avec encore 59 % des ménages touchés. Avec un stress plus précoce et diffus, Marovoay affiche des taux de stress déjà élevés dès le dernier trimestre de l'année civile, avec 35 % en octobre et environ 31 % en novembre-décembre. Même durant les mois les plus favorables (mai à juillet), le stress alimentaire ne descend jamais en dessous de 10 %, indiquant une insécurité alimentaire résiduelle plus persistante.
+:::
+::::
+
 
 ```{r t5_calendrier_stress}
-#| include: false
+#| echo: false
+#| warning: false
+#| message: false
 # T5 : % de ménages en stress alimentaire chaque mois
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(scales)
+
 mois_labels_stress <- c(
   "sal14a_10" = "Octobre", "sal14a_11" = "Novembre", "sal14a_12" = "Décembre",
   "sal14a_01" = "Janvier", "sal14a_02" = "Février", "sal14a_03" = "Mars",
@@ -533,21 +553,34 @@ calendrier_stress <- res_sa %>%
   ) %>%
   pivot_longer(-Observatory, names_to = "mois_var", values_to = "pct") %>%
   mutate(
-    Mois = factor(mois_labels_stress[mois_var], levels = mois_labels_stress)
+    # ordre chronologique Oct -> Sep
+    Mois = factor(mois_labels_stress[mois_var], levels = unname(mois_labels_stress))
   )
 
-calendrier_stress %>%
-  select(Observatory, Mois, pct) %>%
-  pivot_wider(names_from = Observatory, values_from = pct) %>%
-  gt() %>%
-  tab_header(
-    title = "Calendrier du stress alimentaire par observatoire",
-    subtitle = "% de ménages en stress alimentaire chaque mois"
-  ) %>%
-  fmt_number(columns = where(is.numeric), decimals = 1) %>%
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_column_labels()
+# Figure (pas de tableau)
+ggplot(calendrier_stress, aes(x = Mois, y = pct)) +
+  geom_col(fill = "#2F78B7", width = 0.9) +
+  geom_text(aes(label = ifelse(is.na(pct), "", round(pct, 0))),
+            vjust = -0.3, size = 3) +
+  facet_wrap(~ Observatory, nrow = 1) +
+  scale_y_continuous(
+    limits = c(0, max(calendrier_stress$pct, na.rm = TRUE) + 8),
+    breaks = pretty_breaks(5)
+  ) +
+  labs(
+    title = "Calendrier du stress alimentaire",
+    subtitle = "% de ménages en stress alimentaire chaque mois",
+    x = NULL,
+    y = "% ménages en stress alimentaire"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major.x = element_line(color = "#e6e6e6"),
+    panel.grid.major.y = element_line(color = "#e6e6e6"),
+    panel.grid.minor = element_blank(),
+    strip.text = element_text(face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(face = "bold")
   )
 ```
 
@@ -564,7 +597,7 @@ dl_tbl_variants("t5_calendrier_stress", "09", function(d) {
     group_by(Observatory) %>%
     summarise(
       across(starts_with("sal14a_"),
-        ~ round(sum(!is.na(.) & . == 1) / n() * 100, 1)),
+             ~ round(sum(!is.na(.) & . == 1) / n() * 100, 1)),
       .groups = "drop"
     ) %>%
     pivot_longer(-Observatory, names_to = "mois_var", values_to = "pct") %>%
@@ -573,7 +606,12 @@ dl_tbl_variants("t5_calendrier_stress", "09", function(d) {
 }, sa_full)
 ```
 
+
 #### Comparaison soudure et stress alimentaire
+
+::: {.content-visible when-profile="consolidated"}
+Le calendrier révèle deux profils distincts : l'Alaotra subit un choc de soudure extrêmement concentré et violent au premier trimestre, tandis que Marovoay présente un stress plus étalé dans le temps, qui débute plus tôt mais atteint un sommet légèrement moins prononcé.
+:::
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
@@ -642,6 +680,8 @@ dl_fig_variants("g3_soudure_vs_stress", "09", function(d) {
                     x_angle = 45)
 }, sa_full)
 ```
+
+
 
 ### Alimentation de base
 
