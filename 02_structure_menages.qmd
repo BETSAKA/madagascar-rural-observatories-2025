@@ -258,7 +258,7 @@ ggplot(hh_size_hameau_plot, aes(x = j4bis, y = mean_hh_size)) +
   ) +
   scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
   labs(
-    title = obs_title("Taille moyenne des ménages par hameau"),
+    # title = obs_title("Taille moyenne des ménages par hameau"),
     subtitle = "La ligne horizontale indique la taille moyenne de l'observatoire.",
     x = "Hameau",
     y = "Taille moyenne"
@@ -436,8 +436,10 @@ dl_tbl_variants("tbl_origine", "04", function(d) {
 ```
 
 ```{r fig_origine}
-make_origin_histogram(members_site, m3, classify_origin, "Origine",
-                      obs_title("Distribution de l'origine des CM et conjoints"))
+#| label: fig-origine
+#| fig-cap: "Distribution de l'origine des Chefs de ménages et conjoints"
+make_origin_histogram(members_site, m3, classify_origin, "Origine", NULL
+                      )
 ```
 
 ```{r dl_fig_origine}
@@ -515,12 +517,14 @@ dl_tbl_variants("tbl_homeland", "04", function(d) {
 ```
 
 ```{r fig_homeland}
+#| label: fig-homeland
+#| fig-cap: "Région d'origine des Chefs de ménage et conjoints"
 homeland_labels |>
   mutate(Member_Type = if_else(m6 == 1, "Chef de ménage", "Conjoint")) |>
   count(Observatory, Member_Type, Homeland) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Member_Type)) |>
   ror_bar_grouped(x = Homeland, fill = Member_Type, y = pct,
-                  title = "Région d'origine des CM et conjoints",
+                  # title = "Région d'origine des CM et conjoints",
                   y_label = "%", direction = "horizontal")
 ```
 
@@ -539,8 +543,6 @@ dl_fig_variants("fig_homeland", "04", function(d) {
                     y_label = "%", direction = "horizontal")
 }, members)
 ```
-:::
-::::
 
 ### Raison d'installation
 
@@ -562,7 +564,7 @@ Elles distinguent notamment les installations liées au mariage de celles motiv�
 ```{r raison}
 #| include: false
 make_origin_table(members_site, mg4a, classify_reason, "Raison",
-                  obs_title("Raison d'implantation des CM et conjoints"))
+                  obs_title("Raison d'implantation des  Chefs de ménage et conjoints"))
 ```
 
 ```{r dl_tbl_raison}
@@ -580,8 +582,10 @@ dl_tbl_variants("tbl_raison", "04", function(d) {
 ```
 
 ```{r fig_raison}
+#| label: fig_raison
+#| fig-cap: "Distribution des raisons d'implantation des Chefs de ménage et conjoints"
 make_origin_histogram(members_site, mg4a, classify_reason, "Raison",
-                      obs_title("Distribution des raisons d'implantation des CM et conjoints"))
+                      NULL)
 ```
 
 ```{r dl_fig_raison}
@@ -589,7 +593,7 @@ make_origin_histogram(members_site, mg4a, classify_reason, "Raison",
 #| results: asis
 dl_fig_variants("fig_raison", "04", function(d) {
   make_origin_histogram(d, mg4a, classify_reason, "Raison",
-                        "Distribution des raisons d'implantation des CM et conjoints")
+                        "Distribution des raisons d'implantation des  Chefs de ménage et conjoints")
 }, members)
 ```
 
@@ -690,6 +694,7 @@ dl_tbl_variants("tbl_cm_chars", "04", function(d) {
 
 ```{r fig_cm_statut}
 #| echo: false
+#| label: fig_cm_statut
 #| fig-cap: "Statut matrimonial des chefs de ménage"
 #| fig-height: !expr fig_h("fig_cm_statut")
 cm_site |>
@@ -837,7 +842,8 @@ dl_tbl_variants("tbl_cm_educ_sex", "04", function(d) {
 
 ```{r fig_cm_educ_sex}
 #| echo: false
-#| fig-cap: "Niveau d'éducation des CM par sexe"
+#| label: fig_cm_educ_sex
+#| fig-cap: "Niveau d'éducation des Chefs de ménage par sexe"
 cm_site |>
   mutate(
     Sexe = classify_sex(m4),
@@ -979,12 +985,13 @@ La lecture avec difficulté concerne une faible proportion des chefs de ménage 
 
 ```{r cm_read_sex}
 #| include: false
-literacy_3level_sex(cm_site, s1a, "Aptitude à la lecture des CM selon le sexe")
+literacy_3level_sex(cm_site, s1a, "Aptitude à la lecture des Chefs de ménage selon le sexe")
 ```
 
 ```{r fig_cm_read_sex}
-#| fig-cap: "Aptitude à la lecture des CM selon le sexe"
-literacy_3level_bar(cm_site, s1a, "Aptitude à la lecture des CM selon le sexe")
+#| label: fig_cm_read_sex
+#| fig-cap: "Aptitude à la lecture des Chefs de ménage selon le sexe"
+literacy_3level_bar(cm_site, s1a, NULL)
 ```
 
 ```{r dl_tbl_cm_read_sex}
@@ -1047,12 +1054,13 @@ Les chefs de ménage capables d’écrire avec difficulté restent peu nombreux.
 
 ```{r cm_write_sex}
 #| include: false
-literacy_3level_sex(cm_site, s1b, "Aptitude à l'écriture des CM selon le sexe")
+literacy_3level_sex(cm_site, s1b, "Aptitude à l'écriture des Chefs de ménage selon le sexe")
 ```
 
 ```{r fig_cm_write_sex}
-#| fig-cap: "Aptitude à l'écriture des CM selon le sexe"
-literacy_3level_bar(cm_site, s1b, "Aptitude à l'écriture des CM selon le sexe")
+#| label: fig_cm_write_sex
+#| fig-cap: "Aptitude à l'écriture des Chefs de ménage selon le sexe"
+literacy_3level_bar(cm_site, s1b, NULL)
 ```
 
 ```{r dl_tbl_cm_write_sex}
@@ -1205,10 +1213,11 @@ cm_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
 ```
 
 ```{r fig_cm_act_sex}
-#| fig-cap: "Activit\u00e9s principales des CM par observatoire et sexe"
+#| label: fig_cm_act_sex
+#| fig-cap: "Activit\u00e9s principales des Chefs de ménages par observatoire et sexe"
 #| fig-height: !expr fig_h("fig_cm_act_sex")
 cm_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
-                                  title = "Activit\u00e9s principales des CM par observatoire et sexe (%)",
+                                  # title = "Activit\u00e9s principales des CM par observatoire et sexe (%)",
                                   y_label = "%", direction = "horizontal")
 ```
 
@@ -1337,6 +1346,7 @@ dl_tbl_variants("tbl_other_chars", "04", function(d) {
 
 ```{r fig_other_statut}
 #| echo: false
+#| label: fig_other_statut
 #| fig-cap: "Statut matrimonial des autres membres (12 ans et plus)"
 #| fig-height: !expr fig_h("fig_other_statut")
 others_site |>
@@ -1414,6 +1424,7 @@ dl_tbl_variants("tbl_other_educ", "04", function(d) {
 
 ```{r fig_other_educ}
 #| echo: false
+#| label: fig_other_educ
 #| fig-cap: "Niveau d'éducation des autres membres"
 others_site |>
   mutate(Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
