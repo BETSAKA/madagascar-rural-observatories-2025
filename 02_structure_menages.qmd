@@ -1530,7 +1530,7 @@ dl_fig_variants("fig_other_educ_sex", "04", function(d) {
 
 #### Alphabétisation des autres membres
 
-Cette section analyse les capacités de lecture et d'écriture des membres du ménage autres que le CM fournissant un indicateur de la qualité du capital humain au sein des familles rurales. L'évaluation distingue les personnes capables de lire ou d'écrire aisément de celles qui le font avec effort ou qui en sont incapables.
+Cette section analyse les capacités de lecture et d'écriture des membres du ménage autres que le Chef de ménage fournissant un indicateur de la qualité du capital humain au sein des familles rurales. L'évaluation distingue les personnes capables de lire ou d'écrire aisément de celles qui le font avec effort ou qui en sont incapables.
 
 ##### Savoir lire
 
@@ -1550,6 +1550,49 @@ dl_tbl_variants("tbl_other_read", "04", function(d) {
     mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
+```
+
+```{r fig_other_read}
+#| label: fig-other-read
+#| fig-cap: "Aptitude à la lecture des autres membres"
+
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+df_other_read <- others_site |>
+  filter(m6 != 1) |>
+  mutate(Niveau = classify_literacy(s1a)) |>
+  filter(!is.na(Niveau), !is.na(Observatory)) |>
+  mutate(
+    Niveau = recode(Niveau,
+      "Oui, avec effort" = "Avec effort",
+      "oui, avec effort" = "Avec effort"
+    ),
+    Niveau = factor(Niveau, levels = c("Oui", "Avec effort", "Non"))
+  ) |>
+  count(Observatory, Niveau, .drop = FALSE) |>
+  group_by(Observatory) |>
+  mutate(pct = 100 * n / sum(n)) |>
+  ungroup()
+
+ggplot(df_other_read, aes(x = pct, y = Niveau, fill = Observatory)) +
+  geom_col(width = 0.85, show.legend = FALSE) +
+  geom_text(aes(label = round(pct, 0)), hjust = -0.15, size = 3.8) +
+  facet_wrap(~Observatory, nrow = 1) +
+  scale_y_discrete(limits = rev(levels(df_other_read$Niveau))) +  # Oui en haut
+  scale_x_continuous(
+    limits = c(0, max(df_other_read$pct, na.rm = TRUE) + 10),
+    breaks = pretty_breaks(5),
+    labels = function(x) paste0(x, "%")
+  ) +
+  labs(x = "%", y = NULL) +
+  theme_minimal(base_size = 12) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    strip.text = element_text(face = "bold")
+  )
 ```
 
 :::: {.content-hidden when-profile="marovoay"}
