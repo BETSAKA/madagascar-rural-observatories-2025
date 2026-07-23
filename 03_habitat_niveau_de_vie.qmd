@@ -140,11 +140,9 @@ house |>
 ```
 
 
-```{r}
+```{r fig_house_status}
 #| label: fig-statut-logement
-#| fig-cap: |
-#|   Statut d'occupation du logement.
-#|   Source : Enquête BETSAKA 2025.
+#| fig-cap: " Statut d'occupation du logement.<br> Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-height: !expr fig_h("fig-statut-logement")
 #| fig-width: !expr fig_w("fig-statut-logement")
 house |> make_bar_obs(x = Statut, title = "Statut d'occupation du logement")
@@ -200,7 +198,7 @@ latrine |>
 
 ```{r}
 #| label: fig-latrine
-#| fig-cap: "Types de latrine"
+#| fig-cap: "Types de latrine. <br> Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-height: !expr fig_h("fig-latrine")
 #| fig-width: !expr fig_w("fig-latrine")
 latrine |> make_bar_obs(title = obs_title("Types de latrine"))
@@ -255,7 +253,7 @@ water |>
 
 ```{r}
 #| label: fig-eau
-#| fig-cap: "Mode d'approvisionnement en eau"
+#| fig-cap: "Mode d'approvisionnement en eau. <br> Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-height: !expr fig_h("fig-eau")
 #| fig-width: !expr fig_w("fig-eau")
 water |> make_bar_obs(title = obs_title("Mode d'approvisionnement en eau"))
@@ -306,9 +304,9 @@ light |>
   style_table()
 ```
 
-```{r}
+```{r fig_lighting}
 #| label: fig-eclairage
-#| fig-cap: "Modes d'éclairage"
+#| fig-cap: "Modes d'éclairage.<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-height: !expr fig_h("fig-eclairage")
 #| fig-width: !expr fig_w("fig-eclairage")
 light |> make_bar_obs(title = obs_title("Modes d'éclairage"))
@@ -355,8 +353,28 @@ gt(solar_status) |>
   style_table()
 ```
 
+```{r fig_solar_panel_status}
+#| label: fig-solar-panel-status
+#| fig-cap: "Panneau solaire en état de marche (parmi les utilisateurs du solaire).<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-height: !expr fig_h("fig-solar-panel-status")
+#| fig-width: !expr fig_w("fig-solar-panel-status")
+df_solar_plot <- solar_users |>
+  count(Observatory, En_marche = if_else(h7c1 == 1, "Oui", "Non")) |>
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
+
+ggplot(df_solar_plot, aes(x = pct, y = En_marche, fill = Observatory)) +
+  geom_col(width = 0.85, show.legend = FALSE) +
+  geom_text(aes(label = round(pct, 0)), hjust = -0.15, size = 5.2) +
+  facet_wrap(~Observatory, nrow = 1) +
+  scale_x_continuous(labels = function(x) paste0(x, "%")) +
+  labs(x = "%", y = NULL) +
+  theme_minimal()
+```
+
+
 ```{r dl_lighting}
 #| include: false
+#| echo: false
 dl_tbl_variants("tbl_lighting", "05", function(d) {
   d |> tabulate_binary_set("h7", exclude_pattern = "h7c[12]|h7i_autre") |>
     rename(Site = Observatory, Effectif = n, `%` = pct)
@@ -366,6 +384,51 @@ dl_fig_variants("fig_lighting", "05", function(d) {
     make_bar_obs(title = "Modes d'eclairage par observatoire")
 }, res_h |> left_join(obs, by = "j5"))
 ```
+
+```
+
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+df_solar_status <- res_h |>
+  left_join(obs_site, by = "j5") |>
+  filter(h7c == 1, !is.na(h7c1), !is.na(Observatory)) |>
+  mutate(
+    En_marche = if_else(h7c1 == 1, "Oui", "Non"),
+    En_marche = factor(En_marche, levels = c("Oui", "Non")),
+    Observatory = factor(Observatory, levels = c("Marovoay", "Alaotra"))
+  ) |>
+  count(Observatory, En_marche, .drop = FALSE) |>
+  group_by(Observatory) |>
+  mutate(pct = 100 * n / sum(n)) |>
+  ungroup()
+
+ggplot(df_solar_status, aes(x = pct, y = En_marche, fill = Observatory)) +
+  geom_col(width = 0.85, show.legend = FALSE) +
+  geom_text(aes(label = round(pct, 0)), hjust = -0.15, size = 5.2) +
+  facet_wrap(~Observatory, nrow = 1) +
+  scale_y_discrete(limits = rev(levels(df_solar_status$En_marche))) +
+  scale_x_continuous(
+    limits = c(0, max(df_solar_status$pct, na.rm = TRUE) + 10),
+    breaks = pretty_breaks(5),
+    labels = function(x) paste0(x, "%")
+  ) +
+  labs(
+    x = "%",
+    y = NULL
+  ) +
+  theme_minimal(base_size = 16) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    strip.text = element_text(size = 15, face = "plain"),
+    axis.text.y = element_text(size = 15, face = "plain"),
+    axis.text.x = element_text(size = 14, face = "plain"),
+    axis.title.x = element_text(size = 15, face = "plain")
+  )
+```
+
 
 ### Source d'énergie pour la cuisson
 
