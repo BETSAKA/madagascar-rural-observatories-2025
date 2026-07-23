@@ -1539,7 +1539,7 @@ dl_tbl_variants("tbl_other_educ", "04", function(d) {
 ```{r fig_other_educ}
 #| echo: false
 #| label: fig_other_educ
-#| fig-cap: "Niveau d'éducation des autres membres"
+#| fig-cap: "Niveau d'éducation des autres membres du ménage"
 others_site |>
   mutate(Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
   count(Observatory, Type) |>
@@ -1729,7 +1729,7 @@ literacy_3level_sex(others_site, s1a, "Aptitude à la lecture des autres membres
 
 ```{r fig_other_read_sex}
 #| fig-cap: "Aptitude à la lecture des autres membres selon le sexe"
-literacy_3level_bar(others_site, s1a, "Aptitude à la lecture des autres membres selon le sexe")
+literacy_3level_bar(others_site, s1a, NULL)
 ```
 
 ```{r dl_tbl_other_read_sex}
@@ -1759,6 +1759,7 @@ A Alaotra, l'aptitude à l'écriture est maîtrisée sans difficulté par 73.9 %
 ::::
 
 ```{r other_write}
+#| include: false
 literacy_3level(others_site, s1b, "Aptitude à l'écriture des autres membres")
 ```
 
@@ -1774,6 +1775,62 @@ dl_tbl_variants("tbl_other_write", "04", function(d) {
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
+
+```{r other_write_histo_h, echo=FALSE, warning=FALSE, message=FALSE}
+#| label: other_write_histo_h
+#| fig-cap: "Aptitude à l'écriture des autres membres"
+#| fig-width: 12
+#| fig-height: 5.8
+
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+df_other_write <- members |>
+  filter(m6 != 1) |>
+  mutate(Niveau = classify_literacy(s1b)) |>
+  filter(!is.na(Niveau), !is.na(Observatory)) |>
+  mutate(
+    Niveau = recode(Niveau,
+      "Oui, avec effort" = "Avec effort",
+      "oui, avec effort" = "Avec effort",
+      "avec effort" = "Avec effort"
+    ),
+    Niveau = factor(Niveau, levels = c("Oui", "Avec effort", "Non")),
+    Observatory = factor(Observatory, levels = c("Marovoay", "Alaotra"))
+  ) |>
+  count(Observatory, Niveau, .drop = FALSE) |>
+  group_by(Observatory) |>
+  mutate(pct = 100 * n / sum(n)) |>
+  ungroup()
+
+ggplot(df_other_write, aes(x = pct, y = Niveau, fill = Observatory)) +
+  geom_col(width = 0.85, show.legend = FALSE) +
+  geom_text(aes(label = round(pct, 0)), hjust = -0.15, size = 5.2) +
+  facet_wrap(~Observatory, nrow = 1) +
+  scale_y_discrete(limits = rev(levels(df_other_write$Niveau))) +  # Oui en haut
+  scale_x_continuous(
+    limits = c(0, max(df_other_write$pct, na.rm = TRUE) + 10),
+    breaks = pretty_breaks(5),
+    labels = function(x) paste0(x, "%")
+  ) +
+  labs(
+    # title = "Aptitude à l'écriture des autres membres",
+    x = "%",
+    y = NULL
+  ) +
+  theme_minimal(base_size = 16) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    strip.text = element_text(size = 15, face = "plain"),
+    axis.text.y = element_text(size = 15, face = "plain"),
+    axis.text.x = element_text(size = 14, face = "plain"),
+    axis.title.x = element_text(size = 15, face = "plain"),
+    plot.title = element_text(size = 19, face = "plain")
+  )
+```
+
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
@@ -1794,6 +1851,7 @@ literacy_3level_sex(others_site, s1b, "Aptitude à l'écriture des autres membre
 ```
 
 ```{r fig_other_write_sex}
+#| label: fig_other_write_sex
 #| fig-cap: "Aptitude à l'écriture des autres membres selon le sexe"
 literacy_3level_bar(others_site, s1b, "Aptitude à l'écriture des autres membres selon le sexe")
 ```
@@ -1829,11 +1887,12 @@ Dans Marovoay, le taux net de scolarisation s'élève à `r taux_scol_m` %.
 ::::
 
 ```{r schooling}
+#| include: false
 school_rate <- members_site |>
   filter(m5 >= 6, m5 <= 14, s2 %in% c(1, 2)) |>
   mutate(Scolarise = if_else(s2 == 1, "Oui", "Non")) |>
   count(Observatory, Scolarise, name = "n") |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  mutate(pct = round(n / sum(n) * 100, 0), .by = Observatory) |>
   select(-n) |>
   pivot_wider(names_from = Scolarise, values_from = pct,
               names_glue = "{Scolarise}_pct")
@@ -1854,15 +1913,65 @@ dl_tbl_variants("tbl_schooling", "04", function(d) {
     filter(m5 >= 6, m5 <= 14, s2 %in% c(1, 2)) |>
     mutate(Scolarisé = if_else(s2 == 1, "Oui", "Non")) |>
     count(Observatory, Scolarisé) |>
-    mutate(`%` = round(n / sum(n) * 100, 1), .by = Observatory) |>
+    mutate(`%` = round(n / sum(n) * 100, 0), .by = Observatory) |>
     rename(Site = Observatory, Effectif = n)
 }, members)
 ```
 
+```{r schooling_histo_v, echo=FALSE, warning=FALSE, message=FALSE}
+#| label: schooling_histo_v
+#| fig-cap: "Taux de scolarisation des enfants de 6 à 14 ans"
+#| fig-width: 10
+#| fig-height: 6.2
+
+library(dplyr)
+library(ggplot2)
+library(scales)
+
+df_schooling <- members |>
+  filter(m5 >= 6, m5 <= 14, s2 %in% c(1, 2), !is.na(Observatory)) |>
+  mutate(
+    Scolarise = if_else(s2 == 1, "Scolarisés", "Non scolarisés"),
+    Scolarise = factor(Scolarise, levels = c("Scolarisés", "Non scolarisés")),
+    Observatory = factor(Observatory, levels = c("Marovoay", "Alaotra"))
+  ) |>
+  count(Observatory, Scolarise, .drop = FALSE) |>
+  group_by(Observatory) |>
+  mutate(pct = 100 * n / sum(n)) |>
+  ungroup()
+
+ggplot(df_schooling, aes(x = Scolarise, y = pct, fill = Observatory)) +
+  geom_col(width = 0.8, show.legend = FALSE) +
+  geom_text(aes(label = round(pct, 0)), vjust = -0.25, size = 5.2) +
+  facet_wrap(~Observatory, nrow = 1) +
+  scale_y_continuous(
+    limits = c(0, max(df_schooling$pct, na.rm = TRUE) + 10),
+    breaks = pretty_breaks(5),
+    labels = function(x) paste0(x, "%")
+  ) +
+  labs(
+    # title = "Taux de scolarisation des enfants de 6 à 14 ans",
+    x = NULL,
+    y = "%"
+  ) +
+  theme_minimal(base_size = 16) +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    strip.text = element_text(size = 15, face = "plain"),
+    axis.text.x = element_text(size = 15, face = "plain"),
+    axis.text.y = element_text(size = 14, face = "plain"),
+    axis.title.y = element_text(size = 15, face = "plain"),
+    plot.title = element_text(size = 19, face = "plain")
+  )
+```
+
+
+
 ::: {.content-visible when-profile="consolidated"}
 
 #### Classe suivie 2024-2025
-
+La progression scolaire suit globalement la structure attendue par âge. Entre 3 et 5 ans, les enfants sont majoritairement en préscolaire, avec une part déjà entrée en CP1. Chez les 6-10 ans, les classes du primaire dominent nettement, en particulier le CP2, le CE et le CM1-CM2. Entre 11 et 14 ans, la répartition se déplace vers la fin du primaire et le premier cycle du secondaire, surtout la 6e et la 5e. Enfin, les 15-17 ans se concentrent davantage dans les classes du secondaire, tandis que les niveaux supérieurs n’apparaissent que parmi les 18-25 ans.
 
 ```{r class_attended}
 age_levels <- c("3-5 ans", "6-10 ans", "11-14 ans", "15-17 ans", "18-25 ans")
@@ -1923,8 +2032,6 @@ dl_tbl_variants("tbl_class", "04", function(d) {
 }, members)
 ```
 :::
-
-La progression scolaire suit globalement la structure attendue par âge. Entre 3 et 5 ans, les enfants sont majoritairement en préscolaire, avec une part déjà entrée en CP1. Chez les 6-10 ans, les classes du primaire dominent nettement, en particulier le CP2, le CE et le CM1-CM2. Entre 11 et 14 ans, la répartition se déplace vers la fin du primaire et le premier cycle du secondaire, surtout la 6e et la 5e. Enfin, les 15-17 ans se concentrent davantage dans les classes du secondaire, tandis que les niveaux supérieurs n’apparaissent que parmi les 18-25 ans.
 
 #### Raisons de non fréquentation de l'école pour les 6 à 15 ans
 
@@ -2062,9 +2169,11 @@ obs_gt(other_act) |>
 ```
 
 ```{r fig-other-act}
+#| label: fig-other-act
+#| fig-cap: "Activités principales des autres membres (%)"
 #| fig-height: !expr fig_h("fig-other-act")
 other_act |> make_bar_obs(x = Act_principal, y = Percent,
-                     title = obs_title("Activités principales des autres membres (%)"),
+                     # title = obs_title("Activités principales des autres membres (%)"),
                      y_label = "%")
 ```
 
@@ -2082,6 +2191,7 @@ dl_tbl_variants("tbl_other_act", "04", function(d) {
 
 ```{r dl_fig_other_act}
 #| echo: false
+#| fig-cap: "Activités principales des autres membres (%)"
 #| results: asis
 dl_fig_variants("fig_other_act", "04", function(d) {
   act <- d |> filter(m6 != 1) |>
@@ -2090,10 +2200,12 @@ dl_fig_variants("fig_other_act", "04", function(d) {
     count(Observatory, Act_principal, name = "n") |>
     mutate(Percent = round(n / sum(n) * 100, 1), .by = Observatory)
   act |> ror_bar_grouped(x = Act_principal, fill = Observatory, y = Percent,
-                         title = "Activités principales des autres membres (%)",
+                         # title = "Activités principales des autres membres (%)",
                          y_label = "%", direction = "horizontal", facet = FALSE)
 }, members)
 ```
+
+
 
 #### Activités principales des autres membres par sexe
 
@@ -2149,9 +2261,11 @@ other_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent
 ```
 
 ```{r fig_other_act_sex}
+#| label: fig_other_act_sex
+#| fig-cap: "Activités des autres membres par observatoire et sexe (%)"
 #| fig-height: !expr fig_h("fig_other_act_sex")
 other_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
-                                     title = "Activités des autres membres par observatoire et sexe (%)",
+                                     # title = "Activités des autres membres par observatoire et sexe (%)",
                                      y_label = "%", direction = "horizontal")
 ```
 
@@ -2185,6 +2299,7 @@ dl_fig_variants("fig_other_act_sex", "04", function(d) {
 ```
 
 :::: {.content-visible when-profile="consolidated"}
+
 ## Évolution des indicateurs démographiques (1996-2025) {#sec-demog-multiyear}
 
 Les observatoires disposent de données démographiques depuis les années 1990.
@@ -2282,6 +2397,7 @@ demog_gap   <- demog_trends |> filter(year %in% c(2015, 2025))
 ```
 
 ```{r fig_demog_taille}
+#| label: fig_demog_taille
 #| fig-cap: "Évolution de la taille moyenne des ménages (1996-2025)"
 #| fig-width: !expr fig_w("fig_demog_taille")
 #| fig-height: !expr fig_h("fig_demog_taille")
@@ -2305,6 +2421,7 @@ demog_trends |> make_trend_plot(y_var = taille_moy,
 
 
 ```{r fig_demog_fem_cm}
+#| label: fig_demog_fem_cm
 #| fig-cap: "Évolution du pourcentage de chefs de ménage femmes (1996-2025)"
 #| fig-width: !expr fig_w("fig_demog_fem_cm")
 #| fig-height: !expr fig_h("fig_demog_fem_cm")
@@ -2330,6 +2447,7 @@ if ("pct_fem_cm" %in% names(demog_trends)) {
 ::::
 
 ```{r fig_demog_scol}
+#| label: fig_demog_scol
 #| fig-cap: "Évolution du taux de scolarisation des 6-14 ans (1996-2025)"
 #| fig-width: !expr fig_w("fig_demog_scol")
 #| fig-height: !expr fig_h("fig_demog_scol")
@@ -2356,6 +2474,7 @@ if ("taux_scol" %in% names(demog_trends)) {
 
 
 ```{r fig_demog_age_cm}
+#| label: fig_demog_age_cm
 #| fig-cap: "Évolution de l'âge moyen du chef de ménage (1996-2025)"
 #| fig-width: !expr fig_w("fig_demog_age_cm")
 #| fig-height: !expr fig_h("fig_demog_age_cm")
