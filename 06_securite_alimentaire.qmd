@@ -258,7 +258,8 @@ dl_tbl_variants("t2_soudure_hameau", "09", function(d) {
 
 ```{r fig_soudure_hameau}
 #| echo: false
-#| fig-cap: "Durée moyenne de la soudure par hameau"
+#| label: fig-soudure-hameau
+#| fig-cap: "Durée moyenne de la soudure par hameau. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 soudure_combined %>%
   filter(j4bis != "Ensemble") %>%
   ror_bar_grouped(x = j4bis, y = mean_soudure, fill = Observatory,
@@ -270,7 +271,7 @@ soudure_combined %>%
 ```{r dl_fig_soudure_hameau}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_soudure_hameau", "09", function(d) {
+dl_fig_variants("fig-soudure-hameau", "09", function(d) {
   d %>%
     filter(!is.na(sal2d)) %>%
     group_by(Observatory, j4bis) %>%
@@ -295,6 +296,7 @@ A Marovoay, la distribution met en évidence qu'une large majorité des ménages
 ::::
 
 ```{r g1_soudure_distrib}
+#| include: false
 # G1 : Histogramme de la distribution du nombre de mois de soudure
 res_sa %>%
   left_join(res_deb, by = "j5") %>%
@@ -304,6 +306,21 @@ res_sa %>%
   count(Observatory, sal2d) %>%
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) %>%
   ror_bar_v(x = sal2d, y_label = "% ménages", x_angle = 45)
+```
+
+```{r fig_soudure_distrib}
+#| echo: false
+#| label: fig-soudure-distrib
+#| fig-cap: "Distribution annuelle de la soudure par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+res_sa %>%
+  left_join(res_deb, by = "j5") %>%
+  expand_sites_for_profile() %>%
+  filter(!is.na(sal2d)) %>%
+  mutate(sal2d = factor(sal2d)) %>%
+  count(Observatory, sal2d) %>%
+  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) %>%
+  ror_bar_v(x = sal2d, y_label = "% ménages", x_angle = 45
+  )
 ```
 
 ```{r dl_g1_soudure_distrib}
@@ -393,8 +410,9 @@ dl_tbl_variants("t3_calendrier_soudure", "09", function(d) {
 }, sa_full)
 ```
 
-```{r g2_calendrier_soudure}
-# G2 : Graphique du calendrier de la soudure
+```{r fig_calendrier_soudure}
+#| label: fig-calendrier-soudure
+#| fig-cap: "Représentation du calendrier de la soudure par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 res_sa %>%
   left_join(res_deb, by = "j5") %>%
   expand_sites_for_profile() %>%
@@ -412,7 +430,7 @@ res_sa %>%
 ```{r dl_g2_calendrier_soudure}
 #| echo: false
 #| results: asis
-dl_fig_variants("g2_calendrier_soudure", "09", function(d) {
+dl_fig_variants("fig-calendrier-soudure", "09", function(d) {
   cal <- d %>%
     group_by(Observatory) %>%
     summarise(
@@ -524,6 +542,7 @@ A Marovoay,  le niveau maximal de stress alimentaire est atteint en février à 
 
 ```{r t5_calendrier_stress}
 #| echo: false
+#| include: false
 #| warning: false
 #| message: false
 # T5 : % de ménages en stress alimentaire chaque mois
@@ -568,8 +587,8 @@ ggplot(calendrier_stress, aes(x = Mois, y = pct)) +
     breaks = pretty_breaks(5)
   ) +
   labs(
-    title = "Calendrier du stress alimentaire",
-    subtitle = "% de ménages en stress alimentaire chaque mois",
+    # title = "Calendrier du stress alimentaire",
+    # subtitle = "% de ménages en stress alimentaire chaque mois",
     x = NULL,
     y = "% ménages en stress alimentaire"
   ) +
@@ -606,6 +625,32 @@ dl_tbl_variants("t5_calendrier_stress", "09", function(d) {
 }, sa_full)
 ```
 
+```{r fig_calendrier_stress}
+#| label: fig-calendrier-stress
+#| fig-cap: "Représentation du calendrier du stress par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+ggplot(calendrier_stress, aes(x = Mois, y = pct)) +
+  geom_col(fill = "#2F78B7", width = 0.9) +
+  geom_text(aes(label = ifelse(is.na(pct), "", round(pct, 0))),
+            vjust = -0.3, size = 3) +
+  facet_wrap(~ Observatory, nrow = 1) +
+  scale_y_continuous(
+    limits = c(0, max(calendrier_stress$pct, na.rm = TRUE) + 8),
+    breaks = pretty_breaks(5)
+  ) +
+  labs(
+    x = NULL,
+    y = "% ménages en stress alimentaire"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(
+    panel.grid.major.x = element_line(color = "#e6e6e6"),
+    panel.grid.major.y = element_line(color = "#e6e6e6"),
+    panel.grid.minor = element_blank(),
+    strip.text = element_text(face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(face = "bold")
+  )
+```
 
 #### Comparaison soudure et stress alimentaire
 
@@ -625,8 +670,9 @@ Le calendrier révèle deux profils distincts : l'Alaotra subit un choc de soudu
 :::
 ::::
 
-```{r fig-soudure-vs-stress}
-#| fig-cap: "Comparaison soudure et stress alimentaire"
+```{r fig_soudure_vs_stress}
+#| label: fig-soudure-vs-stress
+#| fig-cap: "Comparaison soudure et stress alimentaire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 # G3 : Superposition soudure vs stress alimentaire
 # Rebuild from expanded data for site-level facets
 sa_joined <- res_sa %>%
@@ -658,7 +704,7 @@ comparaison %>%
 
 ```{r dl_g3_soudure_vs_stress}
 #| include: false
-dl_fig_variants("g3_soudure_vs_stress", "09", function(d) {
+dl_fig_variants("fig-soudure-vs-stress", "09", function(d) {
   cal_s <- d %>%
     group_by(Observatory) %>%
     summarise(across(starts_with("sal2d_"),
@@ -876,6 +922,7 @@ A Alaotra, le riz est l'aliment de base quasi exclusif consommé par 93.5% des m
 
 
 ```{r g4_comparaison_dejeuner}
+#| include: false
 # G4 : Comparaison hors soudure vs pendant soudure au déjeuner (top 5 aliments)
 comp_dejeuner <- res_sa %>%
   left_join(res_deb, by = "j5") %>%
@@ -909,9 +956,19 @@ comp_dejeuner %>%
                   y_label = "% ménages", direction = "horizontal")
 ```
 
+```{r fig_comparaison_dejeuner}
+#| echo: false
+#| label: fig-comparaison-dejeuner
+#| fig-cap: "Représentation de l'alimentation au déjeuner hors vs pendant soudure. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+comp_dejeuner %>%
+  filter(Aliment %in% top_aliments) %>%
+  ror_bar_grouped(x = Aliment, fill = Période,
+                  y_label = "% ménages", direction = "horizontal")
+```
+
 ```{r dl_g4_comparaison_dejeuner}
 #| include: false
-dl_fig_variants("g4_comparaison_dejeuner", "09", function(d) {
+dl_fig_variants("fig-comparaison-dejeuner", "09", function(d) {
   comp <- d %>%
     select(Observatory, sal1b, sal2b) %>%
     pivot_longer(cols = c(sal1b, sal2b), names_to = "periode", values_to = "aliment_code") %>%
@@ -933,6 +990,8 @@ dl_fig_variants("g4_comparaison_dejeuner", "09", function(d) {
                     y_label = "% ménages", direction = "horizontal")
 }, sa_full)
 ```
+
+
 
 #### Changement d'aliment de base au déjeuner entre hors et pendant soudure
 
@@ -1092,6 +1151,7 @@ strat_resume %>%
   )
 ```
 
+
 ```{r dl_t9_strategies}
 #| include: false
 dl_tbl_variants("t9_strategies", "09", function(d) {
@@ -1129,6 +1189,7 @@ dl_tbl_variants("t9_strategies", "09", function(d) {
 ```
 
 ```{r g5_strategies_likert}
+#| include: false
 # G5 : Barres horizontales empilées — profil Likert des stratégies
 strat_plot <- res_ssa %>%
   left_join(res_deb, by = "j5") %>%
@@ -1150,7 +1211,30 @@ ggplot(strat_plot, aes(x = pct, y = reorder(Stratégie, pct), fill = Fréquence)
   geom_col(position = "stack") +
   facet_wrap(~Observatory) +
   labs(
-    title = "Profil de fréquence des stratégies d'adaptation",
+    # title = "Profil de fréquence des stratégies d'adaptation",
+    x = "% de ménages",
+    y = NULL,
+    fill = "Fréquence"
+  ) +
+  scale_fill_manual(values = c(
+    "Souvent" = "#d62728", "Quelquefois" = "#ff7f0e",
+    "Rarement" = "#ffbb78", "Jamais" = "#aec7e8"
+  )) +
+  theme_ror() +
+  theme(
+    plot.title = element_text(face = "bold", size = 12),
+    axis.text.y = element_text(size = 8)
+  )
+```
+
+```{r fig-strategies-likert}
+#| echo: false
+#| label: fig-strategies-likert
+#| fig-cap: "Profil de fréquence des stratégies d'adaptation. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+ggplot(strat_plot, aes(x = pct, y = reorder(Stratégie, pct), fill = Fréquence)) +
+  geom_col(position = "stack") +
+  facet_wrap(~Observatory) +
+  labs(
     x = "% de ménages",
     y = NULL,
     fill = "Fréquence"
@@ -1168,7 +1252,7 @@ ggplot(strat_plot, aes(x = pct, y = reorder(Stratégie, pct), fill = Fréquence)
 
 ```{r dl_g5_strategies_likert}
 #| include: false
-dl_fig_variants("g5_strategies_likert", "09", function(d) {
+dl_fig_variants("fig-strategies-likert", "09", function(d) {
   strat_labels_local <- c(
     "ssa01" = "S'endetter", "ssa02" = "Emprunter aliments",
     "ssa03" = "Remplacer base", "ssa04" = "Réduire ration",
@@ -1386,7 +1470,8 @@ dl_tbl_variants("t10_sources_endettement", "09", function(d) {
 
 ```{r fig_sources_endettement}
 #| echo: false
-#| fig-cap: "Sources d'endettement alimentaire"
+#| label: fig-sources-endettement
+#| fig-cap: "Sources d'endettement alimentaire.<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 res_ssa %>%
   left_join(res_deb, by = "j5") %>%
   expand_sites_for_profile() %>%
@@ -1405,7 +1490,7 @@ res_ssa %>%
 ```{r dl_fig_sources_endettement}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_sources_endettement", "09", function(d) {
+dl_fig_variants("fig-sources-endettement", "09", function(d) {
   src_labs <- c(
     "ssa01_01" = "Famille", "ssa01_02" = "Voisins",
     "ssa01_03" = "Usuriers", "ssa01_04" = "Commer\u00e7ants",
@@ -1517,7 +1602,8 @@ A Marovoay, la famille constitue de loin la principale source d’emprunt d’al
 
 ```{r fig_sources_emprunt}
 #| echo: false
-#| fig-cap: "Sources d'emprunt d'aliments de base"
+#| label: fig-sources-emprunt
+#| fig-cap: "Sources d'emprunt d'aliments de base.<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 res_ssa %>%
   left_join(res_deb, by = "j5") %>%
   expand_sites_for_profile() %>%
@@ -1536,7 +1622,7 @@ res_ssa %>%
 ```{r dl_fig_sources_emprunt}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_sources_emprunt", "09", function(d) {
+dl_fig_variants("fig-sources-emprunt", "09", function(d) {
   src_labs <- c(
     "ssa02_01" = "Famille", "ssa02_02" = "Voisins",
     "ssa02_03" = "Usuriers", "ssa02_04" = "Commer\u00e7ants",
@@ -1649,6 +1735,7 @@ A Marovoay, la médiane du score CSI simplifié est légèrement plus élevée, 
 
 
 ```{r g7_csi_boxplot}
+#| include: false
 # G7 : Distribution du score CSI par observatoire
 csi_expanded <- res_ssa %>%
   left_join(res_deb, by = "j5") %>%
@@ -1661,7 +1748,23 @@ ggplot(csi_expanded, aes(x = Observatory, y = csi_score, fill = Observatory)) +
   geom_boxplot(show.legend = FALSE) +
   { if (n_obs > 1) facet_wrap(~Observatory, scales = "free_x") } +
   labs(
-    title = "Distribution du score CSI simplifié par observatoire",
+    # title = "Distribution du score CSI simplifié par observatoire",
+    x = NULL,
+    y = "Score CSI"
+  ) +
+  theme_ror() +
+  theme(plot.title = element_text(face = "bold", size = 12))
+```
+
+```{r fig_csi_boxplot}
+#| echo: false
+#| label: fig-csi-boxplot
+#| fig-cap: "Distribution du score CSI simplifié par observatoire.<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+ggplot(csi_expanded, aes(x = Observatory, y = csi_score, fill = Observatory)) +
+  geom_boxplot(show.legend = FALSE) +
+  { if (n_obs > 1) facet_wrap(~Observatory, scales = "free_x") } +
+  labs(
+    # title = "Distribution du score CSI simplifié par observatoire",
     x = NULL,
     y = "Score CSI"
   ) +
@@ -1671,7 +1774,7 @@ ggplot(csi_expanded, aes(x = Observatory, y = csi_score, fill = Observatory)) +
 
 ```{r dl_g7_csi_boxplot}
 #| include: false
-dl_fig_variants("g7_csi_boxplot", "09", function(d) {
+dl_fig_variants("fig-csi-boxplot", "09", function(d) {
   sv <- c("ssa01", "ssa02", "ssa03", "ssa04", "ssa05", "ssa07",
           "ssa08", "ssa09", "ssa10", "ssa11", "ssa12", "ssa14",
           "ssa15", "ssa17")
@@ -1750,9 +1853,10 @@ sa_gap   <- sa_trends |> filter(year %in% c(2015, 2025))
 ```
 
 ```{r fig_sa_soudure_duration}
-#| fig-cap: "Évolution de la durée moyenne de soudure (mois/ménage)"
-#| fig-width: !expr fig_w("fig_sa_soudure_duration")
-#| fig-height: !expr fig_h("fig_sa_soudure_duration")
+#| label: fig-sa-soudure-duration
+#| fig-cap: "Évolution de la durée moyenne de soudure (mois/ménage).<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-sa-soudure-duration")
+#| fig-height: !expr fig_h("fig-sa-soudure-duration")
 
 sa_trends |>
   filter(year >= 2004) |>
@@ -1772,9 +1876,10 @@ sa_trends |>
 ::::
 
 ```{r fig_sa_pct_soudure}
-#| fig-cap: "Évolution du pourcentage de ménages en soudure"
-#| fig-width: !expr fig_w("fig_sa_pct_soudure")
-#| fig-height: !expr fig_h("fig_sa_pct_soudure")
+#| label: fig-sa-pct-soudure
+#| fig-cap: "Évolution du pourcentage de ménages en soudure.<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-sa-pct-soudure")
+#| fig-height: !expr fig_h("fig-sa-pct-soudure")
 
 sa_trends |>
   filter(year >= 2004) |>
