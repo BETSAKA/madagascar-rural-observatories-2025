@@ -13,17 +13,17 @@ Cette section decrit les conditions d'habitat, les equipements des menages, leur
 <!-- Les résultats présentés ci-dessous sont provisoires et pourront être ajustés ou enrichis par les informations supplémentaires recueillies lors des restitutions locales. -->
 <!-- ::: -->
 
-::: {.content-hidden when-profile="marovoay"}
+:::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
 Dans l'Alaotra, les conditions d'habitat bénéficient de la relative prospérité du premier bassin rizicole du pays. L'accès à l'eau est facilité par la proximité du lac et du réseau d'irrigation, mais la qualité de l'eau potable reste un enjeu sanitaire. Les ménages des fokontany proches des périmètres irrigués (Avaradrano, Feramanga Atsimo, Mangabe) disposent en moyenne d'un meilleur équipement agricole que ceux des zones périphériques. La possession de biens de confort courants y est plus répandue que dans d'autres observatoires ruraux de Madagascar.
 :::
-:::
+::::
 
-::: {.content-hidden when-profile="alaotra"}
+:::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
  À Marovoay, les conditions d'habitat sont étroitement liées à la position des ménages par rapport au fleuve Betsiboka. Les fokontany de la rive droite (Bepako, Madiromiongana), situés en lisière du Parc national d'Ankarafantsika, ont un accès plus limité aux ressources en bois et matériaux de construction, notamment en raison des restrictions liées à la conservation. L'approvisionnement en eau dépend en grande partie du fleuve et de puits traditionnels. L'équipement agricole y est dominé par les outils manuels, complétés par le recours à la traction bovine pour le labour des rizières.
 :::
-:::
+::::
 
 ```{r setup_habitat}
 #| include: false
@@ -109,17 +109,17 @@ Les conditions d'habitat des ménages enquêtés témoignent des réalités du m
 
 Le statut d'occupation du logement traduit la sécurité résidentielle des ménages.
 
-::: {.content-hidden when-profile="marovoay"}
+:::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
 Dans l'Alaotra, `r pct_statut_a` % des ménages occupent un logement en « `r top_statut_a` ».Cette zone rizicole compte plus de locataires (10.1 %) et de logements prêtés (15.8 %).
 :::
-:::
+::::
 
-::: {.content-hidden when-profile="alaotra"}
+:::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
 À Marovoay, `r pct_statut_m` % des ménages occupent un logement en « `r top_statut_m` », avec des proportions particulièrement élevées dans les localités les plus enclavées. À l'inverse, la location reste plus présente dans les hameaux proches de l'axe routier. Ces disparités traduisent des niveaux différents de sécurité résidentielle selon le positionnement géographique des ménages.
 :::
-:::
+::::
 
 ```{r house_status}
 #| include: false
@@ -166,17 +166,17 @@ dl_fig_variants("fig_house_status", "05", function(d) {
 
 Le type de latrine constitue un indicateur sanitaire fondamental.
 
-::: {.content-hidden when-profile="marovoay"}
+:::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
 Dans l'Alaotra, le type d’assainissement le plus répandu est la « `r top_lat_a` » utilisée par `r pct_lat_a` % des ménages. Elle est suivie par la « fosse perdue individuelle » qui concerne 24% des ménages. En revanche, les pratiques de défécation dans la nature demeurent très marginales au sein de cet observatoire.
 :::
-:::
+::::
 
-::: {.content-hidden when-profile="alaotra"}
+:::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
 À Marovoay, le type dominant est « `r top_lat_m` » (`r pct_lat_m` % des ménages). L'assainissement se caractérise par une forte prévalence de la défécation à l'air libre et une utilisation limitée des latrines améliorées. Les fosses perdues en commun et les fosses perdues individuelles occupent une place secondaire, chacune étant utilisée par un quart des ménages. De nettes disparités territoriales existent entre les localités, les hameaux les plus éloignés présentant les taux d'accès les plus faibles aux infrastructures sanitaires.
 :::
-:::
+::::
 
 ```{r latrine}
 #| include: false
@@ -221,17 +221,17 @@ dl_fig_variants("fig_latrine", "05", function(d) {
 L'approvisionnement en eau détermine en grande partie les conditions sanitaires des ménages ruraux.
 L'accès à une eau plus sécurisée est nettement supérieur à Alaotra. Marovoay reste très dépendant des eaux de surface prenant source au fleuve Betsiboka. Ce qui pose des enjeux de santé publique.
 
-::: {.content-hidden when-profile="marovoay"}
+:::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
 Dans l'Alaotra, la source principale est « `r top_eau_a` » (`r pct_eau_a` %). Les puits non aménagés constituent le deuxième mode d’accès à l’eau avec 31.4% des ménages concernés. Les autres sources d’approvisionnement restent minoritaires.
 :::
-:::
+::::
 
-::: {.content-hidden when-profile="alaotra"}
+:::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
 À Marovoay, l’approvisionnement en eau repose principalement sur les « `r top_eau_m` » utilisés par `r pct_eau_m` % des ménages. . Les ménages dépendent fortement des sources naturelles : cours d'eau et puits non aménagés représentent ensemble une part importante de l'approvisionnement (27.6%).L'accès à l'eau améliorée (bornes fontaines publiques, eau courante) reste limité à l'échelle de l'observatoire, avec des disparités marquées entre localités. Les puits à margelle représentent aussi une part notable avec 11.2% des ménages utilisateurs.
 :::
-:::
+::::
 
 ```{r water}
 #| include: false
@@ -385,49 +385,6 @@ dl_fig_variants("fig_lighting", "05", function(d) {
 }, res_h |> left_join(obs, by = "j5"))
 ```
 
-```
-
-library(dplyr)
-library(ggplot2)
-library(scales)
-
-df_solar_status <- res_h |>
-  left_join(obs_site, by = "j5") |>
-  filter(h7c == 1, !is.na(h7c1), !is.na(Observatory)) |>
-  mutate(
-    En_marche = if_else(h7c1 == 1, "Oui", "Non"),
-    En_marche = factor(En_marche, levels = c("Oui", "Non")),
-    Observatory = factor(Observatory, levels = c("Marovoay", "Alaotra"))
-  ) |>
-  count(Observatory, En_marche, .drop = FALSE) |>
-  group_by(Observatory) |>
-  mutate(pct = 100 * n / sum(n)) |>
-  ungroup()
-
-ggplot(df_solar_status, aes(x = pct, y = En_marche, fill = Observatory)) +
-  geom_col(width = 0.85, show.legend = FALSE) +
-  geom_text(aes(label = round(pct, 0)), hjust = -0.15, size = 5.2) +
-  facet_wrap(~Observatory, nrow = 1) +
-  scale_y_discrete(limits = rev(levels(df_solar_status$En_marche))) +
-  scale_x_continuous(
-    limits = c(0, max(df_solar_status$pct, na.rm = TRUE) + 10),
-    breaks = pretty_breaks(5),
-    labels = function(x) paste0(x, "%")
-  ) +
-  labs(
-    x = "%",
-    y = NULL
-  ) +
-  theme_minimal(base_size = 16) +
-  theme(
-    panel.grid.major.y = element_blank(),
-    panel.grid.minor = element_blank(),
-    strip.text = element_text(size = 15, face = "plain"),
-    axis.text.y = element_text(size = 15, face = "plain"),
-    axis.text.x = element_text(size = 14, face = "plain"),
-    axis.title.x = element_text(size = 15, face = "plain")
-  )
-```
 
 
 ### Source d'énergie pour la cuisson
@@ -459,7 +416,7 @@ cooking <- res_h |>
 
 cooking |>
   obs_gt() |>
-  tab_header(title = obs_title("Modes de cuisson des ménages")) |>
+  # tab_header(title = obs_title("Modes de cuisson des ménages")) |>
   cols_label(Type = "Source d'energie", pct = "%") |>
   cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
@@ -467,8 +424,10 @@ cooking |>
 ```
 
 ```{r fig-cooking}
+#| label: fig-cooking
+#| fig-cap: "Mode de cuisson par observatoire.<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-height: !expr fig_h("fig-cooking")
-cooking |> make_bar_obs(title = obs_title("Modes de cuisson"))
+cooking |> make_bar_obs()
 ```
 
 ```{r dl_cooking}
@@ -514,16 +473,18 @@ comfort <- res_v |>
 
 comfort |>
   obs_gt() |>
-  tab_header(title = obs_title("Taux de possession de biens de confort courants")) |>
+  tab_header( title = obs_title("Taux de possession de biens de confort courants")) |>
   cols_label(Type = "Bien", pct = "%") |>
   cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
   style_table()
 ```
 
-```{r fig-comfort}
+```{r fig_comfort}
+#| label: fig-comfort
+#| fig-cap: "Biens de confort courants.<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-height: !expr fig_h("fig-comfort")
-comfort |> make_bar_obs(title = obs_title("Biens de confort courants"))
+comfort |> make_bar_obs()
 ```
 
 ```{r dl_comfort}
@@ -594,11 +555,12 @@ table_equip |>
   style_table()
 ```
 
-```{r fig-table-equip}
+```{r fig_table_equip}
+#| label: fig-table-equip
+#| fig-cap: "Équipements agricoles par observatoire.<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-height: !expr fig_h("fig-table-equip")
 table_equip |>
-  make_bar_obs(x = Equipement, y = pct_menages,
-          title = obs_title("Équipements agricoles"), ncol = 2)
+  make_bar_obs(x = Equipement, y = pct_menages, ncol = 2)
 ```
 
 ```{r dl_agri_equipment}
@@ -664,9 +626,11 @@ comm |>
   style_table()
 ```
 
-```{r fig-comm}
+```{r fig_comm}
+#| label: fig-comm
+#| fig-cap: "Matériels de communication.<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-height: !expr fig_h("fig-comm")
-comm |> make_bar_obs(title = obs_title("Matériels de communication"))
+comm |> make_bar_obs()
 ```
 
 ```{r dl_communication}
@@ -746,8 +710,9 @@ val_par_type <- res_t2_obs |>
   filter(n >= 5)
 ```
 
-```{r fig-transferts-sortants}
-#| fig-cap: "Valeur moyenne des transferts sortants par observatoire et type"
+```{r fig_transferts_sortants}
+#| label: fig-transferts-sortants
+#| fig-cap: "Valeur moyenne des transferts sortants par observatoire et type.<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-transferts-sortants")
 #| fig-height: !expr fig_h("fig-transferts-sortants")
 val_par_type |>
@@ -851,8 +816,9 @@ dest_data <- res_t2_obs |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 ```
 
-```{r fig-destination-transferts}
-#| fig-cap: "Lieu de residence des destinataires de transferts"
+```{r fig_destination_transferts}
+#| label: fig-destination-transferts
+#| fig-cap: "Lieu de résidence des destinataires de transferts.<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-destination-transferts")
 #| fig-height: !expr fig_h("fig-destination-transferts")
 dest_data |>
@@ -881,9 +847,6 @@ dl_fig_variants("fig_destination", "05", function(d) {
                     facet = FALSE)
 }, res_t2 |> left_join(obs, by = "j5"))
 ```
-
-<!-- ::: {.content-visible when-profile="consolidated"} -->
-<!-- ::: {.obs-technical} -->
 
 ## Revenu
 
@@ -943,7 +906,6 @@ Afin de mieux apprécier le niveau de vie, le revenu total est également rappor
 ::: {.content-visible when-profile="consolidated"}
 Pour les deux observatoires, le fait que la moyenne soit nettement supérieure à la médiane (environ 66 % de plus à Marovoay et 67 % à l'Alaotra) confirme qu'une minorité de ménages disposant de revenus très élevés tire la moyenne vers le haut, illustrant les inégalités de richesse dans ces bassins rizicoles. Aussi, le revenu par équivalent est supérieur au revenu par tête, ce qui montre que l'ajustement pour la composition du ménage améliore le niveau de vie économique estimé des membres du ménage.
 L'Alaotra présente des niveaux de vie nettement supérieurs à ceux de Marovoay, quelle que soit l'unité de mesure choisie.
-
 :::
 
 :::: {.content-hidden when-profile="marovoay"}
@@ -1161,19 +1123,20 @@ Afin de mieux apprécier le niveau de vie, le revenu total est également rappor
 :::: {.content-hidden when-profile="marovoay"} 
 ::: obs-alaotra 
  A Alaotra, la distribution du revenu total annuel des ménages dans l’observatoire d’Alaotra montre une forte concentration des revenus autour des valeurs intermédiaires, avec une densité maximale située approximativement entre 1,000,000 et 10,000,000 Ar en échelle logarithmique. La courbe présente une forme relativement asymétrique vers la droite, indiquant que certains ménages disposent de revenus plus élevés mais restent peu nombreux. Les très faibles revenus ainsi que les revenus extrêmement élevés apparaissent avec une faible densité. La distribution traduit donc une concentration majoritaire des ménages autour des revenus moyens. 
- ::: 
- ::::
+::: 
+::::
 
 :::: {.content-hidden when-profile="alaotra"} 
-::: obs-marovoay -
+::: obs-marovoay
 A Marovoay, la distribution du revenu total annuel des ménages suit également une forme unimodale avec une concentration importante des ménages autour des revenus intermédiaires. La densité maximale se situe dans la même plage logarithmique, principalement entre 1,000,000 et 10,000,000 Ar. La courbe présente une légère asymétrie à droite, ce qui montre l’existence de quelques ménages à revenus élevés, mais en effectif limité. Les ménages à très faibles revenus ainsi que ceux ayant des revenus très élevés restent minoritaires dans la distribution globale. 
 :::
 ::::
 
 ```{r fig_revtot_dist}
-#| fig-cap: "Distribution du revenu total par observatoire (echelle log)"
-#| fig-width: !expr fig_w("fig_revtot_dist")
-#| fig-height: !expr fig_h("fig_revtot_dist")
+#| label: fig-revtot-dist
+#| fig-cap: "Distribution du revenu total par observatoire (echelle log).<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-revtot-dist")
+#| fig-height: !expr fig_h("fig-revtot-dist")
 
 inc |>
   filter(revtot > 0) |>
@@ -1490,9 +1453,10 @@ trends <- trends |>
 ```
 
 ```{r fig_trends_revtot}
-#| fig-cap: "Evolution du revenu total moyen par menage (Ar courants)"
-#| fig-width: !expr fig_w("fig_trends_revtot")
-#| fig-height: !expr fig_h("fig_trends_revtot")
+#| label: fig-trends-revtot
+#| fig-cap: "Evolution du revenu total moyen par menage (Ar courants.<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-trends-revtot")
+#| fig-height: !expr fig_h("fig-trends-revtot")
 
 trends |> make_trend_plot(revtot_mean, "Revenu total moyen (Ar/menage/an)")
 ```
@@ -1511,9 +1475,10 @@ A Marovoay, le revenu courant moyen par ménage augmente progressivement entre 1
 
 
 ```{r fig_trends_revcou}
-#| fig-cap: "Evolution du revenu courant moyen par menage (Ar courants)"
-#| fig-width: !expr fig_w("fig_trends_revcou")
-#| fig-height: !expr fig_h("fig_trends_revcou")
+#| label: fig-trends-revcou
+#| fig-cap: "Evolution du revenu courant moyen par menage (Ar courants).<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-trends-revcou")
+#| fig-height: !expr fig_h("fig-trends-revcou")
 
 trends |> make_trend_plot(revcou_mean, "Revenu courant moyen (Ar/menage/an)")
 ```
@@ -1532,9 +1497,10 @@ A Marovoay, le revenu courant moyen suit également une tendance générale à l
 
 
 ```{r fig_trends_decomp}
-#| fig-cap: "Evolution des composantes du revenu courant moyen (Ar courants)"
-#| fig-width: !expr fig_w("fig_trends_decomp")
-#| fig-height: !expr fig_h("fig_trends_decomp")
+#| label: fig-trends-decomp
+#| fig-cap: "Evolution des composantes du revenu courant moyen (Ar courants).<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-trends-decomp")
+#| fig-height: !expr fig_h("fig-trends-decomp")
 
 # Note: certaines composantes (rev_cu en 2002-2004) sont negatives en raison
 # de charges superieures aux recettes. On utilise geom_col qui gere
@@ -1565,14 +1531,15 @@ La comparaison des revenus sur longue periode necessite de tenir compte de l'inf
 
 L’IPC national de Madagascar présente une augmentation continue entre 1995 et 2025, traduisant une hausse progressive du niveau général des prix sur l’ensemble de la période. L’indice passe d’environ 25 en 1995 à près de 50 au début des années 2000, avant d’atteindre le niveau de base 100 en 2010. Après 2010, la progression se poursuit de manière régulière avec un indice d’environ 130 en 2014, puis une accélération plus marquée à partir de 2015. En 2025, l’IPC atteint près de 290, soit presque trois fois le niveau de 2010. Cette évolution montre une inflation soutenue sur le long terme, avec une hausse particulièrement importante au cours des dix dernières années.
 
-::: {.callout-note}
-Une prochaine version de ce rapport integrera un IPC regional (Boeny pour Marovoay, Alaotra-Mangoro pour Alaotra), extrait des series de l'INSTAT ou des enquetes EPM, afin de mieux capter l'inflation locale.
-:::
+<!-- ::: {.callout-note} -->
+<!-- Une prochaine version de ce rapport integrera un IPC regional (Boeny pour Marovoay, Alaotra-Mangoro pour Alaotra), extrait des series de l'INSTAT ou des enquetes EPM, afin de mieux capter l'inflation locale. -->
+<!-- ::: -->
 
 ```{r fig_ipc_national}
-#| fig-cap: "Evolution de l'IPC national Madagascar (base 2010 = 100)"
-#| fig-width: !expr fig_w("fig_ipc_national")
-#| fig-height: !expr fig_h("fig_ipc_national")
+#| label: fig-ipc-national
+#| fig-cap: "Evolution de l'IPC national Madagascar (base 2010 = 100).<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-ipc-national")
+#| fig-height: !expr fig_h("fig-ipc-national")
 
 cpi_series <- trends |>
   distinct(year, cpi) |>
@@ -1612,9 +1579,10 @@ Le prix médian du paddy augmente de manière globale dans les deux observatoire
 ::::
 
 ```{r fig_trends_paddy}
-#| fig-cap: "Evolution du prix median du paddy (Ar/kg)"
-#| fig-width: !expr fig_w("fig_trends_paddy")
-#| fig-height: !expr fig_h("fig_trends_paddy")
+#| label: fig-trends-paddy
+#| fig-cap: "Evolution du prix median du paddy (Ar/kg).<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-trends-paddy")
+#| fig-height: !expr fig_h("fig-trends-paddy")
 
 trends |> make_trend_plot(prix_paddy_median, "Prix median du paddy (Ar/kg)")
 ```
@@ -1635,9 +1603,10 @@ A Alaotra, l’indice du prix du paddy suit également une tendance haussière. 
 
 
 ```{r fig_ipc_vs_paddy}
-#| fig-cap: "Comparaison de l'IPC national et de l'indice du prix du paddy (base 100 en 2010)"
-#| fig-width: !expr fig_w("fig_ipc_vs_paddy")
-#| fig-height: !expr fig_h("fig_ipc_vs_paddy")
+#| label: fig-ipc-vs-paddy
+#| fig-cap: "Comparaison de l'IPC national et de l'indice du prix du paddy (base 100 en 2010).<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-ipc-vs-paddy")
+#| fig-height: !expr fig_h("fig-ipc-vs-paddy")
 
 paddy_2010 <- trends |>
   filter(year == 2010) |>
@@ -1687,27 +1656,30 @@ Le revenu total réel moyen par ménage présente des fluctuations importantes d
 ::::
 
 ```{r fig_trends_revtot_real}
-#| fig-cap: "Evolution du revenu total reel moyen par menage (Ar constants 2010, IPC)"
-#| fig-width: !expr fig_w("fig_trends_revtot_real")
-#| fig-height: !expr fig_h("fig_trends_revtot_real")
+#| label: fig-trends-revtot-real
+#| fig-cap: "Evolution du revenu total réel moyen par ménage (Ar constants 2010, IPC).<br>Source: Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-trends-revtot-real")
+#| fig-height: !expr fig_h("fig-trends-revtot-real")
 
-trends |> make_trend_plot(revtot_real, "Revenu total reel moyen (Ar constants 2010)")
+trends |> make_trend_plot(revtot_real, "Revenu total réel moyen (Ar constants 2010)")
 ```
 
 ```{r fig_trends_revtot_real_pc}
-#| fig-cap: "Evolution du revenu total reel moyen par tete (Ar constants 2010, IPC)"
-#| fig-width: !expr fig_w("fig_trends_revtot_real_pc")
-#| fig-height: !expr fig_h("fig_trends_revtot_real_pc")
+#| label: fig-trends-revtot-real-pc
+#| fig-cap: "Evolution du revenu total réel moyen par tête (Ar constants 2010, IPC).<br>Source: Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-trends-revtot-real-pc")
+#| fig-height: !expr fig_h("fig-trends-revtot-real-pc")
 
-trends |> make_trend_plot(revtot_real_pc, "Revenu total reel moyen (Ar/tete/an, constants 2010)")
+trends |> make_trend_plot(revtot_real_pc, "Revenu total réel moyen (Ar/tete/an, constants 2010)")
 ```
 
 ```{r fig_trends_revtot_real_eq}
-#| fig-cap: "Evolution du revenu total reel moyen par unite de consommation (Ar constants 2010, IPC)"
+#| label: fig-trends-revtot-real-eq
+#| fig-cap: "Evolution du revenu total réel moyen par unité de consommation (Ar constants 2010, IPC).<br>Source: Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig_trends_revtot_real_eq")
 #| fig-height: !expr fig_h("fig_trends_revtot_real_eq")
 
-trends |> make_trend_plot(revtot_real_eq, "Revenu total reel moyen (Ar/UC/an, constants 2010)")
+trends |> make_trend_plot(revtot_real_eq, "Revenu total réel moyen (Ar/UC/an, constants 2010)")
 ```
 
 Le revenu courant réel moyen par ménage présente une évolution très fluctuante dans les deux observatoires sur l’ensemble de la période étudiée.
@@ -1726,30 +1698,33 @@ Le revenu courant réel moyen par ménage présente une évolution très fluctua
 
 
 ```{r fig_trends_revcou_real}
-#| fig-cap: "Evolution du revenu courant reel moyen par menage (Ar constants 2010, IPC)"
+#| label: fig_trends_revcou_real
+#| fig-cap: "Evolution du revenu courant réel moyen par ménage (Ar constants 2010, IPC).<br>Source: Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig_trends_revcou_real")
 #| fig-height: !expr fig_h("fig_trends_revcou_real")
 
-trends |> make_trend_plot(revcou_real, "Revenu courant reel moyen (Ar constants 2010)")
+trends |> make_trend_plot(revcou_real, "Revenu courant reél moyen (Ar constants 2010)")
 ```
 
 ```{r fig_trends_revcou_real_pc}
-#| fig-cap: "Evolution du revenu courant reel moyen par tete (Ar constants 2010, IPC)"
+#| label: fig-trends-revcou-real-pc
+#| fig-cap: "Evolution du revenu courant réel moyen par tête (Ar constants 2010, IPC).<br>Source: Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig_trends_revcou_real_pc")
 #| fig-height: !expr fig_h("fig_trends_revcou_real_pc")
 
-trends |> make_trend_plot(revcou_real_pc, "Revenu courant reel moyen (Ar/tete/an, constants 2010)")
+trends |> make_trend_plot(revcou_real_pc, "Revenu courant réel moyen (Ar/tête/an, constants 2010)")
 ```
 
 ```{r fig_trends_revcou_real_eq}
-#| fig-cap: "Evolution du revenu courant reel moyen par unite de consommation (Ar constants 2010, IPC)"
-#| fig-width: !expr fig_w("fig_trends_revcou_real_eq")
-#| fig-height: !expr fig_h("fig_trends_revcou_real_eq")
+#| label: fig-trends-revcou-real-eq
+#| fig-cap: "Evolution du revenu courant réel moyen par unité de consommation (Ar constants 2010, IPC).<br>Source: Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-trends-revcou-real-eq")
+#| fig-height: !expr fig_h("fig-trends-revcou-real-eq")
 
-trends |> make_trend_plot(revcou_real_eq, "Revenu courant reel moyen (Ar/UC/an, constants 2010)")
+trends |> make_trend_plot(revcou_real_eq, "Revenu courant réel moyen (Ar/UC/an, constants 2010)")
 ```
 
-### Revenus reels (deflates par le prix du paddy)
+### Revenus réels (deflatés par le prix du paddy)
 
 Le prix du paddy, produit central de ces economies rizicoles, offre un déflateur alternatif plus proche de la realite locale que l'IPC national. Les revenus sont ici exprimes en equivalent-paddy a prix 2010, c'est-a-dire divises par l'indice du prix median du paddy de chaque observatoire (base 2010 = 1). Ce déflateur est propre a chaque observatoire. 
 
@@ -1768,11 +1743,12 @@ Le revenu total réel moyen par ménage exprimé en constants paddy 2010 présen
 ::::
 
 ```{r fig_trends_revtot_paddy}
-#| fig-cap: "Evolution du revenu total reel moyen par menage (Ar constants paddy 2010)"
-#| fig-width: !expr fig_w("fig_trends_revtot_paddy")
-#| fig-height: !expr fig_h("fig_trends_revtot_paddy")
+#| label: fig-trends-revtot-paddy
+#| fig-cap: "Evolution du revenu total réel moyen par ménage (Ar constants paddy 2010).<br>Source: Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-trends-revtot-paddy")
+#| fig-height: !expr fig_h("fig-trends-revtot-paddy")
 
-trends |> make_trend_plot(revtot_paddy, "Revenu total reel moyen (Ar constants paddy 2010)")
+trends |> make_trend_plot(revtot_paddy, "Revenu total réel moyen (Ar constants paddy 2010)")
 ```
 
 Le revenu courant réel moyen par ménage exprimé en constants paddy 2010 présente de fortes variations dans les deux observatoires au cours de la période étudiée.
@@ -1790,11 +1766,12 @@ Le revenu courant réel moyen par ménage exprimé en constants paddy 2010 prés
 ::::
 
 ```{r fig_trends_revcou_paddy}
-#| fig-cap: "Evolution du revenu courant reel moyen par menage (Ar constants paddy 2010)"
-#| fig-width: !expr fig_w("fig_trends_revcou_paddy")
-#| fig-height: !expr fig_h("fig_trends_revcou_paddy")
+#| label: fig-trends-revcou-paddy
+#| fig-cap: "Evolution du revenu courant réel moyen par ménage (Ar constants paddy 2010).<br>Source: Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-trends-revcou-paddy")
+#| fig-height: !expr fig_h("fig-trends-revcou-paddy")
 
-trends |> make_trend_plot(revcou_paddy, "Revenu courant reel moyen (Ar constants paddy 2010)")
+trends |> make_trend_plot(revcou_paddy, "Revenu courant réel moyen (Ar constants paddy 2010)")
 ```
 
 ## Evolution des conditions d'habitat (1997-2025) {#sec-habitat-multiyear}
@@ -1873,9 +1850,10 @@ hab_gap   <- habitat_trends |> filter(year %in% c(2015, 2025))
 
 
 ```{r fig_habitat_water}
-#| fig-cap: "Evolution de l'acces a une source d'eau amelioree (1997-2025)"
-#| fig-width: !expr fig_w("fig_habitat_water")
-#| fig-height: !expr fig_h("fig_habitat_water")
+#| label: fig-habitat-water
+#| fig-cap: "Evolution de l'accès à une source d'eau ameliorée (1997-2025).<br>Source: Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-habitat-water")
+#| fig-height: !expr fig_h("fig-habitat-water")
 
 if ("pct_eau_amelioree" %in% names(habitat_trends)) {
   ggplot(mapping = aes(x = year, y = pct_eau_amelioree, colour = Observatory)) +
