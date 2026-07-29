@@ -226,13 +226,13 @@ Le taux d'exposition aux cataclysmes est très élevé.
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
-A Alaotra, l'analyse de la répartition des cataclysmes a met en évidence une prédominance marquée de la sécheresse qui affecte 56.4% des ménages. Les risques liés aux nuisibles constituent le second pôle de vulnérabilité avec 15.2% des foyers touchés par d'autres bestioles et 13.4% par les rats. Les maladies des cultures ou de l'élevage, tout comme les facteurs humains incluant les vols et dégradations concernent chacun 13.0% de la population enquêtée. Les aléas climatiques violents tels que les inondations et les cyclones présentent des taux de prévalence respectifs de 9.5% et 5.5%. Les autres catégories d'évènements, notamment la grêle (1.4%), les incendies ou la foudre (0.8%), les oiseaux (0.8%) et les invasions de criquets (0.4%), demeurent plus marginales au cours de la période de référence.
+A Alaotra, l'analyse de la répartition des cataclysmes a met en évidence une prédominance marquée de la sécheresse qui affecte 43% des ménages. Les maladies des cultures ou de l'élevage, tout comme les rats et les facteurs humains incluant les vols et dégradations concernent chacun 10% des ménages enquêtés. 
 :::
 ::::
 
 :::: {.content-hidden when-profile="alaotra"}
 ::: obs-marovoay
-A Marovoay, la structure de l'exposition aux risques est également dominée par la sécheresse, signalée par 52.4% des ménages. Les pathologies affectant le capital productif regroupées sous la catégorie des maladies des cultures et de l'élevage représentent un défi majeur touchant 20.0% des foyers. Les dommages imputables aux rats et aux facteurs humains atteignent des niveaux identiques concernant chacun 8.1% de l'échantillon. La zone enregistre par ailleurs des incidents liés aux criquets à hauteur de 3.9% suivis par les autres bestioles (3.5%) ainsi que les cyclones (3.1%) et les inondations (3.1%).
+A Marovoay, la structure de l'exposition aux risques est  dominée par la sécheresse, signalée par 50% des ménages. Les pathologies affectant le capital productif regroupées sous la catégorie des maladies des cultures et de l'élevage représentent un défi majeur touchant 19% des ménages. Les dommages imputables aux rats et aux facteurs humains atteignent des niveaux identiques concernant chacun 8% de l'échantillon.
 :::
 ::::
 
@@ -310,6 +310,7 @@ dl_tbl_variants("tbl_cata_type", "11", function(d) {
 La sécheresse est de loin le cataclysme le plus fréquemment cité, suivi des maladies (cultures/élevage), des rats et des facteurs humains (vol, dégradation). Les cyclones et inondations ont touché un nombre plus limité de ménages pour cette campagne.
 
 ```{r g1_prevalence_type}
+#| include: false
 #| fig-height: !expr fig_h("g1_prevalence_type")
 # G1 : Barres horizontales — types de cataclysmes les plus fréquents
 events |>
@@ -325,6 +326,28 @@ events |>
   mutate(pct = round(n / n_total * 100, 1)) |>
   make_bar_obs(x = Catastrophe, y_label = "% des ménages")
 ```
+
+```{r fig_prevalence_type}
+#| echo: false
+#| label: fig-prevalence-type
+#| fig-cap: "Représentation de la prévalence par type de catastrophe. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-prevalence-type")
+#| fig-height: !expr fig_h("fig-prevalence-type")
+
+events |>
+  inner_join(res_deb, by = "j5") |>
+  expand_sites_for_profile() |>
+  group_by(Observatory, Catastrophe) |>
+  summarise(n = n_distinct(j5), .groups = "drop") |>
+  left_join(
+    events |> inner_join(res_deb, by = "j5") |> expand_sites_for_profile() |>
+      count(Observatory, name = "n_total"),
+    by = "Observatory"
+  ) |>
+  mutate(pct = round(n / n_total * 100, 1)) |>
+  make_bar_obs(x = Catastrophe, y_label = "% des ménages")
+```
+
 
 ```{r dl_g1_prevalence_type}
 #| echo: false
@@ -447,7 +470,8 @@ dl_tbl_variants("tbl_degats_logement", "11", function(d) {
 
 ```{r fig_degats_logement}
 #| echo: false
-#| fig-cap: "Dégâts sur le logement par type de catastrophe"
+#| label: fig-degats-logement
+#| fig-cap: "Dégâts sur le logement par type de catastrophe. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 events %>%
   inner_join(res_deb, by = "j5") %>%
   expand_sites_for_profile() %>%
@@ -467,7 +491,7 @@ events %>%
 ```{r dl_fig_degats_logement}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_degats_logement", "11", function(d) {
+dl_fig_variants("fig-degats-logement", "11", function(d) {
   d %>%
     filter(!is.na(cc1a1)) %>%
     group_by(Observatory, Catastrophe) %>%
@@ -498,9 +522,10 @@ A Marovoay, les maladies des cultures et de l'élevage arrivent en tête avec un
 :::
 ::::
 
-```{r t5_degats_elevage}
+```{r fig_degats_elevage}
 #| include: true
-#| fig-cap: "Gravité des dégâts sur l'élevage par type de Catastrophe"
+#| label: fig-degats-elevage
+#| fig-cap: "Gravité des dégâts sur l'élevage par type de Catastrophe. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: 12
 #| fig-height: 8
 # T5 : Gravité des dégâts sur l'élevage par type de Catastrophe et observatoire
@@ -636,7 +661,7 @@ ggplot(degats_elevage_plot, aes(x = Catastrophe, y = pct, fill = Niveau)) +
 #| include: false
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_degats_elevage", "11", function(d) {
+dl_tbl_variants("fig-degats-elevage", "11", function(d) {
   d %>%
     filter(!is.na(cc1a3)) %>%
     mutate(Niveau = degats_labels[as.character(cc1a3)]) %>%
@@ -725,8 +750,9 @@ dl_tbl_variants("tbl_degats_personnes", "11", function(d) {
 
 ```{r fig_degats_personnes}
 #| echo: false
-#| fig-cap: "Conséquences des cataclysmes sur les personnes"
-#| fig-height: !expr fig_h("fig_degats_personnes")
+#| label: fig-degats-personnes
+#| fig-cap: "Conséquences des cataclysmes sur les personnes. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-height: !expr fig_h("fig-degats-personnes")
 events %>%
   inner_join(res_deb, by = "j5") %>%
   expand_sites_for_profile() %>%
@@ -740,14 +766,14 @@ events %>%
   select(-n, -total) %>%
   ror_bar_stacked(
     x = Catastrophe, y = pct, fill = Conséquence,
-    title = "Conséquences sur les personnes par type de catastrophe"
+    # title = "Conséquences sur les personnes par type de catastrophe"
   )
 ```
 
 ```{r dl_fig_degats_personnes}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_degats_personnes", "11", function(d) {
+dl_fig_variants("fig-degats-personnes", "11", function(d) {
   pl <- c("1" = "Aucun", "2" = "Blessure/Maladie",
           "3" = "Décès/Disparu", "4" = "Manque de vivres")
   d %>%
@@ -787,6 +813,7 @@ A Marovoay, le profil de sévérité des catastrophes sur l’agriculture et l'�
 ::::
 
 ```{r g2_severite_profil}
+#| include: false
 # G2 : Barres empilées — sévérité des dégâts pour les 5 cataclysmes les plus fréquents
 top5_cata <- events %>%
   count(Catastrophe, sort = TRUE) %>%
@@ -817,6 +844,25 @@ severite_plot |>
     palette = c(
       "Destruction totale" = "#d62728", "Beaucoup" = "#ff7f0e",
       "Un peu" = "#ffbb78", "Rien" = "#aec7e8"
+    )
+  )
+```
+
+```{r fig_severite_profil}
+#| label: fig-severite-profil
+#| fig-cap: "Représentation de la sévérité des principaux cataclysmes. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-severite-profil")
+#| fig-height: !expr fig_h("fig-severite-profil")
+severite_plot |>
+  ror_bar_stacked(
+    x = Catastrophe, y = pct, fill = Niveau,
+    y_label = "% des ménages", proportion = FALSE,
+    direction = "horizontal",
+    palette = c(
+      "Destruction totale" = "#d62728",
+      "Beaucoup" = "#ff7f0e",
+      "Un peu" = "#ffbb78",
+      "Rien" = "#aec7e8"
     )
   )
 ```
