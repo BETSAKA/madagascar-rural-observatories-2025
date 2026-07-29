@@ -134,11 +134,11 @@ Les ménages ont été interrogés sur la disponibilité de dix catégories de r
 ::::
 
 
-```{r}
-#| fig-cap: "Disponibilité perçue des ressources naturelles dans la zone protégée, par observatoire"
+```{r fig_ressources_dispo}
+#| label: fig-ressources-dispo
+#| fig-cap: "Disponibilité perçue des ressources naturelles dans la zone protégée, par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-ressources-dispo")
 #| fig-height: !expr fig_h("fig-ressources-dispo")
-#| label: fig-ressources-dispo
 
 res_labels <- tribble(
   ~rm2_lig, ~Ressource,
@@ -223,8 +223,8 @@ A Marovoay, 75.0% des ménages rapportent une diminution de la terre de culture,
 :::
 ::::
 
-```{r}
-#| fig-cap: "Évolution perçue des ressources naturelles au cours des 3 dernières années"
+```{r fig_evolution_ressources}
+#| fig-cap: "Évolution perçue des ressources naturelles au cours des 3 dernières années. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-evolution-ressources")
 #| fig-height: !expr fig_h("fig-evolution-ressources")
 #| label: fig-evolution-ressources
@@ -284,7 +284,7 @@ dl_fig_variants("fig_evolution_ressources", "10", function(d) {
 
 ### Appartenance perçue de la zone
 
-La question RM3 demande à qui appartient la zone protégée (réponses multiples). La @fig-appartenance montre les réponses par observatoire.
+La @fig-appartenance montre les réponses par observatoire (réponses multiples).
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
@@ -313,8 +313,8 @@ appart <- rm3_items |>
   pmap_dfr(\(var, label) pct_oui_site(res_op_env, var, label))
 ```
 
-```{r}
-#| fig-cap: "À qui appartient la zone protégée ? (% de Oui, réponses multiples)"
+```{r fig_appartenance}
+#| fig-cap: "À qui appartient la zone protégée ? (% de Oui, réponses multiples). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-appartenance")
 #| fig-height: !expr fig_h("fig-appartenance")
 #| label: fig-appartenance
@@ -421,8 +421,9 @@ resps <- resp_items |>
 ```
 
 ```{r fig_menaces}
-#| fig-cap: "Menaces perçues et responsables identifiés (% de Oui)"
-#| fig-height: !expr fig_h("fig_menaces")
+#| label: fig-menaces
+#| fig-cap: "Menaces perçues et responsables identifiés (% de Oui). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-height: !expr fig_h("fig-menaces")
 
 menaces_long <- bind_rows(
   menace_items |> pmap_dfr(\(var, label) pct_oui_site(op_menace, var, label)) |> mutate(Section = "Menaces"),
@@ -442,7 +443,7 @@ menaces_long |>
 ```{r dl_fig_menaces}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_menaces", "10", function(d) {
+dl_fig_variants("fig-menaces", "10", function(d) {
   pct_v <- function(df, var, label) {
     var_sym <- sym(var)
     df |> summarise(pct = round(sum(!!var_sym == 1, na.rm = TRUE) / sum(!is.na(!!var_sym)) * 100, 0), .by = Observatory) |> mutate(Item = label)
@@ -535,11 +536,12 @@ repr <- rm5_items |>
   pmap_dfr(\(var, label) pct_oui_site(res_op_env, var, label))
 ```
 
-```{r}
-#| fig-cap: "Que représente la zone protégée pour les ménages ? (% de Oui)"
+```{r fig_representation}
+#| label: fig-representation
+#| fig-cap: "Que représente la zone protégée pour les ménages ? (% de Oui). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-representation")
 #| fig-height: !expr fig_h("fig-representation")
-#| label: fig-representation
+
 repr |>
   make_bar_obs(x = Item, y = pct, y_label = "% de ménages")
 ```
@@ -547,7 +549,7 @@ repr |>
 ```{r dl_fig_representation}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_representation", "10", function(d) {
+dl_fig_variants("fig-representation", "10", function(d) {
   rm5_items <- tribble(
     ~var, ~label,
     "rm5_a", "Alimentation", "rm5_b", "Agriculture", "rm5_c", "Élevage",
@@ -593,11 +595,11 @@ A Marovoay, environ un tiers des ménages déclarent pratiquer la collecte de pr
 :::
 ::::
 
-```{r}
-#| fig-cap: "Pourcentage de ménages pratiquant la collecte de produits forestiers, par observatoire"
+```{r fig_ef_produits}
+#| label: fig-ef-produits
+#| fig-cap: "Pourcentage de ménages pratiquant la collecte de produits forestiers, par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-ef-produits")
 #| fig-height: !expr fig_h("fig-ef-produits")
-#| label: fig-ef-produits
 
 ef_labels <- tribble(
   ~ef_lig, ~Produit,
@@ -652,11 +654,11 @@ A Marovoay, les produits forestiers collectés proviennent également presque ex
 ::::
 
 
-```{r}
-#| fig-cap: "Origine des produits forestiers collectés (dans ou hors Aire Protégée)"
+```{r fig_ef_origine}
+#| label: fig-ef-origine
+#| fig-cap: "Origine des produits forestiers collectés (dans ou hors Aire Protégée). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-ef-origine")
 #| fig-height: !expr fig_h("fig-ef-origine")
-#| label: fig-ef-origine
 
 ef_orig <- res_ef |>
   expand_sites_for_profile() |>
@@ -714,11 +716,11 @@ A Marovoay, la collecte de bois de chauffe (kitay) est également importante tou
 :::
 ::::
 
-```{r}
-#| fig-cap: "Saisonnalité de la collecte de produits forestiers (% de ménages actifs par mois)"
+```{r fig_ef_saison}
+#| label: fig-ef-saison
+#| fig-cap: "Saisonnalité de la collecte de produits forestiers (% de ménages actifs par mois). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-ef-saison")
 #| fig-height: !expr fig_h("fig-ef-saison")
-#| label: fig-ef-saison
 
 mois_cols <- paste0("efe_", sprintf("%02d", 1:12))
 
@@ -964,11 +966,11 @@ non_freq <- non_items |>
   pmap_dfr(\(var, label) pct_oui_site(um1_non, var, label))
 ```
 
-```{r}
-#| fig-cap: "Raisons de ne pas se rendre dans l'Aire protégée (% de Oui parmi ceux qui n'y vont pas)"
+```{r fig_non_freq}
+#| label: fig-non-freq
+#| fig-cap: "Raisons de ne pas se rendre dans l'Aire protégée (% de Oui parmi ceux qui n'y vont pas). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-non-freq")
 #| fig-height: !expr fig_h("fig-non-freq")
-#| label: fig-non-freq
 non_freq |>
   make_bar_obs(x = Item, y = pct, y_label = "% de ménages")
 ```
@@ -1042,11 +1044,11 @@ usages <- res_um2 |>
   mutate(pct = round(n / n_usagers * 100, 0))
 ```
 
-```{r}
-#| fig-cap: "Raisons de se rendre dans l'Aire protégée (% de Oui parmi les usagers)"
+```{r fig_usages_ap}
+#| label: fig-usages-ap
+#| fig-cap: "Raisons de se rendre dans l'Aire protégée (% de Oui parmi les usagers). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-usages-ap")
 #| fig-height: !expr fig_h("fig-usages-ap")
-#| label: fig-usages-ap
 usages |>
   make_bar_obs(x = Raison, y = pct, y_label = "% des usagers de l'AP")
 ```
@@ -1089,11 +1091,11 @@ A Marovoay, l’activité présentant la fréquence la plus élevée est le pât
 ::::
 
 
-```{r}
-#| fig-cap: "Fréquence des déplacements dans l'AP selon l'usage, par observatoire"
+```{r fig_freq_usages}
+#| label: fig-freq-usages
+#| fig-cap: "Fréquence des déplacements dans l'AP selon l'usage, par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-freq-usages")
 #| fig-height: !expr fig_h("fig-freq-usages")
-#| label: fig-freq-usages
 
 freq_labels <- c(
   "1" = "Quelques fois par an",
@@ -1165,11 +1167,11 @@ A Marovoay, les usages de l’Aire Protégée varient fortement selon les saison
 :::
 ::::
 
-```{r}
-#| fig-cap: "Saisonnalité des usages de l'AP (% d'usagers actifs par mois, principales raisons), par observatoire"
+```{r fig_saison_ap}
+#| label: fig-saison-ap
+#| fig-cap: "Saisonnalité des usages de l'AP (% d'usagers actifs par mois, principales raisons), par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-saison-ap")
 #| fig-height: !expr fig_h("fig-saison-ap")
-#| label: fig-saison-ap
 
 um2_mois <- paste0("um2_d_", sprintf("%02d", 1:12))
 
@@ -1273,11 +1275,11 @@ feu_raisons <- feu_items |>
   pmap_dfr(\(var, label) pct_oui_site(res_feubrousse, var, label))
 ```
 
-```{r}
-#| fig-cap: "Raisons perçues de faire des feux (% de Oui)"
+```{r fig_raisons_feux}
+#| label: fig-raisons-feux
+#| fig-cap: "Raisons perçues de faire des feux (% de Oui). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-raisons-feux")
 #| fig-height: !expr fig_h("fig-raisons-feux")
-#| label: fig-raisons-feux
 feu_raisons |>
   make_bar_obs(x = Item, y = pct, y_label = "% de ménages")
 ```
@@ -1381,7 +1383,8 @@ Par ailleurs, 81% des ménages déclarent avoir cherché à maîtriser les feux.
 ```
 
 ```{r fig_feux}
-#| fig-cap: "Pratique et perception des feux (% de Oui)"
+#| label: fig-feux
+#| fig-cap: "Pratique et perception des feux (% de Oui). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 
 feu_long <- bind_rows(
   pct_oui_site(res_feubrousse, "s17",   "Faire des feux est une pratique normale"),
@@ -1404,7 +1407,7 @@ feu_long |>
 ```{r dl_fig_feux}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_feux", "10", function(d) {
+dl_fig_variants("fig-feux", "10", function(d) {
   pct_v <- function(df, var, label) {
     var_sym <- sym(var)
     df |> summarise(pct = round(sum(!!var_sym == 1, na.rm = TRUE) / sum(!is.na(!!var_sym)) * 100, 0), .by = Observatory) |> mutate(Item = label)
@@ -1460,11 +1463,11 @@ Ce pic d'activité concentré entre septembre et novembre se situe précisément
 :::
 ::::
 
-```{r}
-#| fig-cap: "Saisonnalité des feux de brousse pratiqués (% de ménages actifs par mois, parmi ceux qui ont fait du feu)"
+```{r fig_saison_feux}
+#| label: fig-saison-feux
+#| fig-cap: "Saisonnalité des feux de brousse pratiqués (% de ménages actifs par mois, parmi ceux qui ont fait du feu). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-saison-feux")
 #| fig-height: !expr fig_h("fig-saison-feux")
-#| label: fig-saison-feux
 
 feu_mois_cols <- paste0("s18_a_", sprintf("%02d", 1:12))
 
@@ -1491,7 +1494,7 @@ ggplot(feu_saison, aes(x = Mois, y = pct, color = Observatory, group = Observato
 ```{r dl_fig_saison_feux}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_saison_feux", "10", function(d) {
+dl_fig_variants("fig-saison-feux", "10", function(d) {
   mois_labs <- c("Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc")
   feu_mois <- paste0("s18_a_", sprintf("%02d", 1:12))
   feu_s <- d |>
@@ -1525,11 +1528,11 @@ A Marovoay, les proportions de ménages pratiquant les feux de brousse restent f
 :::
 ::::
 
-```{r}
-#| fig-cap: "Évolution perçue des feux depuis 3 ans, par observatoire"
+```{r fig_evol_feux}
+#| label: fig-evol-feux
+#| fig-cap: "Évolution perçue des feux depuis 3 ans, par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-evol-feux")
 #| fig-height: !expr fig_h("fig-evol-feux")
-#| label: fig-evol-feux
 
 evol_feux <- res_feubrousse |>
   expand_sites_for_profile() |>
@@ -1581,11 +1584,11 @@ A Marovoay, les feux sont également perçus comme un problème majeur par une g
 :::
 ::::
 
-```{r}
-#| fig-cap: "Les feux sont-ils un problème dans la région ? (par observatoire)"
+```{r fig_probleme_feux}
+#| label: fig-probleme-feux
+#| fig-cap: "Les feux sont-ils un problème dans la région ? (par observatoire). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-probleme-feux")
 #| fig-height: !expr fig_h("fig-probleme-feux")
-#| label: fig-probleme-feux
 
 prob_feux <- res_feubrousse |>
   expand_sites_for_profile() |>
@@ -1645,11 +1648,11 @@ A Marovoay, la majorité des ménages considère également que la pratique du f
 Ces résultats traduisent une forte adhésion à des mesures strictes de contrôle des feux favorable à l’encadrement strict de l’usage du feu par les ménages de l’observatoire.
 
 
-```{r}
-#| fig-cap: "La pratique du feu devrait être… (par observatoire)"
+```{r fig_reglementation_feux}
+#| label: fig-reglementation-feux
+#| fig-cap: "La pratique du feu devrait être… (par observatoire). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-reglementation-feux")
 #| fig-height: !expr fig_h("fig-reglementation-feux")
-#| label: fig-reglementation-feux
 
 regl_feux <- res_feubrousse |>
   expand_sites_for_profile() |>
@@ -1733,8 +1736,9 @@ A Marovoay, la nécessité de protéger l’environnement ainsi que cette Aire P
 #   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
 ```
 
-```{r fig_connaissance_ap}
-#| fig-cap: "Connaissance de l'Aire protégée et demande de protection (% de Oui)"
+```{r fig-connaissance-ap}
+#| label: fig-connaissance-ap
+#| fig-cap: "Connaissance de l'Aire protégée et demande de protection (% de Oui). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 
 ap_long <- bind_rows(
   pct_oui_site(res_ap, "ap1", "A entendu parler de l'AP"),
@@ -1753,7 +1757,7 @@ ap_long |>
 ```{r dl_fig_connaissance_ap_dl}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_connaissance_ap", "10", function(d) {
+dl_fig_variants("fig-connaissance-ap", "10", function(d) {
   pct_v <- function(df, var, label) {
     var_sym <- sym(var)
     df |> summarise(pct = round(sum(!!var_sym == 1, na.rm = TRUE) / sum(!is.na(!!var_sym)) * 100, 0), .by = Observatory) |> mutate(Item = label)
@@ -1805,11 +1809,11 @@ A Marovoay, les perceptions positives dominent également dans les trois dimensi
 :::
 ::::
 
-```{r fig-jugement-ap}
-#| fig-cap: "Jugement des actions de l'AP sur la situation économique, sociale et environnementale"
+```{r fig_jugement_ap}
+#| label: fig-jugement-ap
+#| fig-cap: "Jugement des actions de l'AP sur la situation économique, sociale et environnementale. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: 12
 #| fig-height: 7
-#| label: fig-jugement-ap
 
 ap3_labels <- c(
   "1" = "Très positif",
@@ -2050,11 +2054,12 @@ mesures <- ap5b_items |>
   pmap_dfr(\(var, label) pct_oui_site(ap_favorable, var, label))
 ```
 
-```{r}
-#| fig-cap: "Mesures souhaitées pour protéger l'AP (% de Oui, parmi ceux favorables)"
+```{r fig_mesures_protection}
+#| label: fig-mesures-protection
+#| fig-cap: "Mesures souhaitées pour protéger l'AP (% de Oui, parmi ceux favorables). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-mesures-protection")
 #| fig-height: !expr fig_h("fig-mesures-protection")
-#| label: fig-mesures-protection
+
 mesures |>
   make_bar_obs(x = Item, y = pct, y_label = "% de ménages")
 ```
@@ -2122,11 +2127,11 @@ priorite <- res_ap |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 ```
 
-```{r}
-#| fig-cap: "Pauvreté vs. protection de l'environnement : quelle priorité ? (par observatoire)"
+```{r fig_priorite}
+#| label: fig-priorite
+#| fig-cap: "Pauvreté vs. protection de l'environnement : quelle priorité ? (par observatoire). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-priorite")
 #| fig-height: !expr fig_h("fig-priorite")
-#| label: fig-priorite
 priorite |>
   make_bar_obs(x = Priorité, y = pct, y_label = "% de ménages")
 ```
@@ -2170,11 +2175,11 @@ Concernant l’information, les ménages déclarent avoir principalement été i
 :::
 ::::
 
-```{r}
-#| fig-cap: "Information, consultation et bénéfice des actions de l'AP (% de Oui), par observatoire"
+```{r fig_actions_ap}
+#| label: fig-actions-ap
+#| fig-cap: "Information, consultation et bénéfice des actions de l'AP (% de Oui), par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-actions-ap")
 #| fig-height: !expr fig_h("fig-actions-ap")
-#| label: fig-actions-ap
 
 ap2_labels <- tribble(
   ~ap2_lig, ~Action,
