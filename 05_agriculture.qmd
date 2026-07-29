@@ -322,9 +322,9 @@ A Marovoay, le `r top_tenure_m` constitue également la principale forme d’exp
 
 Les formes liées à la mise en gage sont quasiment inexistantes dans les deux observatoires.
 
-```{r}
+```{r fig_tenure_riz}
 #| label: fig-tenure-riz
-#| fig-cap: "Mode de faire valoir des parcelles rizicoles par observatoire"
+#| fig-cap: "Mode de faire valoir des parcelles rizicoles par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-tenure-riz")
 #| fig-height: !expr fig_h("fig-tenure-riz")
 
@@ -368,9 +368,9 @@ La gestion de l'eau est un enjeu central de la riziculture.
 
 Les problèmes d’ensablement apparaissent comme quasiment absents dans les deux observatoires.
 
-```{r}
+```{r fig_eau_riz}
 #| label: fig-eau-riz
-#| fig-cap: "Problèmes de maîtrise de l'eau sur les parcelles rizicoles"
+#| fig-cap: "Problèmes de maîtrise de l'eau sur les parcelles rizicoles. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-eau-riz")
 #| fig-height: !expr fig_h("fig-eau-riz")
 
@@ -414,9 +414,9 @@ A Marovoay, la culture rizicole repose très largement sur le `r top_tech_m` uti
 :::
 :::
 
-```{r}
+```{r fig_technique_riz}
 #| label: fig-technique-riz
-#| fig-cap: "Technique de culture rizicole par observatoire"
+#| fig-cap: "Technique de culture rizicole par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-technique-riz")
 #| fig-height: !expr fig_h("fig-technique-riz")
 
@@ -456,9 +456,9 @@ dl_fig_variants("fig_technique_riz", "08", function(d) {
 :::
 ::::
 
-```{r}
+```{r fig_engrais_riz}
 #| label: fig-engrais-riz
-#| fig-cap: "Utilisation d'engrais sur les parcelles rizicoles"
+#| fig-cap: "Utilisation d'engrais sur les parcelles rizicoles. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-engrais-riz")
 #| fig-height: !expr fig_h("fig-engrais-riz")
 
@@ -553,8 +553,9 @@ Aucun cas d’absence de labour n’est signalé dans les deux observatoires.
 
 ```{r fig_semences_labour}
 #| echo: false
-#| fig-cap: "Mode de travail du sol sur les parcelles rizicoles"
-#| fig-height: !expr fig_h("fig_semences_labour")
+#| label: fig-semences-labour
+#| fig-cap: "Mode de travail du sol sur les parcelles rizicoles. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-height: !expr fig_h("fig-semences-labour")
 res_r |>
   filter(!is.na(r14)) |>
   mutate(
@@ -570,7 +571,7 @@ res_r |>
 ```{r dl_fig_semences_labour}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_semences_labour", "08", function(d) {
+dl_fig_variants("fig-semences-labour", "08", function(d) {
   d |>
     filter(!is.na(r14)) |>
     mutate(
@@ -601,7 +602,8 @@ A Marovoay, le rendement rizicole médian s'établit à `r rdt_med_m` t/ha (hors
 
 ```{r fig_rendement_perception}
 #| echo: false
-#| fig-cap: "Perception des rendements rizicoles"
+#| label: fig-rendement-perception
+#| fig-cap: "Perception des rendements rizicoles. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 res_r1 |>
   filter(r1a == 1, !is.na(dc23c6)) |>
   mutate(Type = safe_to_char(dc23c6)) |>
@@ -614,7 +616,7 @@ res_r1 |>
 ```{r dl_fig_rendement_perception}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_rendement_perception", "08", function(d) {
+dl_fig_variants("fig-rendement-perception", "08", function(d) {
   d |>
     filter(r1a == 1, !is.na(dc23c6)) |>
     mutate(Type = safe_to_char(dc23c6)) |>
@@ -636,9 +638,9 @@ A Marovoay, les rendements rizicoles sont globalement concentrés à des niveaux
 :::
 ::::
 
-```{r}
+```{r fig_rendement_riz_tha}
 #| label: fig-rendement-riz-tha
-#| fig-cap: "Distribution des rendements rizicoles (t/ha) par observatoire"
+#| fig-cap: "Distribution des rendements rizicoles (t/ha) par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-rendement-riz-tha")
 #| fig-height: !expr fig_h("fig-rendement-riz-tha")
 
@@ -735,9 +737,9 @@ La position topographique de la parcelle (bas-fond, plaine, tanety) détermine e
 :::
 ::::
 
-```{r}
+```{r fig_topographie_riz}
 #| label: fig-topographie-riz
-#| fig-cap: "Topographie des parcelles rizicoles"
+#| fig-cap: "Topographie des parcelles rizicoles. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-topographie-riz")
 #| fig-height: !expr fig_h("fig-topographie-riz")
 
@@ -777,9 +779,9 @@ dl_fig_variants("fig_topographie_riz", "08", function(d) {
 :::
 ::::
 
-```{r}
+```{r fig_saison_riz}
 #| label: fig-saison-riz
-#| fig-cap: "Saison de culture rizicole"
+#| fig-cap: "Saison de culture rizicole. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-saison-riz")
 #| fig-height: !expr fig_h("fig-saison-riz")
 
@@ -833,9 +835,9 @@ origine_semence <- res_r |>
 ::::
 
 
-```{r}
+```{r fig_origine_semence}
 #| label: fig-origine-semence
-#| fig-cap: "Origine des semences de riz"
+#| fig-cap: "Origine des semences de riz. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-origine-semence")
 #| fig-height: !expr fig_h("fig-origine-semence")
 
@@ -874,9 +876,9 @@ A Marovoay, `r pct_vente_m` % des ménages riziculteurs déclarent avoir vendu d
 :::
 :::
 
-```{r}
+```{r fig_ventes_riz_taux}
 #| label: fig-ventes-riz-taux
-#| fig-cap: "Taux de vente de riz par observatoire"
+#| fig-cap: "Taux de vente de riz par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-ventes-riz-taux")
 #| fig-height: !expr fig_h("fig-ventes-riz-taux")
 
@@ -916,9 +918,9 @@ Le pic majeur observé en septembre correspond précisément au déclenchement d
 ::::
 
 
-```{r}
+```{r fig_ventes_riz_mois}
 #| label: fig-ventes-riz-mois
-#| fig-cap: "Répartition mensuelle des ventes de riz"
+#| fig-cap: "Répartition mensuelle des ventes de riz. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-ventes-riz-mois")
 #| fig-height: !expr fig_h("fig-ventes-riz-mois")
 
@@ -963,9 +965,9 @@ dl_fig_variants("fig_ventes_riz_mois", "08", function(d) {
 :::
 ::::
 
-```{r}
+```{r fig_prix_paddy}
 #| label: fig-prix-paddy
-#| fig-cap: "Distribution du prix de vente du paddy (Ar/kg)"
+#| fig-cap: "Distribution du prix de vente du paddy (Ar/kg). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-prix-paddy")
 #| fig-height: !expr fig_h("fig-prix-paddy")
 
@@ -1050,7 +1052,8 @@ dl_tbl_variants("tbl_bilan_riz", "08", function(d) {
 
 ```{r fig_bilan_riz}
 #| echo: false
-#| fig-cap: "Bilan rizicole moyen par ménage (kg de paddy)"
+#| label: fig-bilan-riz
+#| fig-cap: "Bilan rizicole moyen par ménage (kg de paddy). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 bv <- bilan_vars[names(bilan_vars) %in% names(res_dc1)]
 res_dc1 |>
   expand_sites_for_profile() |>
@@ -1072,7 +1075,7 @@ res_dc1 |>
 ```{r dl_fig_bilan_riz}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_bilan_riz", "08", function(d) {
+dl_fig_variants("fig-bilan-riz", "08", function(d) {
   bv <- bilan_vars[names(bilan_vars) %in% names(d)]
   d |>
     summarise(
@@ -1156,9 +1159,9 @@ Le portefeuille de cultures reflète les opportunités de marché et les conditi
 :::
 :::
 
-```{r}
+```{r fig_diversification}
 #| label: fig-diversification
-#| fig-cap: "Nombre de cultures non rizicoles par ménage"
+#| fig-cap: "Nombre de cultures non rizicoles par ménage. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-diversification")
 #| fig-height: !expr fig_h("fig-diversification")
 
@@ -1223,9 +1226,9 @@ A Marovoay, les cultures non rizicoles les plus fréquentes sont dominées par l
 ::::
 
 
-```{r}
+```{r fig_top_cultures}
 #| label: fig-top-cultures
-#| fig-cap: "Cultures non rizicoles les plus fréquentes (nb de ménages pratiquant)"
+#| fig-cap: "Cultures non rizicoles les plus fréquentes (nb de ménages pratiquant). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-top-cultures")
 #| fig-height: !expr fig_h("fig-top-cultures")
 
@@ -1274,9 +1277,9 @@ A Marovoay, la très grande majorité des parcelles de cultures non rizicoles ne
 ::::
 
 
-```{r}
+```{r fig_engrais_autres}
 #| label: fig-engrais-autres
-#| fig-cap: "Utilisation d'engrais sur les parcelles de cultures non rizicoles"
+#| fig-cap: "Utilisation d'engrais sur les parcelles de cultures non rizicoles. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-engrais-autres")
 #| fig-height: !expr fig_h("fig-engrais-autres")
 
@@ -1336,9 +1339,9 @@ Au-delà des mesures quantitatives, la perception subjective des rendements par 
 ::::
 
 
-```{r}
+```{r fig_rendement_perception_autres}
 #| label: fig-rendement-perception-autres
-#| fig-cap: "Perception des rendements des cultures non rizicoles"
+#| fig-cap: "Perception des rendements des cultures non rizicoles. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-rendement-perception-autres")
 #| fig-height: !expr fig_h("fig-rendement-perception-autres")
 res_c0 |>
@@ -1363,9 +1366,9 @@ dl_fig_variants("fig_rendement_perception_autres", "08", function(d) {
 }, res_c0)
 ```
 
-```{r}
+```{r fig_rendement_evolution_autres}
 #| label: fig-rendement-evolution-autres
-#| fig-cap: "Évolution des rendements des cultures non rizicoles par rapport à l'an dernier"
+#| fig-cap: "Évolution des rendements des cultures non rizicoles par rapport à l'an dernier. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-rendement-evolution-autres")
 #| fig-height: !expr fig_h("fig-rendement-evolution-autres")
 res_c0 |>
@@ -1463,9 +1466,9 @@ A Marovoay, les mangues (**manga**) apparaissent également comme le produit le 
 ::::
 
 
-```{r}
+```{r fig_top_jardin}
 #| label: fig-top-jardin
-#| fig-cap: "Produits de jardin / cueillette les plus fréquents"
+#| fig-cap: "Produits de jardin / cueillette les plus fréquents. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-top-jardin")
 #| fig-height: !expr fig_h("fig-top-jardin")
 
@@ -1508,9 +1511,9 @@ pratique_foret <- res_jpchphef |>
   expand_sites_for_profile()
 ```
 
-```{r}
+```{r fig_pratique_foret}
 #| label: fig-pratique-foret
-#| fig-cap: "Part des ménages pratiquant l'exploitation forestière"
+#| fig-cap: "Part des ménages pratiquant l'exploitation forestière. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-pratique-foret")
 #| fig-height: !expr fig_h("fig-pratique-foret")
 
@@ -1566,9 +1569,9 @@ produits_foret <- res_ef |>
   mutate(pct = round(n / n_total * 100, 1))
 ```
 
-```{r}
+```{r fig_produits_foret}
 #| label: fig-produits-foret
-#| fig-cap: "Principaux produits de l'exploitation forestière (% des ménages pratiquant l'exploitation forestière)"
+#| fig-cap: "Principaux produits de l'exploitation forestière (% des ménages pratiquant l'exploitation forestière). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-produits-foret")
 #| fig-height: !expr fig_h("fig-produits-foret")
 
@@ -1677,9 +1680,9 @@ especes_elevage <- res_ele |>
   mutate(pct = round(n / n_total * 100, 1))
 ```
 
-```{r}
+```{r fig_especes_elevage}
 #| label: fig-especes-elevage
-#| fig-cap: "Espèces élevées (% des ménages pratiquant)"
+#| fig-cap: "Espèces élevées (% des ménages pratiquant). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-especes-elevage")
 #| fig-height: !expr fig_h("fig-especes-elevage")
 
@@ -1718,9 +1721,9 @@ La vente occupe généralement la deuxième position. Les proportions varient en
 
 L’autoconsommation représente enfin la modalité la moins importante dans presque tous les observatoires. Les proportions sont souvent inférieures à 10.0 %, notamment à Kisoa et Omby Hafa (2.7 %). Les niveaux les plus élevés sont enregistrés à Gisa (25.1 %) et Akobo (25.0 %), mais cette modalité reste globalement secondaire par rapport aux deux autres objectifs.
 
-```{r}
+```{r fig_objectifs_elevage}
 #| label: fig-objectifs-elevage
-#| fig-cap: "Objectifs de l'élevage par espèce (% des ménages éleveurs)"
+#| fig-cap: "Objectifs de l'élevage par espèce (% des ménages éleveurs). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-objectifs-elevage")
 #| fig-height: !expr fig_h("fig-objectifs-elevage")
 
@@ -1845,9 +1848,9 @@ A Marovoay, les volailles (**Akoho**) demeurent également l’espèce la plus t
 ::::
 
 
-```{r}
+```{r fig_pertes_elevage}
 #| label: fig-pertes-elevage
-#| fig-cap: "Ménages ayant subi des pertes de bétail"
+#| fig-cap: "Ménages ayant subi des pertes de bétail. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-pertes-elevage")
 #| fig-height: !expr fig_h("fig-pertes-elevage")
 
@@ -1922,8 +1925,9 @@ dl_tbl_variants("tbl_produits_elevage", "08", function(d) {
 
 ```{r fig_produits_elevage}
 #| echo: false
-#| fig-cap: "Produits de l'élevage déclarés par les ménages"
-#| fig-height: !expr fig_h("fig_produits_elevage")
+#| label: fig-produits-elevage
+#| fig-cap: "Produits de l'élevage déclarés par les ménages. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-height: !expr fig_h("fig-produits-elevage")
 pe_plot <- res_pe |>
   filter(pe_1 != "", !is.na(pe_1)) |>
   mutate(Produit = str_to_title(pe_1)) |>
@@ -1941,7 +1945,7 @@ pe_plot |>
 ```{r dl_fig_produits_elevage}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_produits_elevage", "08", function(d) {
+dl_fig_variants("fig-produits-elevage", "08", function(d) {
   pe_tot <- d |>
     filter(pe_1 != "", !is.na(pe_1)) |>
     distinct(j5, Observatory) |>
@@ -2018,9 +2022,9 @@ chasse_especes <- res_chph |>
 ::::
 
 
-```{r}
+```{r fig_chasse_especes}
 #| label: fig-chasse-especes
-#| fig-cap: "Principales espèces chassées/pêchées"
+#| fig-cap: "Principales espèces chassées/pêchées. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-chasse-especes")
 #| fig-height: !expr fig_h("fig-chasse-especes")
 
@@ -2071,9 +2075,9 @@ chasse_raison <- res_chph |>
 ::::
 
 
-```{r}
+```{r fig_chasse_raison}
 #| label: fig-chasse-raison
-#| fig-cap: "Raisons de la chasse/pêche par observatoire"
+#| fig-cap: "Raisons de la chasse/pêche par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-chasse-raison")
 #| fig-height: !expr fig_h("fig-chasse-raison")
 
@@ -2125,9 +2129,9 @@ frequence_peche <- res_chph |>
   expand_sites_for_profile()
 ```
 
-```{r}
+```{r fig_frequence_peche}
 #| label: fig-frequence-peche
-#| fig-cap: "Fréquence de la chasse/pêche"
+#| fig-cap: "Fréquence de la chasse/pêche. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-frequence-peche")
 #| fig-height: !expr fig_h("fig-frequence-peche")
 
@@ -2163,9 +2167,9 @@ Le pic observé en février et mars intervient durant une phase de soudure majeu
 :::
 ::::
 
-```{r}
+```{r fig_saisonnalite_peche}
 #| label: fig-saisonnalite-peche
-#| fig-cap: "Saisonnalité de la chasse/pêche (% de mentions par mois)"
+#| fig-cap: "Saisonnalité de la chasse/pêche (% de mentions par mois). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-saisonnalite-peche")
 #| fig-height: !expr fig_h("fig-saisonnalite-peche")
 
@@ -2667,9 +2671,10 @@ agro_gap   <- agro_trends |> filter(year %in% c(2015, 2025))
 ```
 
 ```{r fig_agro_prod_riz}
-#| fig-cap: "Évolution de la production rizicole moyenne par ménage (kg/ménage/an)"
-#| fig-width: !expr fig_w("fig_agro_prod_riz")
-#| fig-height: !expr fig_h("fig_agro_prod_riz")
+#| label: fig-agro-prod-riz
+#| fig-cap: "Évolution de la production rizicole moyenne par ménage (kg/ménage/an). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-agro-prod-riz")
+#| fig-height: !expr fig_h("fig-agro-prod-riz")
 
 if ("prod_moy" %in% names(agro_trends)) {
   ggplot(mapping = aes(x = year, y = prod_moy, colour = Observatory)) +
@@ -2729,9 +2734,10 @@ A Marovoay, le taux de ménages pratiquant l’élevage reste relativement élev
 ::::
 
 ```{r fig_agro_elevage}
-#| fig-cap: "Évolution du taux de pratique de l'élevage (1998–2025)"
-#| fig-width: !expr fig_w("fig_agro_elevage")
-#| fig-height: !expr fig_h("fig_agro_elevage")
+#| label: fig-agro-elevage
+#| fig-cap: "Évolution du taux de pratique de l'élevage (1998–2025). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-agro-elevage")
+#| fig-height: !expr fig_h("fig-agro-elevage")
 
 if ("pct_elevage" %in% names(agro_trends)) {
   el_data <- agro_trends |> filter(!is.na(pct_elevage))
