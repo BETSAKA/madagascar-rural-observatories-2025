@@ -178,9 +178,9 @@ A Alaotra, la grande majorité des ménages membres, soit environ 71 %, ne sont 
 :::
 ::::
 
-```{r}
+```{r fig_nb_org}
 #| label: fig-nb-org
-#| fig-cap: "Nombre d'organisations par ménage membre"
+#| fig-cap: "Nombre d'organisations par ménage membre. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-nb-org")
 #| fig-height: !expr fig_h("fig-nb-org")
 
@@ -242,9 +242,9 @@ org_type_data <- res_respg |>
   filter(pct >= 1)
 ```
 
-```{r}
+```{r fig_type_org}
 #| label: fig-type-org
-#| fig-cap: "Type d'organisation (toutes adhésions)"
+#| fig-cap: "Type d'organisation (toutes adhésions). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-type-org")
 #| fig-height: !expr fig_h("fig-type-org")
 org_type_data |>
@@ -303,9 +303,9 @@ membre_data <- res_respg |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 ```
 
-```{r}
+```{r fig_qui_membre}
 #| label: fig-qui-membre
-#| fig-cap: "Membre du ménage affilié à l'organisation"
+#| fig-cap: "Membre du ménage affilié à l'organisation. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-qui-membre")
 #| fig-height: !expr fig_h("fig-qui-membre")
 membre_data |>
@@ -315,7 +315,7 @@ membre_data |>
 ```{r dl_fig_qui_membre}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_qui_membre", "12", function(d) {
+dl_fig_variants("fig-qui-membre", "12", function(d) {
   d |>
     filter(!is.na(respgc)) |>
     mutate(Membre = case_when(
@@ -351,9 +351,9 @@ A Marovoay, les membres occasionnels constituent la grande majorité des effecti
 :::
 ::::
 
-```{r}
+```{r fig_responsabilite}
 #| label: fig-responsabilite
-#| fig-cap: "Niveau de responsabilité dans l'organisation"
+#| fig-cap: "Niveau de responsabilité dans l'organisation. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-responsabilite")
 #| fig-height: !expr fig_h("fig-responsabilite")
 
@@ -369,7 +369,7 @@ res_respg |>
 ```{r dl_fig_responsabilite}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_responsabilite", "12", function(d) {
+dl_fig_variants("fig-responsabilite", "12", function(d) {
   d |>
     filter(!is.na(respgd), respgd %in% c(1, 2, 3)) |>
     mutate(Role = factor(as.character(respgd), levels = names(role_labs), labels = role_labs)) |>
@@ -394,13 +394,13 @@ L'accès aux projets de développement reste inégal selon les localités.
 
 ::: {.content-hidden when-profile="marovoay"}
 ::: {.obs-alaotra}
-Dans l'Alaotra, `r pct_benef_a` % des ménages déclarent avoir bénéficié d'au moins un projet ou d'une formation. **A VERIFIER LA VALEUR 20%**
+Dans l'Alaotra, un ménage sur cinq  déclare avoir bénéficié d'au moins un projet ou d'une formation. 
 :::
 :::
 
 ::: {.content-hidden when-profile="alaotra"}
 ::: {.obs-marovoay}
-A Marovoay, `r pct_benef_m` % des ménages déclarent avoir bénéficié d'au moins un projet ou d'une formation. **A VERIFIER LA VALEUR 25%**
+A Marovoay, un quart des ménages déclarent avoir bénéficié d'au moins un projet ou d'une formation. 
 :::
 :::
 
@@ -442,7 +442,8 @@ dl_tbl_variants("tbl_pro1", "12", function(d) {
 
 ```{r fig_pro1}
 #| echo: false
-#| fig-cap: "Ménages bénéficiaires de projets ou formations"
+#| label: fig-pro1
+#| fig-cap: "Ménages bénéficiaires de projets ou formations. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 res_respg0 |>
   filter(!is.na(pro1)) |>
   expand_sites_for_profile() |>
@@ -459,7 +460,7 @@ res_respg0 |>
 ```{r dl_fig_pro1}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_pro1", "12", function(d) {
+dl_fig_variants("fig-pro1", "12", function(d) {
   d |>
     filter(!is.na(pro1)) |>
     mutate(Type = case_when(
@@ -514,9 +515,9 @@ benef_type_data <- pro_clean |>
   )
 ```
 
-```{r}
+```{r fig_benef_type}
 #| label: fig-benef-type
-#| fig-cap: "Taux de ménages bénéficiaires par type de projet"
+#| fig-cap: "Taux de ménages bénéficiaires par type de projet. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-benef-type")
 #| fig-height: !expr fig_h("fig-benef-type")
 benef_type_data |>
@@ -526,7 +527,7 @@ benef_type_data |>
 ```{r dl_fig_benef_type}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_benef_type", "12", function(d) {
+dl_fig_variants("fig-benef-type", "12", function(d) {
   d |>
     filter(!is.na(pro2), pro2 %in% c(1, 2)) |>
     summarise(pct = round(mean(pro2 == 1) * 100, 1), .by = c(Observatory, pro_lib_clean)) |>
@@ -539,7 +540,7 @@ dl_fig_variants("fig_benef_type", "12", function(d) {
 ```{r}
 #| label: tbl-benef-type
 #| include: false
-#| tbl-cap: "Taux de bénéficiaires par type de projet et observatoire"
+#| tbl-cap: "Taux de bénéficiaires par type de projet et observatoire."
 
 pro_clean |>
   filter(!is.na(pro2), pro2 %in% c(1, 2)) |>
@@ -643,9 +644,9 @@ A Marovoay, les ONG et projets de développement financent ainsi environ 86.0% d
 ::::
 
 
-```{r fig-source-projet}
+```{r fig_source_projet}
 #| label: fig-source-projet
-#| fig-cap: "Source des projets pour les ménages bénéficiaires"
+#| fig-cap: "Source des projets pour les ménages bénéficiaires. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-source-projet")
 #| fig-height: !expr fig_h("fig-source-projet")
 
@@ -735,7 +736,8 @@ A Marovoay, 35% des ménages sont membres d'une organisation.
 
 ```{r fig_croisement}
 #| echo: false
-#| fig-cap: "Accès aux projets selon l'appartenance à une organisation"
+#| label: fig-croisement
+#| fig-cap: "Accès aux projets selon l'appartenance à une organisation. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 res_respg0 |>
   filter(pro1 %in% c(1, 2)) |>
   mutate(
@@ -753,7 +755,7 @@ res_respg0 |>
 ```{r dl_fig_croisement}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_croisement", "12", function(d) {
+dl_fig_variants("fig-croisement", "12", function(d) {
   d |>
     filter(pro1 %in% c(1, 2)) |>
     mutate(
