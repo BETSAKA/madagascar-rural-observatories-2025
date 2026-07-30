@@ -145,7 +145,7 @@ house |>
 #| fig-cap: " Statut d'occupation du logement.<br> Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-height: !expr fig_h("fig-statut-logement")
 #| fig-width: !expr fig_w("fig-statut-logement")
-house |> make_bar_obs(x = Statut, title = "Statut d'occupation du logement")
+house |> make_bar_obs(x = Statut, title = NULL)
 ```
 
 
@@ -201,7 +201,7 @@ latrine |>
 #| fig-cap: "Types de latrine. <br> Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-height: !expr fig_h("fig-latrine")
 #| fig-width: !expr fig_w("fig-latrine")
-latrine |> make_bar_obs(title = obs_title("Types de latrine"))
+latrine |> make_bar_obs(title = NULL)
 ```
 
 ```{r dl_latrine}
@@ -212,7 +212,7 @@ dl_fig_variants("fig_latrine", "05", function(d) {
     filter(!is.na(Type)) |>
     count(Observatory, Type) |>
     mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-    make_bar_obs(title = "Types de latrine par observatoire")
+    make_bar_obs(title = "Types de latrine")
 }, res_h |> left_join(obs, by = "j5"))
 ```
 
@@ -256,7 +256,7 @@ water |>
 #| fig-cap: "Mode d'approvisionnement en eau. <br> Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-height: !expr fig_h("fig-eau")
 #| fig-width: !expr fig_w("fig-eau")
-water |> make_bar_obs(title = obs_title("Mode d'approvisionnement en eau"))
+water |> make_bar_obs(title = NULL)
 ```
 
 ```{r dl_water}
@@ -297,7 +297,7 @@ light <- res_h |>
 
 light |>
   obs_gt() |>
-  tab_header(title = obs_title("Modes d'éclairage des ménages")) |>
+  tab_header(title = NULL) |>
   cols_label(Type = "Type d'eclairage", pct = "%") |>
   cols_hide(n) |>
   fmt_number(columns = pct, decimals = 1) |>
@@ -309,7 +309,7 @@ light |>
 #| fig-cap: "Modes d'éclairage.<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-height: !expr fig_h("fig-eclairage")
 #| fig-width: !expr fig_w("fig-eclairage")
-light |> make_bar_obs(title = obs_title("Modes d'éclairage"))
+light |> make_bar_obs(title = NULL)
 ```
 
 ```{r dl_fig_lighting}
@@ -996,6 +996,7 @@ A Marovoay, les revenus nets rizicoles représentent la plus grande part du reve
 Pour les deux observatoires, la pêche ne contribue pas au revenu courant moyen.
 
 ```{r t_revcou_decomp}
+#| include: false
 decomp <- inc |>
   summarise(
     `Salaires agricoles` = mean(revsec, na.rm = TRUE),
@@ -1044,9 +1045,10 @@ bind_rows(decomp_display, total_display) |>
 ```
 
 ```{r fig_revcou_shares}
-#| fig-cap: "Part des composantes dans le revenu courant moyen par observatoire"
-#| fig-width: !expr fig_w("fig_revcou_shares")
-#| fig-height: !expr fig_h("fig_revcou_shares")
+#| label: fig-revcou-shares
+#| fig-cap: "Part des composantes dans le revenu courant moyen par observatoire.<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-revcou-shares")
+#| fig-height: !expr fig_h("fig-revcou-shares")
 
 inc |>
   summarise(
@@ -1089,7 +1091,7 @@ dl_tbl_variants("tbl_revcou_decomp", "05", function(d) {
     pivot_longer(-Observatory, names_to = "Composante", values_to = "Montant") |>
     rename(Site = Observatory)
 }, inc)
-dl_fig_variants("fig_revcou_shares", "05", function(d) {
+dl_fig_variants("fig-revcou-shares", "05", function(d) {
   d |> summarise(
     `Salaires agricoles` = mean(revsec, na.rm = TRUE),
     `Salaires non-agricoles` = mean(revppal, na.rm = TRUE),

@@ -362,6 +362,7 @@ A Marovoay, 79 % des ménages estiment que l’environnement est menacé. Les fe
 ::::
 
 ```{r}
+#| include: false
 #| tbl-cap: "Menaces perçues sur l'environnement et responsables identifiés (% de Oui)"
 #| label: tbl-menaces
 
@@ -1090,7 +1091,6 @@ A Marovoay, l’activité présentant la fréquence la plus élevée est le pât
 :::
 ::::
 
-
 ```{r fig_freq_usages}
 #| label: fig-freq-usages
 #| fig-cap: "Fréquence des déplacements dans l'AP selon l'usage, par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
@@ -1150,6 +1150,7 @@ dl_fig_variants("fig_freq_usages", "10", function(d) {
     labs(x = NULL, y = NULL, fill = "Fréquence") + theme_ror()
 }, res_um2)
 ```
+
 
 ### Saisonnalité de la fréquentation de l'AP
 
@@ -1986,11 +1987,11 @@ gest <- res_ap |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 ```
 
-```{r}
-#| fig-cap: "Qui devrait gérer l'AP ? (parmi ceux favorables à la protection)"
+```{r fig_gestionnaire}
+#| label: fig-gestionnaire
+#| fig-cap: "Qui devrait gérer l'AP ? (parmi ceux favorables à la protection) .<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-gestionnaire")
 #| fig-height: !expr fig_h("fig-gestionnaire")
-#| label: fig-gestionnaire
 gest |>
   make_bar_obs(x = Gestionnaire, y = pct, y_label = "% de ménages")
 ```
@@ -1998,7 +1999,7 @@ gest |>
 ```{r dl_fig_gestionnaire}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_gestionnaire", "10", function(d) {
+dl_fig_variants("fig-gestionnaire", "10", function(d) {
   gest_labels <- c("1" = "Communautés locales", "2" = "Riverains", "3" = "État", "4" = "ONG malgache", "5" = "ONG étrangère", "6" = "Partenariat mixte", "7" = "COBA")
   gest <- d |>
     filter(ap5 == 1, ap5a %in% 1:7) |>

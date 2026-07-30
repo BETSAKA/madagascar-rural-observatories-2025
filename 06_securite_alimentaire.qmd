@@ -1070,13 +1070,13 @@ Face à l'insécurité alimentaire, les ménages déploient un éventail de stra
 
 :::: {.content-hidden when-profile="marovoay"}
 ::: obs-alaotra
-A Alaotra, la stratégie d'adaptation la plus fréquemment mobilisée par les ménages, en cumulant les fréquences quelquefois et souvent, est la réduction de la ration à chaque repas avec un taux de 58.2%. Elle est suivie par la réduction ou le renoncement aux ingrédients chers qui concerne 51.7% des foyers et le remplacement de l'aliment de base pour 41.1%. Plus d'un quart des ménages (26.0%) déclarent réduire le nombre de repas quotidien. Viennent ensuite la cueillette d’aliments sauvages (21.5 %), l’emprunt d’aliments (21.4 %) et l’endettement pour l’achat de nourriture (13.8 %).
+A Alaotra, la stratégie d'adaptation la plus fréquemment mobilisée par les ménages, en cumulant les fréquences quelquefois et souvent, est la réduction de la ration à chaque repas avec un taux de 59%. Elle est suivie par la réduction ou le renoncement aux ingrédients chers qui concerne 52% des foyers et le remplacement de l'aliment de base pour 41%. Plus d'un quart des ménages (26%) déclarent réduire le nombre de repas quotidien. Viennent ensuite la cueillette d’aliments sauvages et l’emprunt d’aliments (21% chacun) et l’endettement pour l’achat de nourriture (13%).
 :::
 ::::
 
 :::: {.content-hidden when-profile="alaotra"}
 ::: obs-marovoay
-À Marovoay, la réduction de la ration à chaque repas étant pratiquée souvent ou quelquefois par 80.5% des ménages. La réduction ou le renoncement aux ingrédients chers arrive en deuxième position avec 60.2% des réponses. Le remplacement de l'aliment de base et la réduction du nombre de repas quotidien sont utilisés à parts égales par 43.8% des foyers. On observe ensuite le recours à l'endettement alimentaire (17.7%), la réduction des dépenses non essentielles (16.2%), la cueillette d'aliments sauvages (15.1%) et l'emprunt de nourriture (14.7%). L'envoi d'un membre du ménage chez un autre ménage concerne 10.8% des familles. 
+À Marovoay, la réduction de la ration à chaque repas étant pratiquée souvent ou quelquefois par 80% des ménages. La réduction ou le renoncement aux ingrédients chers arrive en deuxième position avec 60% des réponses. Le remplacement de l'aliment de base et la réduction du nombre de repas quotidien sont utilisés à parts égales par 44% des foyers. On observe ensuite le recours à l'endettement alimentaire et la réduction des dépenses non essentielles (17% chacun), la cueillette d'aliments sauvages et l'emprunt de nourriture (15% chacun).  
 :::
 ::::
 
@@ -1227,12 +1227,18 @@ ggplot(strat_plot, aes(x = pct, y = reorder(Stratégie, pct), fill = Fréquence)
   )
 ```
 
-```{r fig-strategies-likert}
+```{r fig_strategies_likert}
 #| echo: false
 #| label: fig-strategies-likert
 #| fig-cap: "Profil de fréquence des stratégies d'adaptation. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 ggplot(strat_plot, aes(x = pct, y = reorder(Stratégie, pct), fill = Fréquence)) +
   geom_col(position = "stack") +
+  geom_text(
+    aes(label = if_else(pct >= 5, as.character(round(pct, 0)), "")),
+    position = position_stack(vjust = 0.5),
+    color = "black",
+    size = 2.8
+   ) +
   facet_wrap(~Observatory) +
   labs(
     x = "% de ménages",
@@ -1280,6 +1286,12 @@ dl_fig_variants("fig-strategies-likert", "09", function(d) {
     ungroup()
   ggplot(sd, aes(x = pct, y = reorder(Stratégie, pct), fill = Fréquence)) +
     geom_col(position = "stack") +
+    geom_text(
+      aes(label = if_else(pct >= 5, as.character(round(pct, 0)), "")),
+      position = position_stack(vjust = 0.5),
+      color = "black",
+      size = 2.8
+    ) +
     facet_wrap(~Observatory) +
     labs(x = "% de ménages", y = NULL, fill = "Fréquence") +
     scale_fill_manual(values = c(
@@ -1311,8 +1323,10 @@ top5 <- strat_resume %>%
   pivot_longer(cols = where(is.numeric), names_to = "Observatory", values_to = "pct")
 ```
 
-```{r g6_top_strategies}
-#| fig-height: !expr fig_h("g6_top_strategies")
+```{r fig_top_strategies}
+#| label: fig-top-strategies
+#| fig-cap: "Stratégies de sécurité alimentaire adoptées par les ménages.<br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-height: !expr fig_h("fig-top-strategies")
 res_ssa %>%
   left_join(res_deb, by = "j5") %>%
   expand_sites_for_profile() %>%
@@ -1339,7 +1353,7 @@ res_ssa %>%
 
 ```{r dl_g6_top_strategies}
 #| include: false
-dl_fig_variants("g6_top_strategies", "09", function(d) {
+dl_fig_variants("fig-top-strategies", "09", function(d) {
   strat_labels_local <- c(
     "ssa01" = "S'endetter", "ssa02" = "Emprunter aliments",
     "ssa03" = "Remplacer base", "ssa04" = "Réduire ration",
