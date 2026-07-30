@@ -975,7 +975,11 @@ dl_tbl_variants("tbl_saisonnalite", "11", function(d) {
 }, events_full)
 ```
 
-```{r g3_saisonnalite}
+```{r fig_saisonnalite}
+#| label: fig-saisonnalite
+#| fig-cap: "Représentation de la saisonnalité des cataclysmes par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-saisonnalite")
+#| fig-height: !expr fig_h("fig-saisonnalite")
 # G3 : Barres groupées hors soudure vs pendant soudure
 saisonnalite_plot <- saisonnalite %>%
   pivot_longer(
@@ -997,10 +1001,11 @@ saisonnalite_plot |>
   )
 ```
 
+
 ```{r dl_g3_saisonnalite}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_saisonnalite", "11", function(d) {
+dl_fig_variants("fig-saisonnalite", "11", function(d) {
   d %>%
     mutate(
       hors_soudure = if_else(!is.na(cc1a5_1) & cc1a5_1 == 1, 1L, 0L),
@@ -1118,7 +1123,8 @@ dl_tbl_variants("tbl_cultures_touchees", "11", function(d) {
 
 ```{r fig_cultures_touchees}
 #| echo: false
-#| fig-cap: "Top 10 des cultures les plus touchées"
+#| label: fig-cultures-touchees
+#| fig-cap: "Top 10 des cultures les plus touchées. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 res_cca %>%
   inner_join(res_deb, by = "j5") %>%
   expand_sites_for_profile() %>%
@@ -1143,7 +1149,7 @@ res_cca %>%
 ```{r dl_fig_cultures_touchees}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_cultures_touchees", "11", function(d) {
+dl_fig_variants("fig-cultures-touchees", "11", function(d) {
   cl <- attr(res_cca$cc1a0, "labels")
   cl <- setNames(names(cl), as.character(cl))
   d %>%
@@ -1261,8 +1267,9 @@ dl_tbl_variants("tbl_degats_champs_riz", "11", function(d) {
 
 ```{r fig_degats_champs_riz}
 #| echo: false
-#| fig-cap: "Gravité des dégâts sur les champs de riz"
-#| fig-height: !expr fig_h("fig_degats_champs_riz")
+#| label: fig-degats-champs-riz
+#| fig-cap: "Gravité des dégâts sur les champs de riz. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-height: !expr fig_h("fig-degats-champs-riz")
 res_cca %>%
   inner_join(res_deb, by = "j5") %>%
   expand_sites_for_profile() %>%
@@ -1283,7 +1290,7 @@ res_cca %>%
   select(-n, -total) %>%
   ror_bar_stacked(
     x = Catastrophe, y = pct, fill = Niveau,
-    title = "Dégâts sur les champs de riz par type de catastrophe",
+    # title = "Dégâts sur les champs de riz par type de catastrophe",
     palette = c("Rien" = "#4daf4a", "Un peu" = "#ff7f00", "Beaucoup" = "#e41a1c", "Destruction totale" = "#984ea3")
   )
 ```
@@ -1291,7 +1298,7 @@ res_cca %>%
 ```{r dl_fig_degats_champs_riz}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_degats_champs_riz", "11", function(d) {
+dl_fig_variants("fig-degats-champs-riz", "11", function(d) {
   ccl <- c(
     "cc1a5_01" = "Cyclone", "cc1a5_02" = "Inondation", "cc1a5_03" = "Sécheresse",
     "cc1a5_04" = "Grêle", "cc1a5_05" = "Maladie", "cc1a5_06" = "Criquets",
@@ -1410,8 +1417,9 @@ dl_tbl_variants("tbl_degats_stocks_riz", "11", function(d) {
 
 ```{r fig_degats_stocks_riz}
 #| echo: false
-#| fig-cap: "Gravité des dégâts sur les stocks de riz"
-#| fig-height: !expr fig_h("fig_degats_stocks_riz")
+#| label: fig-degats-stocks-riz 
+#| fig-cap: "Gravité des dégâts sur les stocks de riz. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-height: !expr fig_h("fig-degats-stocks-riz")
 res_cca %>%
   inner_join(res_deb, by = "j5") %>%
   expand_sites_for_profile() %>%
@@ -1432,7 +1440,7 @@ res_cca %>%
   select(-n, -total) %>%
   ror_bar_stacked(
     x = Catastrophe, y = pct, fill = Niveau,
-    title = "Dégâts sur les stocks de riz par type de catastrophe",
+    # title = "Dégâts sur les stocks de riz par type de catastrophe",
     palette = c("Rien" = "#4daf4a", "Un peu" = "#ff7f00", "Beaucoup" = "#e41a1c", "Destruction totale" = "#984ea3")
   )
 ```
@@ -1440,7 +1448,7 @@ res_cca %>%
 ```{r dl_fig_degats_stocks_riz}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_degats_stocks_riz", "11", function(d) {
+dl_fig_variants("fig-degats-stocks-riz", "11", function(d) {
   csl <- c(
     "cc1a6_01" = "Cyclone", "cc1a6_02" = "Inondation", "cc1a6_03" = "Sécheresse",
     "cc1a6_04" = "Grêle", "cc1a6_05" = "Maladie", "cc1a6_06" = "Criquets",
@@ -1488,6 +1496,7 @@ A Marovoay, la fréquence des dommages agricoles est nettement plus élevée sur
 ::::
 
 ```{r g4_champs_vs_stocks}
+#| include: false
 # G4 : Comparaison dégâts champs vs stocks pour les 5 cultures principales
 top5_cultures <- res_cca %>%
   filter(!is.na(cc1a0) & cc1a0 != 0) %>%
@@ -1537,10 +1546,24 @@ champs_vs_stocks_plot |>
   )
 ```
 
+```{r fig_champs_vs_stocks}
+#| label: fig-champs-vs-stocks
+#| fig-cap: " Part des ménages affectés selon le type de dégât agricole : champs vs stocks. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-champs-vs-stocks")
+#| fig-height: !expr fig_h("fig-champs-vs-stocks")
+champs_vs_stocks_plot |>
+  ror_bar_grouped(
+    x = Culture, fill = Type,
+    y_label = "% des ménages",
+    direction = "vertical", x_angle = 45,
+    palette = c("Champs" = "#1f77b4", "Stocks" = "#ff7f0e")
+  )
+```
+
 ```{r dl_g4_champs_vs_stocks}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_champs_vs_stocks", "11", function(d) {
+dl_fig_variants("fig-champs-vs-stocks", "11", function(d) {
   top5 <- d %>% filter(!is.na(cc1a0) & cc1a0 != 0) %>%
     count(cc1a0, sort = TRUE) %>% slice_head(n = 5) %>% pull(cc1a0)
   d %>%
@@ -1651,14 +1674,14 @@ cata_gap   <- cata_trends |> filter(year %in% c(2015, 2025))
 ```
 
 ```{r fig_cata_prevalence}
-#| fig-cap: "Évolution du pourcentage de ménages ayant subi au moins une catastrophe (2003–2025)"
-#| fig-width: !expr fig_w("fig_cata_prevalence")
-#| fig-height: !expr fig_h("fig_cata_prevalence")
+#| label: fig-cata-prevalence
+#| fig-cap: "Évolution du pourcentage de ménages ayant subi au moins une catastrophe (2003–2025). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-cata-prevalence")
+#| fig-height: !expr fig_h("fig-cata-prevalence")
 
 cata_trends |>
   make_trend_plot(y_var = pct_cata, y_label = "% de ménages touchés", gap_year = 2015)
 ```
-
 
 
 :::
