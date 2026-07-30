@@ -222,8 +222,9 @@ A Marovoay, on a recensé 2297 individus répartis dans 519 ménages. La taille 
 ::::
 
 ```{r fig_men_hameau}
-#| fig-cap: "Taille moyenne des ménages par hameau selon les observatoires"
-#| fig-height: !expr fig_h("fig_men_hameau", 5)
+#| label: fig-men-hameau
+#| fig-cap: "Taille moyenne des ménages par hameau selon les observatoires. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-height: !expr fig_h("fig-men-hameau", 5)
 hh_size_hameau <- members |>
   mutate(j4bis = fix_hameau(j4)) |>
   summarise(hh_size = n(), .by = c(Observatory, j4bis, j5))
@@ -367,16 +368,17 @@ hh_age_sex <- members_site |>
 ```
 
 ```{r fig_pyramide}
-#| fig-cap: "Pyramide des âges des membres des ménages enquêtés par observatoire"
-#| fig-height: !expr fig_h("fig_pyramide")
+#| label: fig-pyramide
+#| fig-cap: "Pyramide des âges des membres des ménages enquêtés par observatoire. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-height: !expr fig_h("fig-pyramide")
 hh_age_sex |> 
-  ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent, label = "fig_pyramide")
+  ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent, label = "fig-pyramide")
 ```
 
 ```{r dl_fig_pyramide}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_pyramide", "04", function(d) {
+dl_fig_variants("fig-pyramide", "04", function(d) {
   agg <- d |>
     mutate(AgeGroup = classify_age_group(m5), Sexe = classify_sex(m4)) |>
     filter(!is.na(Sexe), !is.na(AgeGroup)) |>
@@ -386,7 +388,7 @@ dl_fig_variants("fig_pyramide", "04", function(d) {
       Percent = if_else(Sexe == "Homme", -Percent, Percent),
       .by = c(Observatory, Sexe)
     )
-  agg |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent, label = "fig_pyramide")
+  agg |> ror_pyramid(age_col = AgeGroup, sex_col = Sexe, y = Percent, label = "fig-pyramide")
 }, members)
 ```
 
@@ -437,7 +439,7 @@ dl_tbl_variants("tbl_origine", "04", function(d) {
 
 ```{r fig_origine}
 #| label: fig-origine
-#| fig-cap: "Distribution de l'origine des Chefs de ménages et conjoints"
+#| fig-cap: "Distribution de l'origine des Chefs de ménages et conjoints. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 make_origin_histogram(members_site, m3, classify_origin, "Origine", NULL
                       )
 ```
@@ -445,14 +447,12 @@ make_origin_histogram(members_site, m3, classify_origin, "Origine", NULL
 ```{r dl_fig_origine}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_origine", "04", function(d) {
+dl_fig_variants("fig-origine", "04", function(d) {
   make_origin_histogram(d, m3, classify_origin, "Origine",
                         "Distribution de l'origine des CM et conjoints")
 }, members)
 ```
 
-:::: {.content-visible when-profile="consolidated"}
-::: obs-technical
 ### Région d'origine
 
 La provenance régionale des CM et conjoints qui ne sont pas natifs de la localité permet d'identifier les principaux bassins migratoires alimentant chaque observatoire.
@@ -518,7 +518,7 @@ dl_tbl_variants("tbl_homeland", "04", function(d) {
 
 ```{r fig_homeland}
 #| label: fig-homeland
-#| fig-cap: "Région d'origine des Chefs de ménage et conjoints"
+#| fig-cap: "Région d'origine des Chefs de ménage et conjoints. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 homeland_labels |>
   mutate(Member_Type = if_else(m6 == 1, "Chef de ménage", "Conjoint")) |>
   count(Observatory, Member_Type, Homeland) |>
@@ -582,8 +582,8 @@ dl_tbl_variants("tbl_raison", "04", function(d) {
 ```
 
 ```{r fig_raison}
-#| label: fig_raison
-#| fig-cap: "Distribution des raisons d'implantation des Chefs de ménage et conjoints"
+#| label: fig-raison
+#| fig-cap: "Distribution des raisons d'implantation des Chefs de ménage et conjoints. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 make_origin_histogram(members_site, mg4a, classify_reason, "Raison",
                       NULL)
 ```
@@ -591,7 +591,7 @@ make_origin_histogram(members_site, mg4a, classify_reason, "Raison",
 ```{r dl_fig_raison}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_raison", "04", function(d) {
+dl_fig_variants("fig-raison", "04", function(d) {
   make_origin_histogram(d, mg4a, classify_reason, "Raison",
                         "Distribution des raisons d'implantation des  Chefs de ménage et conjoints")
 }, members)
@@ -622,6 +622,7 @@ Sur le plan conjugal, `r pct_couple_m` % des CM vivent en couple (mariés ou en 
 ::::
 
 ```{r cm_chars}
+#| results: asis
 cm <- members |> filter(m6 == 1)
 cm_site <- members_site |> filter(m6 == 1)
 
@@ -694,20 +695,20 @@ dl_tbl_variants("tbl_cm_chars", "04", function(d) {
 
 ```{r fig_cm_statut}
 #| echo: false
-#| label: fig_cm_statut
-#| fig-cap: "Statut matrimonial des chefs de ménage"
-#| fig-height: !expr fig_h("fig_cm_statut")
+#| label: fig-cm-statut
+#| fig-cap: "Statut matrimonial des chefs de ménage. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-height: !expr fig_h("fig-cm-statut")
 cm_site |>
   mutate(Type = classify_marital(m7)) |>
   count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  make_bar_obs(label = "fig_cm_statut")
+  make_bar_obs(label = "fig-cm-statut")
 ```
 
 ```{r dl_fig_cm_statut}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_cm_statut", "04", function(d) {
+dl_fig_variants("fig-cm-statut", "04", function(d) {
   d |>
     filter(m6 == 1) |>
     mutate(Type = classify_marital(m7)) |>
@@ -737,6 +738,7 @@ A Alaotra, le profil éducatif des chefs de ménage de l'Alaotra montre une fort
 
 ```{r cm_educ}
 #| include: false
+#| results: asis
 cm_educ <- cm |>
   mutate(Niv_education = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
   count(Observatory, Niv_education) |>
@@ -764,7 +766,8 @@ dl_tbl_variants("tbl_cm_educ", "04", function(d) {
 
 ```{r fig_cm_educ}
 #| echo: false
-#| fig-cap: "Niveau d'éducation des chefs de ménage"
+#| label: fig-cm-educ
+#| fig-cap: "Niveau d'éducation des chefs de ménage. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 cm_site |>
   mutate(Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
   count(Observatory, Type) |>
@@ -775,7 +778,7 @@ cm_site |>
 ```{r dl_fig_cm_educ}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_cm_educ", "04", function(d) {
+dl_fig_variants("fig-cm-educ", "04", function(d) {
   d |> filter(m6 == 1) |>
     mutate(Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
     count(Observatory, Type) |>
@@ -802,6 +805,7 @@ A Marovoay, les femmes chefs de ménage présentent des taux d'instruction nette
 
 ```{r cm_educ_sex}
 #| include: false
+#| results: asis
 cm_educ_sex <- cm |>
   mutate(
     Sexe = classify_sex(m4),
@@ -842,8 +846,8 @@ dl_tbl_variants("tbl_cm_educ_sex", "04", function(d) {
 
 ```{r fig_cm_educ_sex}
 #| echo: false
-#| label: fig_cm_educ_sex
-#| fig-cap: "Niveau d'éducation des Chefs de ménage par sexe"
+#| label: fig-cm-educ-sex
+#| fig-cap: "Niveau d'éducation des Chefs de ménage par sexe. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 cm_site |>
   mutate(
     Sexe = classify_sex(m4),
@@ -859,7 +863,7 @@ cm_site |>
 ```{r dl_fig_cm_educ_sex}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_cm_educ_sex", "04", function(d) {
+dl_fig_variants("fig-cm-educ-sex", "04", function(d) {
   d |> filter(m6 == 1) |>
     mutate(Sexe = classify_sex(m4),
            Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
@@ -966,9 +970,9 @@ dl_tbl_variants("tbl_cm_read", "04", function(d) {
 }, members)
 ```
 
-```{r cm_read_histo_h, echo=FALSE, warning=FALSE, message=FALSE}
-#| label: cm_read_histo_h
-#| fig-cap: "Aptitude à la lecture des chefs de ménage"
+```{r fig_cm_read_histo_h, echo=FALSE, warning=FALSE, message=FALSE}
+#| label: fig-cm-read-histo-h
+#| fig-cap: "Aptitude à la lecture des chefs de ménage. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: 12
 #| fig-height: 5.8
 
@@ -1046,8 +1050,8 @@ literacy_3level_sex(cm_site, s1a, "Aptitude à la lecture des Chefs de ménage s
 ```
 
 ```{r fig_cm_read_sex}
-#| label: fig_cm_read_sex
-#| fig-cap: "Aptitude à la lecture des Chefs de ménage selon le sexe"
+#| label: fig-cm-read-sex
+#| fig-cap: "Aptitude à la lecture des Chefs de ménage selon le sexe. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 literacy_3level_bar(cm_site, s1a, NULL)
 ```
 
@@ -1096,9 +1100,9 @@ dl_tbl_variants("tbl_cm_write", "04", function(d) {
 }, members)
 ```
 
-```{r cm_write_histo_h, echo=FALSE, warning=FALSE, message=FALSE}
-#| label: cm_write_histo_h
-#| fig-cap: "Aptitude à l'écriture des Chefs de ménage"
+```{r fig_cm_write_histo_h, echo=FALSE, warning=FALSE, message=FALSE}
+#| label: fig-cm-write-histo-h
+#| fig-cap: "Aptitude à l'écriture des Chefs de ménage. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: 12
 #| fig-height: 5.8
 
@@ -1172,8 +1176,8 @@ literacy_3level_sex(cm_site, s1b, "Aptitude à l'écriture des Chefs de ménage 
 ```
 
 ```{r fig_cm_write_sex}
-#| label: fig_cm_write_sex
-#| fig-cap: "Aptitude à l'écriture des Chefs de ménage selon le sexe"
+#| label: fig-cm-write-sex
+#| fig-cap: "Aptitude à l'écriture des Chefs de ménage selon le sexe. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 literacy_3level_bar(cm_site, s1b, NULL)
 ```
 
@@ -1235,8 +1239,9 @@ obs_gt(cm_act) |>
   style_table()
 ```
 
-```{r fig-cm-act}
-#| fig-cap: "Activités principales des Chefs de ménages"
+```{r fig_cm_act}
+#| label: fig-cm-act
+#| fig-cap: "Activités principales des Chefs de ménages. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-height: !expr fig_h("fig-cm-act")
 cm_act |> make_bar_obs(x = Act_principal, y = Percent,
                   y_label = "%")
@@ -1257,7 +1262,7 @@ dl_tbl_variants("tbl_cm_act", "04", function(d) {
 ```{r dl_fig_cm_act}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_cm_act", "04", function(d) {
+dl_fig_variants("fig-cm-act", "04", function(d) {
   act <- d |> filter(m6 == 1) |>
     mutate(Act_principal = classify_activity(a1)) |>
     filter(!is.na(Act_principal)) |>
@@ -1327,9 +1332,9 @@ cm_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
 ```
 
 ```{r fig_cm_act_sex}
-#| label: fig_cm_act_sex
-#| fig-cap: "Activit\u00e9s principales des Chefs de ménages par observatoire et sexe"
-#| fig-height: !expr fig_h("fig_cm_act_sex")
+#| label: fig-cm-act-sex
+#| fig-cap: "Activit\u00e9s principales des Chefs de ménages par observatoire et sexe. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-height: !expr fig_h("fig-cm-act-sex")
 cm_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
                                   # title = "Activit\u00e9s principales des CM par observatoire et sexe (%)",
                                   y_label = "%", direction = "horizontal")
@@ -1351,7 +1356,7 @@ dl_tbl_variants("tbl_cm_act_sex", "04", function(d) {
 ```{r dl_fig_cm_act_sex}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_cm_act_sex", "04", function(d) {
+dl_fig_variants("fig-cm-act-sex", "04", function(d) {
   act <- d |> filter(m6 == 1) |>
     mutate(Act_principal = classify_activity(a1),
       Sexe = classify_sex(m4)) |>
@@ -1460,22 +1465,22 @@ dl_tbl_variants("tbl_other_chars", "04", function(d) {
 
 ```{r fig_other_statut}
 #| echo: false
-#| label: fig_other_statut
-#| fig-cap: "Statut matrimonial des autres membres (12 ans et plus)"
-#| fig-height: !expr fig_h("fig_other_statut")
+#| label: fig-other-statut
+#| fig-cap: "Statut matrimonial des autres membres (12 ans et plus). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-height: !expr fig_h("fig-other-statut")
 others_site |>
   filter(m5 >= 12) |>
   mutate(Type = classify_marital(m7)) |>
   filter(!is.na(Type)) |>
   count(Observatory, Type) |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
-  make_bar_obs(label = "fig_other_statut")
+  make_bar_obs(label = "fig-other-statut")
 ```
 
 ```{r dl_fig_other_statut}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_other_statut", "04", function(d) {
+dl_fig_variants("fig-other-statut", "04", function(d) {
   d |>
     filter(m6 != 1, m5 >= 12) |>
     mutate(Type = classify_marital(m7)) |>
@@ -1538,8 +1543,8 @@ dl_tbl_variants("tbl_other_educ", "04", function(d) {
 
 ```{r fig_other_educ}
 #| echo: false
-#| label: fig_other_educ
-#| fig-cap: "Niveau d'éducation des autres membres du ménage"
+#| label: fig-other-educ
+#| fig-cap: "Niveau d'éducation des autres membres du ménage. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 others_site |>
   mutate(Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
   count(Observatory, Type) |>
@@ -1550,7 +1555,7 @@ others_site |>
 ```{r dl_fig_other_educ}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_other_educ", "04", function(d) {
+dl_fig_variants("fig-other-educ", "04", function(d) {
   d |> filter(m6 != 1) |>
     mutate(Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
     count(Observatory, Type) |>
@@ -1613,8 +1618,8 @@ dl_tbl_variants("tbl_other_educ_sex", "04", function(d) {
 
 ```{r fig_other_educ_sex}
 #| echo: false
-#| label: fig_other_educ_sex
-#| fig-cap: "Niveau d'éducation des autres membres par sexe"
+#| label: fig-other-educ-sex
+#| fig-cap: "Niveau d'éducation des autres membres par sexe. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 others_site |>
   mutate(
     Sexe = classify_sex(m4),
@@ -1630,7 +1635,7 @@ others_site |>
 ```{r dl_fig_other_educ_sex}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_other_educ_sex", "04", function(d) {
+dl_fig_variants("fig-other-educ-sex", "04", function(d) {
   d |> filter(m6 != 1) |>
     mutate(Sexe = classify_sex(m4),
            Type = classify_education(s3a, s2, m5) |> replace_na("Inconnu")) |>
@@ -1668,7 +1673,7 @@ dl_tbl_variants("tbl_other_read", "04", function(d) {
 
 ```{r fig_other_read}
 #| label: fig-other-read
-#| fig-cap: "Aptitude à la lecture des autres membres"
+#| fig-cap: "Aptitude à la lecture des autres membres. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 
 library(dplyr)
 library(ggplot2)
@@ -1728,7 +1733,8 @@ literacy_3level_sex(others_site, s1a, "Aptitude à la lecture des autres membres
 ```
 
 ```{r fig_other_read_sex}
-#| fig-cap: "Aptitude à la lecture des autres membres selon le sexe"
+#| label: fig-other-read-sex
+#| fig-cap: "Aptitude à la lecture des autres membres selon le sexe. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 literacy_3level_bar(others_site, s1a, NULL)
 ```
 
@@ -1777,8 +1783,8 @@ dl_tbl_variants("tbl_other_write", "04", function(d) {
 ```
 
 ```{r other_write_histo_h, echo=FALSE, warning=FALSE, message=FALSE}
-#| label: other_write_histo_h
-#| fig-cap: "Aptitude à l'écriture des autres membres"
+#| label: other-write-histo-h
+#| fig-cap: "Aptitude à l'écriture des autres membres. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: 12
 #| fig-height: 5.8
 
@@ -1851,14 +1857,14 @@ literacy_3level_sex(others_site, s1b, "Aptitude à l'écriture des autres membre
 ```
 
 ```{r fig_other_write_sex}
-#| label: fig_other_write_sex
-#| fig-cap: "Aptitude à l'écriture des autres membres selon le sexe"
-literacy_3level_bar(others_site, s1b, "Aptitude à l'écriture des autres membres selon le sexe")
+#| label: fig-other-write-sex
+#| fig-cap: "Aptitude à l'écriture des autres membres selon le sexe. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+literacy_3level_bar(others_site, s1b, NULL)
 ```
 
 ```{r dl_tbl_other_write_sex}
 #| include: false
-dl_tbl_variants("tbl_other_write_sex", "04", function(d) {
+dl_tbl_variants("fig-other-write-sex", "04", function(d) {
   d |> filter(m6 != 1) |>
     mutate(Sexe = classify_sex(m4), Niveau = classify_literacy(s1b)) |>
     filter(!is.na(Sexe), !is.na(Niveau)) |>
@@ -1919,8 +1925,8 @@ dl_tbl_variants("tbl_schooling", "04", function(d) {
 ```
 
 ```{r schooling_histo_v, echo=FALSE, warning=FALSE, message=FALSE}
-#| label: schooling_histo_v
-#| fig-cap: "Taux de scolarisation des enfants de 6 à 14 ans"
+#| label: schooling-histo-v
+#| fig-cap: "Taux de scolarisation des enfants de 6 à 14 ans. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: 10
 #| fig-height: 6.2
 
@@ -2049,8 +2055,9 @@ A Marovoay, parmi les enfants de 6 à 15 ans non scolarisés, la première raiso
 :::
 ::::
 
-```{r fig-raisons-non-scol}
-#| fig-cap: "Principales raisons de non-scolarisation ou d'arrêt des études (6-15 ans)"
+```{r fig_raisons_non_scol}
+#| label: fig-raisons-non-scol
+#| fig-cap: "Principales raisons de non-scolarisation ou d'arrêt des études (6-15 ans. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-raisons-non-scol")
 #| fig-height: !expr fig_h("fig-raisons-non-scol")
 
@@ -2092,7 +2099,7 @@ non_scol |>
 ```{r dl_fig_raisons_non_scol}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_raisons_non_scol", "04", function(d) {
+dl_fig_variants("fig-raisons-non-scol", "04", function(d) {
   ns <- d |>
     filter(m5 >= 6, m5 <= 15, m6 != 1, s2 == 2, !is.na(s5)) |>
     mutate(Raison = if_else(
@@ -2168,9 +2175,9 @@ obs_gt(other_act) |>
   style_table()
 ```
 
-```{r fig-other-act}
+```{r fig_other_act}
 #| label: fig-other-act
-#| fig-cap: "Activités principales des autres membres (%)"
+#| fig-cap: "Activités principales des autres membres (%). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-height: !expr fig_h("fig-other-act")
 other_act |> make_bar_obs(x = Act_principal, y = Percent,
                      # title = obs_title("Activités principales des autres membres (%)"),
@@ -2191,9 +2198,9 @@ dl_tbl_variants("tbl_other_act", "04", function(d) {
 
 ```{r dl_fig_other_act}
 #| echo: false
-#| fig-cap: "Activités principales des autres membres (%)"
+#| fig-cap: "Activités principales des autres membres (%). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| results: asis
-dl_fig_variants("fig_other_act", "04", function(d) {
+dl_fig_variants("fig-other-act", "04", function(d) {
   act <- d |> filter(m6 != 1) |>
     mutate(Act_principal = classify_activity(a1)) |>
     filter(!is.na(Act_principal)) |>
@@ -2261,9 +2268,9 @@ other_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent
 ```
 
 ```{r fig_other_act_sex}
-#| label: fig_other_act_sex
-#| fig-cap: "Activités des autres membres par observatoire et sexe (%)"
-#| fig-height: !expr fig_h("fig_other_act_sex")
+#| label: fig-other-act-sex
+#| fig-cap: "Activités des autres membres par observatoire et sexe (%). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-height: !expr fig_h("fig-other-act-sex")
 other_act_sex_plt |> ror_bar_grouped(x = Act_principal, fill = Sexe, y = Percent,
                                      # title = "Activités des autres membres par observatoire et sexe (%)",
                                      y_label = "%", direction = "horizontal")
@@ -2285,7 +2292,7 @@ dl_tbl_variants("tbl_other_act_sex", "04", function(d) {
 ```{r dl_fig_other_act_sex}
 #| echo: false
 #| results: asis
-dl_fig_variants("fig_other_act_sex", "04", function(d) {
+dl_fig_variants("fig-other-act-sex", "04", function(d) {
   act <- d |> filter(m6 != 1) |>
     mutate(Act_principal = classify_activity(a1),
            Sexe = classify_sex(m4)) |>
@@ -2397,10 +2404,10 @@ demog_gap   <- demog_trends |> filter(year %in% c(2015, 2025))
 ```
 
 ```{r fig_demog_taille}
-#| label: fig_demog_taille
-#| fig-cap: "Évolution de la taille moyenne des ménages (1996-2025)"
-#| fig-width: !expr fig_w("fig_demog_taille")
-#| fig-height: !expr fig_h("fig_demog_taille")
+#| label: fig-demog-taille
+#| fig-cap: "Évolution de la taille moyenne des ménages (1996-2025). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-demog-taille")
+#| fig-height: !expr fig_h("fig-demog-taille")
 
 demog_trends |> make_trend_plot(y_var = taille_moy,
                           y_label = "Taille moyenne du ménage",
@@ -2421,10 +2428,10 @@ demog_trends |> make_trend_plot(y_var = taille_moy,
 
 
 ```{r fig_demog_fem_cm}
-#| label: fig_demog_fem_cm
-#| fig-cap: "Évolution du pourcentage de chefs de ménage femmes (1996-2025)"
-#| fig-width: !expr fig_w("fig_demog_fem_cm")
-#| fig-height: !expr fig_h("fig_demog_fem_cm")
+#| label: fig-demog-fem-cm
+#| fig-cap: "Évolution du pourcentage de chefs de ménage femmes (1996-2025). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-demog-fem-cm")
+#| fig-height: !expr fig_h("fig-demog-fem-cm")
 
 if ("pct_fem_cm" %in% names(demog_trends)) {
   demog_trends |> filter(!is.na(pct_fem_cm)) |>
@@ -2447,10 +2454,10 @@ if ("pct_fem_cm" %in% names(demog_trends)) {
 ::::
 
 ```{r fig_demog_scol}
-#| label: fig_demog_scol
-#| fig-cap: "Évolution du taux de scolarisation des 6-14 ans (1996-2025)"
-#| fig-width: !expr fig_w("fig_demog_scol")
-#| fig-height: !expr fig_h("fig_demog_scol")
+#| label: fig-demog-scol
+#| fig-cap: "Évolution du taux de scolarisation des 6-14 ans (1996-2025). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-demog-scol")
+#| fig-height: !expr fig_h("fig-demog-scol")
 
 if ("taux_scol" %in% names(demog_trends)) {
   demog_trends |> filter(!is.na(taux_scol)) |>
@@ -2474,10 +2481,10 @@ if ("taux_scol" %in% names(demog_trends)) {
 
 
 ```{r fig_demog_age_cm}
-#| label: fig_demog_age_cm
-#| fig-cap: "Évolution de l'âge moyen du chef de ménage (1996-2025)"
-#| fig-width: !expr fig_w("fig_demog_age_cm")
-#| fig-height: !expr fig_h("fig_demog_age_cm")
+#| label: fig-demog-age-cm
+#| fig-cap: "Évolution de l'âge moyen du chef de ménage (1996-2025). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-width: !expr fig_w("fig-demog-age-cm")
+#| fig-height: !expr fig_h("fig-demog-age-cm")
 
 if ("age_cm_moy" %in% names(demog_trends)) {
   demog_trends |> filter(!is.na(age_cm_moy)) |>
