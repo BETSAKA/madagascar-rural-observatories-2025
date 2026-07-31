@@ -658,8 +658,8 @@ A Marovoay, les produits forestiers collectés proviennent également presque ex
 ```{r fig_ef_origine}
 #| label: fig-ef-origine
 #| fig-cap: "Origine des produits forestiers collectés (dans ou hors Aire Protégée). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
-#| fig-width: !expr fig_w("fig-ef-origine")
-#| fig-height: !expr fig_h("fig-ef-origine")
+#| fig-width: 12
+#| fig-height: 8
 
 ef_orig <- res_ef |>
   expand_sites_for_profile() |>
@@ -672,15 +672,25 @@ ef_orig <- res_ef |>
     )
   ) |>
   count(Observatory, Produit, Origine) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = c(Observatory, Produit))
+  mutate(pct = round(n / sum(n) * 100, 0), .by = c(Observatory, Produit))
 
 ef_orig |>
-  ror_bar_stacked(
-    x = Produit, y = pct, fill = Origine,
-    proportion = FALSE, direction = "vertical",
-    palette = c("Dans l'AP" = "#d62728", "Hors AP" = "#2ca02c")
-  ) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  mutate(Observatory = fct_rev(Observatory)) |>
+  ggplot(aes(x = Produit, y = pct, fill = Origine)) +
+  geom_col(position = "stack") +
+  geom_text(aes(label = paste0(pct, "%")), position = position_stack(vjust = 0.5), size = 6, color = "black") +
+  facet_wrap(~Observatory, nrow = 2) +
+  scale_fill_manual(values = c("Dans l'AP" = "#d62728", "Hors AP" = "#2ca02c")) +
+  labs(y = "%", x = NULL) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 15),
+    axis.text.y = element_text(size = 11),
+    strip.text = element_text(size = 18),
+    legend.position = "bottom",
+    legend.text = element_text(size = 15),
+    legend.title = element_text(size = 12)
+  )
 ```
 
 ```{r dl_fig_ef_origine}
@@ -790,7 +800,7 @@ A Marovoay, la commercialisation des produits forestiers reste limitée en nombr
 ::::
 
 
-```{r}
+```{r tbl_ef_vente}
 #| tbl-cap: "Part des ménages vendant les produits forestiers"
 #| label: tbl-ef-vente
 
@@ -824,7 +834,7 @@ ef_vente |>
     style = list(cell_text(weight = "bold"), cell_fill(color = "#B0E0E6")),
     locations = cells_row_groups()
   ) |>
-  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+  style_table()
 ```
 
 ```{r dl_tbl_ef_vente}
@@ -867,7 +877,7 @@ A Marovoay, 27 % des ménages déclarent fréquenter l’Aire Protégée et 21 %
 :::
 ::::
 
-```{r}
+```{r tbl_frequentation}
 #| tbl-cap: "Fréquentation et connaissance de l'Aire protégée"
 #| label: tbl-frequentation
 
@@ -911,7 +921,7 @@ bind_rows(
     style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),
     locations = cells_column_labels(columns = everything())
   ) |>
-  tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))
+  style_table() 
 ```
 
 ```{r dl_tbl_frequentation}
