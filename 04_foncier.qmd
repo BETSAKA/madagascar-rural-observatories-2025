@@ -360,7 +360,8 @@ bind_rows(
     mutate(Indicateur = "Superficie totale / ménage (ares)", .before = 1)
 ) |>
   gt() |>
-  tab_header(title = "Patrimoine foncier des ménages propriétaires")
+  tab_header(title = "Patrimoine foncier des ménages propriétaires") |>
+  style_table()
 ```
 
 ```{r dl_tbl_parcelles_stats}
@@ -909,7 +910,8 @@ res_fr30a |>
     .by = Observatory
   ) |>
   gt() |>
-  tab_header(title = "Ménages cédant des parcelles à des tiers")
+  tab_header(title = " ") |>
+style_table()
 ```
 
 ```{r dl_tbl_cession_pratique}
@@ -1112,7 +1114,8 @@ res_fr30a |>
     .by = Observatory
   ) |>
   gt() |>
-  tab_header(title = "Ménages exploitant des parcelles d'autrui")
+  tab_header(title = "") |>
+  style_table()
 ```
 
 ```{r dl_tbl_exploitation_autres}
@@ -1403,7 +1406,8 @@ res_fr30a |>
     .by = Observatory
   ) |>
   gt() |>
-  tab_header(title = "Abandon de la culture d'une ou plusieurs parcelles")
+  tab_header(title = "Abandon de la culture d'une ou plusieurs parcelles") |>
+  style_table()
 ```
 
 ```{r dl_tbl_abandon}

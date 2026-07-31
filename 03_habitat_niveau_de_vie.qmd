@@ -336,6 +336,7 @@ dl_fig_variants("fig_lighting", "05", function(d) {
 Parmi les ménages utilisant le solaire, la proportion disposant d'un panneau en état de marche est présentée ci-dessous.
 
 ```{r solar_panel_status}
+#| include: false
 solar_users <- res_h |>
   left_join(obs_site, by = "j5") |>
   filter(h7c == 1, !is.na(h7c1))
@@ -363,14 +364,20 @@ df_solar_plot <- solar_users |>
   mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory)
 
 ggplot(df_solar_plot, aes(x = pct, y = En_marche, fill = Observatory)) +
-  geom_col(width = 0.85, show.legend = FALSE) +
-  geom_text(aes(label = round(pct, 0)), hjust = -0.15, size = 5.2) +
+  geom_col(width = 0.6, show.legend = FALSE) +
+  geom_text(aes(label = round(pct, 0)), hjust = -0.3, size = 4) +
   facet_wrap(~Observatory, nrow = 1) +
-  scale_x_continuous(labels = function(x) paste0(x, "%")) +
+  scale_x_continuous(labels = function(x) paste0(x, "%"), limits = c(0, 100)) +
+  scale_fill_manual(values = c("Alaotra" = "#2E5090", "Marovoay" = "#2E5090")) +
   labs(x = "%", y = NULL) +
-  theme_minimal()
+  # scale_y_discrete(expand = expansion(add = c(0.2, 0.2))) +
+  theme_minimal() +
+  theme(
+    panel.spacing = unit(1, "lines"),
+    axis.text.y = element_text(size = 12),
+    strip.text = element_text(size = 12)
+    )
 ```
-
 
 ```{r dl_lighting}
 #| include: false
@@ -754,7 +761,7 @@ dl_fig_variants("fig_transferts", "05", function(d) {
 
 
 ```{r tbl-transferts-sortants}
-#| tbl-cap: "Transferts sortants : resume par observatoire"
+#| tbl-cap: "Transferts sortants : Résumé par observatoire"
 
 n_t2 <- res_t2_obs |>
   summarise(n_envoyeurs = n_distinct(j5), .by = Observatory) |>
@@ -923,7 +930,10 @@ Après ajustement selon l'échelle d'équivalence de l'OCDE modifiée, le revenu
 :::
 ::::
 
-```{r t_revtot_obs}
+```{r tbl_revtot_obs}
+#| tbl-cap: "Revenu total annuel (Ar/an)"
+#| tbl-cap-location: top
+#| label: tbl-revtot-obs
 inc |>
   summarise(
     `Nb ménages` = n(),
@@ -935,7 +945,7 @@ inc |>
   ) |>
   gt() |>
   tab_header(
-    title = "Revenu total annuel (Ar/an)",
+    title = "",
     subtitle = "Comparaison par ménage, par tête et par équivalent (OCDE modifiée)"
   ) |>
   fmt_number(columns = Moyenne:`Par équivalent (moy.)`, use_seps = TRUE, decimals = 0) |>
@@ -1067,7 +1077,7 @@ inc |>
   geom_text(
     aes(label = ifelse(pct > 0.04, paste0(round(pct * 100), "%"), "")),
     position = position_fill(vjust = 0.5),
-    color = "white",
+    color = "black",
     size = 3
   ) +
   scale_y_continuous(labels = percent) +
@@ -1107,7 +1117,7 @@ dl_fig_variants("fig-revcou-shares", "05", function(d) {
     geom_text(
       aes(label = ifelse(pct > 0.04, paste0(round(pct * 100), "%"), "")),
       position = position_fill(vjust = 0.5),
-      color = "white",
+      color = "black",
       size = 3
     ) +
     scale_y_continuous(labels = scales::percent) +
@@ -1180,7 +1190,10 @@ A Marovoay, le revenu total moyen par ménage s’élève à 3,480,646 Ar/an. Le
 :::
 ::::
 
-```{r t_revcou_revexcept}
+```{r tbl_revcou_revexcept}
+#| tbl-cap: "Revenu courant et revenu exceptionnel moyens par menage (Ar/an)"
+#| tbl-cap-location: top
+#| label: tbl-revcou-revexcept
 inc |>
   summarise(
     `Revenu courant` = round(mean(revcou, na.rm = TRUE)),
@@ -1191,7 +1204,7 @@ inc |>
   ) |>
   gt() |>
   tab_header(
-    title = "Revenu courant et revenu exceptionnel moyens par menage (Ar/an)",
+    title = "",
     subtitle = "Campagne 2025"
   ) |>
   fmt_number(
@@ -1700,10 +1713,10 @@ Le revenu courant réel moyen par ménage présente une évolution très fluctua
 
 
 ```{r fig_trends_revcou_real}
-#| label: fig_trends_revcou_real
+#| label: fig-trends-revcou-real
 #| fig-cap: "Evolution du revenu courant réel moyen par ménage (Ar constants 2010, IPC).<br>Source: Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
-#| fig-width: !expr fig_w("fig_trends_revcou_real")
-#| fig-height: !expr fig_h("fig_trends_revcou_real")
+#| fig-width: !expr fig_w("fig-trends-revcou-real")
+#| fig-height: !expr fig_h("fig-trends-revcou-real")
 
 trends |> make_trend_plot(revcou_real, "Revenu courant reél moyen (Ar constants 2010)")
 ```

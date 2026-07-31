@@ -621,7 +621,11 @@ Sur le plan conjugal, `r pct_couple_m` % des CM vivent en couple (mariés ou en 
 :::
 ::::
 
-```{r cm_chars}
+```{r tbl_cm_chars}
+#| tbl-cap: "Caractéristiques des Chefs de ménage"
+#| tbl-cap-location: top
+#| label: tbl-cm-chars
+
 cm <- members |> filter(m6 == 1)
 cm_site <- members_site |> filter(m6 == 1)
 
@@ -629,7 +633,7 @@ cm_site <- members_site |> filter(m6 == 1)
 sexe_table <- cm |>
   mutate(Sexe = classify_sex(m4)) |>
   count(Observatory, Sexe) |>
-  mutate(pct = round(n / sum(n) * 100, 1), .by = Observatory) |>
+  mutate(pct = round(n / sum(n) * 100, 0), .by = Observatory) |>
   mutate(Valeur = paste0(pct, "%")) |>
   select(Observatory, Sexe, Valeur) |>
   pivot_wider(names_from = Observatory, values_from = Valeur, values_fill = "-") |>
@@ -660,11 +664,10 @@ age_table <- cm |>
 hh_combined <- bind_rows(sexe_table, age_table)
 
 gt(hh_combined, groupname_col = "Caractéristique") |>
-  tab_header(title = "Caractéristiques des chefs de ménage") |>
+  tab_header(title = " ") |>
   safe_cols_label(Catégorie = "Catégorie", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
-  tab_footnote(
-    footnote = "Sexe : effectifs et pourcentages. Âge : statistiques descriptives.",
-    locations = cells_title(groups = "title")
+tab_source_note(
+    source_note = "Sexe : effectifs et pourcentages. Âge : statistiques descriptives."
   ) |>
   style_table()
 ```
@@ -672,7 +675,7 @@ gt(hh_combined, groupname_col = "Caractéristique") |>
 ```{r dl_tbl_cm_chars}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_cm_chars", "04", function(d) {
+dl_tbl_variants("tbl-cm-chars", "04", function(d) {
   cm <- d |> filter(m6 == 1)
   sexe <- cm |>
     mutate(Catégorie = classify_sex(m4)) |>
@@ -1391,6 +1394,10 @@ Dans l'Alaotra, les membres non-CM présentent un profil jeune avec une prédomi
 ::::
 
 ```{r other_chars}
+#| tbl-cap: "Caractéristiques des autres membres du ménage"
+#| tbl-cap-location: top
+#| label: tbl-men-ob
+
 others <- members |> filter(m6 != 1)
 others_site <- members_site |> filter(m6 != 1)
 
@@ -1430,11 +1437,10 @@ age_table2 <- others |>
 hh_combined2 <- bind_rows(sexe_table2, age_table2)
 
 gt(hh_combined2, groupname_col = "Caractéristique") |>
-  tab_header(title = "Caractéristiques des autres membres de ménage") |>
+  tab_header(title = " ") |>
   safe_cols_label(Catégorie = "Catégorie", Alaotra = "Alaotra", Marovoay = "Marovoay") |>
-  tab_footnote(
-    footnote = "Sexe : pourcentages. Âge : statistiques descriptives.",
-    locations = cells_title(groups = "title")
+  tab_source_note(
+    source_note = "Sexe : effectifs et pourcentages. Âge : statistiques descriptives."
   ) |>
   style_table()
 ```
@@ -1781,8 +1787,8 @@ dl_tbl_variants("tbl_other_write", "04", function(d) {
 }, members)
 ```
 
-```{r other_write_histo_h, echo=FALSE, warning=FALSE, message=FALSE}
-#| label: other-write-histo-h
+```{r fig_other_write_histo_h, echo=FALSE, warning=FALSE, message=FALSE}
+#| label: fig-other-write-histo-h
 #| fig-cap: "Aptitude à l'écriture des autres membres. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: 12
 #| fig-height: 5.8
@@ -1923,8 +1929,8 @@ dl_tbl_variants("tbl_schooling", "04", function(d) {
 }, members)
 ```
 
-```{r schooling_histo_v, echo=FALSE, warning=FALSE, message=FALSE}
-#| label: schooling-histo-v
+```{r fig_schooling_histo_v, echo=FALSE, warning=FALSE, message=FALSE}
+#| label: fig_schooling-histo-v
 #| fig-cap: "Taux de scolarisation des enfants de 6 à 14 ans. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: 10
 #| fig-height: 6.2
@@ -1979,6 +1985,9 @@ ggplot(df_schooling, aes(x = Scolarise, y = pct, fill = Observatory)) +
 La progression scolaire suit globalement la structure attendue par âge. Entre 3 et 5 ans, les enfants sont majoritairement en préscolaire, avec une part déjà entrée en CP1. Chez les 6-10 ans, les classes du primaire dominent nettement, en particulier le CP2, le CE et le CM1-CM2. Entre 11 et 14 ans, la répartition se déplace vers la fin du primaire et le premier cycle du secondaire, surtout la 6e et la 5e. Enfin, les 15-17 ans se concentrent davantage dans les classes du secondaire, tandis que les niveaux supérieurs n’apparaissent que parmi les 18-25 ans.
 
 ```{r class_attended}
+#| tbl-cap: "Classe suivie en 2024-2025 par catégorie d'âge"
+#| tbl-cap-location: top
+#| label: tbl-class
 age_levels <- c("3-5 ans", "6-10 ans", "11-14 ans", "15-17 ans", "18-25 ans")
 class_levels <- c(
   "Prescolaire", "CP1", "CP2", "CE", "CM1", "CM2",
@@ -2008,7 +2017,7 @@ class_wide <- class_data |>
   arrange(Observatory, Cat_age)
 
 obs_gt(class_wide) |>
-  tab_header(title = "Classe suivie en 2024-2025 par catégorie d'âge") |>
+  tab_header(title = "") |>
   cols_label(Cat_age = "Catégorie d'âge") |>
   style_table()
 ```
@@ -2016,7 +2025,7 @@ obs_gt(class_wide) |>
 ```{r dl_tbl_class}
 #| echo: false
 #| results: asis
-dl_tbl_variants("tbl_class", "04", function(d) {
+dl_tbl_variants("tbl-class", "04", function(d) {
   age_levels <- c("3-5 ans", "6-10 ans", "11-14 ans", "15-17 ans", "18-25 ans")
   class_levels <- c(
     "Prescolaire", "CP1", "CP2", "CE", "CM1", "CM2",
@@ -2056,7 +2065,7 @@ A Marovoay, parmi les enfants de 6 à 15 ans non scolarisés, la première raiso
 
 ```{r fig_raisons_non_scol}
 #| label: fig-raisons-non-scol
-#| fig-cap: "Principales raisons de non-scolarisation ou d'arrêt des études (6-15 ans. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
+#| fig-cap: "Principales raisons de non-scolarisation ou d'arrêt des études (6-15 ans). <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-raisons-non-scol")
 #| fig-height: !expr fig_h("fig-raisons-non-scol")
 

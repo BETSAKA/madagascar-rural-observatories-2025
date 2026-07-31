@@ -345,7 +345,7 @@ style_table <- function(gt_obj) {
       locations = gt::cells_row_groups()
     ) |>
     gt::tab_source_note(
-      source_note = gt::md("**Source : Enquête auprès des OR 2025**")
+      source_note = gt::md("Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD")
     )
 }
 
