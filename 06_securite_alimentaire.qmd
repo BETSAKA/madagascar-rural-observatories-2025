@@ -136,7 +136,10 @@ A Marovoay, l'enquête réalisée auprès de 519 ménages révèle une durée mo
 :::
 ::::
 
-```{r t1_soudure_obs}
+```{r tbl_soudure_obs}
+#| tbl-cap: "Durée de la période de soudure par observatoire"
+#| tbl-cap-location: top
+#| label: tbl-soudure-obs
 # T1 : Statistiques descriptives du nombre de mois de soudure par observatoire
 soudure_stats <- res_sa %>%
   left_join(res_deb, by = "j5") %>%
@@ -154,13 +157,14 @@ soudure_stats <- res_sa %>%
 soudure_stats %>%
   gt() %>%
   tab_header(
-    title = "Durée de la période de soudure par observatoire",
-    subtitle = "Nombre de mois de soudure (sal2d)"
+    title = "",
+    subtitle = "Nombre de mois de soudure"
   ) %>%
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
-  )
+  ) %>% 
+  style_table()
 ```
 
 ```{r dl_t1_soudure_obs}
@@ -479,7 +483,11 @@ A Marovoay, l'enquête auprès des ménages révèle une durée moyenne de stres
 :::
 ::::
 
-```{r t4_stress_obs}
+```{r tbl_stress_obs}
+#| tbl-cap: "Durée du stress alimentaire par observatoire"
+#| tbl-cap-location: top
+#| label: tbl-stress-obs
+
 # T4 : Statistiques du stress alimentaire par observatoire
 stress_stats <- res_sa %>%
   left_join(res_deb, by = "j5") %>%
@@ -497,13 +505,14 @@ stress_stats <- res_sa %>%
 stress_stats %>%
   gt() %>%
   tab_header(
-    title = "Durée du stress alimentaire par observatoire",
+    title = "",
     subtitle = "Nombre de mois de stress alimentaire (sal15a)"
   ) %>%
   tab_style(
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
-  )
+  ) %>%
+  style_table() 
 ```
 
 ```{r dl_t4_stress_obs}
@@ -764,7 +773,11 @@ A Alaotra, le riz constitue le socle de l'alimentation des ménages pour les tro
 :::
 ::::
 
-```{r t6_alim_hors_soudure}
+```{r tbl_alim_hors_soudure}
+#| tbl-cap: "Alimentation de base hors soudure par observatoire"
+#| tbl-cap-location: top
+#| label: tbl-alim-hors-soudure
+
 # T6 : Aliment principal aux 3 repas hors soudure, par observatoire
 alim_hors <- res_sa %>%
   left_join(res_deb, by = "j5") %>%
@@ -794,7 +807,7 @@ alim_hors %>%
   select(Observatory, Repas, Aliment, pct) %>%
   obs_gt() %>%
   tab_header(
-    title = "Alimentation de base hors soudure par observatoire",
+    title = "",
     subtitle = "Aliments représentant au moins 2% des réponses"
   ) %>%
   cols_label(Repas = "Repas", Aliment = "Aliment", pct = "%") %>%
@@ -803,7 +816,8 @@ alim_hors %>%
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
   ) %>%
-  tab_options(row_group.font.weight = "bold")
+  tab_options(row_group.font.weight = "bold") %>% 
+  style_table()
 ```
 
 ```{r dl_t6_alim_hors_soudure}
@@ -842,7 +856,11 @@ A Marovoay, le changement est très marqué durant la soudure au petit déjeuner
 :::
 ::::
 
-```{r t7_alim_pendant_soudure}
+```{r tbl_alim_pendant_soudure}
+#| tbl-cap: "Alimentation de base pendant la soudure par observatoire"
+#| tbl-cap-location: top
+#| label: tbl-alim-pendant-soudure
+
 # T7 : Aliment principal aux 3 repas pendant la soudure
 alim_pendant <- res_sa %>%
   left_join(res_deb, by = "j5") %>%
@@ -872,7 +890,7 @@ alim_pendant %>%
   select(Observatory, Repas, Aliment, pct) %>%
   obs_gt() %>%
   tab_header(
-    title = "Alimentation de base pendant la soudure par observatoire",
+    title = "",
     subtitle = "Aliments représentant au moins 2% des réponses"
   ) %>%
   cols_label(Repas = "Repas", Aliment = "Aliment", pct = "%") %>%
@@ -881,7 +899,8 @@ alim_pendant %>%
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
   ) %>%
-  tab_options(row_group.font.weight = "bold")
+  tab_options(row_group.font.weight = "bold") %>% 
+  style_table()
 ```
 
 ```{r dl_t7_alim_pendant_soudure}
@@ -1007,7 +1026,10 @@ dl_fig_variants("fig-comparaison-dejeuner", "09", function(d) {
 :::
 ::::
 
-```{r t8_transition}
+```{r tbl_transition}
+#| tbl-cap: "Changement d'aliment de base au déjeuner"
+#| tbl-cap-location: top
+#| label: tbl-transition
 # T8 : Matrice de transition simplifiée (déjeuner)
 transition <- res_sa %>%
   left_join(res_deb, by = "j5") %>%
@@ -1027,7 +1049,7 @@ transition %>%
   select(Observatory, Hors_soudure, Pendant_soudure, n, pct) %>%
   obs_gt() %>%
   tab_header(
-    title = "Changement d'aliment de base au déjeuner",
+    title = "",
     subtitle = "Transitions hors soudure → pendant soudure (≥ 1%)"
   ) %>%
   cols_label(
@@ -1040,7 +1062,8 @@ transition %>%
     style = cell_text(weight = "bold"),
     locations = cells_column_labels()
   ) %>%
-  tab_options(row_group.font.weight = "bold")
+  tab_options(row_group.font.weight = "bold") %>% 
+  style_table()
 ```
 
 ```{r dl_t8_transition}
