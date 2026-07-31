@@ -133,9 +133,9 @@ A Marovoay, une majorité de 55.3 % des ménages participent à la vie associati
 :::
 ::::
 
-```{r}
+```{r tbl_adhesion}
 #| label: tbl-adhesion
-#| tbl-cap: "Appartenance à une organisation ou association"
+#| tbl-cap: "Ménages ayant au moins un membre dans une organisation"
 
 res_respg0 |>
   summarise(
@@ -145,7 +145,8 @@ res_respg0 |>
     .by = Observatory
   ) |>
   gt() |>
-  tab_header(title = "Ménages ayant au moins un membre dans une organisation")
+  tab_header(title = "") |>
+  style_table()
 ```
 
 ```{r dl_tbl_adhesion}
@@ -596,9 +597,9 @@ pro_benef <- pro_clean |>
   expand_sites_for_profile()
 ```
 
-```{r tbl-source-global}
+```{r tbl_source_global}
 #| label: tbl-source-global
-#| tbl-cap: "Source des projets (tous types confondus)"
+#| tbl-cap: "Source des projets pour les ménages bénéficiaires (tous types confondus)"
 
 pro_benef |>
   summarise(
@@ -611,7 +612,8 @@ pro_benef |>
     .by = Observatory
   ) |>
   gt() |>
-  tab_header(title = "Source des projets pour les ménages bénéficiaires")
+  tab_header(title = "") |>
+  style_table()
 ```
 
 ```{r dl_tbl_source_global}

@@ -321,7 +321,7 @@ Le @tbl-parcelles-stats résume les principales caractéristiques du patrimoine 
 
 ```{r}
 #| label: tbl-parcelles-stats
-#| tbl-cap: "Statistiques sur le patrimoine foncier possédé"
+#| tbl-cap: "Statistiques sur le patrimoine foncier possédé par les ménages propriétaires"
 
 fr30_data <- res_fr30 |> filter(!is.na(fr30c))
 
@@ -360,7 +360,7 @@ bind_rows(
     mutate(Indicateur = "Superficie totale / ménage (ares)", .before = 1)
 ) |>
   gt() |>
-  tab_header(title = "Patrimoine foncier des ménages propriétaires") |>
+  tab_header(title = "") |>
   style_table()
 ```
 
@@ -1395,7 +1395,7 @@ L'abandon de la culture de certaines parcelles peut révéler des difficultés s
 
 ```{r}
 #| label: tbl-abandon
-#| tbl-cap: "Ménages ayant abandonné la culture de parcelles"
+#| tbl-cap: "Part des ménages ayant abandonné la culture d'une ou plusieurs parcelles"
 
 res_fr30a |>
   filter(!is.na(fr30p)) |>
@@ -1406,7 +1406,7 @@ res_fr30a |>
     .by = Observatory
   ) |>
   gt() |>
-  tab_header(title = "Abandon de la culture d'une ou plusieurs parcelles") |>
+  tab_header(title = "") |>
   style_table()
 ```
 
