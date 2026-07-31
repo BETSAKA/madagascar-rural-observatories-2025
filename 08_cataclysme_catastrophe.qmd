@@ -159,7 +159,10 @@ A Marovoay, `r pct_touch_m` % des ménages déclarent avoir été touchés par a
 :::
 :::
 
-```{r t1_prevalence_globale}
+```{r tbl_prevalence_globale}
+#| tbl-cap: "Ménages ayant subi au moins une catastrophe"
+#| tbl-cap-location: top
+#| label: tbl-prevalence-globale
 # T1 : % de ménages touchés par au moins une catastrophe, par observatoire
 menages_touches <- events %>%
   inner_join(res_deb, by = "j5") %>%
@@ -186,7 +189,7 @@ menages_touches_all <- menages_touches %>%
 menages_touches_all %>%
   gt() %>%
   tab_header(
-    title = "Ménages ayant subi au moins une catastrophe"
+    title = ""
   ) %>%
   cols_label(
     Observatory = "Observatoire",
@@ -202,7 +205,8 @@ menages_touches_all %>%
   tab_style(
     style = list(cell_text(weight = "bold"), cell_fill(color = "#F0F0F0")),
     locations = cells_body(rows = Observatory == "Ensemble")
-  )
+  ) %>% 
+  style_table()
 ```
 
 ```{r dl_t1_prevalence_globale}
@@ -848,24 +852,34 @@ severite_plot |>
   )
 ```
 
+
 ```{r fig_severite_profil}
 #| label: fig-severite-profil
 #| fig-cap: "Représentation de la sévérité des principaux cataclysmes. <br>Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD."
 #| fig-width: !expr fig_w("fig-severite-profil")
 #| fig-height: !expr fig_h("fig-severite-profil")
+
 severite_plot |>
-  ror_bar_stacked(
-    x = Catastrophe, y = pct, fill = Niveau,
-    y_label = "% des ménages", proportion = FALSE,
-    direction = "horizontal",
-    palette = c(
-      "Destruction totale" = "#d62728",
-      "Beaucoup" = "#ff7f0e",
-      "Un peu" = "#ffbb78",
-      "Rien" = "#aec7e8"
-    )
+  filter(pct >= 5) |>
+  ggplot(aes(x = pct, y = Catastrophe, fill = Niveau)) +
+  geom_col(position = "stack") +
+  geom_text(aes(label = paste0(pct, "%")), position = position_stack(vjust = 0.5), size = 3.5, color = "black") +
+  facet_wrap(~Observatory, nrow = 1, ncol = 2) +
+  scale_fill_manual(values = c(
+    "Destruction totale" = "#d62728",
+    "Beaucoup" = "#ff7f0e",
+    "Un peu" = "#ffbb78",
+    "Rien" = "#aec7e8"
+  )) +
+  labs(y = NULL, x = "% des ménages", fill = "Niveau") +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 11),
+    strip.text = element_text(size = 12),
+    legend.position = "bottom"
   )
 ```
+
 
 ```{r dl_g2_severite_profil}
 #| echo: false
