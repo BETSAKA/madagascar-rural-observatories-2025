@@ -14,58 +14,6 @@ editor:
 ::: {#refs}
 :::
 
-## Liste des figures
-
-```{r listes_figures}
-#| results: asis
-#| echo: false
-#| include: true
-
-source("utils/render_lists.R")
-if (knitr::is_html_output()) {
-  refs <- collect_book_crossrefs()
-  figs <- refs[refs$kind == "figure", , drop = FALSE]
-  if (nrow(figs) == 0L) {
-    cat("Aucun élément.\n")
-  } else {
-    cat(paste0(
-      "1. [",
-      figs$caption,
-      "](",
-      figs$href,
-      ")",
-      collapse = "\n"
-    ))
-  }
-}
-```
-
-## Liste des tableaux
-
-```{r listes_tableaux}
-#| results: asis
-#| echo: false
-#| include: true
-
-source("utils/render_lists.R")
-if (knitr::is_html_output()) {
-  refs <- collect_book_crossrefs()
-  tbls <- refs[refs$kind == "table", , drop = FALSE]
-  if (nrow(tbls) == 0L) {
-    cat("Aucun élément.\n")
-  } else {
-    cat(paste0(
-      "1. [",
-      tbls$caption,
-      "](",
-      tbls$href,
-      ")",
-      collapse = "\n"
-    ))
-  }
-}
-```
-
 ## Liste des acronymes
 
 AP : Aire Protégée
