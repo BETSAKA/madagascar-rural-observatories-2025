@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.36">
+<meta name="generator" content="quarto-1.9.37">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -58,7 +58,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -76,7 +95,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap-9e3e5b9121e68b3f077afb32f2c64d95.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
@@ -94,17 +113,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   ],
   "show-item-context": false,
   "language": {
-    "search-no-results-text": "No results",
-    "search-matching-documents-text": "matching documents",
-    "search-copy-link-title": "Copy link to search",
-    "search-hide-matches-text": "Hide additional matches",
-    "search-more-match-text": "more match in this document",
-    "search-more-matches-text": "more matches in this document",
-    "search-clear-button-title": "Clear",
+    "search-no-results-text": "Pas de résultats",
+    "search-matching-documents-text": "documents trouvés",
+    "search-copy-link-title": "Copier le lien vers la recherche",
+    "search-hide-matches-text": "Cacher les correspondances additionnelles",
+    "search-more-match-text": "correspondance de plus dans ce document",
+    "search-more-matches-text": "correspondances de plus dans ce document",
+    "search-clear-button-title": "Effacer",
     "search-text-placeholder": "",
-    "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
+    "search-detached-cancel-button-title": "Annuler",
+    "search-submit-button-title": "Envoyer",
+    "search-label": "Recherche"
   }
 }</script>
 
@@ -119,13 +138,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Basculer la barre latérale" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./07_rapport_environnement.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Rapport des ménages ruraux avec l’environnement</span></a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Basculer la barre latérale" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
-      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+      <button type="button" class="btn quarto-search-button" aria-label="Recherche" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
       </button>
     </div>
@@ -139,13 +158,58 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Campagne 2025 des Observatoires ruraux d’Alaotra et Marovoay</a> 
         <div class="sidebar-tools-main">
+    <div class="dropdown">
+      <a href="" title="" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label=""><i class="bi bi-file-earmark-arrow-down"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="./rapport-consolide.pdf">
+            Consolidé (PDF)
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="./rapport-consolide.docx">
+            Consolidé (Word)
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="">
+            ---
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="./downloads/rapport-marovoay.pdf">
+            Marovoay (PDF)
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="./downloads/rapport-marovoay.docx">
+            Marovoay (Word)
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="">
+            ---
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="./downloads/rapport-alaotra.pdf">
+            Alaotra (PDF)
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="./downloads/rapport-alaotra.docx">
+            Alaotra (Word)
+            </a>
+          </li>
+      </ul>
+    </div>
     <a href="https://github.com/BETSAKA/madagascar-rural-observatories-2025" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
         <div class="sidebar-search">
-        <div id="quarto-search" class="" title="Search"></div>
+        <div id="quarto-search" class="" title="Recherche"></div>
         </div>
         </div>
     <div class="sidebar-menu-container"> 
@@ -224,8 +288,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./12_bibliographie.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Bibliographie</span></a>
+  <a href="./12_references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Références</span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -241,7 +305,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">Table of contents</h2>
+    <h2 id="toc-title">Table des matières</h2>
    
   <ul>
   <li><a href="#sec-representation" id="toc-sec-representation" class="nav-link active" data-scroll-target="#sec-representation"><span class="header-section-number">7.1</span> Représentation de la zone protégée par les ménages</a>
@@ -364,7 +428,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Ressource, <span class="at">y =</span> pct, <span class="at">fill =</span> Disponibilité,</span>
 <span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">direction =</span> <span class="st">"horizontal"</span>,</span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">"Abondant"</span> <span class="ot">=</span> <span class="st">"#2ca02c"</span>, <span class="st">"Normal"</span> <span class="ot">=</span> <span class="st">"#ffbf00"</span>, <span class="st">"Peu ou pas"</span> <span class="ot">=</span> <span class="st">"#d62728"</span>)</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-ressources-dispo" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -383,14 +447,64 @@ Figure&nbsp;7.1: Disponibilité perçue des ressources naturelles dans la zone p
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_ressources_dispo_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_ressources_dispo_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_ressources_dispo_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_ressources_dispo_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ressources_dispo_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ressources_dispo_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ressources_dispo_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_ressources_dispo_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ressources_dispo_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ressources_dispo_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ressources_dispo_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ressources_dispo_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ressources_dispo_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ressources_dispo_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ressources_dispo_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ressources_dispo_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="évolution-perçue-des-ressources" class="level3" data-number="7.1.2">
@@ -426,7 +540,7 @@ Figure&nbsp;7.1: Disponibilité perçue des ressources naturelles dans la zone p
 <span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Ressource, <span class="at">y =</span> pct, <span class="at">fill =</span> Évolution,</span>
 <span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">direction =</span> <span class="st">"horizontal"</span>,</span>
 <span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">"En augmentation"</span> <span class="ot">=</span> <span class="st">"#2ca02c"</span>, <span class="st">"Stable"</span> <span class="ot">=</span> <span class="st">"#ffbf00"</span>, <span class="st">"En diminution"</span> <span class="ot">=</span> <span class="st">"#d62728"</span>)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-evolution-ressources" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -445,14 +559,64 @@ Figure&nbsp;7.2: Évolution perçue des ressources naturelles au cours des 3 der
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_evolution_ressources_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_evolution_ressources_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_evolution_ressources_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_evolution_ressources_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evolution_ressources_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evolution_ressources_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evolution_ressources_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_evolution_ressources_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evolution_ressources_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evolution_ressources_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evolution_ressources_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evolution_ressources_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evolution_ressources_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evolution_ressources_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evolution_ressources_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evolution_ressources_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="appartenance-perçue-de-la-zone" class="level3" data-number="7.1.3">
@@ -478,14 +642,14 @@ Figure&nbsp;7.2: Évolution perçue des ressources naturelles au cours des 3 der
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>appart <span class="ot">&lt;-</span> rm3_items <span class="sc">|&gt;</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui_site</span>(res_op_env, var, label))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui_site</span>(res_op_env, var, label))</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>appart <span class="sc">|&gt;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Item, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Item, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-appartenance" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -504,14 +668,64 @@ Figure&nbsp;7.3: À qui appartient la zone protégée ? (% de Oui, réponses mul
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_appartenance_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_appartenance_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_appartenance_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_appartenance_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_appartenance_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_appartenance_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_appartenance_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_appartenance_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_appartenance_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_appartenance_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_appartenance_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_appartenance_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_appartenance_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_appartenance_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_appartenance_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_appartenance_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="menaces-perçues-et-responsables" class="level3" data-number="7.1.4">
@@ -538,7 +752,7 @@ Figure&nbsp;7.3: À qui appartient la zone protégée ? (% de Oui, réponses mul
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Item, <span class="at">fill =</span> Observatory,</span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">y_label =</span> <span class="st">"%"</span>, <span class="at">direction =</span> <span class="st">"horizontal"</span>, <span class="at">facet =</span> <span class="cn">FALSE</span></span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Section, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Section, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-menaces" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -557,27 +771,127 @@ Figure&nbsp;7.4: Menaces perçues et responsables identifiés (% de Oui). <br>So
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig-menaces_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig-menaces_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig-menaces_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig-menaces_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-menaces_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-menaces_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-menaces_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig-menaces_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-menaces_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-menaces_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-menaces_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-menaces_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-menaces_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-menaces_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-menaces_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-menaces_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 <details class="dl-variants">
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/tbl_menaces_marovoay_tous.xlsx" download="">Marovoay (XLSX)</a>
+<a href="downloads/10/tbl_menaces_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
 </li>
 <li>
-<a href="downloads/10/tbl_menaces_alaotra_tous.xlsx" download="">Alaotra (XLSX)</a>
+<a href="downloads/10/tbl_menaces_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_menaces_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_menaces_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_menaces_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/tbl_menaces_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_menaces_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_menaces_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_menaces_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_menaces_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_menaces_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_menaces_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_menaces_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_menaces_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="ce-que-représente-la-zone-pour-les-ménages" class="level3" data-number="7.1.5">
@@ -610,14 +924,14 @@ Figure&nbsp;7.4: Menaces perçues et responsables identifiés (% de Oui). <br>So
 <span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>repr <span class="ot">&lt;-</span> rm5_items <span class="sc">|&gt;</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui_site</span>(res_op_env, var, label))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui_site</span>(res_op_env, var, label))</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>repr <span class="sc">|&gt;</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Item, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Item, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-representation" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -636,14 +950,64 @@ Figure&nbsp;7.5: Que représente la zone protégée pour les ménages ? (% de Ou
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig-representation_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig-representation_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig-representation_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig-representation_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-representation_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-representation_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-representation_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig-representation_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-representation_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-representation_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-representation_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-representation_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-representation_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-representation_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-representation_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-representation_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 </section>
@@ -684,7 +1048,7 @@ Figure&nbsp;7.5: Que représente la zone protégée pour les ménages ? (% de Ou
 <span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>ef_pct <span class="sc">|&gt;</span></span>
 <span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Produit, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% des ménages"</span>, <span class="at">show_pct =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-ef-produits" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -703,14 +1067,64 @@ Figure&nbsp;7.6: Pourcentage de ménages pratiquant la collecte de produits fore
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_ef_produits_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_ef_produits_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_ef_produits_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_ef_produits_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_produits_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_produits_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_produits_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_ef_produits_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_produits_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_produits_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_produits_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_produits_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_produits_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_produits_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_produits_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_produits_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 <div class="obs-alaotra">
 <p>A Alaotra, la quasi-totalité des produits forestiers collectés provient de zones situées hors de l’Aire Protégée. Le bois d’œuvre et le charbon (saribao) sont entièrement collectés en dehors de l’AP, tandis qu’une très faible proportion du bois de chauffe (kitay) provient de l’intérieur de l’aire protégée.</p>
@@ -750,7 +1164,7 @@ Figure&nbsp;7.6: Pourcentage de ménages pratiquant la collecte de produits fore
 <span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
 <span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">15</span>),</span>
 <span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>)</span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-ef-origine" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -769,14 +1183,64 @@ Figure&nbsp;7.7: Origine des produits forestiers collectés (dans ou hors Aire P
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_ef_origine_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_ef_origine_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_ef_origine_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_ef_origine_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_origine_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_origine_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_origine_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_ef_origine_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_origine_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_origine_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_origine_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_origine_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_origine_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_origine_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_origine_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_origine_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="saisonnalité-de-la-collecte-forestière" class="level3" data-number="7.2.2">
@@ -812,7 +1276,7 @@ Figure&nbsp;7.7: Origine des produits forestiers collectés (dans ou hors Aire P
 <span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
 <span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% actifs"</span>, <span class="at">color =</span> <span class="st">"Produit"</span>) <span class="sc">+</span></span>
 <span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_ror</span>() <span class="sc">+</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-ef-saison" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -831,14 +1295,64 @@ Figure&nbsp;7.8: Saisonnalité de la collecte de produits forestiers (% de ména
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_ef_saison_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_ef_saison_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_ef_saison_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_ef_saison_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_saison_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_saison_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_saison_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_ef_saison_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_saison_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_saison_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_saison_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_saison_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_saison_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_saison_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_saison_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_ef_saison_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="commercialisation-des-produits-forestiers" class="level3" data-number="7.2.3">
@@ -883,7 +1397,7 @@ Figure&nbsp;7.8: Saisonnalité de la collecte de produits forestiers (% de ména
 <span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(<span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>), <span class="fu">cell_fill</span>(<span class="at">color =</span> <span class="st">"#B0E0E6"</span>)),</span>
 <span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_row_groups</span>()</span>
 <span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">style_table</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">style_table</span>()</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="tbl-ef-vente" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -892,7 +1406,7 @@ Table&nbsp;7.1: Part des ménages vendant les produits forestiers
 </figcaption>
 <div aria-describedby="tbl-ef-vente-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="iwpxragqkh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="bdwreqcyra" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -940,8 +1454,8 @@ Table&nbsp;7.1: Part des ménages vendant les produits forestiers
 <td class="gt_row gt_right" headers="Marovoay  pct_vendeurs" style="text-align: right; border-style: none; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; font-variant-numeric: tabular-nums;" data-valign="middle">2</td>
 <td class="gt_row gt_right" headers="Marovoay  pct_vente_moyen" style="text-align: right; border-style: none; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; font-variant-numeric: tabular-nums;" data-valign="middle">99</td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes" style="border-style: none; color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3;" data-bgcolor="#FFFFFF">
-<tr class="odd" style="border-style: none;">
+</tbody><tfoot style="border-style: none;">
+<tr class="gt_sourcenotes odd" style="border-style: none; color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3;" data-bgcolor="#FFFFFF">
 <td colspan="3" class="gt_sourcenote" style="text-align: left; border-style: none; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px;">Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD</td>
 </tr>
 </tfoot>
@@ -958,14 +1472,64 @@ Table&nbsp;7.1: Part des ménages vendant les produits forestiers
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/tbl_ef_vente_marovoay_tous.xlsx" download="">Marovoay (XLSX)</a>
+<a href="downloads/10/tbl_ef_vente_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
 </li>
 <li>
-<a href="downloads/10/tbl_ef_vente_alaotra_tous.xlsx" download="">Alaotra (XLSX)</a>
+<a href="downloads/10/tbl_ef_vente_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_ef_vente_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_ef_vente_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_ef_vente_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/tbl_ef_vente_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_ef_vente_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_ef_vente_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_ef_vente_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_ef_vente_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_ef_vente_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_ef_vente_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_ef_vente_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_ef_vente_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="fréquentation-de-laire-protégée" class="level3" data-number="7.2.4">
@@ -1022,7 +1586,7 @@ Table&nbsp;7.1: Part des ménages vendant les produits forestiers
 <span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> <span class="fu">list</span>(<span class="fu">cell_text</span>(<span class="at">weight =</span> <span class="st">"bold"</span>), <span class="fu">cell_fill</span>(<span class="at">color =</span> <span class="st">"#DCDCDC"</span>)),</span>
 <span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> <span class="fu">cells_column_labels</span>(<span class="at">columns =</span> <span class="fu">everything</span>())</span>
 <span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">style_table</span>() </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">style_table</span>() </span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="tbl-frequentation" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -1031,7 +1595,7 @@ Table&nbsp;7.2: Fréquentation et connaissance de l’Aire protégée
 </figcaption>
 <div aria-describedby="tbl-frequentation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="jihyzpvais" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="hrzimwgmxb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
   
   
 <table class="gt_table cell caption-top table table-sm table-striped small" data-quarto-bootstrap="false" data-bgcolor="#FFFFFF">
@@ -1080,8 +1644,8 @@ Table&nbsp;7.2: Fréquentation et connaissance de l’Aire protégée
 <td class="gt_row gt_right" headers="Alaotra" style="text-align: right; border-style: none; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; font-variant-numeric: tabular-nums;" data-valign="middle">44 %</td>
 <td class="gt_row gt_right" headers="Marovoay" style="text-align: right; border-style: none; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; font-variant-numeric: tabular-nums;" data-valign="middle">53 %</td>
 </tr>
-</tbody><tfoot class="gt_sourcenotes" style="border-style: none; color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3;" data-bgcolor="#FFFFFF">
-<tr class="odd" style="border-style: none;">
+</tbody><tfoot style="border-style: none;">
+<tr class="gt_sourcenotes odd" style="border-style: none; color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3;" data-bgcolor="#FFFFFF">
 <td colspan="3" class="gt_sourcenote" style="text-align: left; border-style: none; font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px;">Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD</td>
 </tr>
 </tfoot>
@@ -1098,14 +1662,64 @@ Table&nbsp;7.2: Fréquentation et connaissance de l’Aire protégée
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/tbl_frequentation_marovoay_tous.xlsx" download="">Marovoay (XLSX)</a>
+<a href="downloads/10/tbl_frequentation_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
 </li>
 <li>
-<a href="downloads/10/tbl_frequentation_alaotra_tous.xlsx" download="">Alaotra (XLSX)</a>
+<a href="downloads/10/tbl_frequentation_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_frequentation_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_frequentation_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_frequentation_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/tbl_frequentation_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_frequentation_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_frequentation_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_frequentation_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_frequentation_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_frequentation_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_frequentation_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_frequentation_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_frequentation_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="raisons-de-non-fréquentation" class="level3" data-number="7.2.5">
@@ -1132,14 +1746,14 @@ Table&nbsp;7.2: Fréquentation et connaissance de l’Aire protégée
 <span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>non_freq <span class="ot">&lt;-</span> non_items <span class="sc">|&gt;</span></span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui_site</span>(um1_non, var, label))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui_site</span>(um1_non, var, label))</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>non_freq <span class="sc">|&gt;</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Item, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Item, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-non-freq" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1158,14 +1772,64 @@ Figure&nbsp;7.9: Raisons de ne pas se rendre dans l’Aire protégée (% de Oui 
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_non_freq_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_non_freq_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_non_freq_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_non_freq_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_non_freq_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_non_freq_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_non_freq_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_non_freq_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_non_freq_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_non_freq_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_non_freq_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_non_freq_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_non_freq_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_non_freq_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_non_freq_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_non_freq_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="usages-de-laire-protégée" class="level3" data-number="7.2.6">
@@ -1205,14 +1869,14 @@ Figure&nbsp;7.9: Raisons de ne pas se rendre dans l’Aire protégée (% de Oui 
 <span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>    res_um1 <span class="sc">|&gt;</span> <span class="fu">expand_sites_for_profile</span>() <span class="sc">|&gt;</span> <span class="fu">filter</span>(um1 <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> <span class="fu">count</span>(Observatory, <span class="at">name =</span> <span class="st">"n_usagers"</span>),</span>
 <span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">"Observatory"</span></span>
 <span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> n_usagers <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">0</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> n_usagers <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">0</span>))</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>usages <span class="sc">|&gt;</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Raison, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% des usagers de l'AP"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Raison, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% des usagers de l'AP"</span>)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-usages-ap" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1231,14 +1895,64 @@ Figure&nbsp;7.10: Raisons de se rendre dans l’Aire protégée (% de Oui parmi 
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_usages_ap_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_usages_ap_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_usages_ap_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_usages_ap_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_usages_ap_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_usages_ap_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_usages_ap_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_usages_ap_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_usages_ap_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_usages_ap_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_usages_ap_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_usages_ap_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_usages_ap_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_usages_ap_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_usages_ap_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_usages_ap_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 <div class="obs-alaotra">
 <p>A Alaotra, les déplacements les plus fréquents dans l’Aire Protégée concernent principalement les activités agricoles et de subsistance. Les activités de culture enregistrent la proportion la plus élevée d’usagers s’y rendant plusieurs fois par semaine (29 %), suivies de la chasse ou de la pêche (22 %). La cueillette de plantes médicinales et le pâturage présentent également des fréquentations régulières, avec respectivement 25 % et 14 % des usagers déclarant fréquenter l’aire plusieurs fois par semaine. Les déplacements effectués une fois par semaine concernent surtout la cueillette de plantes médicinales (25 %), puis la culture et le pâturage (14 % chacun), ainsi que la chasse ou la pêche (8 %). Les usages réalisés quelques fois par mois restent relativement limités et concernent principalement la culture (14 %). En revanche, la majorité des autres activités sont pratiquées de manière occasionnelle, quelques fois par an. C’est notamment le cas de la promenade et du loisir (88 %), des rituels ou cérémonies funéraires, de la coupe du bois, de la cueillette de plantes comestibles, des activités artisanales, de l’accompagnement de touristes ou chercheurs et du passage des zébus, qui sont exclusivement ou presque réalisés de manière ponctuelle.</p>
@@ -1273,7 +1987,7 @@ Figure&nbsp;7.10: Raisons de se rendre dans l’Aire protégée (% de Oui parmi 
 <span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Raison, <span class="at">y =</span> pct, <span class="at">fill =</span> Fréquence,</span>
 <span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">direction =</span> <span class="st">"horizontal"</span></span>
 <span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"YlOrRd"</span>, <span class="at">direction =</span> <span class="sc">-</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"YlOrRd"</span>, <span class="at">direction =</span> <span class="sc">-</span><span class="dv">1</span>)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-freq-usages" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1292,14 +2006,64 @@ Figure&nbsp;7.11: Fréquence des déplacements dans l’AP selon l’usage, par 
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_freq_usages_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_freq_usages_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_freq_usages_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_freq_usages_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_freq_usages_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_freq_usages_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_freq_usages_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_freq_usages_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_freq_usages_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_freq_usages_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_freq_usages_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_freq_usages_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_freq_usages_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_freq_usages_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_freq_usages_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_freq_usages_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="saisonnalité-de-la-fréquentation-de-lap" class="level3" data-number="7.2.7">
@@ -1341,7 +2105,7 @@ Figure&nbsp;7.11: Fréquence des déplacements dans l’AP selon l’usage, par 
 <span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Observatory) <span class="sc">+</span></span>
 <span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% actifs"</span>, <span class="at">color =</span> <span class="st">"Raison"</span>) <span class="sc">+</span></span>
 <span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_ror</span>() <span class="sc">+</span></span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-saison-ap" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1360,14 +2124,64 @@ Figure&nbsp;7.12: Saisonnalité des usages de l’AP (% d’usagers actifs par m
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_saison_ap_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_saison_ap_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_saison_ap_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_saison_ap_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_saison_ap_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_saison_ap_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_saison_ap_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_saison_ap_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_saison_ap_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_saison_ap_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_saison_ap_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_saison_ap_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_saison_ap_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_saison_ap_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_saison_ap_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_saison_ap_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 </section>
@@ -1401,14 +2215,14 @@ Figure&nbsp;7.12: Saisonnalité des usages de l’AP (% d’usagers actifs par m
 <span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>feu_raisons <span class="ot">&lt;-</span> feu_items <span class="sc">|&gt;</span></span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui_site</span>(res_feubrousse, var, label))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui_site</span>(res_feubrousse, var, label))</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>feu_raisons <span class="sc">|&gt;</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Item, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Item, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-raisons-feux" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1427,14 +2241,64 @@ Figure&nbsp;7.13: Raisons perçues de faire des feux (% de Oui). <br>Source : En
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_raisons_feux_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_raisons_feux_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_raisons_feux_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_raisons_feux_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_raisons_feux_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_raisons_feux_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_raisons_feux_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_raisons_feux_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_raisons_feux_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_raisons_feux_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_raisons_feux_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_raisons_feux_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_raisons_feux_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_raisons_feux_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_raisons_feux_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_raisons_feux_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="pratique-du-feu" class="level3" data-number="7.3.2">
@@ -1500,7 +2364,7 @@ Par ailleurs, 81% des ménages déclarent avoir cherché à maîtriser les feux.
 <span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a><span class="co">#     style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),</span></span>
 <span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a><span class="co">#     locations = cells_column_labels(columns = everything())</span></span>
 <span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) |&gt;</span></span>
-<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a><span class="co">#   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a><span class="co">#   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))</span></span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
@@ -1521,7 +2385,7 @@ Par ailleurs, 81% des ménages déclarent avoir cherché à maîtriser les feux.
 <span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_grouped</span>(</span>
 <span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Item, <span class="at">fill =</span> Observatory,</span>
 <span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">y_label =</span> <span class="st">"%"</span>, <span class="at">direction =</span> <span class="st">"horizontal"</span>, <span class="at">facet =</span> <span class="cn">FALSE</span></span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-feux" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1540,27 +2404,127 @@ Figure&nbsp;7.14: Pratique et perception des feux (% de Oui). <br>Source : Enqu�
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig-feux_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig-feux_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig-feux_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig-feux_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-feux_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-feux_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-feux_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig-feux_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-feux_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-feux_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-feux_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-feux_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-feux_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-feux_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-feux_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-feux_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 <details class="dl-variants">
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/tbl_feux_marovoay_tous.xlsx" download="">Marovoay (XLSX)</a>
+<a href="downloads/10/tbl_feux_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
 </li>
 <li>
-<a href="downloads/10/tbl_feux_alaotra_tous.xlsx" download="">Alaotra (XLSX)</a>
+<a href="downloads/10/tbl_feux_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_feux_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_feux_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_feux_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/tbl_feux_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_feux_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_feux_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_feux_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_feux_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_feux_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_feux_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_feux_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_feux_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="saisonnalité-des-feux" class="level3" data-number="7.3.3">
@@ -1594,7 +2558,7 @@ Figure&nbsp;7.14: Pratique et perception des feux (% de Oui). <br>Source : Enqu�
 <span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
 <span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"% des ménages ayant fait du feu"</span>, <span class="at">color =</span> <span class="st">"Observatoire"</span>) <span class="sc">+</span></span>
 <span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_ror</span>() <span class="sc">+</span></span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-saison-feux" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1613,14 +2577,64 @@ Figure&nbsp;7.15: Saisonnalité des feux de brousse pratiqués (% de ménages ac
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig-saison-feux_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig-saison-feux_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig-saison-feux_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig-saison-feux_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-saison-feux_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-saison-feux_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-saison-feux_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig-saison-feux_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-saison-feux_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-saison-feux_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-saison-feux_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-saison-feux_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-saison-feux_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-saison-feux_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-saison-feux_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-saison-feux_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="avis-sur-les-feux" class="level3" data-number="7.3.4">
@@ -1650,7 +2664,7 @@ Figure&nbsp;7.15: Saisonnalité des feux de brousse pratiqués (% de ménages ac
 <span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory)</span>
 <span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>evol_feux <span class="sc">|&gt;</span></span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Évolution, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>, <span class="at">show_pct =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Évolution, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>, <span class="at">show_pct =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-evol-feux" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1669,14 +2683,64 @@ Figure&nbsp;7.16: Évolution perçue des feux depuis 3 ans, par observatoire. <b
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_evol_feux_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_evol_feux_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_evol_feux_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_evol_feux_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evol_feux_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evol_feux_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evol_feux_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_evol_feux_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evol_feux_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evol_feux_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evol_feux_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evol_feux_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evol_feux_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evol_feux_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evol_feux_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_evol_feux_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 <div class="obs-alaotra">
 <p>A Alaotra, les feux sont très largement perçus comme un problème dans la région. En effet, 73.6 % des ménages considèrent qu’ils représentent un problème très important, tandis que 22.7 % les jugent importants. En revanche, seuls 3.4 % estiment que les feux sont peu importants et à peine 0.4 % considèrent qu’ils ne constituent pas du tout un problème. Ces résultats montrent une forte prise de conscience des impacts négatifs des feux au sein des ménages de l’observatoire.</p>
@@ -1704,7 +2768,7 @@ Figure&nbsp;7.16: Évolution perçue des feux depuis 3 ans, par observatoire. <b
 <span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory)</span>
 <span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>prob_feux <span class="sc">|&gt;</span></span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Importance, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>, <span class="at">show_pct =</span> <span class="cn">TRUE</span>, <span class="at">x_angle =</span> <span class="dv">15</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Importance, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>, <span class="at">show_pct =</span> <span class="cn">TRUE</span>, <span class="at">x_angle =</span> <span class="dv">15</span>)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-probleme-feux" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1723,14 +2787,64 @@ Figure&nbsp;7.17: Les feux sont-ils un problème dans la région ? (par observat
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_probleme_feux_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_probleme_feux_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_probleme_feux_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_probleme_feux_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_probleme_feux_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_probleme_feux_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_probleme_feux_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_probleme_feux_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_probleme_feux_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_probleme_feux_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_probleme_feux_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_probleme_feux_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_probleme_feux_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_probleme_feux_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_probleme_feux_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_probleme_feux_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 <div class="obs-alaotra">
 <p>A Alaotra, une très large majorité des ménages estime que la pratique du feu devrait être interdite, avec 85.2 % des réponses. Par ailleurs, 14.6 % considèrent que cette pratique devrait être limitée, tandis qu’une proportion très faible de ménages (0.2 %) pense qu’elle devrait rester libre.</p>
@@ -1757,7 +2871,7 @@ Figure&nbsp;7.17: Les feux sont-ils un problème dans la région ? (par observat
 <span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory)</span>
 <span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>regl_feux <span class="sc">|&gt;</span></span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Avis, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>, <span class="at">show_pct =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ror_bar_v</span>(<span class="at">x =</span> Avis, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>, <span class="at">show_pct =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-reglementation-feux" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1776,14 +2890,64 @@ Figure&nbsp;7.18: La pratique du feu devrait être… (par observatoire). <br>So
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_reglementation_feux_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_reglementation_feux_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_reglementation_feux_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_reglementation_feux_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_reglementation_feux_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_reglementation_feux_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_reglementation_feux_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_reglementation_feux_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_reglementation_feux_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_reglementation_feux_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_reglementation_feux_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_reglementation_feux_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_reglementation_feux_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_reglementation_feux_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_reglementation_feux_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_reglementation_feux_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 </section>
@@ -1821,7 +2985,7 @@ Figure&nbsp;7.18: La pratique du feu devrait être… (par observatoire). <br>So
 <span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="co">#     style = list(cell_text(weight = "bold"), cell_fill(color = "#DCDCDC")),</span></span>
 <span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="co">#     locations = cells_column_labels(columns = everything())</span></span>
 <span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   ) |&gt;</span></span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a><span class="co">#   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a><span class="co">#   tab_source_note(source_note = md("**Source : Enquête auprès des OR 2025**"))</span></span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
@@ -1838,7 +3002,7 @@ Figure&nbsp;7.18: La pratique du feu devrait être… (par observatoire). <br>So
 <span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>ap_long <span class="sc">|&gt;</span></span>
 <span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Item =</span> <span class="fu">reorder</span>(Item, pct)) <span class="sc">|&gt;</span></span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Item, <span class="at">y_label =</span> <span class="st">"%"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Item, <span class="at">y_label =</span> <span class="st">"%"</span>)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-connaissance-ap" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1857,27 +3021,127 @@ Figure&nbsp;7.19: Connaissance de l’Aire protégée et demande de protection (
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig-connaissance-ap_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig-connaissance-ap_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig-connaissance-ap_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig-connaissance-ap_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-connaissance-ap_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-connaissance-ap_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-connaissance-ap_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig-connaissance-ap_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-connaissance-ap_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-connaissance-ap_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-connaissance-ap_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-connaissance-ap_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-connaissance-ap_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-connaissance-ap_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-connaissance-ap_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-connaissance-ap_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 <details class="dl-variants">
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/tbl_connaissance_ap_marovoay_tous.xlsx" download="">Marovoay (XLSX)</a>
+<a href="downloads/10/tbl_connaissance_ap_marovoay_tous.xlsx" download="">Tous (XLSX)</a>
 </li>
 <li>
-<a href="downloads/10/tbl_connaissance_ap_alaotra_tous.xlsx" download="">Alaotra (XLSX)</a>
+<a href="downloads/10/tbl_connaissance_ap_marovoay_ampijoroa.xlsx" download="">Ampijoroa (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_connaissance_ap_marovoay_bepako.xlsx" download="">Bepako (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_connaissance_ap_marovoay_madiromiongana.xlsx" download="">Madiromiongana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_connaissance_ap_marovoay_maroala.xlsx" download="">Maroala (XLSX)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/tbl_connaissance_ap_alaotra_tous.xlsx" download="">Tous (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_connaissance_ap_alaotra_ambatoharanana.xlsx" download="">Ambatoharanana (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_connaissance_ap_alaotra_ambatomanga.xlsx" download="">Ambatomanga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_connaissance_ap_alaotra_ambodivoara.xlsx" download="">Ambodivoara (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_connaissance_ap_alaotra_ambohidrony.xlsx" download="">Ambohidrony (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_connaissance_ap_alaotra_analamiranga.xlsx" download="">Analamiranga (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_connaissance_ap_alaotra_avaradrano.xlsx" download="">Avaradrano (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_connaissance_ap_alaotra_feramanga_atsimo.xlsx" download="">Feramanga Atsimo (XLSX)</a>
+</li>
+<li>
+<a href="downloads/10/tbl_connaissance_ap_alaotra_mangabe.xlsx" download="">Mangabe (XLSX)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="impact-perçu-des-actions-de-lap" class="level3" data-number="7.4.2">
@@ -1954,7 +3218,7 @@ Figure&nbsp;7.19: Connaissance de l’Aire protégée et demande de protection (
 <span id="cb29-60"><a href="#cb29-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
 <span id="cb29-61"><a href="#cb29-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">12</span>),</span>
 <span id="cb29-62"><a href="#cb29-62" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()</span>
-<span id="cb29-63"><a href="#cb29-63" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb29-63"><a href="#cb29-63" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-jugement-ap" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1973,14 +3237,64 @@ Figure&nbsp;7.20: Jugement des actions de l’AP sur la situation économique, s
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_jugement_ap_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_jugement_ap_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_jugement_ap_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_jugement_ap_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_jugement_ap_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_jugement_ap_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_jugement_ap_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_jugement_ap_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_jugement_ap_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_jugement_ap_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_jugement_ap_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_jugement_ap_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_jugement_ap_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_jugement_ap_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_jugement_ap_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_jugement_ap_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="gestionnaire-souhaité" class="level3" data-number="7.4.3">
@@ -2011,14 +3325,14 @@ Figure&nbsp;7.20: Jugement des actions de l’AP sur la situation économique, s
 <span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ap5 <span class="sc">==</span> <span class="dv">1</span>, ap5a <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>) <span class="sc">|&gt;</span></span>
 <span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Gestionnaire =</span> <span class="fu">factor</span>(gest_labels[<span class="fu">as.character</span>(ap5a)], <span class="at">levels =</span> gest_labels)) <span class="sc">|&gt;</span></span>
 <span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Gestionnaire) <span class="sc">|&gt;</span></span>
-<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>gest <span class="sc">|&gt;</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Gestionnaire, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Gestionnaire, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-gestionnaire" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2037,14 +3351,64 @@ Figure&nbsp;7.21: Qui devrait gérer l’AP? (parmi ceux favorables à la protec
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig-gestionnaire_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig-gestionnaire_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig-gestionnaire_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig-gestionnaire_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-gestionnaire_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-gestionnaire_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-gestionnaire_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig-gestionnaire_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-gestionnaire_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-gestionnaire_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-gestionnaire_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-gestionnaire_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-gestionnaire_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-gestionnaire_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-gestionnaire_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig-gestionnaire_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="mesures-de-protection-souhaitées" class="level3" data-number="7.4.4">
@@ -2079,14 +3443,14 @@ Figure&nbsp;7.21: Qui devrait gérer l’AP? (parmi ceux favorables à la protec
 <span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>ap_favorable <span class="ot">&lt;-</span> res_ap <span class="sc">|&gt;</span> <span class="fu">filter</span>(ap5 <span class="sc">==</span> <span class="dv">1</span>)</span>
 <span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a>mesures <span class="ot">&lt;-</span> ap5b_items <span class="sc">|&gt;</span></span>
-<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui_site</span>(ap_favorable, var, label))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pmap_dfr</span>(\(var, label) <span class="fu">pct_oui_site</span>(ap_favorable, var, label))</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>mesures <span class="sc">|&gt;</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Item, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Item, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-mesures-protection" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2105,14 +3469,64 @@ Figure&nbsp;7.22: Mesures souhaitées pour protéger l’AP (% de Oui, parmi ceu
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_mesures_protection_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_mesures_protection_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_mesures_protection_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_mesures_protection_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_mesures_protection_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_mesures_protection_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_mesures_protection_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_mesures_protection_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_mesures_protection_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_mesures_protection_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_mesures_protection_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_mesures_protection_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_mesures_protection_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_mesures_protection_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_mesures_protection_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_mesures_protection_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="pauvreté-vs.-environnement-quelle-priorité" class="level3" data-number="7.4.5">
@@ -2141,14 +3555,14 @@ Figure&nbsp;7.22: Mesures souhaitées pour protéger l’AP (% de Oui, parmi ceu
 <span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ap8 <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>) <span class="sc">|&gt;</span></span>
 <span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(Priorité <span class="ot">=</span> <span class="fu">factor</span>(ap8_labels[<span class="fu">as.character</span>(ap8)], <span class="at">levels =</span> ap8_labels)) <span class="sc">|&gt;</span></span>
 <span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Observatory, Priorité) <span class="sc">|&gt;</span></span>
-<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct =</span> <span class="fu">round</span>(n <span class="sc">/</span> <span class="fu">sum</span>(n) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>), <span class="at">.by =</span> Observatory)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>priorite <span class="sc">|&gt;</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Priorité, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">make_bar_obs</span>(<span class="at">x =</span> Priorité, <span class="at">y =</span> pct, <span class="at">y_label =</span> <span class="st">"% de ménages"</span>)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-priorite" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2167,14 +3581,64 @@ Figure&nbsp;7.23: Pauvreté vs.&nbsp;protection de l’environnement : quelle pr
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_priorite_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_priorite_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_priorite_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_priorite_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_priorite_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_priorite_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_priorite_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_priorite_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_priorite_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_priorite_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_priorite_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_priorite_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_priorite_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_priorite_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_priorite_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_priorite_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 </section>
 <section id="connaissance-des-actions-de-protection" class="level3" data-number="7.4.6">
@@ -2221,7 +3685,7 @@ Figure&nbsp;7.23: Pauvreté vs.&nbsp;protection de l’environnement : quelle pr
 <span id="cb36-30"><a href="#cb36-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Action, <span class="at">fill =</span> Indicateur,</span>
 <span id="cb36-31"><a href="#cb36-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">y_label =</span> <span class="st">"% de ménages"</span>, <span class="at">direction =</span> <span class="st">"horizontal"</span></span>
 <span id="cb36-32"><a href="#cb36-32" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb36-33"><a href="#cb36-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"Set2"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb36-33"><a href="#cb36-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"Set2"</span>)</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <div id="fig-actions-ap" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -2240,17 +3704,117 @@ Figure&nbsp;7.24: Information, consultation et bénéfice des actions de l’AP 
 <summary>
 📥 Télécharger par hameau et par observatoire
 </summary>
-<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">
+<div class="dl-grid">
+<div class="dl-group">
+<h4 class="anchored">
+Marovoay
+</h4>
+<ul>
 <li>
-<a href="downloads/10/fig_actions_ap_marovoay_tous.png" download="">Marovoay (PNG)</a>
+<a href="downloads/10/fig_actions_ap_marovoay_tous.png" download="">Tous (PNG)</a>
 </li>
 <li>
-<a href="downloads/10/fig_actions_ap_alaotra_tous.png" download="">Alaotra (PNG)</a>
+<a href="downloads/10/fig_actions_ap_marovoay_ampijoroa.png" download="">Ampijoroa (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_actions_ap_marovoay_bepako.png" download="">Bepako (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_actions_ap_marovoay_madiromiongana.png" download="">Madiromiongana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_actions_ap_marovoay_maroala.png" download="">Maroala (PNG)</a>
 </li>
 </ul>
+</div>
+<div class="dl-group">
+<h4 class="anchored">
+Alaotra
+</h4>
+<ul>
+<li>
+<a href="downloads/10/fig_actions_ap_alaotra_tous.png" download="">Tous (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_actions_ap_alaotra_ambatoharanana.png" download="">Ambatoharanana (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_actions_ap_alaotra_ambatomanga.png" download="">Ambatomanga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_actions_ap_alaotra_ambodivoara.png" download="">Ambodivoara (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_actions_ap_alaotra_ambohidrony.png" download="">Ambohidrony (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_actions_ap_alaotra_analamiranga.png" download="">Analamiranga (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_actions_ap_alaotra_avaradrano.png" download="">Avaradrano (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_actions_ap_alaotra_feramanga_atsimo.png" download="">Feramanga Atsimo (PNG)</a>
+</li>
+<li>
+<a href="downloads/10/fig_actions_ap_alaotra_mangabe.png" download="">Mangabe (PNG)</a>
+</li>
+</ul>
+</div>
+</div>
 </details>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" role="list" style="display: none">
+<div id="ref-battese1988" class="csl-entry" role="listitem">
+Battese, George E., Rachel M. Harter, et Wayne A. Fuller. 1988. <span>«&nbsp;An Error-Components Model for Prediction of County Crop Areas Using Survey and Satellite Data&nbsp;»</span>. <em>Journal of the American Statistical Association</em> 83 (401): 28‑36. <a href="https://doi.org/10.1080/01621459.1988.10478561">https://doi.org/10.1080/01621459.1988.10478561</a>.
+</div>
+<div id="ref-deville1992" class="csl-entry" role="listitem">
+Deville, Jean-Claude, et Carl-Erik Särndal. 1992. <span>«&nbsp;Calibration Estimators in Survey Sampling&nbsp;»</span>. <em>Journal of the American Statistical Association</em> 87 (418): 376‑82. <a href="https://doi.org/10.1080/01621459.1992.10475217">https://doi.org/10.1080/01621459.1992.10475217</a>.
+</div>
+<div id="ref-dgm2019meteo" class="csl-entry" role="listitem">
+DGM. 2019. <em>Les tendances climatiques et les futurs changements climatiques à Madagascar</em>. Direction Générale de la Météorologie.
+</div>
+<div id="ref-fay1979" class="csl-entry" role="listitem">
+Fay, Robert E., et Roger A. Herriot. 1979. <span>«&nbsp;Estimation of Income from Small Places: An Application of <span>James-Stein</span> Procedures to Census Data&nbsp;»</span>. <em>Journal of the American Statistical Association</em> 74 (366): 269‑77. <a href="https://doi.org/10.1080/01621459.1979.10482505">https://doi.org/10.1080/01621459.1979.10482505</a>.
+</div>
+<div id="ref-haziza2017" class="csl-entry" role="listitem">
+Haziza, David, et Jean-François Beaumont. 2017. <span>«&nbsp;Construction of Weights in Surveys: A Review&nbsp;»</span>. <em>Statistical Science</em> 32 (2): 206‑26. <a href="https://doi.org/10.1214/16-STS608">https://doi.org/10.1214/16-STS608</a>.
+</div>
+<div id="ref-instat2020rgph" class="csl-entry" role="listitem">
+INSTAT. 2020. <em>Troisième Recensement Général de la Population et de l’Habitation (RGPH-3) : Résultats provisoires</em>. Institut National de la Statistique.
+</div>
+<div id="ref-kish1965" class="csl-entry" role="listitem">
+Kish, Leslie. 1965. <em>Survey Sampling</em>. John Wiley &amp; Sons.
+</div>
+<div id="ref-kott2006" class="csl-entry" role="listitem">
+Kott, Phillip S. 2006. <span>«&nbsp;Using Calibration Weighting to Adjust for Nonresponse and Coverage Errors&nbsp;»</span>. <em>Survey Methodology</em> 32 (2): 133‑42.
+</div>
+<div id="ref-little1986" class="csl-entry" role="listitem">
+Little, Roderick J. A. 1986. <span>«&nbsp;Survey Nonresponse Adjustments for Estimates of Means&nbsp;»</span>. <em>International Statistical Review</em> 54 (2): 139‑57. <a href="https://doi.org/10.2307/1403140">https://doi.org/10.2307/1403140</a>.
+</div>
+<div id="ref-lohr2022" class="csl-entry" role="listitem">
+Lohr, Sharon L. 2022. <em>Sampling: Design and Analysis</em>. 3rd éd. CRC Press.
+</div>
+<div id="ref-lumley2004" class="csl-entry" role="listitem">
+Lumley, Thomas. 2004. <span>«&nbsp;Analysis of Complex Survey Samples&nbsp;»</span>. <em>Journal of Statistical Software</em> 9 (8): 1‑19. <a href="https://doi.org/10.18637/jss.v009.i08">https://doi.org/10.18637/jss.v009.i08</a>.
+</div>
+<div id="ref-lumley2010" class="csl-entry" role="listitem">
+Lumley, Thomas. 2010. <em>Complex Surveys: A Guide to Analysis Using <span>R</span></em>. John Wiley &amp; Sons.
+</div>
+<div id="ref-lumley2023survey" class="csl-entry" role="listitem">
+Lumley, Thomas. 2023. <em>survey: Analysis of Complex Survey Samples</em>. <a href="https://CRAN.R-project.org/package=survey">https://CRAN.R-project.org/package=survey</a>.
+</div>
+<div id="ref-rao2015" class="csl-entry" role="listitem">
+Rao, J. N. K., et Isabel Molina. 2015. <em>Small Area Estimation</em>. 2nd éd. John Wiley &amp; Sons.
+</div>
+<div id="ref-ror2015" class="csl-entry" role="listitem">
+ROR, et DIAL. 2016. <em>Réseau des Observatoires Ruraux de Madagascar : Rapport annuel 2015</em>. Réseau des Observatoires Ruraux.
+</div>
+<div id="ref-sarndal2003" class="csl-entry" role="listitem">
+Särndal, Carl-Erik, Bengt Swensson, et Jan Wretman. 2003. <em>Model Assisted Survey Sampling</em>. Springer-Verlag.
+</div>
+</div>
 </section>
 </section>
 
@@ -2280,12 +3844,12 @@ Figure&nbsp;7.24: Information, consultation et bénéfice des actions de l’AP 
       // flash "checked"
       button.classList.add('code-copy-button-checked');
       var currentTitle = button.getAttribute("title");
-      button.setAttribute("title", "Copied!");
+      button.setAttribute("title", "Copié");
       let tooltip;
       if (window.bootstrap) {
         button.setAttribute("data-bs-toggle", "tooltip");
         button.setAttribute("data-bs-placement", "left");
-        button.setAttribute("data-bs-title", "Copied!");
+        button.setAttribute("data-bs-title", "Copié");
         tooltip = new bootstrap.Tooltip(button, 
           { trigger: "manual", 
             customClass: "code-copy-button-tooltip",

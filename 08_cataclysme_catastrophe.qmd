@@ -588,23 +588,8 @@ degats_elevage_display <- events %>%
 #   ) %>%
 #   tab_options(row_group.font.weight = "bold")
 
-# ---- Préparation ordre des modalités basé sur Marovoay ----
-ordre_catastrophe <- events %>%
-  inner_join(res_deb, by = "j5") %>%
-  filter(!is.na(cc1a3)) %>%
-  mutate(Niveau = degats_labels[as.character(cc1a3)]) %>%
-  count(Observatory, Catastrophe, Niveau) %>%
-  group_by(Observatory, Catastrophe) %>%
-  mutate(total = sum(n), pct = n / total) %>%
-  ungroup() %>%
-  filter(total >= 5, Observatory == "Marovoay") %>%
-  group_by(Catastrophe) %>%
-  summarise(score_marovoay = sum(pct[Niveau %in% c("Beaucoup", "Destruction totale")], na.rm = TRUE), .groups = "drop") %>%
-  arrange(desc(score_marovoay)) %>%
-  pull(Catastrophe)
-
-# ---- Affichage HISTOGRAMMES ----
-degats_elevage_plot <- events %>%
+# ---- Préparation ordre des modalités ----
+degats_elevage_counts <- events %>%
   inner_join(res_deb, by = "j5") %>%
   filter(!is.na(cc1a3)) %>%
   mutate(
@@ -620,43 +605,68 @@ degats_elevage_plot <- events %>%
     pct = n / sum(n),
     total = sum(n)
   ) %>%
-  ungroup() %>%
+  ungroup()
+
+ordre_catastrophe <- degats_elevage_counts %>%
+  filter(total >= 5, Observatory == "Marovoay") %>%
+  group_by(Catastrophe) %>%
+  summarise(score = sum(pct[Niveau %in% c("Beaucoup", "Destruction totale")], na.rm = TRUE), .groups = "drop") %>%
+  arrange(desc(score)) %>%
+  pull(Catastrophe)
+
+if (length(ordre_catastrophe) == 0) {
+  ordre_catastrophe <- degats_elevage_counts %>%
+    filter(total >= 5) %>%
+    group_by(Catastrophe) %>%
+    summarise(score = sum(pct[Niveau %in% c("Beaucoup", "Destruction totale")], na.rm = TRUE), .groups = "drop") %>%
+    arrange(desc(score)) %>%
+    pull(Catastrophe)
+}
+
+# ---- Affichage HISTOGRAMMES ----
+degats_elevage_plot <- degats_elevage_counts %>%
   filter(total >= 5, Catastrophe %in% ordre_catastrophe) %>%
   mutate(Catastrophe = factor(Catastrophe, levels = rev(ordre_catastrophe)))
 
-ggplot(degats_elevage_plot, aes(x = Catastrophe, y = pct, fill = Niveau)) +
-  geom_col(position = "fill") +
-  geom_text(
-    aes(label = ifelse(pct >= 0.08, scales::percent(pct, accuracy = 1), "")),
-    position = position_fill(vjust = 0.5),
-    size = 4.6,
-    fontface = "plain"
-  ) +
-  coord_flip() +
-  facet_wrap(~Observatory, ncol = 1, scales = "free_y") +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  scale_fill_manual(
-    values = c(
-      "Rien" = "#9ecae1",
-      "Un peu" = "#fdd0a2",
-      "Beaucoup" = "#fc8d59",
-      "Destruction totale" = "#d7301f"
+if (nrow(degats_elevage_plot) == 0) {
+  ggplot() +
+    annotate("text", x = 1, y = 1, label = "Aucune donnée disponible pour ce profil") +
+    theme_void()
+} else {
+  ggplot(degats_elevage_plot, aes(x = Catastrophe, y = pct, fill = Niveau)) +
+    geom_col(position = "fill") +
+    geom_text(
+      aes(label = ifelse(pct >= 0.08, scales::percent(pct, accuracy = 1), "")),
+      position = position_fill(vjust = 0.5),
+      size = 4.6,
+      fontface = "plain"
+    ) +
+    coord_flip() +
+    facet_wrap(~Observatory, ncol = 1, scales = "free_y") +
+    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+    scale_fill_manual(
+      values = c(
+        "Rien" = "#9ecae1",
+        "Un peu" = "#fdd0a2",
+        "Beaucoup" = "#fc8d59",
+        "Destruction totale" = "#d7301f"
+      )
+    ) +
+    labs(
+      x = NULL, y = NULL,
+      fill = "Niveau de dégâts"
+    ) +
+    theme_ror(base_size = 14) +
+    theme(
+      legend.position = "bottom",
+      legend.title = element_text(size = 16, face = "plain"),
+      legend.text = element_text(size = 15),
+      strip.text = element_text(size = 16, face = "plain"),
+      axis.text.x = element_text(size = 15),
+      axis.text.y = element_text(size = 15),
+      panel.grid.minor = element_blank()
     )
-  ) +
-  labs(
-    x = NULL, y = NULL,
-    fill = "Niveau de dégâts"
-  ) +
-  theme_ror(base_size = 14) +
-  theme(
-    legend.position = "bottom",
-    legend.title = element_text(size = 16, face = "plain"),   # <- pas en gras
-    legend.text = element_text(size = 15),
-    strip.text = element_text(size = 16, face = "plain"),     # <- pas en gras
-    axis.text.x = element_text(size = 15),
-    axis.text.y = element_text(size = 15),
-    panel.grid.minor = element_blank()
-)
+}
 ```
 
 
@@ -834,7 +844,6 @@ severite_plot <- events %>%
       levels = c("Destruction totale", "Beaucoup", "Un peu", "Rien")
     )
   ) %>%
-  expand_sites_for_profile() %>%
   count(Observatory, Catastrophe, Niveau) %>%
   group_by(Observatory, Catastrophe) %>%
   mutate(pct = round(n / sum(n) * 100, 1)) %>%

@@ -11,6 +11,7 @@ source("utils/sites.R")
 source("utils/plot_theme.R")
 source("utils/figure_sizes.R")
 source("utils/ror_plots.R")
+source("utils/render_lists.R")
 REPORT_MODE <- get_report_mode()
 
 # --- Figure height scaling for observatory profiles ---
@@ -345,7 +346,9 @@ style_table <- function(gt_obj) {
       locations = gt::cells_row_groups()
     ) |>
     gt::tab_source_note(
-      source_note = gt::md("Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD")
+      source_note = gt::md(
+        "Source : Enquêtes auprès des OR Alaotra et Marovoay - 2025, projet BETSAKA, CERED, IRD"
+      )
     )
 }
 

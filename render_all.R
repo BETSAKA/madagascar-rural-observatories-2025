@@ -91,6 +91,37 @@ clean_stale_rmarkdown <- function() {
   }
 }
 
+clean_quarto_temp <- function() {
+  qdir <- ".quarto"
+  if (!dir.exists(qdir)) {
+    return(invisible(NULL))
+  }
+
+  session_dirs <- list.dirs(qdir, recursive = FALSE, full.names = TRUE)
+  session_dirs <- session_dirs[grepl(
+    "quarto-session-temp",
+    basename(session_dirs),
+    fixed = TRUE
+  )]
+  if (length(session_dirs) > 0) {
+    unlink(session_dirs, recursive = TRUE, force = TRUE)
+    cat("Removed stale Quarto session dirs:", length(session_dirs), "\n")
+  }
+
+  cache_dirs <- file.path(qdir, c("project-cache", "idx"))
+  cache_dirs <- cache_dirs[dir.exists(cache_dirs)]
+  if (length(cache_dirs) > 0) {
+    unlink(cache_dirs, recursive = TRUE, force = TRUE)
+    cat(
+      "Removed Quarto cache dirs:",
+      paste(basename(cache_dirs), collapse = ", "),
+      "\n"
+    )
+  }
+
+  invisible(NULL)
+}
+
 # Load DOCX cover-insertion utility
 source("utils/add_cover_docx.R")
 
@@ -100,28 +131,34 @@ source("utils/add_cover_docx.R")
 # so they don't wipe previously rendered formats.
 ensure_output_dirs()
 clean_stale_files()
+clean_quarto_temp()
 run_render("1a/3  Consolidated — HTML", "quarto render --to html")
 clean_stale_files()
 clean_stale_rmarkdown()
+clean_quarto_temp()
 
 # Render PDF separately so a cleanup failure doesn't block DOCX
 run_render("1b/3  Consolidated — PDF", "quarto render --to pdf --no-clean")
 clean_stale_files()
 clean_stale_rmarkdown()
+clean_quarto_temp()
 rescue_outputs("docs", "rapport-consolide")
 
 # Render DOCX separately
 run_render("1c/3  Consolidated — DOCX", "quarto render --to docx --no-clean")
 clean_stale_files()
 clean_stale_rmarkdown()
+clean_quarto_temp()
 rescue_outputs("docs", "rapport-consolide")
 add_cover_to_docx("docs/rapport-consolide.docx", "images/cover.jpg")
 
 # --- 2/3: Marovoay (PDF + DOCX) ---
 clean_stale_files()
+clean_quarto_temp()
 run_render("2a/3  Marovoay — PDF", "quarto render --profile marovoay --to pdf")
 clean_stale_files()
 clean_stale_rmarkdown()
+clean_quarto_temp()
 rescue_outputs("docs-marovoay", "rapport-marovoay")
 
 run_render(
@@ -130,14 +167,17 @@ run_render(
 )
 clean_stale_files()
 clean_stale_rmarkdown()
+clean_quarto_temp()
 rescue_outputs("docs-marovoay", "rapport-marovoay")
 add_cover_to_docx("docs-marovoay/rapport-marovoay.docx", "images/cover.jpg")
 
 # --- 3/3: Alaotra (PDF + DOCX) ---
 clean_stale_files()
+clean_quarto_temp()
 run_render("3a/3  Alaotra — PDF", "quarto render --profile alaotra --to pdf")
 clean_stale_files()
 clean_stale_rmarkdown()
+clean_quarto_temp()
 rescue_outputs("docs-alaotra", "rapport-alaotra")
 
 run_render(
@@ -146,6 +186,7 @@ run_render(
 )
 clean_stale_files()
 clean_stale_rmarkdown()
+clean_quarto_temp()
 rescue_outputs("docs-alaotra", "rapport-alaotra")
 add_cover_to_docx("docs-alaotra/rapport-alaotra.docx", "images/cover.jpg")
 
@@ -176,6 +217,7 @@ for (f in files_to_copy) {
 cat("\n=== Checking expected outputs ===\n")
 expected <- c(
   "docs/index.html",
+  "docs/12_references.html",
   "docs/rapport-consolide.pdf",
   "docs/rapport-consolide.docx",
   "docs/downloads/rapport-marovoay.pdf",
@@ -223,7 +265,7 @@ for (e in render_errors) {
 }
 
 if (length(missing) == 0 && length(real_errors) == 0) {
-  cat("\nAll 7 outputs produced successfully:\n")
+  cat("\nAll 8 outputs produced successfully:\n")
   for (f in expected) {
     cat("  OK:", f, "\n")
   }

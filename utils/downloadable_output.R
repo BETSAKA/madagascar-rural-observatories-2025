@@ -30,6 +30,22 @@ make_dl_filename <- function(id, obs, site, ext) {
   )
 }
 
+#' Resolve active Quarto output directory for downloads
+#' @return Character scalar output directory name
+get_active_output_dir <- function() {
+  mode <- get_report_mode()
+  if (mode$is_consolidated) {
+    return("docs")
+  }
+  if (identical(mode$observatory, "Marovoay")) {
+    return("docs-marovoay")
+  }
+  if (identical(mode$observatory, "Alaotra")) {
+    return("docs-alaotra")
+  }
+  "docs"
+}
+
 # ----------------------------------------------------------
 # Data preparation
 # ----------------------------------------------------------
@@ -129,19 +145,22 @@ dl_fig_variants <- function(
     return(invisible(NULL))
   }
 
-  disk_dir <- file.path("docs", "downloads", chapter)
+  disk_dir <- file.path(get_active_output_dir(), "downloads", chapter)
   dir.create(disk_dir, recursive = TRUE, showWarnings = FALSE)
 
-  obs_list <- intersect(c("Marovoay", "Alaotra"), unique(data$Observatory))
+  combos <- get_site_combos(data)
   links <- list()
 
-  for (obs in obs_list) {
-    variant <- prepare_variant_data(data, obs, "Tous")
+  for (i in seq_len(nrow(combos))) {
+    obs <- combos$Observatory[i]
+    site <- combos$Site[i]
+
+    variant <- prepare_variant_data(data, obs, site)
     if (nrow(variant) == 0) {
       next
     }
 
-    fname <- make_dl_filename(id, obs, "tous", "png")
+    fname <- make_dl_filename(id, obs, site, "png")
     disk_path <- file.path(disk_dir, fname)
     web_path <- file.path("downloads", chapter, fname)
 
@@ -157,7 +176,7 @@ dl_fig_variants <- function(
           bg = "white"
         )
         links[[length(links) + 1]] <- list(
-          label = obs,
+          label = site,
           obs = obs,
           href = web_path,
           ext = "png"
@@ -186,19 +205,22 @@ dl_tbl_variants <- function(id, chapter, tbl_fn, data, min_cell = 5) {
     return(invisible(NULL))
   }
 
-  disk_dir <- file.path("docs", "downloads", chapter)
+  disk_dir <- file.path(get_active_output_dir(), "downloads", chapter)
   dir.create(disk_dir, recursive = TRUE, showWarnings = FALSE)
 
-  obs_list <- intersect(c("Marovoay", "Alaotra"), unique(data$Observatory))
+  combos <- get_site_combos(data)
   links <- list()
 
-  for (obs in obs_list) {
-    variant <- prepare_variant_data(data, obs, "Tous")
+  for (i in seq_len(nrow(combos))) {
+    obs <- combos$Observatory[i]
+    site <- combos$Site[i]
+
+    variant <- prepare_variant_data(data, obs, site)
     if (nrow(variant) == 0) {
       next
     }
 
-    fname <- make_dl_filename(id, obs, "tous", "xlsx")
+    fname <- make_dl_filename(id, obs, site, "xlsx")
     disk_path <- file.path(disk_dir, fname)
     web_path <- file.path("downloads", chapter, fname)
 
@@ -208,7 +230,7 @@ dl_tbl_variants <- function(id, chapter, tbl_fn, data, min_cell = 5) {
         tbl_df <- suppress_for_export(tbl_df, threshold = min_cell)
         writexl::write_xlsx(tbl_df, disk_path)
         links[[length(links) + 1]] <- list(
-          label = obs,
+          label = site,
           obs = obs,
           href = web_path,
           ext = "xlsx"
@@ -234,27 +256,35 @@ emit_download_links <- function(links) {
     return(invisible(NULL))
   }
 
-  parts <- vapply(
-    links,
-    function(item) {
-      ext_lbl <- toupper(item$ext)
-      sprintf(
-        '<li><a href="%s" download>%s (%s)</a></li>',
-        item$href,
-        item$label,
-        ext_lbl
-      )
-    },
-    character(1)
-  )
+  obs_groups <- split(links, vapply(links, function(x) x$obs, character(1)))
 
+  html <- '<details class="dl-variants">\n'
   html <- paste0(
-    '<details class="dl-variants">\n',
-    '<summary>\U{1F4E5} T\u00e9l\u00e9charger par hameau et par observatoire</summary>\n',
-    '<ul style="list-style:none; padding-left:0; margin:0.25rem 0;">\n',
-    paste(parts, collapse = "\n"),
-    '\n</ul>\n',
-    '</details>\n'
+    html,
+    '<summary>\U{1F4E5} T\u00e9l\u00e9charger par hameau et par observatoire</summary>\n'
   )
+  html <- paste0(html, '<div class="dl-grid">\n')
+
+  for (obs in intersect(c("Marovoay", "Alaotra"), names(obs_groups))) {
+    items <- obs_groups[[obs]]
+    html <- paste0(html, '<div class="dl-group">\n')
+    html <- paste0(html, '<h4>', obs, '</h4>\n<ul>\n')
+    for (item in items) {
+      ext_lbl <- toupper(item$ext)
+      html <- paste0(
+        html,
+        '<li><a href="',
+        item$href,
+        '" download>',
+        item$label,
+        ' (',
+        ext_lbl,
+        ')</a></li>\n'
+      )
+    }
+    html <- paste0(html, '</ul>\n</div>\n')
+  }
+
+  html <- paste0(html, '</div>\n</details>\n')
   cat(html)
 }

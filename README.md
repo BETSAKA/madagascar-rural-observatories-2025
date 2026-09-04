@@ -29,7 +29,7 @@ The report covers: survey description, household demographics, housing and livin
 ├── 09_insertion_projet.qmd       # Ch 9: Project participation
 ├── 10_enquete_qualite.qmd        # Ch 10: Data quality
 ├── 11_representativite_ponderation.qmd  # Ch 11: Representativeness
-├── 12_bibliographie.qmd          # Ch 12: Bibliography
+├── 12_references.qmd       # Ch 12: Bibliography
 ├── render_all.R                  # Script to build all report variants
 ├── references.bib                # Bibliography
 ├── utils/                        # R helper functions
