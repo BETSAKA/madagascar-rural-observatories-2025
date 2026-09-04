@@ -217,6 +217,7 @@ for (f in files_to_copy) {
 cat("\n=== Checking expected outputs ===\n")
 expected <- c(
   "docs/index.html",
+  "docs/12_references.html",
   "docs/rapport-consolide.pdf",
   "docs/rapport-consolide.docx",
   "docs/downloads/rapport-marovoay.pdf",
@@ -264,7 +265,7 @@ for (e in render_errors) {
 }
 
 if (length(missing) == 0 && length(real_errors) == 0) {
-  cat("\nAll 7 outputs produced successfully:\n")
+  cat("\nAll 8 outputs produced successfully:\n")
   for (f in expected) {
     cat("  OK:", f, "\n")
   }

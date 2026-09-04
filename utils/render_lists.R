@@ -118,6 +118,7 @@ extract_crossrefs_from_qmd <- function(file) {
         caption <- gsub("\\s+", " ", caption)
         res[[length(res) + 1L]] <- data.frame(
           file = file,
+          href = paste0(sub("\\.qmd$", ".html", basename(file)), "#", label),
           label = label,
           kind = kind,
           caption = trimws(caption),
@@ -131,6 +132,7 @@ extract_crossrefs_from_qmd <- function(file) {
   if (length(res) == 0L) {
     data.frame(
       file = character(),
+      href = character(),
       label = character(),
       kind = character(),
       caption = character(),
@@ -185,7 +187,11 @@ render_book_lists_markdown <- function(config = "_quarto-consolidated.yml") {
       "-",
       seq_len(nrow(df)),
       "\"></span>",
+      "[",
       df$caption,
+      "](",
+      df$href,
+      ")",
       collapse = "\n"
     )
   }
